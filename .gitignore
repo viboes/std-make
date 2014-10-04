@@ -1,3 +1,6 @@
+#projects
+.project
+
 # Compiled Object files
 *.slo
 *.lo
@@ -23,6 +26,7 @@
 *.lib
 
 # Executables
+bin/*
 *.exe
 *.out
 *.app

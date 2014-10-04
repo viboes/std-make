@@ -1,0 +1,29 @@
+# Copyright Vicente J. Botet Escriba 2014.
+
+# Distributed under the Boost Software License, Version 1.0.
+# (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
+import testing ;
+  
+if ! $(BOOST_ROOT)
+{
+    BOOST_ROOT = [ modules.peek : BOOST_ROOT ] ;
+}
+
+project std-make
+    : requirements
+      <include>. # .cpp files in expected/test.
+      <include>../include/ # make .hpp files.    
+      <include>$(BOOST_ROOT) # boost .hpp files.    
+      <include>$(BOOST_EXPECTED)/include # expected .hpp files.    
+    ;
+
+test-suite general
+    : 
+      [ run make/make_pass.cpp  ]
+    ;
+
+explicit fix ;
+test-suite fix
+    : 
+    ;
