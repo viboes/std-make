@@ -18,5 +18,5 @@ Supported Compilers
 -------------------
 The code is known to work on the following compilers:
 
-* Clang 3.5
-* GCC 4.9.0
+* Clang 3.2, 3.5
+* GCC 4.8.2, 4.9.0
