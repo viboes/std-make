@@ -49,15 +49,15 @@ and the class itself
 make<shared_ptr<A>>(v, v);
 make<unique_ptr<A>>(v, v);
 make<optional<A>>(v, v);
-make<future<auto&>>(v);
 make<future<A>>(v, v);
 make<shared_future<A>>(v, v);
 make<expected<A>>(v, v);
 make<expected<_, E>>(v);
 ```
 
-A type holder ```_```can be used to mean any type
+A type holder ```_t```can be used to mean any type
 ```c++
-make<expected<_, E>>(v);
+make<future<_t&>>(v);
+make<expected<_t, E>>(v);
 ```
 
