@@ -17,10 +17,14 @@ namespace experimental
 inline namespace fundamental_v2
 {
   template <template <class ...> class M>
-  struct tc {};
+  struct type_constructor {
+    template <class T>
+    using rebind = M<T>;
+  };
 
   template <class T>
-  struct c {};
+  struct type {
+  };
 
   struct in_place_t {};
   constexpr in_place_t in_place = {};
@@ -28,27 +32,33 @@ inline namespace fundamental_v2
   struct _t {};
 
   template <template <class ...> class M, class X>
-  auto make(X&& x) -> decltype(make(tc<M>{}, std::forward<X>(x)))
+  auto make(X&& x) -> decltype( make(type<M<typename std::decay<X>::type>>{}, std::forward<X>(x)) )
   {
-    return make(tc<M>{}, std::forward<X>(x));
+    return make(type<M<typename std::decay<X>::type>>{}, std::forward<X>(x));
+  }
+
+  template <class M, class X>
+  auto make(X&& x) -> decltype(make(type<M>{}, std::forward<X>(x)))
+  {
+    return make(type<M>{}, std::forward<X>(x));
   }
 
   template <class M, class ...Args>
-  auto make(Args&& ...args) -> decltype(make(c<M>{}, std::forward<Args>(args)...))
+  auto make(in_place_t, Args&& ...args) -> decltype(make(type<M>{}, in_place, std::forward<Args>(args)...))
   {
-    return make(c<M>{}, std::forward<Args>(args)...);
+    return make(type<M>{}, in_place, std::forward<Args>(args)...);
   }
 
-  // default customization point
-  template <template <class ...> class M, class X>
-  M<typename std::decay<X>::type> make(tc<M>, X&& x)
+  // default customization point for constructor from X
+  template <class M, class X>
+  M make(type<M>, X&& x)
   {
-    return M<typename std::decay<X>::type>(in_place, std::forward<typename std::decay<X>::type>(x));
+    return M(std::forward<X>(x));
   }
 
-  // default customization point
+  // default customization point for in_place constructor
   template <class M, class ...Args>
-  M make(c<M>, Args&& ...args)
+  M make(type<M>, in_place_t, Args&& ...args)
   {
     return M(in_place, std::forward<Args>(args)...);
   }

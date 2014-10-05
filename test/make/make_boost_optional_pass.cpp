@@ -17,16 +17,16 @@
 
 namespace boost {
 
-// customization point for template (needed because boost::optional don't uses experimental::in_place_t)
-template <class X>
-constexpr optional<typename std::decay<X>::type> make(std::experimental::tc<boost::optional>, X&& x)
-{
-  return optional<typename std::decay<X>::type>(std::forward<X>(x));
-}
+// customization point for template (needed because boost::optional doesn't uses experimental::in_place_t)
+//template <class X>
+//constexpr optional<typename std::decay<X>::type> make(std::experimental::type_constructor<boost::optional>, X&& x)
+//{
+//  return optional<typename std::decay<X>::type>(std::forward<X>(x));
+//}
 
-// customization point for template (needed because boost::optional don't uses experimental::in_place_t)
+// customization point for template (needed because boost::optional doesn't has experimental::in_place_t constructor)
 template <class X, class ...Args>
-optional<X> make(std::experimental::c<optional<X>>, Args&& ...args)
+optional<X> make(std::experimental::type<optional<X>>, std::experimental::in_place_t, Args&& ...args)
 {
   optional<X> res;
   res.emplace(std::forward<Args>(args)...);
@@ -39,9 +39,9 @@ struct optional<std::experimental::_t> {};
 
 // customization point for holder
 template <class X>
-optional<typename std::decay<X>::type> make(std::experimental::c<optional<std::experimental::_t>>, X&& x)
+optional<typename std::decay<X>::type> make(std::experimental::type<optional<std::experimental::_t>>, X&& x)
 {
-  return optional<typename std::decay<X>::type>(std::forward<X>(x));
+  return std::experimental::make<optional>(std::forward<X>(x));
 }
 
 }
@@ -67,11 +67,11 @@ int main()
   }
   {
     int v=1;
-    boost::optional<A> x = std::experimental::make<boost::optional<A>>(v,v);
+    boost::optional<A> x = std::experimental::make<boost::optional<A>>(std::experimental::in_place, v,v);
     BOOST_TEST(x->v == 2);
   }
   {
-    boost::optional<int> x = std::experimental::make<boost::optional<int>>();
+    boost::optional<int> x = std::experimental::make<boost::optional<int>>(std::experimental::in_place);
     BOOST_TEST_EQ(*x,  0);
   }
 //  {

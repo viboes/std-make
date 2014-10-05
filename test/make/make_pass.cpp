@@ -19,6 +19,7 @@ template <class T>
 struct A
 {
   T v;
+  A(T v): v(std::move(v)) {}
   A(std::experimental::in_place_t): v(3) {}
   A(std::experimental::in_place_t, T v): v(std::move(v)) {}
   A(std::experimental::in_place_t, T v1, T v2): v(v1+v2) {}
@@ -27,7 +28,7 @@ template <class T>
 struct A<T&>
 {
   T* ptr;
-  A(std::experimental::in_place_t, T& v): ptr(&v) {}
+  A(T& v): ptr(&v) {}
 };
 template <>
 struct A<std::experimental::_t> {};
@@ -35,9 +36,11 @@ struct A<std::experimental::_t> {};
 
 // default customization point
 template <class X>
-A<typename std::decay<X>::type> make(std::experimental::c<A<std::experimental::_t>>, X&& x)
+A<typename std::decay<X>::type> make(std::experimental::type<A<std::experimental::_t>>, X&& x)
 {
-  return A<typename std::decay<X>::type>(std::experimental::in_place, std::forward<typename std::decay<X>::type>(x));
+  return std::experimental::make<A>(std::forward<X>(x));
+
+  //return A<typename std::decay<X>::type>(std::experimental::in_place, std::forward<typename std::decay<X>::type>(x));
 }
 
 
@@ -55,11 +58,11 @@ int main()
   }
   {
     int v=1;
-    A<int> x = std::experimental::make<A<int>>(v,v);
+    A<int> x = std::experimental::make<A<int>>(std::experimental::in_place, v,v);
     BOOST_TEST(x.v == 2);
   }
   {
-    A<int> x = std::experimental::make<A<int>>();
+    A<int> x = std::experimental::make<A<int>>(std::experimental::in_place);
     BOOST_TEST(x.v == 3);
   }
   {
