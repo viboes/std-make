@@ -1,9 +1,9 @@
 std-make
 ========
 
-C++ generic factories 
+C++ make generic factory 
 
-Experimental generic factories library for C++11/14/17. This code will eventualy form the basis of a formal proposal to add a generic factories to the C++ standard library.
+Experimental make generic factory library for C++11/14/17. This code will eventualy form the basis of a formal proposal to add a generic factories to the C++ standard library.
 
 ## Development Status
 
@@ -50,12 +50,12 @@ auto x6 = make<expected>(v);
 or use the class name to build to support in place construction
 
 ```c++
-auto x1 = emplace<shared_ptr<A>>(v, v);
-auto x2 = emplace<unique_ptr<A>>(v, v);
-auto x3 = emplace<optional<A>>();
-auto x4 = emplace<future<A>>(v);
-auto x5 = emplace<shared_future<A>>(v, v);
-auto x6 = emplace<expected<A>>(v, v);
+auto x1 = make<shared_ptr<A>>(v, v);
+auto x2 = make<unique_ptr<A>>(v, v);
+auto x3 = make<optional<A>>();
+auto x4 = make<future<A>>(v);
+auto x5 = make<shared_future<A>>(v, v);
+auto x6 = make<expected<A>>(v, v);
 ```
 
 We can also make use of the class name to avoid the type deduction
@@ -100,7 +100,7 @@ When the existing class doesn't provide the needed constructor, the user needs t
   template <class X, class ...Args>
   C<X> make(type<C<X>>, X&& x);
   template <class X, class ...Args>
-  C<X> emplace(type<C<X>>, Args&& ...args);
+  C<X> make(type<C<X>>, in_place_t, Args&& ...args);
 ```
 
 ## How to customize the uses of type holder `_t`?
@@ -111,16 +111,16 @@ When the existing class doesn't provide the needed constructor, the user needs t
 
 The first factoy `make` uses conversion constructor from the underlying type. 
 
-The second factory is used to be able to do emplace construction given the specific type.
+The second factory `make` is used to be able to do emplace construction given the specific type.
 
 ## Customization point
 
-This proposal takes advatage of overloading the `make`/`emplace` functions adding a the tags `type<T>`.
+This proposal takes advatage of overloading the `make` functions adding a the tags `type<T>` and `in_place_t`.
 
-We could rename the customization points `make`/`emplace` function to `custom_make`/`custom_emplace` for example, to make more evident that these are customization points.
+We could rename the customization points `make` function to `custom_make` for example, to make more evident that these are customization points.
 
 
-# Reference
+# Technical Specification
 
 ## Synopsis 
 
@@ -148,10 +148,10 @@ inline namespace fundamental_v2
     M make(type<M>, X&& x);
     
   template <class M, class ...Args>
-    auto emplace(Args&& ...args) -> decltype(make(type<M>{}, std::forward<Args>(args)...));
+    auto make(Args&& ...args) -> decltype(make(type<M>{}, in_place, std::forward<Args>(args)...));
 
   template <class M, class ...Args>
-    M emplace(type<M>, Args&& ...args);
+    M make(type<M>, in_place_t, Args&& ...args);
 
 }
 }
@@ -196,26 +196,33 @@ template <class M, class X>
 
 *Throws:* Any exception thows by the constructor.
 
-## Template function `emplace` 
+## Template function `make` `in_place_t` 
 
 ```c++
 template <class M, class ...Args>
-  auto emplace(Args&& ...args) -> decltype(emplace(type<M>{}, std::forward<Args>(args)...));
+  auto make(Args&& ...args) -> decltype(make(type<M>{}, in_place, std::forward<Args>(args)...));
 ```
 
-*Effects:* Forwards to the customization point `emplace` with a type conctructor `type<M>`. As if
+*Effects:* Forwards to the customization point `make` with a type conctructor `type<M>` and `in_place_t`. As if
 
 ```c++
-    return emplace(type<M>{}, std::forward<Args>(args)...);
+    return make(type<M>{}, in_place, std::forward<Args>(args)...);
 ```
 
-## Template function `emplace` - default customization
+## Template function `make` `in_place_t` - default customization
 
 ```c++
-emplate <class M, class ...Args>
-  M emplace(type<M>, Args&& ...args);
+make <class M, class ...Args>
+  M make(type<M>, in_place_t, Args&& ...args);
 ```
 
 *Returns:* A `M` constructed using the in place constructor `M(in_place, std::forward<Args>(args)...)`
 
 *Throws:* Any exception thows by the constructor.
+
+# Acknowledgements 
+
+Many thanks to Agustín K-ballo Bergé. 
+
+# References
+
