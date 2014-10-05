@@ -5,10 +5,12 @@
 
 // <experimental/make.hpp>
 
-//  template <template <class ...> M, class X>
+//  template <template <class ...> class M, class X>
+//  auto make(X&& x);
+//  template <class M, class X>
 //  auto make(X&& x);
 //  template <class M, class ...Args>
-//  auto make(Args&& ...args);
+//  auto emplace(Args&& ...args);
 
 
 #include <experimental/make.hpp>

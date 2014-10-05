@@ -4,16 +4,24 @@
 //
 // (C) Copyright 2014 Vicente J. Botet Escriba
 
-#ifndef VIBOES_STD_EXPERIMENTAL_STD_MAKE_MAKE_HPP
-#define VIBOES_STD_EXPERIMENTAL_STD_MAKE_MAKE_HPP
+#ifndef VIBOES_STD_EXPERIMENTAL_FUNDAMENTALS_V2_MAKE_HPP
+#define VIBOES_STD_EXPERIMENTAL_FUNDAMENTALS_V2_MAKE_HPP
 
 #include <utility>
 #include <type_traits>
+
+#if defined VIBOES_STD_EXPERIMENTAL_FACTORIES_USE_OPTIONAL
+#include <optional.hpp>
+#endif
 
 namespace std
 {
 namespace experimental
 {
+#if ! defined VIBOES_STD_EXPERIMENTAL_FACTORIES_USE_OPTIONAL
+  constexpr struct in_place_t{} in_place{};
+#endif
+
 inline namespace fundamental_v2
 {
   template <template <class ...> class M>
@@ -22,12 +30,8 @@ inline namespace fundamental_v2
     using rebind = M<T>;
   };
 
-  template <class T>
-  struct type {
-  };
-
-  struct in_place_t {};
-  constexpr in_place_t in_place = {};
+  template <class T=void>
+  struct type {};
 
   struct _t {};
 
@@ -67,4 +71,4 @@ inline namespace fundamental_v2
 }
 }
 
-#endif // VIBOES_STD_EXPERIMENTAL_STD_MAKE_MAKE_HPP
+#endif // VIBOES_STD_EXPERIMENTAL_FUNDAMENTALS_V2_MAKE_HPP

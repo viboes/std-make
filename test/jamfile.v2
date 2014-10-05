@@ -10,13 +10,20 @@ if ! $(BOOST_ROOT)
     BOOST_ROOT = [ modules.peek : BOOST_ROOT ] ;
 }
 
-project std-make
+if ! $(STD_OPTIONAL)
+{
+    STD_OPTIONAL = [ modules.peek : STD_OPTIONAL ] ;
+}
+
+project std_make
     : requirements
       <include>. # .cpp files in expected/test.
       <include>../include/ # make .hpp files.    
       <include>$(BOOST_ROOT) # boost .hpp files.    
-      <include>$(BOOST_EXPECTED)/include # expected .hpp files.    
+      <include>$(STD_OPTIONAL) # optional.hpp file.    
     ;
+
+      #<include>$(BOOST_EXPECTED)/include # expected .hpp files.    
 
 test-suite general
     : 
@@ -26,6 +33,11 @@ test-suite general
 test-suite boost_optional
     : 
       [ run make/make_boost_optional_pass.cpp  ]
+    ;
+
+test-suite std_optional
+    : 
+      [ run make/make_std_optional_pass.cpp  ]
     ;
 
 test-suite std_future
