@@ -1,9 +1,9 @@
 std-make
 ========
 
-C++ generic make factory 
+C++ generic factories 
 
-Experimental generic make factory library for C++11/14/17. This code will eventualy form the basis of a formal proposal to add a generic make factory to the C++ standard library.
+Experimental generic factories library for C++11/14/17. This code will eventualy form the basis of a formal proposal to add a generic factories to the C++ standard library.
 
 ## Development Status
 
@@ -12,7 +12,7 @@ This code is undocumented, untested, constantly changing, and generally not fit 
 
 # License
 
-Most of the source code in this project are mine, and those are under the Boost Software License.
+Most of the source code in this project are mine, and those are under the Boost Software License. I have borrowed the `hana::type` class.
 
 # Supported Compilers
 
@@ -50,12 +50,12 @@ auto x6 = make<expected>(v);
 or use the class name to build to support in place construction
 
 ```c++
-auto x1 = make<shared_ptr<A>>(v, v);
-auto x2 = make<unique_ptr<A>>(v, v);
-auto x3 = make<optional<A>>(v, v);
-auto x4 = make<future<A>>(v, v);
-auto x5 = make<shared_future<A>>(v, v);
-auto x6 = make<expected<A>>(v, v);
+auto x1 = emplace<shared_ptr<A>>(v, v);
+auto x2 = emplace<unique_ptr<A>>(v, v);
+auto x3 = emplace<optional<A>>();
+auto x4 = emplace<future<A>>(v);
+auto x5 = emplace<shared_future<A>>(v, v);
+auto x6 = emplace<expected<A>>(v, v);
 ```
 
 We can also make use of the class name to avoid the type deduction
@@ -79,7 +79,13 @@ auto x2 = make<expected<_t, E>>(v);
 
 ## How to define a class that wouldn't need customization? 
 
-The class needs at least to have a in_place constructor
+For the `make` function, the class needs at least to have constructor from the underlying type
+
+```c++
+C(X&&);
+```
+
+For the `emplace` function, the class needs at least to have a in_place constructor
 
 ```c++
 C(in_place_t, ...);
@@ -87,12 +93,14 @@ C(in_place_t, ...);
 
 ## How to customize an existing class
 
-When the existing class doesn't provide the in_place constructor, we need to add the overload
+When the existing class doesn't provide the needed constructor, the user needs to add the following overloads
 
 
 ```c++
   template <class X, class ...Args>
-  C<X> make(c<C<X>>, Args&& ...args);
+  C<X> make(type<C<X>>, X&& x);
+  template <class X, class ...Args>
+  C<X> emplace(type<C<X>>, Args&& ...args);
 ```
 
 ## How to customize the uses of type holder `_t`?
@@ -101,15 +109,15 @@ When the existing class doesn't provide the in_place constructor, we need to add
 
 ## Why to have two customization points?
 
-The first factoy make use of a template class parameter as type constructor. 
+The first factoy `make` uses conversion constructor from the underlying type. 
 
 The second factory is used to be able to do emplace construction given the specific type.
 
 ## Customization point
 
-This proposal takes advatage of overloading the `make` function adding a the tags `tc<T>`and `c<T>`.
+This proposal takes advatage of overloading the `make`/`emplace` functions adding a the tags `type<T>`.
 
-We could rename the customization `make` function to `custom_make` for example, to make more evident that this is a customization point.
+We could rename the customization points `make`/`emplace` function to `custom_make`/`custom_emplace` for example, to make more evident that these are customization points.
 
 
 # Reference
@@ -123,28 +131,27 @@ namespace experimental
 {
 inline namespace fundamental_v2
 {
-  // tag for template conctructor
-  template <template <class ...> class M>
-    struct tc {};
-
   // tag for type conctructor
   template <class T>
-    struct c {};
+    struct type {};
 
-  // type holde
+  // type holder
   struct _t {};
 
   template <template <class ...> class M, class X>
-    auto make(X&& x) -> decltype(make(tc<M>{}, std::forward<X>(x)));
+    auto make(X&& x) -> decltype( make(type<M<decay_t<X>>{}, std::forward<X>(x)) );
+
+  template <class M, class X>
+    auto make(X&& x) -> decltype( make(type<M>{}, std::forward<X>(x)) );
+    
+  template <class M, class X>
+    M make(type<M>, X&& x);
+    
+  template <class M, class ...Args>
+    auto emplace(Args&& ...args) -> decltype(make(type<M>{}, std::forward<Args>(args)...));
 
   template <class M, class ...Args>
-    auto make(Args&& ...args) -> decltype(make(c<M>{}, std::forward<Args>(args)...));
-
-  template <template <class ...> class M, class X>
-    M<decay_t<X>> make(tc<M>, X&& x);
-
-  template <class M, class ...Args>
-    M make(c<M>, Args&& ...args);
+    M emplace(type<M>, Args&& ...args);
 
 }
 }
@@ -152,52 +159,61 @@ inline namespace fundamental_v2
 
 ```
 
-## Template function make 
-
-### With template parameter
+## Template function `make` 
 
 ```c++
-template <template <class ...> class M, class X>
-  auto make(X&& x) -> decltype(make(tc<M>{}, std::forward<X>(x)));
+emplate <template <class ...> class M, class X>
+  auto make(X&& x) -> decltype( make(type<M<decay_t<X>>>{}, std::forward<X>(x)) );
 ```
 
-*Effects:* Forwards to the customization point `make` with a template conctructor `tc<M>`. As if
+*Effects:* Forwards to the customization point `make` with a template conctructor `type<M<decay_t<X>>>`. As if
 
 ```c++
-return make(tc<M>{}, std::forward<X>(x));
+    return make(type<M<decay_t<X>>>{}, std::forward<X>(x));
 ```
-
-### With type parameter
-
-```c++
-template <class M, class ...Args>
-auto make(Args&& ...args) -> decltype(make(c<M>{}, std::forward<Args>(args)...));
-```
-
-*Effects:* Forwards to the customization point `make` with a type conctructor `c<M>`. As if
-
-```c++
-return make(c<M>{}, std::forward<Args>(args)...);
-```
-
-### template type constructor default customization
 
 
 ```c++
-template <template <class ...> class M, class X>
-  M<decay_t<X>> make(tc<M>, X&& x);
+emplate <class M, class X>
+  auto make(X&& x) -> decltype( make(type<M>{}, std::forward<X>(x)) );
 ```
 
-*Returns:* A `M<decay_t<X>>` constructed using the in place constructor `M<decay_t<X>>(in_place, std::forward<X>(x))`
+*Effects:* Forwards to the customization point `make` with a template conctructor `type<M>`. As if
+
+```c++
+    return make(type<M>{}, std::forward<X>(x));
+```
+
+
+## Template function `make` - default customization point
+
+```c++
+template <class M, class X>
+  M make(type<M>, X&& x);
+```
+
+*Returns:* A `M` constructed using the constructor `M(std::forward<X>(x))`
 
 *Throws:* Any exception thows by the constructor.
 
-### type default customization
-
+## Template function `emplace` 
 
 ```c++
-  template <class M, class ...Args>
-  M make(c<M>, Args&& ...args);
+template <class M, class ...Args>
+  auto emplace(Args&& ...args) -> decltype(emplace(type<M>{}, std::forward<Args>(args)...));
+```
+
+*Effects:* Forwards to the customization point `emplace` with a type conctructor `type<M>`. As if
+
+```c++
+    return emplace(type<M>{}, std::forward<Args>(args)...);
+```
+
+## Template function `emplace` - default customization
+
+```c++
+emplate <class M, class ...Args>
+  M emplace(type<M>, Args&& ...args);
 ```
 
 *Returns:* A `M` constructed using the in place constructor `M(in_place, std::forward<Args>(args)...)`
