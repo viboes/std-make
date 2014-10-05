@@ -31,7 +31,11 @@ The goal is to be able to have a generic make factory that can be used in place 
 * ```make_optional```
 * ```make_ready_future```
 
-There are two kind of type constructors: The template class
+There are two kind of factories: 
+* type constructor with the underlying type as parameter
+* emplace construction of the underlying type given the constructor parameters
+
+We can use the template class name as a type constructor
 
 ```c++
 int v=0;
@@ -43,7 +47,7 @@ auto x5 = make<shared_future>(v);
 auto x6 = make<expected>(v);
 ```
 
-and the class itself to support emplace construction and avoid the type deduction
+or use the class name to build to support in place construction
 
 ```c++
 auto x1 = make<shared_ptr<A>>(v, v);
@@ -52,14 +56,61 @@ auto x3 = make<optional<A>>(v, v);
 auto x4 = make<future<A>>(v, v);
 auto x5 = make<shared_future<A>>(v, v);
 auto x6 = make<expected<A>>(v, v);
-auto x7 = make<future<int&>>(i);
 ```
 
-A type holder ```_t```can be used to mean any type
+We can also make use of the class name to avoid the type deduction
+
+```c++
+auto x1 = make<future<int&>>(v);
+```
+
+Sometimes the user wants that the underlying type be deduced from the parameter, but the type constructor need more information. A type  holder ```_t```can be used to mean any type
+
 ```c++
 auto x1 = make<future<_t&>>(v);
 auto x2 = make<expected<_t, E>>(v);
 ```
+
+# Tutorial
+
+## Type constructor factory
+
+## Emplace factory
+
+## How to define a class that wouldn't need customization? 
+
+The class needs at least to have a in_place constructor
+
+```c++
+C(in_place_t, ...);
+```
+
+## How to customize an existing class
+
+When the existing class doesn't provide the in_place constructor, we need to add the overload
+
+
+```c++
+  template <class X, class ...Args>
+  C<X> make(c<C<X>>, Args&& ...args);
+```
+
+## How to customize the uses of type holder `_t`?
+
+# Design rationale
+
+## Why to have two customization points?
+
+The first factoy make use of a template class parameter as type constructor. 
+
+The second factory is used to be able to do emplace construction given the specific type.
+
+## Customization point
+
+This proposal takes advatage of overloading the `make` function adding a the tags `tc<T>`and `c<T>`.
+
+We could rename the customization `make` function to `custom_make` for example, to make more evident that this is a customization point.
+
 
 # Reference
 
@@ -141,7 +192,7 @@ template <template <class ...> class M, class X>
 
 *Throws:* Any exception thows by the constructor.
 
-### template type constructor default customization
+### type default customization
 
 
 ```c++
