@@ -62,11 +62,11 @@ int main()
     std::experimental::optional<int> x = std::experimental::emplace<std::experimental::optional<int>>();
     BOOST_TEST_EQ(*x,  0);
   }
-//  {
-//    int v=0;
-//    std::experimental::optional<int&> x = std::experimental::make<std::experimental::optional<int&>>(v);
-//    BOOST_TEST(&v == x.get());
-//  }
+  {
+    int v=0;
+    std::experimental::optional<int&> x = std::experimental::make<std::experimental::optional<int&>>(v);
+    BOOST_TEST(&v == &x.value());
+  }
   {
     using namespace std::experimental;
     int v=0;
