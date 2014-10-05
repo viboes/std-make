@@ -7,6 +7,8 @@
 
 //  template <template <class ...> M, class X>
 //  auto make(X&& x);
+//  template <class M, class ...Args>
+//  auto make(Args&& ...args);
 
 
 #include <experimental/make.hpp>

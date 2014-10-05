@@ -23,6 +23,11 @@ test-suite general
       [ run make/make_pass.cpp  ]
     ;
 
+test-suite boost_optional
+    : 
+      [ run make/make_boost_optional_pass.cpp  ]
+    ;
+
 explicit fix ;
 test-suite fix
     : 
