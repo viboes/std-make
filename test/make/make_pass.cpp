@@ -58,11 +58,11 @@ int main()
   }
   {
     int v=1;
-    A<int> x = std::experimental::make<A<int>>(std::experimental::in_place, v,v);
+    A<int> x = std::experimental::emplace<A<int>>(v,v);
     BOOST_TEST(x.v == 2);
   }
   {
-    A<int> x = std::experimental::make<A<int>>(std::experimental::in_place);
+    A<int> x = std::experimental::emplace<A<int>>();
     BOOST_TEST(x.v == 3);
   }
   {

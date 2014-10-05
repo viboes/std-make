@@ -29,7 +29,7 @@ future<DX> make(std::experimental::type<std::future<DX>>, X&& x)
 
 // customization point for template (needed because std::future don't uses experimental::in_place_t)
 template <class X, class ...Args>
-future<X> make(std::experimental::type<future<X>>, std::experimental::in_place_t, Args&& ...args)
+future<X> emplace(std::experimental::type<future<X>>, Args&& ...args)
 {
   typedef X value_type;
   promise<value_type> p;
@@ -73,11 +73,11 @@ int main()
   }
   {
     int v=1;
-    std::future<A> x = std::experimental::make<std::future<A>>(std::experimental::in_place, v,v);
+    std::future<A> x = std::experimental::emplace<std::future<A>>(v,v);
     BOOST_TEST(x.get().v == 2);
   }
   {
-    std::future<int> x = std::experimental::make<std::future<int>>(std::experimental::in_place);
+    std::future<int> x = std::experimental::emplace<std::future<int>>();
     BOOST_TEST_EQ(x.get(),  0);
   }
   {

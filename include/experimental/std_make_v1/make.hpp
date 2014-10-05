@@ -44,9 +44,9 @@ inline namespace fundamental_v2
   }
 
   template <class M, class ...Args>
-  auto make(in_place_t, Args&& ...args) -> decltype(make(type<M>{}, in_place, std::forward<Args>(args)...))
+  auto emplace(Args&& ...args) -> decltype(emplace(type<M>{}, std::forward<Args>(args)...))
   {
-    return make(type<M>{}, in_place, std::forward<Args>(args)...);
+    return emplace(type<M>{}, std::forward<Args>(args)...);
   }
 
   // default customization point for constructor from X
@@ -58,7 +58,7 @@ inline namespace fundamental_v2
 
   // default customization point for in_place constructor
   template <class M, class ...Args>
-  M make(type<M>, in_place_t, Args&& ...args)
+  M emplace(type<M>, Args&& ...args)
   {
     return M(in_place, std::forward<Args>(args)...);
   }
