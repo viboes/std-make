@@ -10,7 +10,7 @@
 //  template <class M, class X>
 //  auto make(X&& x);
 //  template <class M, class ...Args>
-//  auto emplace(Args&& ...args);
+//  auto make(Args&& ...args);
 
 
 #include <experimental/make.hpp>
@@ -19,24 +19,58 @@
 
 namespace std {
 
+
+template <int = 0, int..., typename T>
+  future<typename std::decay<T>::type> make_ready_future(T&& x)
+{
+  typedef typename std::decay<T>::type value_type;
+  promise<value_type> p;
+  p.set_value(std::forward<T>(x));
+  return p.get_future();
+}
+
+// explicit overloads
+template <typename T>
+  future<T> make_ready_future(typename std::remove_reference<T>::type const& x)
+{
+  typedef T value_type;
+  promise<value_type> p;
+  p.set_value(x);
+  return p.get_future();
+}
+
+template <typename T>
+  future<T> make_ready_future(typename std::remove_reference<T>::type&& x)
+{
+  typedef T value_type;
+  promise<value_type> p;
+  p.set_value(std::forward<typename std::remove_reference<T>::type>(x));
+  return p.get_future();
+}
+
+// variadic overload
+template <typename T, typename ...Args>
+  future<T> make_ready_future(Args&&... args)
+{
+  typedef T value_type;
+  promise<value_type> p;
+  p.set_value(value_type(std::forward<Args>(args)...));
+  return p.get_future();
+
+}
+
 // customization point for template (needed because std::future don't uses experimental::in_place_t)
 template <class DX, class X>
 future<DX> make(std::experimental::type<std::future<DX>>, X&& x)
 {
-  typedef DX value_type;
-  promise<value_type> p;
-  p.set_value(std::forward<X>(x));
-  return p.get_future();
+  return make_ready_future<DX>(std::forward<X>(x));
 }
 
 // customization point for template (needed because std::future don't uses experimental::in_place_t)
 template <class X, class ...Args>
-future<X> emplace(std::experimental::type<future<X>>, Args&& ...args)
+future<X> make(std::experimental::type<future<X>>, std::experimental::in_place_t, Args&& ...args)
 {
-  typedef X value_type;
-  promise<value_type> p;
-  p.set_value(value_type(std::forward<Args>(args)...));
-  return p.get_future();
+  return make_ready_future<X>(std::forward<Args>(args)...);
 }
 
 // Holder specialization
@@ -65,7 +99,17 @@ int main()
 {
   {
     int v=0;
+    std::future<int> x = std::make_ready_future(v);
+    BOOST_TEST(x.get() == 0);
+  }
+  {
+    int v=0;
     std::future<int> x = std::experimental::make<std::future>(v);
+    BOOST_TEST(x.get() == 0);
+  }
+  {
+    int v=0;
+    std::future<int> x = std::make_ready_future<int>(v);
     BOOST_TEST(x.get() == 0);
   }
   {
@@ -75,12 +119,26 @@ int main()
   }
   {
     int v=1;
-    std::future<A> x = std::experimental::emplace<std::future<A>>(v,v);
+    std::future<A> x = std::make_ready_future<A>(v,v);
     BOOST_TEST(x.get().v == 2);
   }
   {
-    std::future<int> x = std::experimental::emplace<std::future<int>>();
+    int v=1;
+    std::future<A> x = std::experimental::make<std::future<A>>(v,v);
+    BOOST_TEST(x.get().v == 2);
+  }
+  {
+    std::future<int> x = std::make_ready_future<int>();
     BOOST_TEST_EQ(x.get(),  0);
+  }
+  {
+    std::future<int> x = std::experimental::make<std::future<int>>();
+    BOOST_TEST_EQ(x.get(),  0);
+  }
+  {
+    int v=0;
+    std::future<int&> x = std::make_ready_future<int&>(v);
+    BOOST_TEST(&x.get() == &v);
   }
   {
     int v=0;

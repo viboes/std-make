@@ -10,7 +10,7 @@
 //  template <class M, class X>
 //  auto make(X&& x);
 //  template <class M, class ...Args>
-//  auto emplace(Args&& ...args);
+//  auto make(Args&& ...args);
 
 
 #include <experimental/make.hpp>
@@ -60,11 +60,11 @@ int main()
   }
   {
     int v=1;
-    A<int> x = std::experimental::emplace<A<int>>(v,v);
+    A<int> x = std::experimental::make<A<int>>(v,v);
     BOOST_TEST(x.v == 2);
   }
   {
-    A<int> x = std::experimental::emplace<A<int>>();
+    A<int> x = std::experimental::make<A<int>>();
     BOOST_TEST(x.v == 3);
   }
   {

@@ -19,7 +19,7 @@ namespace boost {
 
 // customization point for template (needed because boost::expected doesn't has experimental::in_place_t constructor)
 template <class X, class ...Args>
-expected<X> emplace(std::experimental::type<expected<X>>, Args&& ...args)
+expected<X> make(std::experimental::type<expected<X>>, std::experimental::in_place_t, Args&& ...args)
 {
   expected<X> res;
   res.emplace(std::forward<Args>(args)...);
@@ -60,11 +60,11 @@ int main()
   }
   {
     int v=1;
-    boost::expected<A> x = std::experimental::emplace<boost::expected<A>>(v,v);
+    boost::expected<A> x = std::experimental::make<boost::expected<A>>(v,v);
     BOOST_TEST(x->v == 2);
   }
   {
-    boost::expected<int> x = std::experimental::emplace<boost::expected<int>>();
+    boost::expected<int> x = std::experimental::make<boost::expected<int>>();
     BOOST_TEST_EQ(*x,  0);
   }
 //  {

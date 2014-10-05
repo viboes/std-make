@@ -10,7 +10,7 @@
 //  template <class M, class X>
 //  auto make(X&& x);
 //  template <class M, class ...Args>
-//  auto emplace(Args&& ...args);
+//  auto make(Args&& ...args);
 
 
 #include <experimental/make.hpp>
@@ -31,7 +31,7 @@ shared_future<DX> make(std::experimental::type<std::shared_future<DX>>, X&& x)
 
 // customization point for template (needed because std::shared_future doesn't use experimental::in_place_t)
 template <class X, class ...Args>
-shared_future<X> emplace(std::experimental::type<shared_future<X>>, Args&& ...args)
+shared_future<X> make(std::experimental::type<shared_future<X>>, std::experimental::in_place_t, Args&& ...args)
 {
   typedef X value_type;
   promise<value_type> p;
@@ -75,11 +75,11 @@ int main()
   }
   {
     int v=1;
-    std::shared_future<A> x = std::experimental::emplace<std::shared_future<A>>(v,v);
+    std::shared_future<A> x = std::experimental::make<std::shared_future<A>>(v,v);
     BOOST_TEST(x.get().v == 2);
   }
   {
-    std::shared_future<int> x = std::experimental::emplace<std::shared_future<int>>();
+    std::shared_future<int> x = std::experimental::make<std::shared_future<int>>();
     BOOST_TEST_EQ(x.get(),  0);
   }
   {

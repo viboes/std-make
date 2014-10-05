@@ -10,7 +10,7 @@
 //  template <class M, class X>
 //  auto make(X&& x);
 //  template <class M, class ...Args>
-//  auto emplace(Args&& ...args);
+//  auto make(Args&& ...args);
 
 #define VIBOES_STD_EXPERIMENTAL_FACTORIES_USE_OPTIONAL
 #include <experimental/make.hpp>
@@ -55,11 +55,11 @@ int main()
   }
   {
     int v=1;
-    std::experimental::optional<A> x = std::experimental::emplace<std::experimental::optional<A>>(v,v);
+    std::experimental::optional<A> x = std::experimental::make<std::experimental::optional<A>>(v,v);
     BOOST_TEST(x->v == 2);
   }
   {
-    std::experimental::optional<int> x = std::experimental::emplace<std::experimental::optional<int>>();
+    std::experimental::optional<int> x = std::experimental::make<std::experimental::optional<int>>();
     BOOST_TEST_EQ(*x,  0);
   }
   {
