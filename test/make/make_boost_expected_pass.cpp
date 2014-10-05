@@ -18,23 +18,23 @@
 namespace boost {
 
 // customization point for template (needed because boost::expected doesn't has experimental::in_place_t constructor)
-template <class X, class ...Args>
-expected<X> make(std::experimental::type<expected<X>>, std::experimental::in_place_t, Args&& ...args)
+template <class X, class E, class ...Args>
+expected<X, E> make(std::experimental::type<expected<X, E>>, std::experimental::in_place_t, Args&& ...args)
 {
-  expected<X> res;
+  expected<X, E> res;
   res.emplace(std::forward<Args>(args)...);
   return std::move(res);
 }
 
 // Holder specialization
-template <>
-struct expected<std::experimental::_t> {};
+template <class E>
+struct expected<std::experimental::_t, E> {};
 
 // customization point for holder
-template <class X>
-expected<typename std::decay<X>::type> make(std::experimental::type<expected<std::experimental::_t>>, X&& x)
+template <class X, class E>
+expected<typename std::decay<X>::type, E> make(std::experimental::type<expected<std::experimental::_t, E>>, X&& x)
 {
-  return std::experimental::make<expected>(std::forward<X>(x));
+  return std::experimental::make<expected<typename std::decay<X>::type, E>>(std::forward<X>(x));
 }
 
 }
@@ -59,12 +59,26 @@ int main()
     BOOST_TEST(*x == 0);
   }
   {
+    int v=0;
+    auto x = std::experimental::make<boost::expected<int, std::string>>(v);
+    BOOST_TEST(*x == 0);
+  }
+  {
     int v=1;
     boost::expected<A> x = std::experimental::make<boost::expected<A>>(v,v);
     BOOST_TEST(x->v == 2);
   }
   {
+    int v=1;
+    auto x = std::experimental::make<boost::expected<A, std::string>>(v,v);
+    BOOST_TEST(x->v == 2);
+  }
+  {
     boost::expected<int> x = std::experimental::make<boost::expected<int>>();
+    BOOST_TEST_EQ(*x,  0);
+  }
+  {
+    auto x = std::experimental::make<boost::expected<int, std::string>>();
     BOOST_TEST_EQ(*x,  0);
   }
 //  {
@@ -75,7 +89,13 @@ int main()
   {
     using namespace std::experimental;
     int v=0;
-    boost::expected<int> x = make<boost::expected<_t>>(v);
+    auto x = make<boost::expected<_t>>(v);
+    BOOST_TEST(*x == 0);
+  }
+  {
+    using namespace std::experimental;
+    int v=0;
+    auto x = make<boost::expected<_t, std::string>>(v);
     BOOST_TEST(*x == 0);
   }
   return ::boost::report_errors();
