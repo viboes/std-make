@@ -41,7 +41,7 @@ inline namespace fundamental_v2
     return make(type<M<typename std::decay<X>::type>>{}, std::forward<X>(x));
   }
 
-  template <class M, class X>
+  template <class M, int = 0, int..., class X>
   auto make(X&& x) -> decltype(make(type<M>{}, std::forward<X>(x)))
   {
     return make(type<M>{}, std::forward<X>(x));
