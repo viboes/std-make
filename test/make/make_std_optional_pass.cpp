@@ -54,6 +54,11 @@ int main()
     BOOST_TEST(*x == 0);
   }
   {
+    short v=0;
+    std::experimental::optional<int> x = std::experimental::make<std::experimental::optional<int>>(v);
+    BOOST_TEST(*x == 0);
+  }
+  {
     int v=1;
     std::experimental::optional<A> x = std::experimental::make<std::experimental::optional<A>>(v,v);
     BOOST_TEST(x->v == 2);
