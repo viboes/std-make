@@ -28,6 +28,12 @@ test-suite boost_optional
       [ run make/make_boost_optional_pass.cpp  ]
     ;
 
+test-suite std_future
+    : 
+      [ run make/make_std_future_pass.cpp  ]
+      [ run make/make_std_shared_future_pass.cpp  ]
+    ;
+
 explicit fix ;
 test-suite fix
     : 
