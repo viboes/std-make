@@ -5,11 +5,12 @@
 
 // <experimental/make.hpp>
 
-//  template <template <class ...> M, class X>
+//  template <template <class ...> class M, class X>
+//  auto make(X&& x);
+//  template <class M, class X>
 //  auto make(X&& x);
 //  template <class M, class ...Args>
 //  auto make(Args&& ...args);
-
 
 #include <experimental/make.hpp>
 #include <boost/optional.hpp>
@@ -48,34 +49,34 @@ struct A
 
 int main()
 {
+  namespace stde = std::experimental;
   {
     int v=0;
-    boost::optional<int> x = std::experimental::make<boost::optional>(v);
+    boost::optional<int> x = stde::make<boost::optional>(v);
     BOOST_TEST(*x == 0);
   }
   {
     int v=0;
-    boost::optional<int> x = std::experimental::make<boost::optional<int>>(v);
+    boost::optional<int> x = stde::make<boost::optional<int>>(v);
     BOOST_TEST(*x == 0);
   }
   {
     int v=1;
-    boost::optional<A> x = std::experimental::make<boost::optional<A>>(v,v);
+    boost::optional<A> x = stde::make<boost::optional<A>>(v,v);
     BOOST_TEST(x->v == 2);
   }
   {
-    boost::optional<int> x = std::experimental::make<boost::optional<int>>();
+    boost::optional<int> x = stde::make<boost::optional<int>>();
     BOOST_TEST_EQ(*x,  0);
   }
 //  {
 //    int v=0;
-//    boost::optional<int&> x = std::experimental::make<boost::optional<int&>>(v);
+//    boost::optional<int&> x = stde::make<boost::optional<int&>>(v);
 //    BOOST_TEST(&v == x.get());
 //  }
   {
-    using namespace std::experimental;
     int v=0;
-    boost::optional<int> x = make<boost::optional<_t>>(v);
+    boost::optional<int> x = stde::make<boost::optional<stde::_t>>(v);
     BOOST_TEST(*x == 0);
   }
   return ::boost::report_errors();

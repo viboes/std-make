@@ -63,38 +63,37 @@ struct A
 
 int main()
 {
+  namespace stde = std::experimental;
   {
     int v=0;
-    std::shared_future<int> x = std::experimental::make<std::shared_future>(v);
+    std::shared_future<int> x = stde::make<std::shared_future>(v);
     BOOST_TEST(x.get() == 0);
   }
   {
     int v=0;
-    std::shared_future<int> x = std::experimental::make<std::shared_future<int>>(v);
+    std::shared_future<int> x = stde::make<std::shared_future<int>>(v);
     BOOST_TEST(x.get() == 0);
   }
   {
     int v=1;
-    std::shared_future<A> x = std::experimental::make<std::shared_future<A>>(v,v);
+    std::shared_future<A> x = stde::make<std::shared_future<A>>(v,v);
     BOOST_TEST(x.get().v == 2);
   }
   {
-    std::shared_future<int> x = std::experimental::make<std::shared_future<int>>();
+    std::shared_future<int> x = stde::make<std::shared_future<int>>();
     BOOST_TEST_EQ(x.get(),  0);
   }
   {
     int v=0;
-    std::shared_future<int&> x = std::experimental::make<std::shared_future<int&>>(v);
+    std::shared_future<int&> x = stde::make<std::shared_future<int&>>(v);
     BOOST_TEST(&x.get() == &v);
   }
   {
-    using namespace std::experimental;
     int v=0;
-    std::shared_future<int> x = make<std::shared_future<_t>>(v);
+    std::shared_future<int> x = stde::make<std::shared_future<stde::_t>>(v);
     BOOST_TEST(x.get() == 0);
   }
 //  {
-//    using namespace std::experimental;
 //    int v=0;
 //    auto x = make<std::shared_future<_t&>>(v);
 //    BOOST_TEST(&x.get() == &v);

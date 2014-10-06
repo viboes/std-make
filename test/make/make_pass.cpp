@@ -48,34 +48,34 @@ A<typename std::decay<X>::type> make(std::experimental::type<A<std::experimental
 
 int main()
 {
+  namespace stde = std::experimental;
   {
     int v=0;
-    A<int> x = std::experimental::make<A>(v);
+    A<int> x = stde::make<A>(v);
     BOOST_TEST(x.v == 0);
   }
   {
     int v=0;
-    A<int> x = std::experimental::make<A<int>>(v);
+    A<int> x = stde::make<A<int>>(v);
     BOOST_TEST(x.v == 0);
   }
   {
     int v=1;
-    A<int> x = std::experimental::make<A<int>>(v,v);
+    A<int> x = stde::make<A<int>>(v,v);
     BOOST_TEST(x.v == 2);
   }
   {
-    A<int> x = std::experimental::make<A<int>>();
+    A<int> x = stde::make<A<int>>();
     BOOST_TEST(x.v == 3);
   }
   {
     int v=0;
-    A<int&> x = std::experimental::make<A<int&>>(v);
+    A<int&> x = stde::make<A<int&>>(v);
     BOOST_TEST(&v == x.ptr);
   }
   {
-    using namespace std::experimental;
     int v=0;
-    A<int> x = make<A<_t>>(v);
+    A<int> x = stde::make<A<stde::_t>>(v);
     BOOST_TEST(x.v == 0);
   }
   return ::boost::report_errors();

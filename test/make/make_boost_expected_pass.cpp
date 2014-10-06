@@ -48,54 +48,53 @@ struct A
 
 int main()
 {
+  namespace stde = std::experimental;
   {
     int v=0;
-    boost::expected<int> x = std::experimental::make<boost::expected>(v);
+    boost::expected<int> x = stde::make<boost::expected>(v);
     BOOST_TEST(*x == 0);
   }
   {
     int v=0;
-    boost::expected<int> x = std::experimental::make<boost::expected<int>>(v);
+    boost::expected<int> x = stde::make<boost::expected<int>>(v);
     BOOST_TEST(*x == 0);
   }
   {
     int v=0;
-    auto x = std::experimental::make<boost::expected<int, std::string>>(v);
+    auto x = stde::make<boost::expected<int, std::string>>(v);
     BOOST_TEST(*x == 0);
   }
   {
     int v=1;
-    boost::expected<A> x = std::experimental::make<boost::expected<A>>(v,v);
+    boost::expected<A> x = stde::make<boost::expected<A>>(v,v);
     BOOST_TEST(x->v == 2);
   }
   {
     int v=1;
-    auto x = std::experimental::make<boost::expected<A, std::string>>(v,v);
+    auto x = stde::make<boost::expected<A, std::string>>(v,v);
     BOOST_TEST(x->v == 2);
   }
   {
-    boost::expected<int> x = std::experimental::make<boost::expected<int>>();
+    boost::expected<int> x = stde::make<boost::expected<int>>();
     BOOST_TEST_EQ(*x,  0);
   }
   {
-    auto x = std::experimental::make<boost::expected<int, std::string>>();
+    auto x = stde::make<boost::expected<int, std::string>>();
     BOOST_TEST_EQ(*x,  0);
   }
 //  {
 //    int v=0;
-//    boost::expected<int&> x = std::experimental::make<boost::expected<int&>>(v);
+//    boost::expected<int&> x = stde::make<boost::expected<int&>>(v);
 //    BOOST_TEST(&v == &x.value());
 //  }
   {
-    using namespace std::experimental;
     int v=0;
-    auto x = make<boost::expected<_t>>(v);
+    auto x = stde::make<boost::expected<stde::_t>>(v);
     BOOST_TEST(*x == 0);
   }
   {
-    using namespace std::experimental;
     int v=0;
-    auto x = make<boost::expected<_t, std::string>>(v);
+    auto x = stde::make<boost::expected<stde::_t, std::string>>(v);
     BOOST_TEST(*x == 0);
   }
   return ::boost::report_errors();

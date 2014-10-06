@@ -97,6 +97,7 @@ struct A
 
 int main()
 {
+  namespace stde = std::experimental;
   {
     int v=0;
     std::future<int> x = std::make_ready_future(v);
@@ -104,7 +105,7 @@ int main()
   }
   {
     int v=0;
-    std::future<int> x = std::experimental::make<std::future>(v);
+    std::future<int> x = stde::make<std::future>(v);
     BOOST_TEST(x.get() == 0);
   }
   {
@@ -114,7 +115,7 @@ int main()
   }
   {
     int v=0;
-    std::future<int> x = std::experimental::make<std::future<int>>(v);
+    std::future<int> x = stde::make<std::future<int>>(v);
     BOOST_TEST(x.get() == 0);
   }
   {
@@ -124,7 +125,7 @@ int main()
   }
   {
     int v=1;
-    std::future<A> x = std::experimental::make<std::future<A>>(v,v);
+    std::future<A> x = stde::make<std::future<A>>(v,v);
     BOOST_TEST(x.get().v == 2);
   }
   {
@@ -132,7 +133,7 @@ int main()
     BOOST_TEST_EQ(x.get(),  0);
   }
   {
-    std::future<int> x = std::experimental::make<std::future<int>>();
+    std::future<int> x = stde::make<std::future<int>>();
     BOOST_TEST_EQ(x.get(),  0);
   }
   {
@@ -142,19 +143,17 @@ int main()
   }
   {
     int v=0;
-    std::future<int&> x = std::experimental::make<std::future<int&>>(v);
+    std::future<int&> x = stde::make<std::future<int&>>(v);
     BOOST_TEST(&x.get() == &v);
   }
   {
-    using namespace std::experimental;
     int v=0;
-    std::future<int> x = make<std::future<_t>>(v);
+    std::future<int> x = stde::make<std::future<stde::_t>>(v);
     BOOST_TEST(x.get() == 0);
   }
 //  {
-//    using namespace std::experimental;
 //    int v=0;
-//    auto x = make<std::future<_t&>>(v);
+//    auto x = stde::make<std::future<stde::_t&>>(v);
 //    BOOST_TEST(&x.get() == &v);
 //  }
   return ::boost::report_errors();
