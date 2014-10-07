@@ -35,6 +35,12 @@ inline namespace fundamental_v2
 
   struct _t {};
 
+  template <template <class ...> class M>
+  auto make() -> decltype( make(type<M<void>>{}) )
+  {
+    return make(type<M<void>>{});
+  }
+
   template <template <class ...> class M, int = 0, int..., class X>
   auto make(X&& x) -> decltype( make(type<M<typename std::decay<X>::type>>{}, std::forward<X>(x)) )
   {
@@ -51,6 +57,13 @@ inline namespace fundamental_v2
   auto make(Args&& ...args) -> decltype(make(type<M>{}, in_place, std::forward<Args>(args)...))
   {
     return make(type<M>{}, in_place, std::forward<Args>(args)...);
+  }
+
+  // default customization point for constructor from X
+  template <class M>
+  M make(type<M>)
+  {
+    return M();
   }
 
   // default customization point for constructor from X

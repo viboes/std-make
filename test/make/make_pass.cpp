@@ -33,6 +33,11 @@ struct A<T&>
   A(T& v): ptr(&v) {}
 };
 template <>
+struct A<void>
+{
+  A() {}
+};
+template <>
 struct A<std::experimental::_t> {};
 
 

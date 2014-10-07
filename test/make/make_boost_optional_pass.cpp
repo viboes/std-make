@@ -27,6 +27,8 @@ optional<X> make(std::experimental::type<optional<X>>, std::experimental::in_pla
   return std::move(res);
 }
 
+template <>
+struct optional<void> {};
 // Holder specialization
 template <>
 struct optional<std::experimental::_t> {};

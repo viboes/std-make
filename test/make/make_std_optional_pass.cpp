@@ -24,6 +24,9 @@ namespace experimental {
 template <>
 struct optional<_t> {};
 
+template <>
+struct optional<void> {};
+
 // customization point for holder
 template <class X>
 optional<typename std::decay<X>::type> make(type<optional<_t>>, X&& x)

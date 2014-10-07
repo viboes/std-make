@@ -19,19 +19,25 @@
 
 namespace std {
 
+future<void> make_ready_future()
+{
+  promise<void> p;
+  p.set_value();
+  return p.get_future();
+}
 
 template <int = 0, int..., typename T>
-  future<typename std::decay<T>::type> make_ready_future(T&& x)
+  future<typename decay<T>::type> make_ready_future(T&& x)
 {
-  typedef typename std::decay<T>::type value_type;
+  typedef typename decay<T>::type value_type;
   promise<value_type> p;
-  p.set_value(std::forward<T>(x));
+  p.set_value(forward<T>(x));
   return p.get_future();
 }
 
 // explicit overloads
 template <typename T>
-  future<T> make_ready_future(typename std::remove_reference<T>::type const& x)
+  future<T> make_ready_future(typename remove_reference<T>::type const& x)
 {
   typedef T value_type;
   promise<value_type> p;
@@ -40,11 +46,11 @@ template <typename T>
 }
 
 template <typename T>
-  future<T> make_ready_future(typename std::remove_reference<T>::type&& x)
+  future<T> make_ready_future(typename remove_reference<T>::type&& x)
 {
   typedef T value_type;
   promise<value_type> p;
-  p.set_value(std::forward<typename std::remove_reference<T>::type>(x));
+  p.set_value(forward<typename remove_reference<T>::type>(x));
   return p.get_future();
 }
 
@@ -54,36 +60,42 @@ template <typename T, typename ...Args>
 {
   typedef T value_type;
   promise<value_type> p;
-  p.set_value(value_type(std::forward<Args>(args)...));
+  p.set_value(value_type(forward<Args>(args)...));
   return p.get_future();
 
 }
 
-// customization point for template (needed because std::future don't uses experimental::in_place_t)
-template <class DX, class X>
-future<DX> make(std::experimental::type<std::future<DX>>, X&& x)
+// customization point for template (needed because std::future doesn't has a default constructor)
+future<void> make(experimental::type<future<void>>)
 {
-  return make_ready_future<DX>(std::forward<X>(x));
+  return make_ready_future();
 }
 
-// customization point for template (needed because std::future don't uses experimental::in_place_t)
-template <class X, class ...Args>
-future<X> make(std::experimental::type<future<X>>, std::experimental::in_place_t, Args&& ...args)
+// customization point for template (needed because std::future doesn't has a conversion constructor)
+template <class DX, class X>
+future<DX> make(experimental::type<future<DX>>, X&& x)
 {
-  return make_ready_future<X>(std::forward<Args>(args)...);
+  return make_ready_future<DX>(forward<X>(x));
+}
+
+// customization point for template (needed because std::future doesn't uses experimental::in_place_t)
+template <class X, class ...Args>
+future<X> make(experimental::type<future<X>>, experimental::in_place_t, Args&& ...args)
+{
+  return make_ready_future<X>(forward<Args>(args)...);
 }
 
 // Holder specialization
 template <>
-struct future<std::experimental::_t> {};
+struct future<experimental::_t> {};
 template <>
-struct future<std::experimental::_t&> {};
+struct future<experimental::_t&> {};
 
 // customization point for holder
 template <class X>
-future<typename std::decay<X>::type> make(std::experimental::type<future<std::experimental::_t>>, X&& x)
+future<typename decay<X>::type> make(experimental::type<future<experimental::_t>>, X&& x)
 {
-  return std::experimental::make<future>(std::forward<X>(x));
+  return experimental::make<future>(forward<X>(x));
 }
 
 }
@@ -98,6 +110,14 @@ struct A
 int main()
 {
   namespace stde = std::experimental;
+  {
+    std::future<void> x = std::make_ready_future();
+    x.get();
+  }
+  {
+    std::future<void> x = stde::make<std::future>();
+    x.get();
+  }
   {
     int v=0;
     std::future<int> x = std::make_ready_future(v);
