@@ -316,6 +316,88 @@ make <class M, class ...Args>
 
 *Throws:* Any exception thows by the constructor.
 
+# Example of customizations
+
+## `optional`
+
+```c++
+namespace std {
+namespace experimental {
+
+  // Holder specialization
+  template <>
+  struct optional<_t>;
+
+}
+}
+```
+
+## `expected`
+
+```c++
+namespace std {
+namespace experimental {
+
+  // Holder specialization
+  template <class E>
+  struct expected<_t, E>;
+
+}
+}
+```
+
+## `future`/`shared_future`
+
+```c++
+namespace std {
+namespace experimental {
+
+  // customization point for template 
+  // (needed because std::experimental::future doesn't has a default constructor)
+  future<void> make(type<future<void>>);
+
+  // customization point for template
+  // (needed because std::experimental::future doesn't has a conversion constructor)
+  template <class DX, class X>
+    future<DX> make(type<future<DX>>, X&& x);
+
+  // customization point for template 
+  // (needed because std::experimental::future doesn't uses experimental::in_place_t)
+  template <class X, class ...Args>
+    future<X> make(type<future<X>>, experimental::in_place_t, Args&& ...args);
+
+  // Holder specializations
+  template <>
+    struct future<_t>;
+  template <>
+    struct future<_t&>;
+
+  // customization point for template 
+  // (needed because std::experimental::shared_future doesn't has a default constructor)
+  shared_future<void> make(type<shared_future<void>>);
+
+  // customization point for template 
+  // (needed because std::experimental::shared_future<X> doesn't has a constructor from X)
+  template <class DX, class X>
+    shared_future<DX> make(type<shared_future<DX>>, X&& x);
+  
+  // customization point for template 
+  // (needed because std::experimental::shared_future doesn't use experimental::in_place_t)
+  template <class X, class ...Args>
+    shared_future<X> make(type<shared_future<X>>, experimental::in_place_t, Args&& ...args);
+    
+  // Holder specializations
+  template <>
+    struct shared_future<_t>;
+  template <>
+    struct shared_future<_t&>;
+
+}
+}
+```
+
+## `unique_ptr`/`shared_ptr`
+
 # Acknowledgements 
 
 Many thanks to Agustín K-ballo Bergé. 
