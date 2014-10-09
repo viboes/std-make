@@ -269,14 +269,15 @@ template <template <class ...> class M, class X>
     return make(type<M<decay_t<X>>>{}, std::forward<X>(x));
 ```
 
+
 ### type constructor + deduced underlying type
 
 ```c++
   template <class TC, class X>
-    apply<TC, typename std::decay<X>::type> make(X&& x);
+    apply<TC, std::decay<X>> make(X&& x);
 ```
 
-*Requires:* `TC`is a type constructor
+*Requires:* `TC`is a type constructor.
 
 *Effects:* Forwards to the customization point `make` with a template conctructor `type<M<void>>`. As if
 
@@ -292,7 +293,7 @@ template <class M, class X>
   auto make(X&& x) -> decltype( make(type<M>{}, std::forward<X>(x)) );
 ```
 
-*Requires:* `M`is not a type constructor
+*Requires:* `M`is not a type constructor and the underlying type of `M`is convertible from `X`.
 
 *Effects:* Forwards to the customization point `make` with a template conctructor `type<M>`. As if
 
@@ -300,7 +301,7 @@ template <class M, class X>
     return make(type<M>{}, std::forward<X>(x));
 ```
 
-### type + emplace aargs 
+### type + emplace args 
 
 ```c++
 template <class M, class ...Args>
