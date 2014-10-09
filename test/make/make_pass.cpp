@@ -37,19 +37,10 @@ struct A<void>
 {
   A() {}
 };
+
+// Holder specialization
 template <>
-struct A<std::experimental::_t> {};
-
-
-// default customization point
-template <class X>
-A<typename std::decay<X>::type> make(std::experimental::type<A<std::experimental::_t>>, X&& x)
-{
-  return std::experimental::make<A>(std::forward<X>(x));
-
-  //return A<typename std::decay<X>::type>(std::experimental::in_place, std::forward<typename std::decay<X>::type>(x));
-}
-
+struct A<std::experimental::_t> : std::experimental::lift<A> {};
 
 int main()
 {
@@ -77,6 +68,11 @@ int main()
     int v=0;
     A<int&> x = stde::make<A<int&>>(v);
     BOOST_TEST(&v == x.ptr);
+  }
+  {
+    int v=0;
+    A<int> x = stde::make< stde::lift<A> >(v);
+    BOOST_TEST(x.v == 0);
   }
   {
     int v=0;

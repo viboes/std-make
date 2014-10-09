@@ -28,16 +28,10 @@ expected<X, E> make(std::experimental::type<expected<X, E>>, std::experimental::
 
 // Holder specialization
 template <class E>
-struct expected<std::experimental::_t, E> {};
-
-// customization point for holder
-template <class X, class E>
-expected<typename std::decay<X>::type, E> make(std::experimental::type<expected<std::experimental::_t, E>>, X&& x)
-{
-  return std::experimental::make<expected<typename std::decay<X>::type, E>>(std::forward<X>(x));
-}
+struct expected<std::experimental::_t, E>: std::experimental::reverse_lift<expected, E> {};
 
 }
+
 struct A
 {
   int v;

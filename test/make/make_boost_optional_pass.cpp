@@ -29,18 +29,13 @@ optional<X> make(std::experimental::type<optional<X>>, std::experimental::in_pla
 
 template <>
 struct optional<void> {};
+
 // Holder specialization
 template <>
-struct optional<std::experimental::_t> {};
-
-// customization point for holder
-template <class X>
-optional<typename std::decay<X>::type> make(std::experimental::type<optional<std::experimental::_t>>, X&& x)
-{
-  return std::experimental::make<optional>(std::forward<X>(x));
-}
+struct optional<std::experimental::_t> : std::experimental::lift<optional> {};
 
 }
+
 struct A
 {
   int v;

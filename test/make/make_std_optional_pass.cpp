@@ -22,20 +22,15 @@ namespace experimental {
 
 // Holder specialization
 template <>
-struct optional<_t> {};
+struct optional<_t>  : lift<optional> {};
 
 template <>
 struct optional<void> {};
 
-// customization point for holder
-template <class X>
-optional<typename std::decay<X>::type> make(type<optional<_t>>, X&& x)
-{
-  return make<optional>(std::forward<X>(x));
+}
 }
 
-}
-}
+
 struct A
 {
   int v;

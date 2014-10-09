@@ -41,18 +41,18 @@ shared_future<X> make(experimental::type<shared_future<X>>, experimental::in_pla
 
 // Holder specialization
 template <>
-struct shared_future<experimental::_t> {};
+struct shared_future<experimental::_t> : experimental::lift<shared_future> {};
+
 template <>
-struct shared_future<experimental::_t&> {};
-
-// customization point for holder
-template <class X>
-shared_future<typename decay<X>::type> make(experimental::type<shared_future<experimental::_t>>, X&& x)
+struct shared_future<experimental::_t&> : experimental::type_constructor_t
 {
-  return experimental::make<shared_future>(forward<X>(x));
-}
+  template<class T>
+  using type = shared_future<T&>;
+};
 
 }
+
+
 struct A
 {
   int v;
@@ -93,10 +93,10 @@ int main()
     std::shared_future<int> x = stde::make<std::shared_future<stde::_t>>(v);
     BOOST_TEST(x.get() == 0);
   }
-//  {
-//    int v=0;
-//    auto x = make<std::shared_future<_t&>>(v);
-//    BOOST_TEST(&x.get() == &v);
-//  }
+  {
+    int v=0;
+    auto x = stde::make<std::shared_future<stde::_t&>>(v);
+    BOOST_TEST(&x.get() == &v);
+  }
   return ::boost::report_errors();
 }

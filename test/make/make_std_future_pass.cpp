@@ -87,18 +87,17 @@ future<X> make(experimental::type<future<X>>, experimental::in_place_t, Args&& .
 
 // Holder specialization
 template <>
-struct future<experimental::_t> {};
+struct future<experimental::_t> : experimental::lift<future> {};
+
 template <>
-struct future<experimental::_t&> {};
-
-// customization point for holder
-template <class X>
-future<typename decay<X>::type> make(experimental::type<future<experimental::_t>>, X&& x)
+struct future<experimental::_t&>  : experimental::type_constructor_t
 {
-  return experimental::make<future>(forward<X>(x));
-}
+  template<class T>
+  using type = future<T&>;
+};
 
 }
+
 struct A
 {
   int v;
@@ -171,10 +170,10 @@ int main()
     std::future<int> x = stde::make<std::future<stde::_t>>(v);
     BOOST_TEST(x.get() == 0);
   }
-//  {
-//    int v=0;
-//    auto x = stde::make<std::future<stde::_t&>>(v);
-//    BOOST_TEST(&x.get() == &v);
-//  }
+  {
+    int v=0;
+    auto x = stde::make<std::future<stde::_t&>>(v);
+    BOOST_TEST(&x.get() == &v);
+  }
   return ::boost::report_errors();
 }
