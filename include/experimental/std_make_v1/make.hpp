@@ -25,13 +25,17 @@ namespace experimental
 inline namespace fundamental_v2
 {
 
+  // type wrapper
   template <class T=void>
   struct type {};
 
+  // holder type
   struct _t {};
 
+  // type constructor tag type
   struct type_constructor_t {};
 
+  // lift a template class to a type_constructor
   template <template <class ...> class TC, class... Args>
   struct lift : type_constructor_t
   {
@@ -39,6 +43,7 @@ inline namespace fundamental_v2
     using type = TC<Args..., Args2...>;
   };
 
+  // reverse lift a template class to a type_constructor
   template <template <class ...> class TC, class... Args>
   struct reverse_lift : type_constructor_t
   {
@@ -46,34 +51,41 @@ inline namespace fundamental_v2
     using type = TC<Args2..., Args...>;
   };
 
+  // apply a type constuctor TC to the type parameters Args
   template<class TC, class... Args>
   using apply = typename TC::template type<Args...>;
 
+  // identity meta-function
   template<class T>
   struct identity
   {
     typedef T type;
   };
 
-
-  template <class M > // customization point
+  // type constructor customization point. Default implementation make use of nested type type_constructor
+  template <class M >
   struct type_constructor_impl : identity<typename  M::type_constructor> {};
 
+  // type constructor meta-function
   template <class M >
   using type_constructor = typename type_constructor_impl<M>::type;
 
+  // rebinds a type havind a underlying type with another underlying type
   template <class M, class U>
   using rebind = apply<type_constructor<M>, U>;
 
+  // type trait based on inheritance from type_constructor_t
   template <class TC >
   struct is_type_constructor : is_base_of<type_constructor_t, TC> {};
 
+  // make() overload
   template <template <class ...> class M>
-  auto make() -> decltype( make(type<M<void>>{}) )
+  M<void> make()
   {
     return make(type<M<void>>{});
   }
 
+  // make overload: requires a template class, deduce the underlying type
   template <template <class ...> class M, int = 0, int..., class X>
   M<typename std::decay<X>::type>
   make(X&& x)
@@ -81,6 +93,7 @@ inline namespace fundamental_v2
     return make(type<M<typename std::decay<X>::type>>{}, std::forward<X>(x));
   }
 
+  // make overload: requires a type construcor, deduce the underlying type
   template <class TC, int = 0, int..., class X>
   typename enable_if<is_type_constructor<TC>::value,
     apply<TC, typename std::decay<X>::type>
@@ -90,6 +103,7 @@ inline namespace fundamental_v2
     return make(type<apply<TC, typename std::decay<X>::type>>{}, std::forward<X>(x));
   }
 
+  // make overload: requires a type with a specific underlying type, don't deduce the underlying type from X
   template <class M, int = 0, int..., class X>
   typename enable_if<! is_type_constructor<M>::value,
     M
@@ -99,9 +113,9 @@ inline namespace fundamental_v2
     return make(type<M>{}, std::forward<X>(x));
   }
 
+  // make emplace overload: requires a type with a specific underlying type, don't deduce the underlying type from X
   template <class M, class ...Args>
-  M
-  make(Args&& ...args)
+  M make(Args&& ...args)
   {
     return make(type<M>{}, in_place, std::forward<Args>(args)...);
   }
