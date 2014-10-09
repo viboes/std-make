@@ -84,17 +84,44 @@ auto x2 = make<expected<_t, E>>(v);
 
 ## Type constructor factory
 
+
+```c++
+template <class TC>
+  apply<TC, int> safe_divide(int i, int j)
+{
+  if (j == 0)
+    return make_error<TC>(DivideByZero());
+  else
+    return make<TC>(i / j);
+}
+```
+
+We can use this function with different type constructor as
+
+```c++
+auto x = safe_divide<optional<_t>>(1, 0);
+```
+
+or
+
+```c++
+auto x = safe_divide<expected<_t>>(1, 0);
+```
+
+  
 ## Emplace factory
+
+
 
 ## How to define a class that wouldn't need customization? 
 
-For the `make` default constructor function, the class needs at least to have constructor from the underlying type
+For the `make` default constructor function, the class needs at least to have a constructor from the underlying type
 
 ```c++
 C();
 ```
 
-For the `make` copy/move constructor function, the class needs at least to have constructor from the underlying type
+For the `make` copy/move constructor function, the class needs at least to have a constructor from the underlying type.
 
 ```c++
 C(X&&);
