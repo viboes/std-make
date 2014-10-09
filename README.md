@@ -138,21 +138,73 @@ inline namespace fundamental_v2
   // type holder
   struct _t {};
 
-  template <template <class ...> class M, class X>
-    auto make(X&& x) -> decltype( make(type<M<decay_t<X>>{}, std::forward<X>(x)) );
+  // type constructor tag type
+  struct type_constructor_t {};
 
-  template <class M, class X>
-    auto make(X&& x) -> decltype( make(type<M>{}, std::forward<X>(x)) );
+  // lift a template class to a type_constructor
+  template <template <class ...> class TC, class... Args>
+  struct lift;
+
+  // reverse lift a template class to a type_constructor
+  template <template <class ...> class TC, class... Args>
+  struct reverse_lift;
+
+  // apply a type constuctor TC to the type parameters Args
+  template<class TC, class... Args>
+  using apply;
+
+  // identity meta-function
+  template<class T>
+  struct identity;
+
+  // type constructor customization point. Default implementation make use of nested type type_constructor
+  template <class M >
+  struct type_constructor_impl;
+
+  // type constructor meta-function
+  template <class M >
+  using type_constructor = typename type_constructor_impl<M>::type;
+
+  // rebinds a type havind a underlying type with another underlying type
+  template <class M, class U>
+  using rebind = apply<type_constructor<M>, U>;
+
+  // type trait based on inheritance from type_constructor_t
+  template <class TC >
+  struct is_type_constructor;
+
+  // make() overload
+  template <template <class ...> class M>
+  M<void> make();
+  
+  // make overload: requires a template class, deduce the underlying type
+  template <template <class ...> class M, class X>
+    M<typename std::decay<X>::type> make(X&& x);
+
+    // make overload: requires a type construcor, deduce the underlying type
+  template <class TC, class X>
+    apply<TC, typename std::decay<X>::type> make(X&& x);
     
+  // make overload: requires a type with a specific underlying type, don't deduce the underlying type from X
   template <class M, class X>
     M make(type<M>, X&& x);
     
+  // make emplace overload: requires a type with a specific underlying type, don't deduce the underlying type from X
   template <class M, class ...Args>
     auto make(Args&& ...args) -> decltype(make(type<M>{}, in_place, std::forward<Args>(args)...));
 
-  template <class M, class ...Args>
-    M make(type<M>, in_place_t, Args&& ...args);
+  // default customization point for TC<void> default constructor
+  template <class M>
+  M make(type<M>);
 
+  // default customization point for constructor from X
+  template <class M, class X>
+  M make(type<M>, X&& x);
+
+  // default customization point for in_place constructor
+  template <class M, class ...Args>
+  M make(type<M>, in_place_t, Args&& ...args);
+  
 }
 }
 }
@@ -161,8 +213,23 @@ inline namespace fundamental_v2
 
 ## Template function `make` 
 
+### template + void
+
 ```c++
-emplate <template <class ...> class M, class X>
+  template <template <class ...> class M>
+  M<void> make();
+```
+
+*Effects:* Forwards to the customization point `make` with a template conctructor `type<M<void>>`. As if
+
+```c++
+    return make(type<M<void>>{});
+```
+
+### template + deduced underlying type
+
+```c++
+template <template <class ...> class M, class X>
   auto make(X&& x) -> decltype( make(type<M<decay_t<X>>>{}, std::forward<X>(x)) );
 ```
 
@@ -172,11 +239,30 @@ emplate <template <class ...> class M, class X>
     return make(type<M<decay_t<X>>>{}, std::forward<X>(x));
 ```
 
+### type constructor + deduced underlying type
 
 ```c++
-emplate <class M, class X>
+  template <class TC, class X>
+    apply<TC, typename std::decay<X>::type> make(X&& x);
+```
+
+*Requires:* `TC`is a type constructor
+
+*Effects:* Forwards to the customization point `make` with a template conctructor `type<M<void>>`. As if
+
+```c++
+    return make(type<apply<TC, decay_t<X>>>{}, std::forward<X>(x));
+```
+
+### type + non deduced underlying type
+
+
+```c++
+template <class M, class X>
   auto make(X&& x) -> decltype( make(type<M>{}, std::forward<X>(x)) );
 ```
+
+*Requires:* `M`is not a type constructor
 
 *Effects:* Forwards to the customization point `make` with a template conctructor `type<M>`. As if
 
@@ -184,19 +270,7 @@ emplate <class M, class X>
     return make(type<M>{}, std::forward<X>(x));
 ```
 
-
-## Template function `make` - default customization point
-
-```c++
-template <class M, class X>
-  M make(type<M>, X&& x);
-```
-
-*Returns:* A `M` constructed using the constructor `M(std::forward<X>(x))`
-
-*Throws:* Any exception thows by the constructor.
-
-## Template function `make` `in_place_t` 
+### type + emplace aargs 
 
 ```c++
 template <class M, class ...Args>
@@ -209,7 +283,29 @@ template <class M, class ...Args>
     return make(type<M>{}, in_place, std::forward<Args>(args)...);
 ```
 
-## Template function `make` `in_place_t` - default customization
+### Template function `make` - default constructor customization point for void
+
+```c++
+  template <class M>
+  M make(type<M>)
+```
+
+*Returns:* A `M` constructed using the constructor `M()`
+
+*Throws:* Any exception thows by the constructor.
+
+### copy constructor customization point
+
+```c++
+template <class M, class X>
+  M make(type<M>, X&& x);
+```
+
+*Returns:* A `M` constructed using the constructor `M(std::forward<X>(x))`
+
+*Throws:* Any exception thows by the constructor.
+
+### `in_place_t` - emplace customization point
 
 ```c++
 make <class M, class ...Args>
