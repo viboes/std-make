@@ -1,35 +1,43 @@
-std-make
-========
+<table border="0" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="607">
+    <tr>
+        <td width="172" align="left" valign="top">Document number:</td>
+        <td width="435"><span style="background-color: #FFFF00">DXXXX</span>=yy-nnnn</td>
+    </tr>
+    <tr>
+        <td width="172" align="left" valign="top">Date:</td>
+        <td width="435">2014-10-09</td>
+    </tr>
+    <tr>
+        <td width="172" align="left" valign="top">Project:</td>
+        <td width="435">Programming Language C++, Library Evolution Working Group</td>
+    </tr>
+    <tr>
+        <td width="172" align="left" valign="top">Reply-to:</td>
+        <td width="435">Vicente J. Botet Escriba &lt;<a href="mailto:vicente.botet@wanadoo.fr">vicente.botet@wanadoo.fr</a>&gt;</td>
+    </tr>
+</table>
 
-C++ make generic factory 
+C++ generic factory 
+===================
 
-Experimental make generic factory library for C++11/14/17. This code will eventualy form the basis of a formal proposal to add a generic factories to the C++ standard library.
+Experimental generic factory library for C++11/14/17. This code will eventualy form the basis of a formal proposal to add a generic factories to the C++ standard library.
 
-## Development Status
+# Introduction
 
-This code is undocumented, untested, constantly changing, and generally not fit for any use whatsoever.
+This paper present a proposal for a generic factory `make`.
 
 
-# License
+# Motivation and Scope
 
-Most of the source code in this project are mine, and those are under the Boost Software License. I have borrowed the `hana::type` class.
 
-# Supported Compilers
-
-The code is known to work on the following compilers:
-
-* Clang 3.2 -std=c++11 
-* Clang 3.5 -std=c++11 -std=c++1y
-* GCC 4.7.2, 4.8.0, 4.8.1, 4.8.2 -std=c++11
-* GCC 4.9.0 -std=c++11 -std=c++1y
-
-# Motivation
-
-The goal is to be able to have a generic make factory that can be used in place of 
+The goal is to be able to have a generic `make` factory that can be used in place of 
 * ```make_shared``` 
 * ```make_unique```
 * ```make_optional```
 * ```make_ready_future```
+
+All these types, `shared_ptr<T>`, `unique_ptr<T,D>`, `optional<T>` and `future<T>`, 
+have in common that all of them have an underlying type `T'.
 
 There are two kind of factories: 
 * type constructor with the underlying type as parameter
@@ -62,6 +70,7 @@ We can also make use of the class name to avoid the type deduction
 
 ```c++
 auto x1 = make<future<int&>>(v);
+auto x2 = make<expected<_t, E>>(v);
 ```
 
 Sometimes the user wants that the underlying type be deduced from the parameter, but the type constructor need more information. A type  holder ```_t```can be used to mean any type
@@ -79,13 +88,19 @@ auto x2 = make<expected<_t, E>>(v);
 
 ## How to define a class that wouldn't need customization? 
 
-For the `make` function, the class needs at least to have constructor from the underlying type
+For the `make` default constructor function, the class needs at least to have constructor from the underlying type
+
+```c++
+C();
+```
+
+For the `make` copy/move constructor function, the class needs at least to have constructor from the underlying type
 
 ```c++
 C(X&&);
 ```
 
-For the `emplace` function, the class needs at least to have a in_place constructor
+For the `make` emplace constructor, the class needs at least to have an em_place constructor
 
 ```c++
 C(in_place_t, ...);
@@ -97,6 +112,7 @@ When the existing class doesn't provide the needed constructor, the user needs t
 
 
 ```c++
+  C<void> make(type<C<void>>);
   template <class X, class ...Args>
   C<X> make(type<C<X>>, X&& x);
   template <class X, class ...Args>
@@ -105,13 +121,27 @@ When the existing class doesn't provide the needed constructor, the user needs t
 
 ## How to customize the uses of type holder `_t`?
 
+
+```c++
+namespace std
+{
+namespace experimental
+{
+  template <>
+    struct C<_t> : lift<C> ;
+}
+}
+```
+
 # Design rationale
 
-## Why to have two customization points?
+## Why to have customization points?
 
-The first factoy `make` uses conversion constructor from the underlying type. 
+The first factoy `make` uses defaut constructor to build a `C<void>`. 
 
-The second factory `make` is used to be able to do emplace construction given the specific type.
+The second factoy `make` uses conversion constructor from the underlying type. 
+
+The thrid factory `make` is used to be able to do emplace construction given the specific type.
 
 ## Customization point
 
@@ -397,6 +427,24 @@ namespace experimental {
 ```
 
 ## `unique_ptr`/`shared_ptr`
+
+## Development Status
+
+This code is undocumented, untested, constantly changing, and generally not fit for any use whatsoever.
+
+
+# License
+
+Most of the source code in this project are mine, and those are under the Boost Software License. I have borrowed the `hana::type` class.
+
+# Supported Compilers
+
+The code is known to work on the following compilers:
+
+* Clang 3.2 -std=c++11 
+* Clang 3.5 -std=c++11 -std=c++1y
+* GCC 4.7.2, 4.8.0, 4.8.1, 4.8.2 -std=c++11
+* GCC 4.9.0 -std=c++11 -std=c++1y
 
 # Acknowledgements 
 
