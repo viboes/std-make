@@ -46,7 +46,7 @@ template <>
 struct shared_future<experimental::_t&> : experimental::type_constructor_tag
 {
   template<class T>
-  using type = shared_future<T&>;
+  using apply = shared_future<T&>;
 };
 
 namespace experimental

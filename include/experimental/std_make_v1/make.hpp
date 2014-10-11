@@ -51,7 +51,7 @@ inline namespace fundamental_v2
 
   // apply a type constuctor TC to the type parameters Args
   template<class TC, class... Args>
-  using apply = typename TC::template type<Args...>;
+  using apply = typename TC::template apply<Args...>;
 
   // type constructor customization point.
   // Default implementation make use of a nested type type_constructor
@@ -71,7 +71,7 @@ inline namespace fundamental_v2
   struct lift : type_constructor_tag
   {
     template<class... Args2>
-    using type = TC<Args..., Args2...>;
+    using apply = TC<Args..., Args2...>;
   };
 
   // transforms a template class into a type_constructor that add the parameter at the begining
@@ -79,7 +79,7 @@ inline namespace fundamental_v2
   struct reverse_lift : type_constructor_tag
   {
     template<class... Args2>
-    using type = TC<Args2..., Args...>;
+    using apply = TC<Args2..., Args...>;
   };
 
 

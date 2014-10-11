@@ -93,7 +93,7 @@ template <>
 struct future<experimental::_t&>  : experimental::type_constructor_tag
 {
   template<class T>
-  using type = future<T&>;
+  using apply = future<T&>;
 };
 namespace experimental
 {
