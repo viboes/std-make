@@ -25,36 +25,6 @@ namespace experimental
 inline namespace fundamental_v2
 {
 
-  // type wrapper
-  template <class T=void>
-  struct type {};
-
-  // holder type
-  struct _t {};
-
-  // type constructor tag type
-  struct type_constructor_t {};
-
-  // lift a template class to a type_constructor
-  template <template <class ...> class TC, class... Args>
-  struct lift : type_constructor_t
-  {
-    template<class... Args2>
-    using type = TC<Args..., Args2...>;
-  };
-
-  // reverse lift a template class to a type_constructor
-  template <template <class ...> class TC, class... Args>
-  struct reverse_lift : type_constructor_t
-  {
-    template<class... Args2>
-    using type = TC<Args2..., Args...>;
-  };
-
-  // apply a type constuctor TC to the type parameters Args
-  template<class TC, class... Args>
-  using apply = typename TC::template type<Args...>;
-
   // identity meta-function
   template<class T>
   struct identity
@@ -62,21 +32,57 @@ inline namespace fundamental_v2
     typedef T type;
   };
 
-  // type constructor customization point. Default implementation make use of nested type type_constructor
-  template <class M >
-  struct type_constructor_impl : identity<typename  M::type_constructor> {};
+  // tag type
+  template <class T>
+  struct type {
+    using underlying_type = T;
+  };
 
-  // type constructor meta-function
-  template <class M >
-  using type_constructor = typename type_constructor_impl<M>::type;
+  // holder type
+  struct _t {};
 
-  // rebinds a type havind a underlying type with another underlying type
-  template <class M, class U>
-  using rebind = apply<type_constructor<M>, U>;
+  // type constructor tag type used to check if a class is a type constructor
+  struct type_constructor_tag {};
 
-  // type trait based on inheritance from type_constructor_t
+  // type trait based on inheritance from type_constructor_tag
+  // todo change for has TC::template type
   template <class TC >
-  struct is_type_constructor : is_base_of<type_constructor_t, TC> {};
+  struct is_type_constructor : is_base_of<type_constructor_tag, TC> {};
+
+  // apply a type constuctor TC to the type parameters Args
+  template<class TC, class... Args>
+  using apply = typename TC::template type<Args...>;
+
+  // type constructor customization point.
+  // Default implementation make use of a nested type type_constructor
+  template <class M >
+  struct type_constructor : identity<typename  M::type_constructor> {};
+
+  // type constructor getter meta-function
+  template <class M >
+  using type_constructor_t = typename type_constructor<M>::type;
+
+  // rebinds a type having a underlying type with another underlying type
+  template <class M, class U>
+  using rebind = apply<type_constructor_t<M>, U>;
+
+  // transforms a template class into a type_constructor that add the parameter at the end
+  template <template <class ...> class TC, class... Args>
+  struct lift : type_constructor_tag
+  {
+    template<class... Args2>
+    using type = TC<Args..., Args2...>;
+  };
+
+  // transforms a template class into a type_constructor that add the parameter at the begining
+  template <template <class ...> class TC, class... Args>
+  struct reverse_lift : type_constructor_tag
+  {
+    template<class... Args2>
+    using type = TC<Args2..., Args...>;
+  };
+
+
 
   // make() overload
   template <template <class ...> class M>

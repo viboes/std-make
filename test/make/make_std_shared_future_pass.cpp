@@ -38,18 +38,23 @@ shared_future<X> make(experimental::type<shared_future<X>>, experimental::in_pla
   p.set_value(value_type(forward<Args>(args)...));
   return p.get_future().share();
 }
-
 // Holder specialization
 template <>
 struct shared_future<experimental::_t> : experimental::lift<shared_future> {};
 
 template <>
-struct shared_future<experimental::_t&> : experimental::type_constructor_t
+struct shared_future<experimental::_t&> : experimental::type_constructor_tag
 {
   template<class T>
   using type = shared_future<T&>;
 };
 
+namespace experimental
+{
+  // type_constructor customization
+  template <class T>
+  struct type_constructor<shared_future<T>> : shared_future<_t> {};
+}
 }
 
 

@@ -85,16 +85,22 @@ future<X> make(experimental::type<future<X>>, experimental::in_place_t, Args&& .
   return make_ready_future<X>(forward<Args>(args)...);
 }
 
-// Holder specialization
+// Holder customization
 template <>
 struct future<experimental::_t> : experimental::lift<future> {};
 
 template <>
-struct future<experimental::_t&>  : experimental::type_constructor_t
+struct future<experimental::_t&>  : experimental::type_constructor_tag
 {
   template<class T>
   using type = future<T&>;
 };
+namespace experimental
+{
+// type_constructor customization
+template <class T>
+struct type_constructor<future<T>> : future<_t> {};
+}
 
 }
 
