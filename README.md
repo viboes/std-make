@@ -35,8 +35,9 @@ The goal is to be able to have a generic `make` factory that can be used in plac
 * ```make_unique```
 * ```make_optional```
 * ```make_ready_future```
+* ```make_expected```
 
-All these types, `shared_ptr<T>`, `unique_ptr<T,D>`, `optional<T>` and `future<T>`, 
+All these types, `shared_ptr<T>`, `unique_ptr<T,D>`, `optional<T>`, `expected<T,E>` and `future<T>`, 
 have in common that all of them have an underlying type `T'.
 
 There are two kind of factories: 
@@ -70,7 +71,6 @@ We can also make use of the class name to avoid the type deduction
 
 ```c++
 auto x1 = make<future<int&>>(v);
-auto x2 = make<expected<_t, E>>(v);
 ```
 
 Sometimes the user wants that the underlying type be deduced from the parameter, but the type constructor need more information. A type  holder ```_t```can be used to mean any type
@@ -78,6 +78,7 @@ Sometimes the user wants that the underlying type be deduced from the parameter,
 ```c++
 auto x1 = make<future<_t&>>(v);
 auto x2 = make<expected<_t, E>>(v);
+auto x2 = make<unique_ptr<_t, MyDeleter>>(v);
 ```
 
 # Tutorial
@@ -391,6 +392,8 @@ namespace experimental {
   // Holder specialization
   template <>
   struct optional<_t>;
+  template <class T>
+    struct type_constructor<optional<T>>;
 
 }
 }
@@ -405,7 +408,8 @@ namespace experimental {
   // Holder specialization
   template <class E>
   struct expected<_t, E>;
-
+  template <class T, class E>
+    struct type_constructor<expected<T,E>>;
 }
 }
 ```
@@ -455,12 +459,73 @@ namespace experimental {
     struct shared_future<_t>;
   template <>
     struct shared_future<_t&>;
+  template <class T>
+    struct type_constructor<shared_future<T>>;
 
 }
 }
 ```
 
-## `unique_ptr`/`shared_ptr`
+## `unique_ptr`
+
+```c++
+namespace std {
+namespace experimental {
+
+  // customization point for template 
+  // (needed because std::unique_ptr doesn't has a conversion constructor)
+  template <class DX, class X>
+    unique_ptr<DX> make(experimental::type<unique_ptr<DX>>, X&& x);
+
+  // customization point for template 
+  // (needed because std::unique_ptr doesn't uses experimental::in_place_t)
+  template <class X, class ...Args>
+  unique_ptr<X> make(experimental::type<unique_ptr<X>>, experimental::in_place_t, Args&& ...args);
+
+
+  // Holder customization
+  template <class D>
+  struct unique_ptr<_t, D>;
+
+  template <>
+  struct default_delete<_t>;
+
+
+  // type_constructor customization
+  template <class T, class D>
+  struct type_constructor<unique_ptr<T,D>>;
+  template <class T>
+  struct type_constructor<default_delete<T>>;
+
+
+}}
+```
+
+## `shared_ptr`
+
+```c++
+namespace std {
+namespace experimental {
+
+  // customization point for template 
+  // (needed because std::shared_ptr doesn't has a conversion constructor)
+  template <class DX, class X>
+  shared_ptr<DX> make(type<shared_ptr<DX>>, X&& x);
+
+  // customization point for template (needed because std::shared_ptr doesn't uses experimental::in_place_t)
+  template <class X, class ...Args>
+  shared_ptr<X> make(type<shared_ptr<X>>, in_place_t, Args&& ...args);
+
+  // Holder customization
+  template <>
+  struct shared_ptr<_t>;
+  
+  // type_constructor customization
+  template <class T>
+  struct type_constructor<shared_ptr<T>>;
+
+}}
+```
 
 ## Development Status
 
