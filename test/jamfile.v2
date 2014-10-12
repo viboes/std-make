@@ -56,6 +56,15 @@ test-suite std_future
       [ run make/make_std_shared_future_pass.cpp  ]
     ;
 
+test-suite std_unique_ptr
+    : 
+      [ run make/make_std_unique_ptr_pass.cpp  ]
+    ;
+test-suite std_shared_ptr
+    : 
+      [ run make/make_std_shared_ptr_pass.cpp  ]
+    ;
+
 explicit fix ;
 test-suite fix
     : 

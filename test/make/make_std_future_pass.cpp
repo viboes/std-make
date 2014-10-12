@@ -99,7 +99,7 @@ namespace experimental
 {
 // type_constructor customization
 template <class T>
-struct type_constructor<future<T>> : future<_t> {};
+struct type_constructor<future<T>> : identity<future<_t>> {};
 }
 
 }

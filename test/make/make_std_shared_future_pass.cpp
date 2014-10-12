@@ -53,7 +53,7 @@ namespace experimental
 {
   // type_constructor customization
   template <class T>
-  struct type_constructor<shared_future<T>> : shared_future<_t> {};
+  struct type_constructor<shared_future<T>> : identity<shared_future<_t>> {};
 }
 }
 

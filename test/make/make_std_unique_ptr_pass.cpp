@@ -1,0 +1,149 @@
+// Copyright (C) 2014 Vicente J. Botet Escriba
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
+//  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
+// <experimental/make.hpp>
+
+//  template <template <class ...> class M, class X>
+//  auto make(X&& x);
+//  template <class M, class X>
+//  auto make(X&& x);
+//  template <class M, class ...Args>
+//  auto make(Args&& ...args);
+
+
+#include <experimental/make.hpp>
+#include <memory>
+#include <boost/detail/lightweight_test.hpp>
+
+namespace std {
+
+template <int = 0, int..., typename T>
+  unique_ptr<typename decay<T>::type> make_unique(T&& x)
+{
+  typedef typename decay<T>::type X;
+  return unique_ptr<X>(new X(x));
+}
+
+// explicit overloads
+template <typename T>
+  unique_ptr<T> make_unique(typename remove_reference<T>::type const& x)
+{
+  typedef T X;
+  return unique_ptr<X>(new X(x));
+}
+
+template <typename T>
+  unique_ptr<T> make_unique(typename remove_reference<T>::type&& x)
+{
+  typedef T X;
+  return unique_ptr<X>(new X(std::forward<typename remove_reference<T>::type>(x)));
+}
+
+// variadic overload
+template <typename T, typename ...Args>
+  unique_ptr<T> make_unique(Args&&... args)
+{
+  typedef T X;
+  return unique_ptr<X>(new X(forward<Args>(args)...));
+}
+
+// customization point for template (needed because std::unique_ptr doesn't has a conversion constructor)
+template <class DX, class X>
+unique_ptr<DX> make(experimental::type<unique_ptr<DX>>, X&& x)
+{
+  return make_unique<DX>(forward<X>(x));
+}
+
+// customization point for template (needed because std::unique_ptr doesn't uses experimental::in_place_t)
+template <class X, class ...Args>
+unique_ptr<X> make(experimental::type<unique_ptr<X>>, experimental::in_place_t, Args&& ...args)
+{
+  return make_unique<X>(forward<Args>(args)...);
+}
+
+
+// Holder customization
+template <class D>
+struct unique_ptr<experimental::_t, D> : experimental::type_constructor_tag
+{
+    template<class T>
+    using apply = unique_ptr<T, experimental::rebind<D, T>>;
+};
+
+template <>
+struct default_delete<experimental::_t> : std::experimental::lift<default_delete> {};
+
+// todo remove this specialization
+template <>
+struct unique_ptr<void> {};
+
+namespace experimental
+{
+// type_constructor customization
+  template <class T, class D>
+  struct type_constructor<unique_ptr<T,D>> : identity<unique_ptr<_t, D>> {};
+  template <class T>
+  struct type_constructor<default_delete<T>> : identity<default_delete<_t>> {};
+}
+
+}
+
+struct A
+{
+  int v;
+  A(): v(3) {}
+  A(int v): v(std::move(v)) {}
+  A(int v1, int v2): v(v1+v2) {}
+};
+
+int main()
+{
+  namespace stde = std::experimental;
+  {
+    int v=0;
+    std::unique_ptr<int> x = std::make_unique(v);
+    BOOST_TEST(*x == 0);
+  }
+  {
+    int v=0;
+    std::unique_ptr<int> x = stde::make<std::unique_ptr>(v);
+    BOOST_TEST(*x == 0);
+  }
+  {
+    int v=0;
+    std::unique_ptr<int> x = std::make_unique<int>(v);
+    BOOST_TEST(*x == 0);
+  }
+  {
+    int v=0;
+    std::unique_ptr<int> x = stde::make<std::unique_ptr<int>>(v);
+    BOOST_TEST(*x == 0);
+  }
+  {
+    int v=1;
+    std::unique_ptr<A> x = std::make_unique<A>(v,v);
+    BOOST_TEST(x->v == 2);
+  }
+  {
+    int v=1;
+    std::unique_ptr<A> x = stde::make<std::unique_ptr<A>>(v,v);
+    BOOST_TEST(x->v == 2);
+  }
+  {
+    std::unique_ptr<int> x = stde::make<std::unique_ptr<int>>();
+    BOOST_TEST_EQ(*x,  0);
+  }
+  {
+    int v=0;
+    std::unique_ptr<int> x = stde::make<std::unique_ptr<stde::_t>>(v);
+    BOOST_TEST(*x == 0);
+  }
+  {
+    int v=0;
+    std::unique_ptr<int,std::default_delete<int> > x = stde::make<std::unique_ptr<stde::_t, std::default_delete<int> >>(v);
+    BOOST_TEST(*x == 0);
+  }
+  return ::boost::report_errors();
+}
