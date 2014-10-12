@@ -26,7 +26,7 @@ namespace std {
     return p.get_future();
   }
 
-  template <int = 0, int..., typename T>
+  template <int = 0, int..., class T>
     future<decay_t<T>> make_ready_future(T&& x)
   {
     typedef decay_t<T> value_type;
@@ -36,8 +36,8 @@ namespace std {
   }
 
   // explicit overloads
-  template <typename T>
-    future<T> make_ready_future(typename remove_reference<T>::type const& x)
+  template <class T>
+    future<T> make_ready_future(remove_reference_t<T> const& x)
   {
     typedef T value_type;
     promise<value_type> p;
@@ -45,17 +45,17 @@ namespace std {
     return p.get_future();
   }
 
-  template <typename T>
-    future<T> make_ready_future(typename remove_reference<T>::type&& x)
+  template <class T>
+    future<T> make_ready_future(remove_reference_t<T>&& x)
   {
     typedef T value_type;
     promise<value_type> p;
-    p.set_value(forward<typename remove_reference<T>::type>(x));
+    p.set_value(forward<remove_reference_t<T>>(x));
     return p.get_future();
   }
 
   // variadic overload
-  template <typename T, typename ...Args>
+  template <class T, class ...Args>
     future<T> make_ready_future(Args&&... args)
   {
     typedef T value_type;

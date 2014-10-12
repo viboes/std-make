@@ -18,7 +18,11 @@ namespace std
 {
 #if __cplusplus <= 201103L
   template <class T>
-  using decay_t = typename std::decay<T>::type;
+  using decay_t = typename decay<T>::type;
+
+  template <class T>
+  using remove_reference_t = typename remove_reference<T>::type;
+
 #endif
 
 namespace experimental
