@@ -19,6 +19,7 @@
 
 namespace std {
 
+#if __cplusplus <= 201103L
 template <int = 0, int..., typename T>
   unique_ptr<typename decay<T>::type> make_unique(T&& x)
 {
@@ -48,6 +49,7 @@ template <typename T, typename ...Args>
   typedef T X;
   return unique_ptr<X>(new X(forward<Args>(args)...));
 }
+#endif
 
 // customization point for template (needed because std::unique_ptr doesn't has a conversion constructor)
 template <class DX, class X>
@@ -103,11 +105,6 @@ int main()
   namespace stde = std::experimental;
   {
     int v=0;
-    std::unique_ptr<int> x = std::make_unique(v);
-    BOOST_TEST(*x == 0);
-  }
-  {
-    int v=0;
     std::unique_ptr<int> x = stde::make<std::unique_ptr>(v);
     BOOST_TEST(*x == 0);
   }
@@ -132,8 +129,8 @@ int main()
     BOOST_TEST(x->v == 2);
   }
   {
-    std::unique_ptr<int> x = stde::make<std::unique_ptr<int>>();
-    BOOST_TEST_EQ(*x,  0);
+    std::unique_ptr<A> x = stde::make<std::unique_ptr<A>>();
+    BOOST_TEST_EQ(x->v,  3);
   }
   {
     int v=0;
@@ -142,7 +139,7 @@ int main()
   }
   {
     int v=0;
-    std::unique_ptr<int,std::default_delete<int> > x = stde::make<std::unique_ptr<stde::_t, std::default_delete<int> >>(v);
+    std::unique_ptr<int,std::default_delete<int> > x = stde::make<std::unique_ptr<stde::_t, std::default_delete<stde::_t> >>(v);
     BOOST_TEST(*x == 0);
   }
   return ::boost::report_errors();

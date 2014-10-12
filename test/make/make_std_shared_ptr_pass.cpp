@@ -117,8 +117,8 @@ int main()
     BOOST_TEST(x->v == 2);
   }
   {
-    std::shared_ptr<int> x = stde::make<std::shared_ptr<int>>();
-    BOOST_TEST_EQ(*x,  0);
+    std::shared_ptr<A> x = stde::make<std::shared_ptr<A>>();
+    BOOST_TEST_EQ(x->v,  3);
   }
   {
     int v=0;
