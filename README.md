@@ -136,19 +136,29 @@ C(in_place_t, ...);
 
 ## How to customize an existing class
 
-When the existing class doesn't provide the needed constructor, the user needs to add the following overloads
+When the existing class doesn't provide the needed constructor as e.g. `future<T>`, the user needs to add the missing overloads
 
 
 ```c++
-  C<void> make(type<C<void>>);
+  future<void> make(type<future<void>>) 
+  { 
+    return make_ready_future(); 
+    }
   template <class X, class ...Args>
-  C<X> make(type<C<X>>, X&& x);
+  future<X> make(type<future<X>>, X&& x) 
+  { 
+    return make_ready_future(forward<X>(x)); 
+  }
   template <class X, class ...Args>
-  C<X> make(type<C<X>>, in_place_t, Args&& ...args);
+  future<X> make(type<future<X>>, in_place_t, Args&& ...args)
+  { 
+    return make_ready_future(X(forward<Args>(x)...); 
+  }
 ```
 
-## How to customize the uses of type holder `_t`?
+## How to customize the uses of type holder `_t` and the `type_constructor`?
 
+The simple case is when the class has a single template parameter as is the case for `future<T>`. It is enough to define `future<_t>` as `lift<future>` and `type_constructor<future<T>>` as `future<_t>`.
 
 ```c++
 namespace std
@@ -156,10 +166,54 @@ namespace std
 namespace experimental
 {
   template <>
-    struct C<_t> : lift<C> ;
+    struct future<_t> : lift<C> ;
+  template <class T>
+    struct type_constructor<future<T>> : future<_t> ;
 }
 }
 ```
+
+When the class has two parameter and the underlying type is the first template parameter, as it is the case for `expected`, it is enough to define `expected<_t,E>` as `reverse_lift<expected,E>` and `type_constructor<expected<T,E>>` as `future<_t,E>`. 
+
+```c++
+namespace std
+{
+namespace experimental
+{
+  template <class E>
+    struct expected<_t, E> : reverse_lift<expected, E> ;
+  template <class T>
+    struct type_constructor<expected<T, E>> : expected<_t, E> ;
+}
+}
+```
+
+If the second template depends on the first one as it is the case of `unique_ptr<T, D>`, the rebind of the second parameter must be done explicitly. `type_constructor<unique_ptr<T,D>>` is also defined as `unique_ptr<_t,D>`
+
+```c++
+namespace std
+{
+  template <>
+    struct default_delete<experimental::_t> : experimental::lift<default_delete> {};
+    
+  template <class D>
+    struct unique_ptr<experimental::_t, D> : experimental::type_constructor_tag
+  {
+    template<class T>
+    using apply = unique_ptr<T, experimental::rebind<D, T>>;
+  };
+  
+  namespace experimental
+  {
+    template <class T>
+    struct type_constructor<default_delete<T>> : identity<default_delete<_t>> {};
+    template <class T, class D>
+    struct type_constructor<unique_ptr<T,D>> : identity<unique_ptr<_t, D>> {};
+ }
+}
+```
+
+Note that the use of the `experimental::type_constructor_tag` is temporary (waiting for less intrusive type trait). 
 
 # Design rationale
 
