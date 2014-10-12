@@ -29,8 +29,7 @@ namespace std {
   template <int = 0, int..., class T>
     future<decay_t<T>> make_ready_future(T&& x)
   {
-    typedef decay_t<T> value_type;
-    promise<value_type> p;
+    promise<decay_t<T>> p;
     p.set_value(forward<T>(x));
     return p.get_future();
   }
@@ -39,8 +38,7 @@ namespace std {
   template <class T>
     future<T> make_ready_future(remove_reference_t<T> const& x)
   {
-    typedef T value_type;
-    promise<value_type> p;
+    promise<T> p;
     p.set_value(x);
     return p.get_future();
   }
@@ -48,8 +46,7 @@ namespace std {
   template <class T>
     future<T> make_ready_future(remove_reference_t<T>&& x)
   {
-    typedef T value_type;
-    promise<value_type> p;
+    promise<T> p;
     p.set_value(forward<remove_reference_t<T>>(x));
     return p.get_future();
   }
@@ -58,9 +55,8 @@ namespace std {
   template <class T, class ...Args>
     future<T> make_ready_future(Args&&... args)
   {
-    typedef T value_type;
-    promise<value_type> p;
-    p.set_value(value_type(forward<Args>(args)...));
+    promise<T> p;
+    p.set_value(T(forward<Args>(args)...));
     return p.get_future();
 
   }

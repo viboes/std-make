@@ -23,46 +23,42 @@ namespace std {
   template <int = 0, int..., class T>
     unique_ptr<decay_t<T>> make_unique(T&& x)
   {
-    typedef decay_t<T> X;
-    return unique_ptr<X>(new X(x));
+    return unique_ptr<decay_t<T>>(new decay_t<T>(x));
   }
 
   // explicit overloads
   template <class T>
     unique_ptr<T> make_unique(remove_reference_t<T> const& x)
   {
-    typedef T X;
-    return unique_ptr<X>(new X(x));
+    return unique_ptr<T>(new T(x));
   }
 
   template <class T>
     unique_ptr<T> make_unique(remove_reference_t<T>&& x)
   {
-    typedef T X;
-    return unique_ptr<X>(new X(std::forward<remove_reference_t<T>>(x)));
+    return unique_ptr<T>(new T(std::forward<remove_reference_t<T>>(x)));
   }
 
   // variadic overload
   template <class T, class ...Args>
     unique_ptr<T> make_unique(Args&&... args)
   {
-    typedef T X;
-    return unique_ptr<X>(new X(forward<Args>(args)...));
+    return unique_ptr<T>(new T(forward<Args>(args)...));
   }
 #endif
 
   // customization point for template (needed because std::unique_ptr doesn't has a conversion constructor)
-  template <class DX, class X>
-  unique_ptr<DX> make(experimental::type<unique_ptr<DX>>, X&& x)
+  template <class T, class X>
+  unique_ptr<T> make(experimental::type<unique_ptr<T>>, X&& x)
   {
-    return make_unique<DX>(forward<X>(x));
+    return make_unique<T>(forward<X>(x));
   }
 
   // customization point for template (needed because std::unique_ptr doesn't uses experimental::in_place_t)
-  template <class X, class ...Args>
-  unique_ptr<X> make(experimental::type<unique_ptr<X>>, experimental::in_place_t, Args&& ...args)
+  template <class T, class ...Args>
+  unique_ptr<T> make(experimental::type<unique_ptr<T>>, experimental::in_place_t, Args&& ...args)
   {
-    return make_unique<X>(forward<Args>(args)...);
+    return make_unique<T>(forward<Args>(args)...);
   }
 
 
