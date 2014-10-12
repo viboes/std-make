@@ -19,64 +19,34 @@
 
 namespace std {
 
-//template <int = 0, int..., typename T>
-//  shared_ptr<typename decay<T>::type> make_shared(T&& x)
-//{
-//  typedef typename decay<T>::type X;
-//  return shared_ptr<X>(new X(x));
-//}
-//
-//// explicit overloads
-//template <typename T>
-//  shared_ptr<T> make_shared(typename remove_reference<T>::type const& x)
-//{
-//  typedef T X;
-//  return shared_ptr<X>(new X(x));
-//}
-//
-//template <typename T>
-//  shared_ptr<T> make_shared(typename remove_reference<T>::type&& x)
-//{
-//  typedef T X;
-//  return shared_ptr<X>(new X(std::forward<typename remove_reference<T>::type>(x)));
-//}
-//
-//// variadic overload
-//template <typename T, typename ...Args>
-//  shared_ptr<T> make_shared(Args&&... args)
-//{
-//  typedef T X;
-//  return shared_ptr<X>(new X(forward<Args>(args)...));
-//}
+  // customization point for template (needed because std::shared_ptr doesn't has a conversion constructor)
+  template <class DX, class X>
+  shared_ptr<DX> make(experimental::type<shared_ptr<DX>>, X&& x)
+  {
+    return make_shared<DX>(forward<X>(x));
+  }
 
-// customization point for template (needed because std::shared_ptr doesn't has a conversion constructor)
-template <class DX, class X>
-shared_ptr<DX> make(experimental::type<shared_ptr<DX>>, X&& x)
-{
-  return make_shared<DX>(forward<X>(x));
-}
+  // customization point for template (needed because std::shared_ptr doesn't uses experimental::in_place_t)
+  template <class X, class ...Args>
+  shared_ptr<X> make(experimental::type<shared_ptr<X>>, experimental::in_place_t, Args&& ...args)
+  {
+    return make_shared<X>(forward<Args>(args)...);
+  }
 
-// customization point for template (needed because std::shared_ptr doesn't uses experimental::in_place_t)
-template <class X, class ...Args>
-shared_ptr<X> make(experimental::type<shared_ptr<X>>, experimental::in_place_t, Args&& ...args)
-{
-  return make_shared<X>(forward<Args>(args)...);
-}
+  // Holder customization
+  template <>
+  struct shared_ptr<experimental::_t> : experimental::lift<shared_ptr> {};
 
-// Holder customization
-template <>
-struct shared_ptr<experimental::_t> : experimental::lift<shared_ptr> {};
+  // todo remove this specialization
+  template <>
+  struct shared_ptr<void> {};
 
-// todo remove this specialization
-template <>
-struct shared_ptr<void> {};
-
-namespace experimental
-{
-// type_constructor customization
-template <class T>
-struct type_constructor<shared_ptr<T>> : identity<shared_ptr<_t>> {};
-}
+  namespace experimental
+  {
+    // type_constructor customization
+    template <class T>
+    struct type_constructor<shared_ptr<T>> : identity<shared_ptr<_t>> {};
+  }
 
 }
 

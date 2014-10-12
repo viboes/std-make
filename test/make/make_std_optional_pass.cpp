@@ -18,16 +18,19 @@
 #include <boost/detail/lightweight_test.hpp>
 
 namespace std {
-namespace experimental {
+  namespace experimental {
 
-// Holder specialization
-template <>
-struct optional<_t>  : lift<optional> {};
+    // Holder specialization
+    template <>
+    struct optional<_t>  : lift<optional> {};
 
-template <>
-struct optional<void> {};
+    template <>
+    struct optional<void> {};
 
-}
+    // type_constructor customization
+    template <class T>
+    struct type_constructor<optional<T>> : identity<optional<_t>> {};
+  }
 }
 
 

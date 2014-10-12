@@ -18,23 +18,34 @@
 
 namespace boost {
 
-// customization point for template (needed because boost::optional doesn't has experimental::in_place_t constructor)
-template <class X, class ...Args>
-optional<X> make(std::experimental::type<optional<X>>, std::experimental::in_place_t, Args&& ...args)
+  // customization point for template (needed because boost::optional doesn't has experimental::in_place_t constructor)
+  template <class X, class ...Args>
+  optional<X> make(std::experimental::type<optional<X>>, std::experimental::in_place_t, Args&& ...args)
+  {
+    optional<X> res;
+    res.emplace(std::forward<Args>(args)...);
+    return std::move(res);
+  }
+
+  template <>
+  struct optional<void> {};
+
+  // Holder specialization
+  template <>
+  struct optional<std::experimental::_t> : std::experimental::lift<optional> {};
+
+}
+
+namespace std
 {
-  optional<X> res;
-  res.emplace(std::forward<Args>(args)...);
-  return std::move(res);
+  namespace experimental
+  {
+    // type_constructor customization
+    template <class T>
+    struct type_constructor<boost::optional<T>> : identity<boost::optional<_t>> {};
+  }
 }
 
-template <>
-struct optional<void> {};
-
-// Holder specialization
-template <>
-struct optional<std::experimental::_t> : std::experimental::lift<optional> {};
-
-}
 
 struct A
 {

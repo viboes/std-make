@@ -17,19 +17,29 @@
 
 namespace boost {
 
-// customization point for template (needed because boost::expected doesn't has experimental::in_place_t constructor)
-template <class X, class E, class ...Args>
-expected<X, E> make(std::experimental::type<expected<X, E>>, std::experimental::in_place_t, Args&& ...args)
-{
-  expected<X, E> res;
-  res.emplace(std::forward<Args>(args)...);
-  return std::move(res);
+  // customization point for template (needed because boost::expected doesn't has experimental::in_place_t constructor)
+  template <class X, class E, class ...Args>
+  expected<X, E> make(std::experimental::type<expected<X, E>>, std::experimental::in_place_t, Args&& ...args)
+  {
+    expected<X, E> res;
+    res.emplace(std::forward<Args>(args)...);
+    return std::move(res);
+  }
+
+  // Holder specialization
+  template <class E>
+  struct expected<std::experimental::_t, E>: std::experimental::reverse_lift<expected, E> {};
+
 }
 
-// Holder specialization
-template <class E>
-struct expected<std::experimental::_t, E>: std::experimental::reverse_lift<expected, E> {};
-
+namespace std
+{
+  namespace experimental
+  {
+    // type_constructor customization
+    template <class T, class E>
+    struct type_constructor<boost::expected<T, E>> : identity<boost::expected<_t, E>> {};
+  }
 }
 
 struct A

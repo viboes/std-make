@@ -19,88 +19,89 @@
 
 namespace std {
 
-future<void> make_ready_future()
-{
-  promise<void> p;
-  p.set_value();
-  return p.get_future();
-}
+  future<void> make_ready_future()
+  {
+    promise<void> p;
+    p.set_value();
+    return p.get_future();
+  }
 
-template <int = 0, int..., typename T>
-  future<typename decay<T>::type> make_ready_future(T&& x)
-{
-  typedef typename decay<T>::type value_type;
-  promise<value_type> p;
-  p.set_value(forward<T>(x));
-  return p.get_future();
-}
+  template <int = 0, int..., typename T>
+    future<typename decay<T>::type> make_ready_future(T&& x)
+  {
+    typedef typename decay<T>::type value_type;
+    promise<value_type> p;
+    p.set_value(forward<T>(x));
+    return p.get_future();
+  }
 
-// explicit overloads
-template <typename T>
-  future<T> make_ready_future(typename remove_reference<T>::type const& x)
-{
-  typedef T value_type;
-  promise<value_type> p;
-  p.set_value(x);
-  return p.get_future();
-}
+  // explicit overloads
+  template <typename T>
+    future<T> make_ready_future(typename remove_reference<T>::type const& x)
+  {
+    typedef T value_type;
+    promise<value_type> p;
+    p.set_value(x);
+    return p.get_future();
+  }
 
-template <typename T>
-  future<T> make_ready_future(typename remove_reference<T>::type&& x)
-{
-  typedef T value_type;
-  promise<value_type> p;
-  p.set_value(forward<typename remove_reference<T>::type>(x));
-  return p.get_future();
-}
+  template <typename T>
+    future<T> make_ready_future(typename remove_reference<T>::type&& x)
+  {
+    typedef T value_type;
+    promise<value_type> p;
+    p.set_value(forward<typename remove_reference<T>::type>(x));
+    return p.get_future();
+  }
 
-// variadic overload
-template <typename T, typename ...Args>
-  future<T> make_ready_future(Args&&... args)
-{
-  typedef T value_type;
-  promise<value_type> p;
-  p.set_value(value_type(forward<Args>(args)...));
-  return p.get_future();
+  // variadic overload
+  template <typename T, typename ...Args>
+    future<T> make_ready_future(Args&&... args)
+  {
+    typedef T value_type;
+    promise<value_type> p;
+    p.set_value(value_type(forward<Args>(args)...));
+    return p.get_future();
 
-}
+  }
 
-// customization point for template (needed because std::future doesn't has a default constructor)
-future<void> make(experimental::type<future<void>>)
-{
-  return make_ready_future();
-}
+  // customization point for template (needed because std::future doesn't has a default constructor)
+  future<void> make(experimental::type<future<void>>)
+  {
+    return make_ready_future();
+  }
 
-// customization point for template (needed because std::future doesn't has a conversion constructor)
-template <class DX, class X>
-future<DX> make(experimental::type<future<DX>>, X&& x)
-{
-  return make_ready_future<DX>(forward<X>(x));
-}
+  // customization point for template (needed because std::future doesn't has a conversion constructor)
+  template <class DX, class X>
+  future<DX> make(experimental::type<future<DX>>, X&& x)
+  {
+    return make_ready_future<DX>(forward<X>(x));
+  }
 
-// customization point for template (needed because std::future doesn't uses experimental::in_place_t)
-template <class X, class ...Args>
-future<X> make(experimental::type<future<X>>, experimental::in_place_t, Args&& ...args)
-{
-  return make_ready_future<X>(forward<Args>(args)...);
-}
+  // customization point for template (needed because std::future doesn't uses experimental::in_place_t)
+  template <class X, class ...Args>
+  future<X> make(experimental::type<future<X>>, experimental::in_place_t, Args&& ...args)
+  {
+    return make_ready_future<X>(forward<Args>(args)...);
+  }
 
-// Holder customization
-template <>
-struct future<experimental::_t> : experimental::lift<future> {};
+  // Holder customization
+  template <>
+  struct future<experimental::_t> : experimental::lift<future> {};
 
-template <>
-struct future<experimental::_t&>  : experimental::type_constructor_tag
-{
-  template<class T>
-  using apply = future<T&>;
-};
-namespace experimental
-{
-// type_constructor customization
-template <class T>
-struct type_constructor<future<T>> : identity<future<_t>> {};
-}
+  template <>
+  struct future<experimental::_t&>  : experimental::type_constructor_tag
+  {
+    template<class T>
+    using apply = future<T&>;
+  };
+
+  namespace experimental
+  {
+    // type_constructor customization
+    template <class T>
+    struct type_constructor<future<T>> : identity<future<_t>> {};
+  }
 
 }
 

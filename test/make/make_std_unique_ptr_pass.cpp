@@ -20,75 +20,75 @@
 namespace std {
 
 #if __cplusplus <= 201103L
-template <int = 0, int..., typename T>
-  unique_ptr<typename decay<T>::type> make_unique(T&& x)
-{
-  typedef typename decay<T>::type X;
-  return unique_ptr<X>(new X(x));
-}
+  template <int = 0, int..., typename T>
+    unique_ptr<typename decay<T>::type> make_unique(T&& x)
+  {
+    typedef typename decay<T>::type X;
+    return unique_ptr<X>(new X(x));
+  }
 
-// explicit overloads
-template <typename T>
-  unique_ptr<T> make_unique(typename remove_reference<T>::type const& x)
-{
-  typedef T X;
-  return unique_ptr<X>(new X(x));
-}
+  // explicit overloads
+  template <typename T>
+    unique_ptr<T> make_unique(typename remove_reference<T>::type const& x)
+  {
+    typedef T X;
+    return unique_ptr<X>(new X(x));
+  }
 
-template <typename T>
-  unique_ptr<T> make_unique(typename remove_reference<T>::type&& x)
-{
-  typedef T X;
-  return unique_ptr<X>(new X(std::forward<typename remove_reference<T>::type>(x)));
-}
+  template <typename T>
+    unique_ptr<T> make_unique(typename remove_reference<T>::type&& x)
+  {
+    typedef T X;
+    return unique_ptr<X>(new X(std::forward<typename remove_reference<T>::type>(x)));
+  }
 
-// variadic overload
-template <typename T, typename ...Args>
-  unique_ptr<T> make_unique(Args&&... args)
-{
-  typedef T X;
-  return unique_ptr<X>(new X(forward<Args>(args)...));
-}
+  // variadic overload
+  template <typename T, typename ...Args>
+    unique_ptr<T> make_unique(Args&&... args)
+  {
+    typedef T X;
+    return unique_ptr<X>(new X(forward<Args>(args)...));
+  }
 #endif
 
-// customization point for template (needed because std::unique_ptr doesn't has a conversion constructor)
-template <class DX, class X>
-unique_ptr<DX> make(experimental::type<unique_ptr<DX>>, X&& x)
-{
-  return make_unique<DX>(forward<X>(x));
-}
+  // customization point for template (needed because std::unique_ptr doesn't has a conversion constructor)
+  template <class DX, class X>
+  unique_ptr<DX> make(experimental::type<unique_ptr<DX>>, X&& x)
+  {
+    return make_unique<DX>(forward<X>(x));
+  }
 
-// customization point for template (needed because std::unique_ptr doesn't uses experimental::in_place_t)
-template <class X, class ...Args>
-unique_ptr<X> make(experimental::type<unique_ptr<X>>, experimental::in_place_t, Args&& ...args)
-{
-  return make_unique<X>(forward<Args>(args)...);
-}
+  // customization point for template (needed because std::unique_ptr doesn't uses experimental::in_place_t)
+  template <class X, class ...Args>
+  unique_ptr<X> make(experimental::type<unique_ptr<X>>, experimental::in_place_t, Args&& ...args)
+  {
+    return make_unique<X>(forward<Args>(args)...);
+  }
 
 
-// Holder customization
-template <class D>
-struct unique_ptr<experimental::_t, D> : experimental::type_constructor_tag
-{
-    template<class T>
-    using apply = unique_ptr<T, experimental::rebind<D, T>>;
-};
+  // Holder customization
+  template <class D>
+  struct unique_ptr<experimental::_t, D> : experimental::type_constructor_tag
+  {
+      template<class T>
+      using apply = unique_ptr<T, experimental::rebind<D, T>>;
+  };
 
-template <>
-struct default_delete<experimental::_t> : std::experimental::lift<default_delete> {};
+  template <>
+  struct default_delete<experimental::_t> : std::experimental::lift<default_delete> {};
 
-// todo remove this specialization
-template <>
-struct unique_ptr<void> {};
+  // todo remove this specialization
+  template <>
+  struct unique_ptr<void> {};
 
-namespace experimental
-{
-// type_constructor customization
-  template <class T, class D>
-  struct type_constructor<unique_ptr<T,D>> : identity<unique_ptr<_t, D>> {};
-  template <class T>
-  struct type_constructor<default_delete<T>> : identity<default_delete<_t>> {};
-}
+  namespace experimental
+  {
+  // type_constructor customization
+    template <class T, class D>
+    struct type_constructor<unique_ptr<T,D>> : identity<unique_ptr<_t, D>> {};
+    template <class T>
+    struct type_constructor<default_delete<T>> : identity<default_delete<_t>> {};
+  }
 
 }
 

@@ -19,42 +19,43 @@
 
 namespace std {
 
-// customization point for template (needed because std::shared_future<X> doesn't has a constructor from X)
-template <class DX, class X>
-shared_future<DX> make(experimental::type<shared_future<DX>>, X&& x)
-{
-  typedef DX value_type;
-  promise<value_type> p;
-  p.set_value(forward<X>(x));
-  return p.get_future().share();
-}
+  // customization point for template (needed because std::shared_future<X> doesn't has a constructor from X)
+  template <class DX, class X>
+  shared_future<DX> make(experimental::type<shared_future<DX>>, X&& x)
+  {
+    typedef DX value_type;
+    promise<value_type> p;
+    p.set_value(forward<X>(x));
+    return p.get_future().share();
+  }
 
-// customization point for template (needed because std::shared_future doesn't use experimental::in_place_t)
-template <class X, class ...Args>
-shared_future<X> make(experimental::type<shared_future<X>>, experimental::in_place_t, Args&& ...args)
-{
-  typedef X value_type;
-  promise<value_type> p;
-  p.set_value(value_type(forward<Args>(args)...));
-  return p.get_future().share();
-}
-// Holder specialization
-template <>
-struct shared_future<experimental::_t> : experimental::lift<shared_future> {};
+  // customization point for template (needed because std::shared_future doesn't use experimental::in_place_t)
+  template <class X, class ...Args>
+  shared_future<X> make(experimental::type<shared_future<X>>, experimental::in_place_t, Args&& ...args)
+  {
+    typedef X value_type;
+    promise<value_type> p;
+    p.set_value(value_type(forward<Args>(args)...));
+    return p.get_future().share();
+  }
 
-template <>
-struct shared_future<experimental::_t&> : experimental::type_constructor_tag
-{
-  template<class T>
-  using apply = shared_future<T&>;
-};
+  // Holder specialization
+  template <>
+  struct shared_future<experimental::_t> : experimental::lift<shared_future> {};
 
-namespace experimental
-{
-  // type_constructor customization
-  template <class T>
-  struct type_constructor<shared_future<T>> : identity<shared_future<_t>> {};
-}
+  template <>
+  struct shared_future<experimental::_t&> : experimental::type_constructor_tag
+  {
+    template<class T>
+    using apply = shared_future<T&>;
+  };
+
+  namespace experimental
+  {
+    // type_constructor customization
+    template <class T>
+    struct type_constructor<shared_future<T>> : identity<shared_future<_t>> {};
+  }
 }
 
 
