@@ -16,6 +16,11 @@
 
 namespace std
 {
+#if __cplusplus <= 201103L
+  template <class T>
+  using decay_t = typename std::decay<T>::type;
+#endif
+
 namespace experimental
 {
 #if ! defined VIBOES_STD_EXPERIMENTAL_FACTORIES_USE_OPTIONAL
@@ -93,20 +98,20 @@ inline namespace fundamental_v2
 
   // make overload: requires a template class, deduce the underlying type
   template <template <class ...> class M, int = 0, int..., class X>
-  M<typename std::decay<X>::type>
+  M<std::decay_t<X>>
   make(X&& x)
   {
-    return make(type<M<typename std::decay<X>::type>>{}, std::forward<X>(x));
+    return make(type<M<std::decay_t<X>>>{}, std::forward<X>(x));
   }
 
   // make overload: requires a type construcor, deduce the underlying type
   template <class TC, int = 0, int..., class X>
   typename enable_if<is_type_constructor<TC>::value,
-    apply<TC, typename std::decay<X>::type>
+    apply<TC, std::decay_t<X>>
   >::type
   make(X&& x)
   {
-    return make(type<apply<TC, typename std::decay<X>::type>>{}, std::forward<X>(x));
+    return make(type<apply<TC, std::decay_t<X>>>{}, std::forward<X>(x));
   }
 
   // make overload: requires a type with a specific underlying type, don't deduce the underlying type from X

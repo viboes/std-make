@@ -27,9 +27,9 @@ namespace std {
   }
 
   template <int = 0, int..., typename T>
-    future<typename decay<T>::type> make_ready_future(T&& x)
+    future<decay_t<T>> make_ready_future(T&& x)
   {
-    typedef typename decay<T>::type value_type;
+    typedef decay_t<T> value_type;
     promise<value_type> p;
     p.set_value(forward<T>(x));
     return p.get_future();

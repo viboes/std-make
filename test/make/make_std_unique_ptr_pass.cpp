@@ -21,9 +21,9 @@ namespace std {
 
 #if __cplusplus <= 201103L
   template <int = 0, int..., typename T>
-    unique_ptr<typename decay<T>::type> make_unique(T&& x)
+    unique_ptr<decay_t<T>> make_unique(T&& x)
   {
-    typedef typename decay<T>::type X;
+    typedef decay_t<T> X;
     return unique_ptr<X>(new X(x));
   }
 
@@ -75,7 +75,7 @@ namespace std {
   };
 
   template <>
-  struct default_delete<experimental::_t> : std::experimental::lift<default_delete> {};
+  struct default_delete<experimental::_t> : experimental::lift<default_delete> {};
 
   // todo remove this specialization
   template <>
