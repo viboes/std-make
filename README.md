@@ -166,14 +166,14 @@ namespace std
 namespace experimental
 {
   template <>
-    struct future<_t> : lift<C> ;
+    struct future<_t> : lift<future> ;
   template <class T>
     struct type_constructor<future<T>> : future<_t> ;
 }
 }
 ```
 
-When the class has two parameter and the underlying type is the first template parameter, as it is the case for `expected`, it is enough to define `expected<_t,E>` as `reverse_lift<expected,E>` and `type_constructor<expected<T,E>>` as `future<_t,E>`. 
+When the class has two parameter and the underlying type is the first template parameter, as it is the case for `expected`, it is enough to define `expected<_t, E>` as `reverse_lift<expected, E>` and `type_constructor<expected<T, E>>` as `future<_t, E>`. 
 
 ```c++
 namespace std
@@ -188,7 +188,7 @@ namespace experimental
 }
 ```
 
-If the second template depends on the first one as it is the case of `unique_ptr<T, D>`, the rebind of the second parameter must be done explicitly. `type_constructor<unique_ptr<T,D>>` is also defined as `unique_ptr<_t,D>`
+If the second template depends on the first one as it is the case of `unique_ptr<T, D>`, the rebind of the second parameter must be done explicitly. `type_constructor<unique_ptr<T, D>>` is also defined as `unique_ptr<_t, D>`
 
 ```c++
 namespace std
@@ -208,7 +208,7 @@ namespace std
     template <class T>
     struct type_constructor<default_delete<T>> : identity<default_delete<_t>> {};
     template <class T, class D>
-    struct type_constructor<unique_ptr<T,D>> : identity<unique_ptr<_t, D>> {};
+    struct type_constructor<unique_ptr<T, D>> : identity<unique_ptr<_t, D>> {};
  }
 }
 ```
