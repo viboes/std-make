@@ -245,11 +245,14 @@ inline namespace fundamental_v2
 {
   // apply a type constuctor TC to the type parameters Args
   template<class TC, class... Args>
-  using apply = typename TC::template apply<Args...>;
+    using apply = typename TC::template apply<Args...>;
 
   // identity meta-function
   template<class T>
-  struct identity;
+    struct identity
+    {
+      using type = T;
+    };
 
   // tag type
   template <class T>
@@ -266,29 +269,29 @@ inline namespace fundamental_v2
 
   // lift a template class to a type constructor
   template <template <class ...> class TC, class... Args>
-  struct lift;
+    struct lift;
 
   // reverse lift a template class to a type constructor
   template <template <class ...> class TC, class... Args>
-  struct reverse_lift;
+    struct reverse_lift;
 
   // type constructor customization point. Default implementation make use of nested type type_constructor
   template <class M >
-  struct type_constructor;
+    struct type_constructor;
 
   // type constructor meta-function
   template <class M >
-  using type_constructor_t = typename type_constructor<M>::type;
+    using type_constructor_t = typename type_constructor<M>::type;
 
   // type trait based on inheritance from type_constructor_tag
   template <class TC >
-  struct is_type_constructor;
+    struct is_type_constructor;
   template <class TC >
-  using is_type_constructor_t = typename is_type_constructor<TC>::type;
+    using is_type_constructor_t = typename is_type_constructor<TC>::type;
 
   // rebinds a type having a underlying type with another underlying type
   template <class M, class U>
-  using rebind = apply<type_constructor_t<M>, U>;
+    using rebind = apply<type_constructor_t<M>, U>;
 
 
   // make() overload
@@ -297,7 +300,7 @@ inline namespace fundamental_v2
   
   // make overload: requires a template class, deduce the underlying type
   template <template <class ...> class M, class X>
-    M<typename std::decay<X>::type> make(X&& x);
+    M<std::decay_t<X>> make(X&& x);
 
     // make overload: requires a type construcor, deduce the underlying type
   template <class TC, class X>
@@ -313,15 +316,15 @@ inline namespace fundamental_v2
 
   // default customization point for TC<void> default constructor
   template <class M>
-  M make(type<M>);
+    M make(type<M>);
 
   // default customization point for constructor from X
   template <class M, class X>
-  M make(type<M>, X&& x);
+    M make(type<M>, X&& x);
 
   // default customization point for in_place constructor
   template <class M, class ...Args>
-  M make(type<M>, in_place_t, Args&& ...args);
+    M make(type<M>, in_place_t, Args&& ...args);
   
 }
 }
@@ -334,7 +337,7 @@ inline namespace fundamental_v2
 ### template + void
 
 ```c++
-  template <template <class ...> class M>
+template <template <class ...> class M>
   M<void> make();
 ```
 
@@ -361,8 +364,8 @@ template <template <class ...> class M, class X>
 ### type constructor + deduced underlying type
 
 ```c++
-  template <class TC, class X>
-    apply<TC, decay_t<X>> make(X&& x);
+template <class TC, class X>
+  apply<TC, decay_t<X>> make(X&& x);
 ```
 
 *Requires:* `TC`is a type constructor.
@@ -405,7 +408,7 @@ template <class M, class ...Args>
 ### Template function `make` - default constructor customization point for void
 
 ```c++
-  template <class M>
+template <class M>
   M make(type<M>)
 ```
 
@@ -427,7 +430,7 @@ template <class M, class X>
 ### `in_place_t` - emplace customization point
 
 ```c++
-make <class M, class ...Args>
+template <class M, class ...Args>
   M make(type<M>, in_place_t, Args&& ...args);
 ```
 
@@ -445,7 +448,7 @@ namespace experimental {
 
   // Holder specialization
   template <>
-  struct optional<_t>;
+    struct optional<_t>;
   template <class T>
     struct type_constructor<optional<T>>;
 
@@ -461,7 +464,7 @@ namespace experimental {
 
   // Holder specialization
   template <class E>
-  struct expected<_t, E>;
+    struct expected<_t, E>;
   template <class T, class E>
     struct type_constructor<expected<T,E>>;
 }
@@ -486,7 +489,7 @@ namespace experimental {
   // customization point for template 
   // (needed because std::experimental::future doesn't uses experimental::in_place_t)
   template <class X, class ...Args>
-    future<X> make(type<future<X>>, experimental::in_place_t, Args&& ...args);
+    future<X> make(type<future<X>>, in_place_t, Args&& ...args);
 
   // Holder specializations
   template <>
@@ -506,7 +509,7 @@ namespace experimental {
   // customization point for template 
   // (needed because std::experimental::shared_future doesn't use experimental::in_place_t)
   template <class X, class ...Args>
-    shared_future<X> make(type<shared_future<X>>, experimental::in_place_t, Args&& ...args);
+    shared_future<X> make(type<shared_future<X>>, in_place_t, Args&& ...args);
     
   // Holder specializations
   template <>
@@ -529,12 +532,12 @@ namespace experimental {
   // customization point for template 
   // (needed because std::unique_ptr doesn't has a conversion constructor)
   template <class DX, class X>
-    unique_ptr<DX> make(experimental::type<unique_ptr<DX>>, X&& x);
+    unique_ptr<DX> make(type<unique_ptr<DX>>, X&& x);
 
   // customization point for template 
-  // (needed because std::unique_ptr doesn't uses experimental::in_place_t)
+  // (needed because std::unique_ptr doesn't uses in_place_t)
   template <class X, class ...Args>
-  unique_ptr<X> make(experimental::type<unique_ptr<X>>, experimental::in_place_t, Args&& ...args);
+  unique_ptr<X> make(type<unique_ptr<X>>, in_place_t, Args&& ...args);
 
 
   // Holder customization
