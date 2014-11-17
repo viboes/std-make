@@ -75,7 +75,7 @@ inline namespace fundamental_v2
   template <class M, class U>
   using rebind = apply<type_constructor_t<M>, U>;
 
-  // transforms a template class into a type_constructor that add the parameter at the end
+  // transforms a template class into a type_constructor that adds the parameter at the end
   template <template <class ...> class TC, class... Args>
   struct lift : type_constructor_tag
   {
@@ -83,7 +83,7 @@ inline namespace fundamental_v2
     using apply = TC<Args..., Args2...>;
   };
 
-  // transforms a template class into a type_constructor that add the parameter at the begining
+  // transforms a template class into a type_constructor that adds the parameter at the begining
   template <template <class ...> class TC, class... Args>
   struct reverse_lift : type_constructor_tag
   {
