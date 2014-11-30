@@ -5,7 +5,7 @@ Experimental generic factory library for C++11/14/17.
 
 # Proposal
 
-This code will eventualy form the basis of a formal proposal to add a generic factories to the C++ standard library.
+This code will eventualy form the basis of a formal proposal to add a generic factories to the C++ standard library (https://github.com/viboes/std-make/blob/master/doc/proposal/factories/DXXXX_factories.md).
 
 
 # Development Status
