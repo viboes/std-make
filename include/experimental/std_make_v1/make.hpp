@@ -91,6 +91,14 @@ inline namespace fundamental_v2
     using apply = TC<Args2..., Args...>;
   };
 
+  //  // undelying_type customization point.
+  //  // Default implementation make use of a nested type underlying_type
+  //  template <class M >
+  //  struct underlying_type : identity<typename  M::underlying_type> {};
+  //
+  //  // underlying_type getter meta-function
+  //  template <class M >
+  //  using underlying_type_t = typename underlying_type<M>::type;
 
 
   // make() overload
@@ -120,8 +128,9 @@ inline namespace fundamental_v2
 
   // make overload: requires a type with a specific underlying type, don't deduce the underlying type from X
   template <class M, int = 0, int..., class X>
-  typename enable_if<! is_type_constructor<M>::value,
-    M
+  typename enable_if<   ! is_type_constructor<M>::value
+                     //&&   is_same<X, underlying_type_t<M>>::value
+  , M
   >::type
   make(X&& x)
   {
@@ -138,13 +147,15 @@ inline namespace fundamental_v2
   // default customization point for TC<void> default constructor
   template <class M>
   M make(type<M>)
+  // requires is_default_constructible<M> and is_same<void, underlying_type_t<M>>
   {
     return M();
   }
 
   // default customization point for constructor from X
-  template <class M, class X>
+  template <class M,   class X>
   M make(type<M>, X&& x)
+  // requires is_constructible<M, decat_t<X>>
   {
     return M(std::forward<X>(x));
   }
@@ -152,6 +163,7 @@ inline namespace fundamental_v2
   // default customization point for in_place constructor
   template <class M, class ...Args>
   M make(type<M>, in_place_t, Args&& ...args)
+  // requires is_constructible<M, inplace_t, decay_t<Args>...>
   {
     return M(in_place, std::forward<Args>(args)...);
   }

@@ -71,7 +71,12 @@ int main()
   }
   {
     int v=0;
-    A<int> x = stde::make< stde::lift<A> >(v);
+    A<int> x = stde::make<stde::lift<A>>(v);
+    BOOST_TEST(x.v == 0);
+  }
+  {
+    int v=0;
+    A<int> x = stde::make<A>(v);
     BOOST_TEST(x.v == 0);
   }
   {
