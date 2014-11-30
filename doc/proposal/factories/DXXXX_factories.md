@@ -5,7 +5,7 @@
     </tr>
     <tr>
         <td width="172" align="left" valign="top">Date:</td>
-        <td width="435">2014-10-09</td>
+        <td width="435">2014-11-17</td>
     </tr>
     <tr>
         <td width="172" align="left" valign="top">Project:</td>
@@ -166,14 +166,14 @@ namespace std
 namespace experimental
 {
   template <>
-    struct future<_t> : lift<C> ;
+    struct future<_t> : lift<future> ;
   template <class T>
     struct type_constructor<future<T>> : future<_t> ;
 }
 }
 ```
 
-When the class has two parameter and the underlying type is the first template parameter, as it is the case for `expected`, it is enough to define `expected<_t,E>` as `reverse_lift<expected,E>` and `type_constructor<expected<T,E>>` as `future<_t,E>`. 
+When the class has two parameter and the underlying type is the first template parameter, as it is the case for `expected`, it is enough to define `expected<_t, E>` as `reverse_lift<expected, E>` and `type_constructor<expected<T, E>>` as `future<_t, E>`. 
 
 ```c++
 namespace std
@@ -188,7 +188,7 @@ namespace experimental
 }
 ```
 
-If the second template depends on the first one as it is the case of `unique_ptr<T, D>`, the rebind of the second parameter must be done explicitly. `type_constructor<unique_ptr<T,D>>` is also defined as `unique_ptr<_t,D>`
+If the second template depends on the first one as it is the case of `unique_ptr<T, D>`, the rebind of the second parameter must be done explicitly. `type_constructor<unique_ptr<T, D>>` is also defined as `unique_ptr<_t, D>`
 
 ```c++
 namespace std
@@ -208,7 +208,7 @@ namespace std
     template <class T>
     struct type_constructor<default_delete<T>> : identity<default_delete<_t>> {};
     template <class T, class D>
-    struct type_constructor<unique_ptr<T,D>> : identity<unique_ptr<_t, D>> {};
+    struct type_constructor<unique_ptr<T, D>> : identity<unique_ptr<_t, D>> {};
  }
 }
 ```
@@ -245,12 +245,15 @@ inline namespace fundamental_v2
 {
   // apply a type constuctor TC to the type parameters Args
   template<class TC, class... Args>
-  using apply = typename TC::template apply<Args...>;
+    using apply = typename TC::template apply<Args...>;
 
   // identity meta-function
   template<class T>
-  struct identity;
-
+    struct identity;
+    {
+      using type = T;
+    };
+  
   // tag type
   template <class T>
     struct type 
@@ -262,38 +265,38 @@ inline namespace fundamental_v2
   struct _t {};
 
   // type constructor tag type
-  struct type_constructor_tag {};
+    struct type_constructor_tag {};
 
   // lift a template class to a type constructor
   template <template <class ...> class TC, class... Args>
-  struct lift;
+    struct lift;
 
   // reverse lift a template class to a type constructor
   template <template <class ...> class TC, class... Args>
-  struct reverse_lift;
+    struct reverse_lift;
 
   // type constructor customization point. Default implementation make use of nested type type_constructor
   template <class M >
-  struct type_constructor;
+    struct type_constructor;
 
   // type constructor meta-function
   template <class M >
-  using type_constructor_t = typename type_constructor<M>::type;
+    using type_constructor_t = typename type_constructor<M>::type;
 
   // type trait based on inheritance from type_constructor_tag
   template <class TC >
-  struct is_type_constructor;
+    struct is_type_constructor;
   template <class TC >
-  using is_type_constructor_t = typename is_type_constructor<TC>::type;
+    using is_type_constructor_t = typename is_type_constructor<TC>::type;
 
   // rebinds a type having a underlying type with another underlying type
   template <class M, class U>
-  using rebind = apply<type_constructor_t<M>, U>;
+    using rebind = apply<type_constructor_t<M>, U>;
 
 
   // make() overload
   template <template <class ...> class M>
-  M<void> make();
+    M<void> make();
   
   // make overload: requires a template class, deduce the underlying type
   template <template <class ...> class M, class X>
@@ -313,15 +316,15 @@ inline namespace fundamental_v2
 
   // default customization point for TC<void> default constructor
   template <class M>
-  M make(type<M>);
+    M make(type<M>);
 
   // default customization point for constructor from X
   template <class M, class X>
-  M make(type<M>, X&& x);
+    M make(type<M>, X&& x);
 
   // default customization point for in_place constructor
   template <class M, class ...Args>
-  M make(type<M>, in_place_t, Args&& ...args);
+    M make(type<M>, in_place_t, Args&& ...args);
   
 }
 }
@@ -490,7 +493,7 @@ namespace experimental {
 
   // Holder specializations
   template <>
-    struct future<_t>;
+    struct future<_t>
   template <>
     struct future<_t&>;
 
@@ -521,6 +524,7 @@ namespace experimental {
 ```
 
 ## `unique_ptr`
+
 
 ```c++
 namespace std {
