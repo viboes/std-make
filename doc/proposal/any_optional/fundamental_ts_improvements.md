@@ -307,10 +307,10 @@ Thanks to Jeffrey Yasskin to encourage me to report these a possible issues of t
 
 # References
 
-* n4335 - Working Draft, C++ Extensions for Library Fundamentals 
+## n4335 - Working Draft, C++ Extensions for Library Fundamentals 
 http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n4335.html
 
-* DXXXX - C++ generic factory 
+## DXXXX - C++ generic factory 
 https://github.com/viboes/std-make/blob/master/doc/proposal/factories/DXXXX_factories.md
 
 
