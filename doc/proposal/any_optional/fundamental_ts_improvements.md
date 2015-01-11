@@ -190,7 +190,7 @@ emplace_any(type<none_t>) {
 
 If possible it would even better if the `emplace_any`/`emplace_optional` could be added as overloads of `make_any`/`make_optional`.
 
-We have an implementation of this kind of overload in [DXXXX]. The problem is that this implementation is not portable and make use of UB. 
+We have an implementation of this kind of overload in [GF] as part of the  [DXXXX](https://github.com/viboes/std-make/blob/master/doc/proposal/any_optional/fundamental_ts_improvements.md#dxxxx---c-generic-factory) proposal. The problem is that this implementation is not portable and make use of UB. 
 If anyone know how to implement this overloads in a portable way, the authors would prefer the `make_any`/`make_optional` overloads.
 
 # Technical Specification
@@ -312,5 +312,8 @@ http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n4335.html
 
 ## DXXXX - C++ generic factory 
 https://github.com/viboes/std-make/blob/master/doc/proposal/factories/DXXXX_factories.md
+
+## C++ generic factory - Implementation 
+https://github.com/viboes/std-make/blob/master/include/experimental/std_make_v1/make.hpp
 
 
