@@ -195,7 +195,7 @@ If anyone know how to implement this overloads in a portable way, the authors wo
 
 # Technical Specification
 
-The wording is relative to [n4335].
+The wording is relative to [n4335] (https://github.com/viboes/std-make/blob/master/doc/proposal/any_optional/fundamental_ts_improvements.md#n4335---working-draft-c-extensions-for-library-fundamentals).
 
 Update 6.1 Header <experimental/any> synopsis adding
 
