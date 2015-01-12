@@ -14,10 +14,10 @@ This code is undocumented, untested, constantly changing, and generally not fit 
 
 # Test results
 
-@               | Build         | Tests coverage | More info
-----------------|-------------- | -------------- |-----------
-travis-ci.org/viboes/std-make)  | [![Coverage Status](https://coveralls.io/repos/viboes/std-make/badge.png?branch=develop)](https://coveralls.io/r/viboes/std-make?branch=develop) | [details...](http://www.boost.org/development/tests/develop/developer/std-make.html)
-Master branch:  | [![Build Status](https://travis-ci.org/viboes/std-make.svg?branch=master)](https://travis-ci.org/viboes/std-make)  | [![Coverage Status](https://coveralls.io/repos/viboes/std-make/badge.png?branch=master)](https://coveralls.io/r/viboes/std-make?branch=master) | [details...](http://www.boost.org/development/tests/master/developer/std-make.html)
+@               | Build         | Tests coverage 
+----------------|-------------- | -------------- 
+Develop branch: | [![Build Status](https://travis-ci.org/viboes/std-make.svg?branch=develop)](https://travis-ci.org/viboes/std-make)  | [![Coverage Status](https://coveralls.io/repos/viboes/std-make/badge.png?branch=develop)](https://coveralls.io/r/viboes/std-make?branch=develop)
+Master branch:  | [![Build Status](https://travis-ci.org/viboes/std-make.svg?branch=master)](https://travis-ci.org/viboes/std-make)  | [![Coverage Status](https://coveralls.io/repos/viboes/std-make/badge.png?branch=master)](https://coveralls.io/r/viboes/std-make?branch=master) 
 
 
 # License
