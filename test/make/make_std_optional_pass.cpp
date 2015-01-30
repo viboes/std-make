@@ -27,9 +27,11 @@ namespace std {
     template <>
     struct optional<void> {};
 
+#ifdef VIBOES_STD_EXPERIMENTAL_FUNDAMENTALS_V2_MAKE_TYPE_CONSTRUCTOR
     // type_constructor customization
     template <class T>
     struct type_constructor<optional<T>> : identity<optional<_t>> {};
+#endif
   }
 }
 

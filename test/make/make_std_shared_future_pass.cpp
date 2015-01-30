@@ -48,12 +48,14 @@ namespace std {
     using apply = shared_future<T&>;
   };
 
+#ifdef VIBOES_STD_EXPERIMENTAL_FUNDAMENTALS_V2_MAKE_TYPE_CONSTRUCTOR
   namespace experimental
   {
     // type_constructor customization
     template <class T>
     struct type_constructor<shared_future<T>> : identity<shared_future<_t>> {};
   }
+#endif
 }
 
 

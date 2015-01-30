@@ -31,6 +31,7 @@ namespace boost {
   struct expected<std::experimental::_t, E>: std::experimental::reverse_lift<expected, E> {};
 
 }
+#ifdef VIBOES_STD_EXPERIMENTAL_FUNDAMENTALS_V2_MAKE_TYPE_CONSTRUCTOR
 
 namespace std
 {
@@ -44,6 +45,7 @@ namespace std
 //    struct underlying_type<boost::expected<T, E>> : identity<T> {};
   }
 }
+#endif
 
 struct A
 {

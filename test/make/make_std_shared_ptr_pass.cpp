@@ -41,13 +41,14 @@ namespace std {
   template <>
   struct shared_ptr<void> {};
 
+#ifdef VIBOES_STD_EXPERIMENTAL_FUNDAMENTALS_V2_MAKE_TYPE_CONSTRUCTOR
   namespace experimental
   {
     // type_constructor customization
     template <class T>
     struct type_constructor<shared_ptr<T>> : identity<shared_ptr<_t>> {};
   }
-
+#endif
 }
 
 struct A

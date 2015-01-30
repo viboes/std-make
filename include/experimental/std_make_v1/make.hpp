@@ -62,6 +62,7 @@ inline namespace fundamental_v2
   template<class TC, class... Args>
   using apply = typename TC::template apply<Args...>;
 
+#ifdef VIBOES_STD_EXPERIMENTAL_FUNDAMENTALS_V2_MAKE_TYPE_CONSTRUCTOR
   // type constructor customization point.
   // Default implementation make use of a nested type type_constructor
   template <class M >
@@ -74,6 +75,7 @@ inline namespace fundamental_v2
   // rebinds a type having a underlying type with another underlying type
   template <class M, class U>
   using rebind = apply<type_constructor_t<M>, U>;
+#endif
 
   // transforms a template class into a type_constructor that adds the parameter at the end
   template <template <class ...> class TC, class... Args>

@@ -36,6 +36,7 @@ namespace boost {
 
 }
 
+#ifdef VIBOES_STD_EXPERIMENTAL_FUNDAMENTALS_V2_MAKE_TYPE_CONSTRUCTOR
 namespace std
 {
   namespace experimental
@@ -45,7 +46,7 @@ namespace std
     struct type_constructor<boost::optional<T>> : identity<boost::optional<_t>> {};
   }
 }
-
+#endif
 
 struct A
 {

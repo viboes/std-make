@@ -12,6 +12,7 @@
 //  template <class M, class ...Args>
 //  auto make(Args&& ...args);
 
+#define VIBOES_STD_EXPERIMENTAL_FUNDAMENTALS_V2_MAKE_TYPE_CONSTRUCTOR
 
 #include <experimental/make.hpp>
 #include <memory>
@@ -77,6 +78,7 @@ namespace std {
   template <>
   struct unique_ptr<void> {};
 
+#ifdef VIBOES_STD_EXPERIMENTAL_FUNDAMENTALS_V2_MAKE_TYPE_CONSTRUCTOR
   namespace experimental
   {
   // type_constructor customization
@@ -85,7 +87,7 @@ namespace std {
     template <class T>
     struct type_constructor<default_delete<T>> : identity<default_delete<_t>> {};
   }
-
+#endif
 }
 
 struct A

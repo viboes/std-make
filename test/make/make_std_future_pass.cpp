@@ -92,12 +92,14 @@ namespace std {
     using apply = future<T&>;
   };
 
+#ifdef VIBOES_STD_EXPERIMENTAL_FUNDAMENTALS_V2_MAKE_TYPE_CONSTRUCTOR
   namespace experimental
   {
     // type_constructor customization
     template <class T>
     struct type_constructor<future<T>> : identity<future<_t>> {};
   }
+#endif
 
 }
 
