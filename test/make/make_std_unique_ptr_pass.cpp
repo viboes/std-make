@@ -65,7 +65,7 @@ namespace std {
 
   // Holder customization
   template <class D>
-  struct unique_ptr<experimental::_t, D> : experimental::type_constructor_tag
+  struct unique_ptr<experimental::_t, D>
   {
       template<class T>
       using apply = unique_ptr<T, experimental::rebind<D, T>>;

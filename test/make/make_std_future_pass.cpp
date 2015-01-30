@@ -86,7 +86,7 @@ namespace std {
   struct future<experimental::_t> : experimental::lift<future> {};
 
   template <>
-  struct future<experimental::_t&>  : experimental::type_constructor_tag
+  struct future<experimental::_t&>
   {
     template<class T>
     using apply = future<T&>;

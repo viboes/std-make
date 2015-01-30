@@ -42,7 +42,7 @@ namespace std {
   struct shared_future<experimental::_t> : experimental::lift<shared_future> {};
 
   template <>
-  struct shared_future<experimental::_t&> : experimental::type_constructor_tag
+  struct shared_future<experimental::_t&>
   {
     template<class T>
     using apply = shared_future<T&>;

@@ -50,13 +50,22 @@ inline namespace fundamental_v2
   // holder type
   struct _t {};
 
-  // type constructor tag type used to check if a class is a type constructor
-  struct type_constructor_tag {};
+  namespace detail {
+    template <class TC, class ...U>
+    struct has_apply
+    {
+    private:
+        struct two {char a; char b;};
+        template <class X> static two test(...);
+        template <class X> static char test(typename X::template apply<U...>* = 0);
+    public:
+        static const bool value = sizeof(test<TC>(0)) == 1;
+    };
+  }
 
-  // type trait based on inheritance from type_constructor_tag
-  // todo change for has TC::template type
-  template <class TC >
-  struct is_type_constructor : is_base_of<type_constructor_tag, TC> {};
+  template <class TC, class U >
+  struct is_type_constructor_for : detail::has_apply<TC, U> {};
+
 
   // apply a type constuctor TC to the type parameters Args
   template<class TC, class... Args>
@@ -79,7 +88,7 @@ inline namespace fundamental_v2
 
   // transforms a template class into a type_constructor that adds the parameter at the end
   template <template <class ...> class TC, class... Args>
-  struct lift : type_constructor_tag
+  struct lift
   {
     template<class... Args2>
     using apply = TC<Args..., Args2...>;
@@ -87,7 +96,7 @@ inline namespace fundamental_v2
 
   // transforms a template class into a type_constructor that adds the parameter at the begining
   template <template <class ...> class TC, class... Args>
-  struct reverse_lift : type_constructor_tag
+  struct reverse_lift
   {
     template<class... Args2>
     using apply = TC<Args2..., Args...>;
@@ -112,25 +121,25 @@ inline namespace fundamental_v2
 
   // make overload: requires a template class, deduce the underlying type
   template <template <class ...> class M, int = 0, int..., class X>
-  M<std::decay_t<X>>
+  M<decay_t<X>>
   make(X&& x)
   {
-    return make(type<M<std::decay_t<X>>>{}, std::forward<X>(x));
+    return make(type<M<decay_t<X>>>{}, std::forward<X>(x));
   }
 
   // make overload: requires a type construcor, deduce the underlying type
   template <class TC, int = 0, int..., class X>
-  typename enable_if<is_type_constructor<TC>::value,
-    apply<TC, std::decay_t<X>>
+  typename enable_if<detail::has_apply<TC, decay_t<X>>::value,
+    apply<TC, decay_t<X>>
   >::type
   make(X&& x)
   {
-    return make(type<apply<TC, std::decay_t<X>>>{}, std::forward<X>(x));
+    return make(type<apply<TC, decay_t<X>>>{}, std::forward<X>(x));
   }
 
   // make overload: requires a type with a specific underlying type, don't deduce the underlying type from X
   template <class M, int = 0, int..., class X>
-  typename enable_if<   ! is_type_constructor<M>::value
+  typename enable_if<   ! detail::has_apply<M, decay_t<X>>::value
                      //&&   is_same<X, underlying_type_t<M>>::value
   , M
   >::type
