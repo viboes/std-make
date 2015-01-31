@@ -61,7 +61,29 @@ inline namespace fundamental_v2
     public:
         static const bool value = sizeof(test<TC>(0)) == 1;
     };
+
+    template <class T>
+    struct deduced_type_impl
+    {
+        typedef T type;
+    };
+
+    template <class T>
+    struct deduced_type_impl<reference_wrapper<T>>
+    {
+        typedef T& type;
+    };
+
   }
+
+  template <class T>
+  struct deduced_type
+  {
+      typedef typename detail::deduced_type_impl<decay_t<T>>::type type;
+  };
+
+  template <class T>
+  using deduced_type_t = typename deduced_type<T>::type;
 
   template <class TC, class U >
   struct is_type_constructor_for : detail::has_apply<TC, U> {};
@@ -121,25 +143,25 @@ inline namespace fundamental_v2
 
   // make overload: requires a template class, deduce the underlying type
   template <template <class ...> class M, int = 0, int..., class X>
-  M<decay_t<X>>
+  M<deduced_type_t<X>>
   make(X&& x)
   {
-    return make(type<M<decay_t<X>>>{}, std::forward<X>(x));
+    return make(type<M<deduced_type_t<X>>>{}, std::forward<X>(x));
   }
 
   // make overload: requires a type construcor, deduce the underlying type
   template <class TC, int = 0, int..., class X>
-  typename enable_if<detail::has_apply<TC, decay_t<X>>::value,
-    apply<TC, decay_t<X>>
+  typename enable_if<detail::has_apply<TC, deduced_type_t<X>>::value,
+    apply<TC, deduced_type_t<X>>
   >::type
   make(X&& x)
   {
-    return make(type<apply<TC, decay_t<X>>>{}, std::forward<X>(x));
+    return make(type<apply<TC, deduced_type_t<X>>>{}, std::forward<X>(x));
   }
 
   // make overload: requires a type with a specific underlying type, don't deduce the underlying type from X
   template <class M, int = 0, int..., class X>
-  typename enable_if<   ! detail::has_apply<M, decay_t<X>>::value
+  typename enable_if<   ! detail::has_apply<M, deduced_type_t<X>>::value
                      //&&   is_same<X, underlying_type_t<M>>::value
   , M
   >::type
@@ -174,7 +196,7 @@ inline namespace fundamental_v2
   // default customization point for in_place constructor
   template <class M, class ...Args>
   M make(type<M>, in_place_t, Args&& ...args)
-  // requires is_constructible<M, inplace_t, decay_t<Args>...>
+  // requires is_constructible<M, inplace_t, decay_tdeduced_type_t..>
   {
     return M(in_place, std::forward<Args>(args)...);
   }

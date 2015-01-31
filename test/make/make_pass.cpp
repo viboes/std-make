@@ -81,8 +81,18 @@ int main()
   }
   {
     int v=0;
+    A<int&> x = stde::make<A>(std::ref(v));
+    BOOST_TEST(&v == x.ptr);
+  }
+  {
+    int v=0;
     A<int> x = stde::make<A<stde::_t>>(v);
     BOOST_TEST(x.v == 0);
+  }
+  {
+    int v=0;
+    A<int&> x = stde::make<A<stde::_t>>(std::ref(v));
+    BOOST_TEST(&v == x.ptr);
   }
   return ::boost::report_errors();
 }

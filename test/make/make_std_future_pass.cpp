@@ -27,9 +27,9 @@ namespace std {
   }
 
   template <int = 0, int..., class T>
-    future<decay_t<T>> make_ready_future(T&& x)
+    future<experimental::deduced_type_t<T>> make_ready_future(T&& x)
   {
-    promise<decay_t<T>> p;
+    promise<experimental::deduced_type_t<T>> p;
     p.set_value(forward<T>(x));
     return p.get_future();
   }
@@ -167,13 +167,28 @@ int main()
   }
   {
     int v=0;
+    std::future<int&> x = std::make_ready_future(std::ref(v));
+    BOOST_TEST(&x.get() == &v);
+  }
+  {
+    int v=0;
     std::future<int&> x = stde::make<std::future<int&>>(v);
+    BOOST_TEST(&x.get() == &v);
+  }
+  {
+    int v=0;
+    std::future<int&> x = stde::make<std::future>(std::ref(v));
     BOOST_TEST(&x.get() == &v);
   }
   {
     int v=0;
     std::future<int> x = stde::make<std::future<stde::_t>>(v);
     BOOST_TEST(x.get() == 0);
+  }
+  {
+    int v=0;
+    std::future<int&> x = stde::make<std::future<stde::_t>>(std::ref(v));
+    BOOST_TEST(&x.get() == &v);
   }
   {
     int v=0;
