@@ -181,9 +181,9 @@ namespace std
 namespace experimental
 {
   template <class E>
-    struct expected<_t, E> : reverse_lift<expected, E> ;
+    struct expected<_t, E> : reverse_lift<expected, E> {};
   template <class T>
-    struct type_constructor<expected<T, E>> : expected<_t, E> ;
+    struct type_constructor<expected<T, E>> : expected<_t, E> {};
 }
 }
 ```
