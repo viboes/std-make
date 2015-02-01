@@ -1,4 +1,4 @@
-// Copyright (C) 2014 Vicente J. Botet Escriba
+// Copyright (C) 2014-2015 Vicente J. Botet Escriba
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -66,7 +66,7 @@ int main()
   }
   {
     int v=0;
-    A<int&> x = stde::make<A<int&>>(v);
+    A<int&> x = stde::make<A<int&>>(std::ref(v));
     BOOST_TEST(&v == x.ptr);
   }
   {

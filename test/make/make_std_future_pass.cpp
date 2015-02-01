@@ -1,4 +1,4 @@
-// Copyright (C) 2014 Vicente J. Botet Escriba
+// Copyright (C) 2014-2015 Vicente J. Botet Escriba
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -88,8 +88,8 @@ namespace std {
   template <>
   struct future<experimental::_t&>
   {
-    template<class T>
-    using apply = future<T&>;
+    template<class ...T>
+    using apply = future<T& ...>;
   };
 
 #ifdef VIBOES_STD_EXPERIMENTAL_FUNDAMENTALS_V2_MAKE_TYPE_CONSTRUCTOR
@@ -192,7 +192,7 @@ int main()
   }
   {
     int v=0;
-    auto x = stde::make<std::future<stde::_t&>>(v);
+    auto x = stde::make<std::future<stde::_t&>>(std::ref(v));
     BOOST_TEST(&x.get() == &v);
   }
   return ::boost::report_errors();

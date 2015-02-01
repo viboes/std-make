@@ -65,6 +65,11 @@ test-suite std_shared_ptr
       [ run make/make_std_shared_ptr_pass.cpp  ]
     ;
 
+test-suite std_pair
+    : 
+      [ run make/make_std_pair_pass.cpp  ]
+    ;
+
 explicit fix ;
 test-suite fix
     : 

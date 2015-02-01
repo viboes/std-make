@@ -2,7 +2,7 @@
 // accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 //
-// (C) Copyright 2014 Vicente J. Botet Escriba
+// Copyright (C) 2014-2015 Vicente J. Botet Escriba
 
 #ifndef VIBOES_STD_EXPERIMENTAL_FUNDAMENTALS_V2_MAKE_HPP
 #define VIBOES_STD_EXPERIMENTAL_FUNDAMENTALS_V2_MAKE_HPP
@@ -104,8 +104,8 @@ inline namespace fundamental_v2
   using type_constructor_t = typename type_constructor<M>::type;
 
   // rebinds a type having a underlying type with another underlying type
-  template <class M, class U>
-  using rebind = apply<type_constructor_t<M>, U>;
+  template <class M, class ...U>
+  using rebind = apply<type_constructor_t<M>, U...>;
 #endif
 
   // transforms a template class into a type_constructor that adds the parameter at the end
@@ -142,21 +142,21 @@ inline namespace fundamental_v2
   }
 
   // make overload: requires a template class, deduce the underlying type
-  template <template <class ...> class M, int = 0, int..., class X>
-  M<deduced_type_t<X>>
-  make(X&& x)
+  template <template <class ...> class M, int = 0, int..., class ...X>
+  M<deduced_type_t<X>...>
+  make(X&& ...x)
   {
-    return make(type<M<deduced_type_t<X>>>{}, std::forward<X>(x));
+    return make(type<M<deduced_type_t<X>...>>{}, std::forward<X>(x)...);
   }
 
   // make overload: requires a type construcor, deduce the underlying type
-  template <class TC, int = 0, int..., class X>
-  typename enable_if<detail::has_apply<TC, deduced_type_t<X>>::value,
-    apply<TC, deduced_type_t<X>>
+  template <class TC, int = 0, int..., class ...X>
+  typename enable_if<detail::has_apply<TC, deduced_type_t<X>...>::value,
+    apply<TC, deduced_type_t<X>...>
   >::type
-  make(X&& x)
+  make(X&& ...x)
   {
-    return make(type<apply<TC, deduced_type_t<X>>>{}, std::forward<X>(x));
+    return make(type<apply<TC, deduced_type_t<X>...>>{}, std::forward<X>(x)...);
   }
 
   // make overload: requires a type with a specific underlying type, don't deduce the underlying type from X
@@ -172,31 +172,37 @@ inline namespace fundamental_v2
 
   // make emplace overload: requires a type with a specific underlying type, don't deduce the underlying type from X
   template <class M, class ...Args>
-  M make(Args&& ...args)
+  typename enable_if<
+    ! detail::has_apply<M, deduced_type_t<Args>...>::value, M
+  >::type
+  make(Args&& ...args)
   {
     return make(type<M>{}, in_place, std::forward<Args>(args)...);
   }
 
   // default customization point for TC<void> default constructor
   template <class M>
-  M make(type<M>)
+  typename enable_if<std::is_default_constructible<M>::value,  M>::type
+  make(type<M>)
   // requires is_default_constructible<M> and is_same<void, underlying_type_t<M>>
   {
     return M();
   }
 
   // default customization point for constructor from X
-  template <class M,   class X>
-  M make(type<M>, X&& x)
+  template <class M, class ...X>
+  typename enable_if<std::is_constructible<M, deduced_type_t<X>...>::value,  M>::type
+  make(type<M>, X&& ...x)
   // requires is_constructible<M, decat_t<X>>
   {
-    return M(std::forward<X>(x));
+    return M(std::forward<deduced_type_t<X>>(x)...);
   }
 
   // default customization point for in_place constructor
   template <class M, class ...Args>
-  M make(type<M>, in_place_t, Args&& ...args)
-  // requires is_constructible<M, inplace_t, decay_tdeduced_type_t..>
+  typename enable_if<std::is_constructible<M, in_place_t, deduced_type_t<Args>...>::value,  M>::type
+  make(type<M>, in_place_t, Args&& ...args)
+  // requires is_constructible<M, inplace_t, decay_t<Args>...>
   {
     return M(in_place, std::forward<Args>(args)...);
   }
