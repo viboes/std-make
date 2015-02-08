@@ -5,7 +5,7 @@
     </tr>
     <tr>
         <td width="172" align="left" valign="top">Date:</td>
-        <td width="435">2015-01-11</td>
+        <td width="435">2015-02-08</td>
     </tr>
     <tr>
         <td width="172" align="left" valign="top">Project:</td>
@@ -50,19 +50,27 @@ we can discuss of the whole view.
 # Proposal
 
 We propose to: 
-* Add to class `none_t` and a `none` constexpr variable.
 
-* Add to class `any`
-  * a implicit conversion from none_t,
-  * an in place forward constructor,
-  * an emplace forward member function,
+* Make `in_place_t` a variadic template class.
+* Change the definition of `in_place` as a constant of type `in_place<>`. 
+
+* To class `optional<T>`
+  * Add a `reset` member function.
+  * Replace the uses of `in_place_t` by `in_place<>`.
+
+* Add an `emplace_optional` factory.
+
+* To class `any`
+  * make the default constructor constexpr,
+  * add in place forward constructors,
+  * add emplace forward member functions,
   * rename the `empty` function with an `explicit bool` conversion,
   * rename the `clear` member function to `reset`,
-  * an assignment from `none_t`.
 
-* Add to class `optional`
-  * a `reset` member function.
+* Add a `none` constexpr variable of type `any`.
 
+* Add an `emplace_any` factory.
+  
 # Design rationale
 
 ## `any` in_place constructor
@@ -74,7 +82,8 @@ template <class... Args>
 constexpr explicit optional<T>::optional(in_place_t, Args&&... args);
 ```
 
-In place construct for `any`can not have an implicit type `T`. We need a way to state explicitly which `T`must be constructed in place 
+In place construct for `any` can not have an implicit type `T`. We need a way to state explicitly which `T` must be constructed in place.
+The template class `type`is used to convey the type `T` participating in overload resolution.
 
 ```c++
 template <class T> struct type {};
@@ -83,25 +92,53 @@ template <class T, class ...Args>
 any(type<T>, in_place_t, Args&& ...);
 ```
 
+This can be used as 
+
 ```c++
 any(type<X>{}, in_place, v1, ..., vn);
 ```
 
-## `any` emplace assignment constructor
+An alternative is to have a template class in_place_t  
 
-`optonal<T>` emplace assignment emplace implicitly a `T`. 
+```c++
+template <class ...T> struct in_place_t {};
+
+template <class T, class ...Args>
+any(in_place_t<T>, Args&& ...);
+```
+
+This can be used as 
+
+```c++
+any(in_place_t<X>{}, v1, ..., vn);
+```
+
+Adopting this template class to optional needs to change the definition of `in_place` to 
+
+```c++
+constexpr in_place_t<> in_place {};
+```
+
+an replace `in_place_t` by `in_place_t<>` on the existing overloads.
+
+## `any` emplace forward member function
+
+`optional<T>` emplace member function emplaces implicitly a `T`. 
 
 ```c++
 template <class ...Args>
 optional<T>::emplace(Args&& ...);
 ```
 
-Emplace assignment for `any` can not have an implicit type `T`. We need a way to state explicitly which `T` must be emplaced. 
+`emplace` for `any` can not have an implicit type `T`. 
+We need a way to state explicitly which `T` must be emplaced. 
 
 ```c++
 template <class T, class ...Args>
 any::emplace(Args&& ...);
 ```
+
+and used as follows
 
 ```c++
 any a;
@@ -119,6 +156,19 @@ We consider `any` as a probably valued type.
 `clear` is more associated to containers. We don't see neither `any` nor `optional` as container classes. 
 For probably valued types (as are the smart pointers) the standard uses `reset` instead.  
 
+## About the constant `none`
+
+Instead of an additional `none`, `any{}` plays well the role. 
+However, the authors think that using `none` is much more explicit.
+
+## Do we need a specific type for `none` 
+
+Instead of an additional `constexpr none_t none{}`, `constexpr any none{}` plays well the role. 
+
+The advantages of the `any` constant is that we don't need conversions.
+However, assignment from `none` could be less efficient. 
+If performance is required the user should use the `reset` function.
+
 ## About a `none_t` type implicitly convertible to `any` and `optional` 
 
 An alternative to the clear member function would be to be able to assign a `none_t` to an `optional` and to an `any`. 
@@ -128,10 +178,7 @@ The problem is that then `none` can be seen as an `optional` or an `any` and cou
 
 We think that this implicit conversion goes against the raison d'être of `nullptr` and that we need explicit factories/constants.
 
-## About a `none_t` type implicitly convertible to only `any` 
 
-Instead of an additional `none`, `any()` plays well the role. 
-However, the authors think that using `none` is more explicit.
 
 ## Do we need an explicit `make_any` factory? 
 
@@ -139,11 +186,11 @@ However, the authors think that using `none` is more explicit.
 
 This is way this paper doesn't propose a `make_any` factory. 
 
-## About an `emplace_xxx` factory
+## About an emplace factories
 
-However, we could consider an emplace_xxx factory that in place construct a `T`.
+However, we could consider an emplace_xxx factory that in place constructs a `T`.
 
-`optional<T>` and `any`can be in place constructed as follows:
+`optional<T>` and `any` can be in place constructed as follows:
 
 ```c++
 optional<T> opt(in_place, v1, vn);
@@ -175,55 +222,81 @@ The implementation of `emplace_any` could be:
 ```c++
 template <class T, class ...Args>
 emplace_any(Args&& ...args) {
-    return emplace_any(type<T>{}, args...);
-}
-
-template <class T, class ...Args>
-emplace_any(type<T>, Args&& ...args) {
-    return any(type<T>, in_place, args...);
-}
-
-emplace_any(type<none_t>) {
-    return any();
+    return any(in_place_t<T>, std::forward<Args>(args)...);
 }
 ```
 
-If possible it would even better if the `emplace_any`/`emplace_optional` could be added as overloads of `make_any`/`make_optional`.
+It is possible to replace `emplace_optional` by an overloaded `make_optional`. We have an implementation of this kind of overload in [GF](https://github.com/viboes/std-make/blob/master/doc/proposal/any_optional/fundamental_ts_improvements.md#c-generic-factory---implementation) as part of the  [DXXXX](https://github.com/viboes/std-make/blob/master/doc/proposal/any_optional/fundamental_ts_improvements.md#dxxxx---c-generic-factory) proposal. The problem is that this implementation is not portable and make use of UB. 
+The authors prefer the overloaded version, however the wording would be more difficult to write.
 
-We have an implementation of this kind of overload in [GF](https://github.com/viboes/std-make/blob/master/doc/proposal/any_optional/fundamental_ts_improvements.md#c-generic-factory---implementation) as part of the  [DXXXX](https://github.com/viboes/std-make/blob/master/doc/proposal/any_optional/fundamental_ts_improvements.md#dxxxx---c-generic-factory) proposal. The problem is that this implementation is not portable and make use of UB. 
-If anyone know how to implement this overloads in a portable way, the authors would prefer the `make_any`/`make_optional` overloads.
+```c++
+auto opt=emplace_optional<T>(v1, vn);
+f(make_optional<T>(v1, vn));
+
+auto a=emplace_any<T>(v1, vn);
+f(make_any<T>(v1, vn));
+```
+
+## Which file for in_place?
+
+As `in_place_t` is used by `optional` and `any` we need to move its definition to another file.
+The preference of the authors will be to place `in_place_t` in `<experimental/utility>`.
+For coherence purposes `in_place` would be moved also.
 
 # Technical Specification
 
 The wording is relative to [n4335] (https://github.com/viboes/std-make/blob/master/doc/proposal/any_optional/fundamental_ts_improvements.md#n4335---working-draft-c-extensions-for-library-fundamentals).
 
-Update 6.1 Header <experimental/any> synopsis adding
+Move `in_place_t` and `in_place` to the <experimental/utility> synopsis
 
 ```c++
-  struct none_t{};
-  constexpr none_t none{};
-
-  template <class T> 
-    struct type {};
-  
-  //... as before adding 
-  template <class T, class ...Args>
-    void emplace_optional(Args&& ...args);
-
+template <class ...T> in_place_t {};
+constexpr in_place_t<> in_place {}
 ```
+
+Update 5.2 [optional.synopsis] adding after `make_optional`
+
+```c++
+  template <class T, class ...Args>
+    optional<T> emplace_optional(Args&& ...args);
+```
+
+Update 5.3 [optional.object] updating `in_place_t` by  `in_place_t<>` and 
+adding 
+
+```c++
+    void reset() noexcept;
+```
+
+Add in 5.10 [optional.specalg]
+
+```c++
+  template <class T, class ...Args>
+    optional<T> emplace_optional(Args&& ...args);
+```
+
+  *Returns*:
+    optional<T>(in_place, std::forward<Args>(args)...). 
+
+Update 6.1 [any.synopsis] adding
+
+```c++
+  template <class T, class ...Args>
+    any emplace_any(Args&& ...args);
+```
+
 Add inside class `any`
 
 ```c++
-    constexpr any(none_t) noexcept;
+    template <class T, class ...Args>
+      any(in_place_t<T>, Args&& ...);
+    template <class T, class U, class... Args>
+      explicit any(in_place_t<T>, initializer_list<U>, Args&&...);
     
     template <class T, class ...Args>
-    any(type<T>, in_place_t, Args&& ...);
-    
-    any& operator=(none_t) noexcept;
-    
-    template <class T, class ...Args>
-    void emplace(Args&& ...);
-  };
+      void emplace(Args&& ...);
+    template <class T, class U, class... Args>
+      void emplace(initializer_list<U>, Args&&...);
 ```
 
 Replace inside class `any`
@@ -240,18 +313,15 @@ by
     explicit operator bool() const noexcept;
 ```
 
-Add in 6.3.1 `any` construct/destruc after p1
+Add after class `any`
 
-```c++
-    any(none_t) noexcept;
-  };
-```
+  constexpr any none{};
 
-after p14
+Add in 6.3.1 `any` construct/destruc after p14
 
 ```c++
     template <class T, class ...Args>
-    any(type<T>, in_place_t, Args&& ...);   
+    any(in_place_t<T>, Args&& ...);   
   };
 ```
 
@@ -264,23 +334,26 @@ after p14
     *this contains a value of type `T`.
   *Throws*:
     Any exception thrown by the selected constructor of `T`.
-  *Remarks*:
-    If `T`'s constructor selected for the initialization is a constexpr constructor, 
-    this constructor shall be a constexpr constructor. 
 
-Add in 6.3.2 `any` assignments after p9
 
 ```c++
-    any& operator=(none_t) noexcept;
+    template <class T, class U, class ...Args>
+    any(in_place_t<T>, initializer_list<U> il, Args&& ...args);   
   };
 ```
+
+  *Requires*:
+    `is_constructible_v<T, initializer_list<U>&, Args&&...>` is true.
   *Effects*:
-    If `*this` contains a value, calls `val->T::~T()`to destroy the contained value; otherwise no effect.
-  *Returns*:
-    `*this.
+    Initializes the contained value as if direct-non-list-initializing an object of type `T` with the arguments `il, std::forward<Args>(args)...`.
   *Postconditions*:
-    `*this` does not contain a value. 
+    `*this` contains a value.
+  *Throws*:
+    Any exception thrown by the selected constructor of `T`.
+  *Remarks*:
+    The function shall not participate in overload resolution unless `is_constructible_v<T, initializer_list<U>&, Args&&...>` is true. 
     
+
 Add in 6.3.3 `any` modifiers
 
 ```c++
@@ -288,6 +361,39 @@ Add in 6.3.3 `any` modifiers
     void emplace(Args&& ...);
   };
 ```
+
+  *Requires*:
+    is_constructible_v<T, Args&&...> is true.
+  *Effects*:
+    Calls `this.reset()`. Then initializes the contained value as if direct-non-list-initializing 
+    an object of type `T` with the arguments `std::forward<Args>(args)...`.
+  *Postconditions*:
+    *this contains a value.
+  *Throws*:
+    Any exception thrown by the selected constructor of `T`.
+  *Remarks*:
+    If an exception is thrown during the call to `T`'s constructor, 
+    `*this` does not contain a value, and the previous (if any) has been destroyed. 
+
+```c++
+    template <class T, class U, class ...Args>
+    void emplace(initializer_list<U> il, Args&& ...);
+  };
+```
+
+  *Effects*:
+    Calls this->reset()`. 
+    Then initializes the contained value as if direct-non-list-initializing 
+    an object of type `T` with the arguments `il, std::forward<Args>(args)...`.
+  *Postconditions*:
+    `*this` contains a value.
+  *Throws*:
+    Any exception thrown by the selected constructor of `T`.
+  *Remarks*:
+    If an exception is thrown during the call to `T`'s constructor, 
+    `*this` does not contain a value, and the previous (if any) has been destroyed.
+
+    The function shall not participate in overload resolution unless `is_constructible_v<T, initializer_list<U>&, Args&&...>` is true.
 
 Replace in 6.3.3 `any` modifiers, `clear` by `reset`.
 
@@ -297,13 +403,16 @@ Add in 6.4 Non-member functions
 
 ```c++
   template <class T, class ...Args>
-    void emplace_optional(Args&& ...args);
+    any emplace_any(Args&& ...args);
 ```
 
+  *Returns*:
+    any(in_place_t<T>{}, std::forward<Args>(args)...). 
    
 # Acknowledgements 
 
-Thanks to Jeffrey Yasskin to encourage me to report these a possible issues of the TS. 
+Thanks to Jeffrey Yasskin to encourage me to report these a possible issues of the TS, 
+Agustin Bergé for his suggestions about `none` and `in_place`.  
 
 # References
 
