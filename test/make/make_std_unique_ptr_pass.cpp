@@ -48,6 +48,8 @@ namespace std {
   }
 #endif
 
+  nullptr_t none_ovl(experimental::type<unique_ptr<experimental::_t>>) { return nullptr; }
+
   // customization point for template (needed because std::unique_ptr doesn't has a conversion constructor)
   template <class T, class X>
   unique_ptr<T> make(experimental::type<unique_ptr<T>>, X&& x)
@@ -100,6 +102,14 @@ struct A
 int main()
 {
   namespace stde = std::experimental;
+  {
+    std::unique_ptr<int> x = stde::none<std::unique_ptr>();
+    BOOST_TEST( ! x);
+  }
+  {
+    std::unique_ptr<int> x = stde::none<std::unique_ptr<stde::_t> >();
+    BOOST_TEST( ! x);
+  }
   {
     int v=0;
     std::unique_ptr<int> x = stde::make<std::unique_ptr>(v);

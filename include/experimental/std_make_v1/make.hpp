@@ -16,7 +16,7 @@
 
 namespace std
 {
-#if __cplusplus <= 201103L
+#if __cplusplus < 201103L
   template <class T>
   using decay_t = typename decay<T>::type;
 
@@ -124,6 +124,9 @@ inline namespace fundamental_v2
     using apply = TC<Args2..., Args...>;
   };
 
+  template <template <class ...> class A>
+  using lift_tc = A<_t>;
+
   //  // undelying_type customization point.
   //  // Default implementation make use of a nested type underlying_type
   //  template <class M >
@@ -132,6 +135,17 @@ inline namespace fundamental_v2
   //  // underlying_type getter meta-function
   //  template <class M >
   //  using underlying_type_t = typename underlying_type<M>::type;
+
+  template <template <class ...> class TC>
+  auto none()
+  {
+    return none_ovl(type<lift_tc<TC>>{});
+  }
+
+  template <class TC>
+  auto none() {
+    return none_ovl(type<TC>{});
+  }
 
 
   // make() overload
@@ -184,7 +198,6 @@ inline namespace fundamental_v2
   template <class M>
   typename enable_if<std::is_default_constructible<M>::value,  M>::type
   make(type<M>)
-  // requires is_default_constructible<M> and is_same<void, underlying_type_t<M>>
   {
     return M();
   }
@@ -193,7 +206,6 @@ inline namespace fundamental_v2
   template <class M, class ...X>
   typename enable_if<std::is_constructible<M, deduced_type_t<X>...>::value,  M>::type
   make(type<M>, X&& ...x)
-  // requires is_constructible<M, decat_t<X>>
   {
     return M(std::forward<deduced_type_t<X>>(x)...);
   }
@@ -202,7 +214,6 @@ inline namespace fundamental_v2
   template <class M, class ...Args>
   typename enable_if<std::is_constructible<M, in_place_t, deduced_type_t<Args>...>::value,  M>::type
   make(type<M>, in_place_t, Args&& ...args)
-  // requires is_constructible<M, inplace_t, decay_t<Args>...>
   {
     return M(in_place, std::forward<Args>(args)...);
   }

@@ -32,6 +32,8 @@ namespace std {
     template <class T>
     struct type_constructor<optional<T>> : identity<optional<_t>> {};
 #endif
+
+    nullopt_t none_ovl(type<optional<_t>>) { return nullopt; }
   }
 }
 
@@ -47,6 +49,14 @@ struct A
 int main()
 {
   namespace stde = std::experimental;
+  {
+    stde::optional<int> x = stde::none<stde::optional>();
+    BOOST_TEST(! x);
+  }
+  {
+    stde::optional<int> x = stde::none<stde::optional<stde::_t>>();
+    BOOST_TEST(! x);
+  }
   {
     int v=0;
     stde::optional<int> x = stde::make<stde::optional>(v);

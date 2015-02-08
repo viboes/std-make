@@ -19,6 +19,8 @@
 
 namespace std {
 
+  nullptr_t none_ovl(experimental::type<shared_ptr<experimental::_t>>) { return nullptr; }
+
   // customization point for template (needed because std::shared_ptr doesn't has a conversion constructor)
   template <class DX, class X>
   shared_ptr<DX> make(experimental::type<shared_ptr<DX>>, X&& x)
@@ -62,6 +64,14 @@ struct A
 int main()
 {
   namespace stde = std::experimental;
+  {
+    std::unique_ptr<int> x = stde::none<std::shared_ptr>();
+    BOOST_TEST( ! x);
+  }
+  {
+    std::unique_ptr<int> x = stde::none<std::shared_ptr<stde::_t> >();
+    BOOST_TEST( ! x);
+  }
   {
     int v=0;
     std::shared_ptr<int> x = stde::make<std::shared_ptr>(v);
