@@ -38,8 +38,8 @@ namespace std {
   template <>
   struct pair<experimental::_t, experimental::_t>
   {
-      template <class ...T>
-      using apply = pair<T...>;
+      template <class T, class U>
+      using apply = pair<T, U>;
   };
 
   // todo remove this specialization
@@ -51,7 +51,7 @@ namespace std {
   {
   // type_constructor customization
     template <class T1, class T2>
-    struct type_constructor<pair<T1,T2>> : identity<pair<_t, _t>> {};
+    struct type_constructor<pair<T1,T2>> : id<pair<_t, _t>> {};
   }
 #endif
 }

@@ -12,7 +12,7 @@
 //  template <class M, class ...Args>
 //  auto make(Args&& ...args);
 
-#define VIBOES_STD_EXPERIMENTAL_FUNDAMENTALS_V2_MAKE_TYPE_CONSTRUCTOR
+//#define VIBOES_STD_EXPERIMENTAL_FUNDAMENTALS_V2_MAKE_TYPE_CONSTRUCTOR
 
 #include <experimental/make.hpp>
 #include <memory>
@@ -48,7 +48,9 @@ namespace std {
   }
 #endif
 
-  nullptr_t none_ovl(experimental::type<unique_ptr<experimental::_t>>) { return nullptr; }
+  template <class D>
+  nullptr_t none_custom(experimental::type<unique_ptr<experimental::_t, D>>) { return nullptr; }
+  nullptr_t none_custom(experimental::template_class<unique_ptr>) { return nullptr; }
 
   // customization point for template (needed because std::unique_ptr doesn't has a conversion constructor)
   template <class T, class X>
@@ -69,7 +71,7 @@ namespace std {
   struct unique_ptr<experimental::_t, D>
   {
       template <class ...T>
-      using apply = unique_ptr<T..., experimental::rebind<D, T...>>;
+      using apply = unique_ptr<T..., experimental::eval<experimental::rebind<D, T...>>>;
   };
 
   template <>
@@ -84,11 +86,12 @@ namespace std {
   {
   // type_constructor customization
     template <class T, class D>
-    struct type_constructor<unique_ptr<T,D>> : identity<unique_ptr<_t, D>> {};
+    struct type_constructor<unique_ptr<T,D>> : id<unique_ptr<_t, D>> {};
     template <class T>
-    struct type_constructor<default_delete<T>> : identity<default_delete<_t>> {};
+    struct type_constructor<default_delete<T>> : id<default_delete<_t>> {};
   }
 #endif
+
 }
 
 struct A
@@ -102,6 +105,8 @@ struct A
 int main()
 {
   namespace stde = std::experimental;
+
+  static_assert(std::is_same<stde::rebind_t<std::default_delete<int>, long>, std::default_delete<long>>::value, "ERROR");
   {
     std::unique_ptr<int> x = stde::none<std::unique_ptr>();
     BOOST_TEST( ! x);

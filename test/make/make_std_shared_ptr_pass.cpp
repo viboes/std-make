@@ -19,7 +19,8 @@
 
 namespace std {
 
-  nullptr_t none_ovl(experimental::type<shared_ptr<experimental::_t>>) { return nullptr; }
+  nullptr_t none_custom(experimental::template_class<shared_ptr>) { return nullptr; }
+  nullptr_t none_custom(experimental::type<shared_ptr<experimental::_t>>) { return nullptr; }
 
   // customization point for template (needed because std::shared_ptr doesn't has a conversion constructor)
   template <class DX, class X>
@@ -37,7 +38,13 @@ namespace std {
 
   // Holder customization
   template <>
-  struct shared_ptr<experimental::_t> : experimental::lift<shared_ptr> {};
+  struct shared_ptr<experimental::_t>
+  //: experimental::lift<shared_ptr> {};
+  {
+    template <class  T>
+    using apply = shared_ptr<T>;
+  };
+
 
   // todo remove this specialization
   template <>
@@ -48,7 +55,7 @@ namespace std {
   {
     // type_constructor customization
     template <class T>
-    struct type_constructor<shared_ptr<T>> : identity<shared_ptr<_t>> {};
+    struct type_constructor<shared_ptr<T>> : id<shared_ptr<_t>> {};
   }
 #endif
 }
@@ -64,6 +71,8 @@ struct A
 int main()
 {
   namespace stde = std::experimental;
+  static_assert(stde::is_applicable_with<std::shared_ptr<stde::_t>, int>::value, "ERROR");
+
   {
     std::unique_ptr<int> x = stde::none<std::shared_ptr>();
     BOOST_TEST( ! x);

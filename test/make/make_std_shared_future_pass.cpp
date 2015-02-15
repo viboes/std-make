@@ -41,19 +41,19 @@ namespace std {
   template <>
   struct shared_future<experimental::_t> : experimental::lift<shared_future> {};
 
-  template <>
-  struct shared_future<experimental::_t&>
-  {
-    template<class ...T>
-    using apply = shared_future<T& ...>;
-  };
+//  template <>
+//  struct shared_future<experimental::_t&>
+//  {
+//    template<class ...T>
+//    using apply = shared_future<T& ...>;
+//  };
 
 #ifdef VIBOES_STD_EXPERIMENTAL_FUNDAMENTALS_V2_MAKE_TYPE_CONSTRUCTOR
   namespace experimental
   {
     // type_constructor customization
     template <class T>
-    struct type_constructor<shared_future<T>> : identity<shared_future<_t>> {};
+    struct type_constructor<shared_future<T>> : id<shared_future<_t>> {};
   }
 #endif
 }
@@ -101,7 +101,7 @@ int main()
   }
   {
     int v=0;
-    auto x = stde::make<std::shared_future<stde::_t&>>(std::ref(v));
+    auto x = stde::make<std::shared_future<stde::_t>>(std::ref(v));
     BOOST_TEST(&x.get() == &v);
   }
   {

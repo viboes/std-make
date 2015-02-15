@@ -1,4 +1,4 @@
-// Copyright (C) 2014 Vicente J. Botet Escriba
+// Copyright (C) 2014-2015 Vicente J. Botet Escriba
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -18,7 +18,7 @@
 
 namespace boost {
 
-  none_t none_ovl(std::experimental::type<optional<std::experimental::_t>>) { return boost::none; }
+  none_t none_custom(std::experimental::type<optional<std::experimental::_t>>) { return boost::none; }
 
   // customization point for template (needed because boost::optional doesn't has experimental::in_place_t constructor)
   template <class X, class ...Args>
@@ -34,7 +34,12 @@ namespace boost {
 
   // Holder specialization
   template <>
-  struct optional<std::experimental::_t> : std::experimental::lift<optional> {};
+  struct optional<std::experimental::_t>
+  //: std::experimental::quote<optional> {};
+  {
+    template <class  T>
+    using apply = optional<T>;
+  };
 
 }
 
@@ -45,7 +50,7 @@ namespace std
   {
     // type_constructor customization
     template <class T>
-    struct type_constructor<boost::optional<T>> : identity<boost::optional<_t>> {};
+    struct type_constructor<boost::optional<T>> : id<boost::optional<_t>> {};
   }
 }
 #endif
@@ -61,6 +66,7 @@ struct A
 int main()
 {
   namespace stde = std::experimental;
+  static_assert(stde::is_applicable_with<boost::optional<stde::_t>, int>::value, "ERROR");
   {
     int v=0;
     boost::optional<int> x = stde::make<boost::optional>(v);

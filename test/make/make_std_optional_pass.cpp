@@ -30,10 +30,11 @@ namespace std {
 #ifdef VIBOES_STD_EXPERIMENTAL_FUNDAMENTALS_V2_MAKE_TYPE_CONSTRUCTOR
     // type_constructor customization
     template <class T>
-    struct type_constructor<optional<T>> : identity<optional<_t>> {};
+    struct type_constructor<optional<T>> : id<optional<_t>> {};
 #endif
 
-    nullopt_t none_ovl(type<optional<_t>>) { return nullopt; }
+    nullopt_t none_custom(type<optional<_t>>) { return nullopt; }
+    nullopt_t none_custom(template_class<optional>) { return nullopt; }
   }
 }
 

@@ -15,6 +15,9 @@
 
 #include <experimental/make.hpp>
 #include <memory>
+#include <algorithm>
+#include <iterator>
+#include <vector>
 #include <boost/detail/lightweight_test.hpp>
 
 template <class T>
@@ -93,6 +96,16 @@ int main()
     int v=0;
     A<int&> x = stde::make<A<stde::_t>>(std::ref(v));
     BOOST_TEST(&v == x.ptr);
+  }
+  {
+    std::vector<int> xs;
+    std::vector<A<int> > ys;
+    std::transform(xs.begin(), xs.end(), std::back_inserter(ys), stde::maker<A<stde::_t>>{});
+  }
+  {
+    std::vector<int> xs;
+    std::vector<A<long> > ys;
+    std::transform(xs.begin(), xs.end(), std::back_inserter(ys), stde::emplacer<A<long>>{});
   }
   return ::boost::report_errors();
 }

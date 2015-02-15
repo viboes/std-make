@@ -16,43 +16,65 @@
 
 namespace std
 {
-#if __cplusplus < 201103L
-  template <class T>
-  using decay_t = typename decay<T>::type;
-
-  template <class T>
-  using remove_reference_t = typename remove_reference<T>::type;
-
-#endif
 
 namespace experimental
 {
 #if ! defined VIBOES_STD_EXPERIMENTAL_FACTORIES_USE_OPTIONAL
+inline namespace fundamental_v1
+{
   constexpr struct in_place_t{} in_place{};
+}
 #endif
 
 inline namespace fundamental_v2
 {
+//namespace meta
+//{
+
+  /// evaluates a meta-expression \p T by returning the nested \c T::type
+  template <class T>
+  using eval = typename T::type;
 
   // identity meta-function
   template<class T>
-  struct identity
+  struct id
   {
-    typedef T type;
+    using type = T;
   };
 
   // tag type
   template <class T>
-  struct type {
+  struct type
+  {
     using underlying_type = T;
+  };
+
+  // tag template class
+  template <template <class...> class T>
+  struct template_class
+  {
   };
 
   // holder type
   struct _t {};
 
   namespace detail {
+    template <class T>
+    struct deduced_type_impl : id<T> {};
+
+    template <class T>
+    struct deduced_type_impl<reference_wrapper<T>> : id<T&> {};
+  }
+
+  template <class T>
+  struct deduced_type : detail::deduced_type_impl<eval<decay<T>>> {};
+
+  template <class T>
+  using deduced_type_t = eval<deduced_type<T>>;
+
+  namespace detail {
     template <class TC, class ...U>
-    struct has_apply
+    struct is_applicable_with
     {
     private:
         struct two {char a; char b;};
@@ -61,35 +83,26 @@ inline namespace fundamental_v2
     public:
         static const bool value = sizeof(test<TC>(0)) == 1;
     };
-
-    template <class T>
-    struct deduced_type_impl
+    template <class TC, class U>
+    struct is_applicable_with1
     {
-        typedef T type;
+    private:
+        struct two {char a; char b;};
+        template <class X> static two test(...);
+        template <class X> static char test(typename X::template apply<U>* = 0);
+    public:
+        static const bool value = sizeof(test<TC>(0)) == 1;
     };
-
-    template <class T>
-    struct deduced_type_impl<reference_wrapper<T>>
-    {
-        typedef T& type;
-    };
-
   }
 
-  template <class T>
-  struct deduced_type
-  {
-      typedef typename detail::deduced_type_impl<decay_t<T>>::type type;
-  };
-
-  template <class T>
-  using deduced_type_t = typename deduced_type<T>::type;
+  /// trait stating if a metafunction \p TC is applicable with the argument \p U
+  template <class TC, class ...U >
+  struct is_applicable_with : detail::is_applicable_with<TC, U...> {};
 
   template <class TC, class U >
-  struct is_type_constructor_for : detail::has_apply<TC, U> {};
+  struct is_applicable_with1 : detail::is_applicable_with1<TC, U> {};
 
-
-  // apply a type constuctor TC to the type parameters Args
+  /// applies a meta-function \p TC to the arguments \p Args
   template<class TC, class... Args>
   using apply = typename TC::template apply<Args...>;
 
@@ -97,40 +110,71 @@ inline namespace fundamental_v2
   // type constructor customization point.
   // Default implementation make use of a nested type type_constructor
   template <class M >
-  struct type_constructor : identity<typename  M::type_constructor> {};
+  struct type_constructor : id<typename  M::type_constructor> {};
 
-  // type constructor getter meta-function
+  // type constructor getter meta-function-class
   template <class M >
-  using type_constructor_t = typename type_constructor<M>::type;
+  using type_constructor_t = eval<type_constructor<M>>;
 
   // rebinds a type having a underlying type with another underlying type
   template <class M, class ...U>
-  using rebind = apply<type_constructor_t<M>, U...>;
+  using rebind2 = apply<eval<type_constructor<M>>, U...>;
 #endif
+
+  template <class M, class ...U>
+  struct rebind : id<typename M::template rebind<U...>> {};
+
+  template <template<class ...> class TC, class ...Ts, class ...Us>
+  struct rebind<TC<Ts...>, Us...> : id<TC<Us...>> {};
+
+  template <class M, class ...Us>
+  using rebind_t = eval<rebind<M, Us...>>;
+
+  // transforms a template class into a type_constructor that adds the parameter at the end
+  template <template <class ...> class TC>
+  struct quote
+  {
+  private:
+    /// Indirection here needed to avoid Core issue 1430
+    /// http://open-std.org/jtc1/sc22/wg21/docs/cwg_active.html#1430
+    template <class... Args>
+    struct impl : id<TC<Args...>> {};
+  public:
+    template <class... Args>
+    using apply = eval<impl<Args...>>;
+  };
 
   // transforms a template class into a type_constructor that adds the parameter at the end
   template <template <class ...> class TC, class... Args>
   struct lift
   {
-    template<class... Args2>
-    using apply = TC<Args..., Args2...>;
+  private:
+    /// Indirection here needed to avoid Core issue 1430
+    /// http://open-std.org/jtc1/sc22/wg21/docs/cwg_active.html#1430
+    template <class... Args2>
+    struct impl : id<TC<Args..., Args2...>> {};
+  public:
+    template <class... Args2>
+    using apply = eval<impl<Args2...>>;
   };
 
   // transforms a template class into a type_constructor that adds the parameter at the begining
   template <template <class ...> class TC, class... Args>
   struct reverse_lift
   {
+  private:
+    /// Indirection here needed to avoid Core issue 1430
+    /// http://open-std.org/jtc1/sc22/wg21/docs/cwg_active.html#1430
+    template <class... Args2> struct impl : id<TC<Args2..., Args...>> {};
+  public:
     template<class... Args2>
-    using apply = TC<Args2..., Args...>;
+    using apply = eval<impl<Args2...>>;
   };
-
-  template <template <class ...> class A>
-  using lift_tc = A<_t>;
 
   //  // undelying_type customization point.
   //  // Default implementation make use of a nested type underlying_type
   //  template <class M >
-  //  struct underlying_type : identity<typename  M::underlying_type> {};
+  //  struct underlying_type : id<typename  M::underlying_type> {};
   //
   //  // underlying_type getter meta-function
   //  template <class M >
@@ -139,44 +183,61 @@ inline namespace fundamental_v2
   template <template <class ...> class TC>
   auto none()
   {
-    return none_ovl(type<lift_tc<TC>>{});
+    return none_custom(template_class<TC>{});
   }
 
   template <class TC>
   auto none() {
-    return none_ovl(type<TC>{});
+    return none_custom(type<TC>{});
   }
 
+  template <class TC>
+  struct noner
+  {
+    auto operator()() {
+      return none_custom(type<TC>{});
+    }
+  };
 
   // make() overload
-  template <template <class ...> class M>
+  template <template <class> class M>
   M<void> make()
   {
     return make(type<M<void>>{});
   }
 
+//  template <class TC, int = 0, int...>
+//  typename enable_if<
+//    is_applicable_with1<TC, void>::value,
+//    apply<TC, void>
+//  >::type
+//  make()
+//  {
+//    return make(type<apply<TC, void>>{});
+//  }
+
   // make overload: requires a template class, deduce the underlying type
   template <template <class ...> class M, int = 0, int..., class ...X>
-  M<deduced_type_t<X>...>
+  M<eval<deduced_type<X>>...>
   make(X&& ...x)
   {
-    return make(type<M<deduced_type_t<X>...>>{}, std::forward<X>(x)...);
+    return make(type<M<eval<deduced_type<X>>...>>{}, std::forward<X>(x)...);
   }
 
-  // make overload: requires a type construcor, deduce the underlying type
+  // make overload: requires a type constructor, deduce the underlying type
   template <class TC, int = 0, int..., class ...X>
-  typename enable_if<detail::has_apply<TC, deduced_type_t<X>...>::value,
-    apply<TC, deduced_type_t<X>...>
+  typename enable_if<is_applicable_with<TC, eval<deduced_type<X>>...>::value,
+    apply<TC, eval<deduced_type<X>>...>
   >::type
   make(X&& ...x)
   {
-    return make(type<apply<TC, deduced_type_t<X>...>>{}, std::forward<X>(x)...);
+    return make(type<apply<TC, eval<deduced_type<X>>...>>{}, std::forward<X>(x)...);
   }
 
   // make overload: requires a type with a specific underlying type, don't deduce the underlying type from X
   template <class M, int = 0, int..., class X>
-  typename enable_if<   ! detail::has_apply<M, deduced_type_t<X>>::value
-                     //&&   is_same<X, underlying_type_t<M>>::value
+  typename enable_if<   ! is_applicable_with<M, eval<deduced_type<X>>>::value
+                     //&&   is_same<M, rebind_t<M, X>>::value
   , M
   >::type
   make(X&& x)
@@ -186,13 +247,43 @@ inline namespace fundamental_v2
 
   // make emplace overload: requires a type with a specific underlying type, don't deduce the underlying type from X
   template <class M, class ...Args>
-  typename enable_if<
-    ! detail::has_apply<M, deduced_type_t<Args>...>::value, M
+  typename enable_if<    ! is_applicable_with<M, eval<deduced_type<Args>>...>::value
+  , M
   >::type
   make(Args&& ...args)
   {
     return make(type<M>{}, in_place, std::forward<Args>(args)...);
   }
+
+  template <class TC>
+  struct maker
+  {
+    // make overload: requires a type constructor, deduce the underlying type
+    template <class ...X>
+    apply<TC, eval<deduced_type<X>>...>
+    operator()(X&& ...x)
+    {
+      return make<TC>(std::forward<X>(x)...);
+    }
+  };
+
+  template <class M>
+  struct emplacer
+  {
+    // make overload: requires a type with a specific underlying type, don't deduce the underlying type from X
+    template <class X>
+    M operator()(X&& x)
+    {
+      return make<M>(std::forward<X>(x));
+    }
+
+    // make emplace overload: requires a type with a specific underlying type, don't deduce the underlying type from X
+    template <class ...Args>
+    M operator()(Args&& ...args)
+    {
+      return make<M>(std::forward<Args>(args)...);
+    }
+  };
 
   // default customization point for TC<void> default constructor
   template <class M>
@@ -204,15 +295,15 @@ inline namespace fundamental_v2
 
   // default customization point for constructor from X
   template <class M, class ...X>
-  typename enable_if<std::is_constructible<M, deduced_type_t<X>...>::value,  M>::type
+  typename enable_if<std::is_constructible<M, eval<deduced_type<X>>...>::value,  M>::type
   make(type<M>, X&& ...x)
   {
-    return M(std::forward<deduced_type_t<X>>(x)...);
+    return M(std::forward<eval<deduced_type<X>>>(x)...);
   }
 
   // default customization point for in_place constructor
   template <class M, class ...Args>
-  typename enable_if<std::is_constructible<M, in_place_t, deduced_type_t<Args>...>::value,  M>::type
+  typename enable_if<std::is_constructible<M, in_place_t, eval<deduced_type<Args>>...>::value,  M>::type
   make(type<M>, in_place_t, Args&& ...args)
   {
     return M(in_place, std::forward<Args>(args)...);

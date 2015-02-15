@@ -39,10 +39,10 @@ namespace std
   {
     // type_constructor customization
     template <class T, class E>
-    struct type_constructor<boost::expected<T, E>> : identity<boost::expected<_t, E>> {};
+    struct type_constructor<boost::expected<T, E>> : id<boost::expected<_t, E>> {};
 //    // underlying_type customization
 //    template <class T, class E>
-//    struct underlying_type<boost::expected<T, E>> : identity<T> {};
+//    struct underlying_type<boost::expected<T, E>> : id<T> {};
   }
 }
 #endif

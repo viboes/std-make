@@ -85,19 +85,19 @@ namespace std {
   template <>
   struct future<experimental::_t> : experimental::lift<future> {};
 
-  template <>
-  struct future<experimental::_t&>
-  {
-    template<class ...T>
-    using apply = future<T& ...>;
-  };
+//  template <>
+//  struct future<experimental::_t&>
+//  {
+//    template<class ...T>
+//    using apply = future<T& ...>;
+//  };
 
 #ifdef VIBOES_STD_EXPERIMENTAL_FUNDAMENTALS_V2_MAKE_TYPE_CONSTRUCTOR
   namespace experimental
   {
     // type_constructor customization
     template <class T>
-    struct type_constructor<future<T>> : identity<future<_t>> {};
+    struct type_constructor<future<T>> : id<future<_t>> {};
   }
 #endif
 
@@ -192,7 +192,7 @@ int main()
   }
   {
     int v=0;
-    auto x = stde::make<std::future<stde::_t&>>(std::ref(v));
+    auto x = stde::make<std::future<stde::_t>>(std::ref(v));
     BOOST_TEST(&x.get() == &v);
   }
   return ::boost::report_errors();
