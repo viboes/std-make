@@ -42,6 +42,11 @@ inline namespace fundamental_v2
     using type = T;
   };
 
+  template <class ...Ts>
+  struct types
+  {
+  };
+
   // tag type
   template <class T>
   struct type
@@ -181,44 +186,36 @@ inline namespace fundamental_v2
   //  using underlying_type_t = typename underlying_type<M>::type;
 
   template <template <class ...> class TC>
-  auto none()
+  constexpr auto none()
   {
     return none_custom(template_class<TC>{});
   }
 
   template <class TC>
-  auto none() {
+  constexpr auto none() {
     return none_custom(type<TC>{});
   }
 
-  template <class TC>
-  struct noner
-  {
-    auto operator()() {
-      return none_custom(type<TC>{});
-    }
-  };
-
   // make() overload
   template <template <class> class M>
-  M<void> make()
+  constexpr M<void> make()
   {
     return make(type<M<void>>{});
   }
 
-//  template <class TC, int = 0, int...>
-//  typename enable_if<
-//    is_applicable_with1<TC, void>::value,
-//    apply<TC, void>
-//  >::type
-//  make()
-//  {
-//    return make(type<apply<TC, void>>{});
-//  }
+  template <class TC, int = 0, int...>
+  constexpr typename enable_if<
+    is_applicable_with1<TC, void>::value,
+    apply<TC, void>
+  >::type
+  make()
+  {
+    return make(type<apply<TC, void>>{});
+  }
 
   // make overload: requires a template class, deduce the underlying type
   template <template <class ...> class M, int = 0, int..., class ...X>
-  M<eval<deduced_type<X>>...>
+  constexpr M<eval<deduced_type<X>>...>
   make(X&& ...x)
   {
     return make(type<M<eval<deduced_type<X>>...>>{}, std::forward<X>(x)...);
@@ -226,7 +223,7 @@ inline namespace fundamental_v2
 
   // make overload: requires a type constructor, deduce the underlying type
   template <class TC, int = 0, int..., class ...X>
-  typename enable_if<is_applicable_with<TC, eval<deduced_type<X>>...>::value,
+  constexpr typename enable_if<is_applicable_with<TC, eval<deduced_type<X>>...>::value,
     apply<TC, eval<deduced_type<X>>...>
   >::type
   make(X&& ...x)
@@ -236,7 +233,7 @@ inline namespace fundamental_v2
 
   // make overload: requires a type with a specific underlying type, don't deduce the underlying type from X
   template <class M, int = 0, int..., class X>
-  typename enable_if<   ! is_applicable_with<M, eval<deduced_type<X>>>::value
+  constexpr typename enable_if<   ! is_applicable_with<M, eval<deduced_type<X>>>::value
                      //&&   is_same<M, rebind_t<M, X>>::value
   , M
   >::type
@@ -247,7 +244,7 @@ inline namespace fundamental_v2
 
   // make emplace overload: requires a type with a specific underlying type, don't deduce the underlying type from X
   template <class M, class ...Args>
-  typename enable_if<    ! is_applicable_with<M, eval<deduced_type<Args>>...>::value
+  constexpr typename enable_if<    ! is_applicable_with<M, eval<deduced_type<Args>>...>::value
   , M
   >::type
   make(Args&& ...args)
@@ -255,39 +252,65 @@ inline namespace fundamental_v2
     return make(type<M>{}, in_place, std::forward<Args>(args)...);
   }
 
-  template <class TC>
-  struct maker
+  template <class MFC>
+  struct maker_mfc
   {
-    // make overload: requires a type constructor, deduce the underlying type
-    template <class ...X>
-    apply<TC, eval<deduced_type<X>>...>
-    operator()(X&& ...x)
+    constexpr apply<MFC, void> operator()() const
     {
-      return make<TC>(std::forward<X>(x)...);
+      return make<MFC>();
+    }
+
+    // make overload: requires a type constructor, deduce the underlying type from Xs
+    template <class ...Xs>
+    constexpr apply<MFC, eval<deduced_type<Xs>>...>
+    operator()(Xs&& ...xs)
+    {
+      return make<MFC>(std::forward<Xs>(xs)...);
+    }
+  };
+
+  template <template <class ...> class TC>
+  struct maker_tc
+  {
+    // make() overload
+    constexpr TC<void> operator()() const
+    {
+      //return make(type<TC<void>>{});
+      return make<TC>();
+    }
+
+    // make overload: deduce the underlying type from Xs
+    template <class ...Xs>
+    constexpr TC<eval<deduced_type<Xs>>...> operator()(Xs&& ...xs) const
+    {
+      return make<TC>(std::forward<Xs>(xs)...);
     }
   };
 
   template <class M>
-  struct emplacer
+  struct maker_t
   {
     // make overload: requires a type with a specific underlying type, don't deduce the underlying type from X
     template <class X>
-    M operator()(X&& x)
+    constexpr M operator()(X&& x) const
     {
       return make<M>(std::forward<X>(x));
     }
 
     // make emplace overload: requires a type with a specific underlying type, don't deduce the underlying type from X
     template <class ...Args>
-    M operator()(Args&& ...args)
+    constexpr M operator()(Args&& ...args) const
     {
       return make<M>(std::forward<Args>(args)...);
     }
   };
 
+  template <template <class ...> class TC>
+  struct maker : maker_tc<TC> {};
+
   // default customization point for TC<void> default constructor
   template <class M>
-  typename enable_if<std::is_default_constructible<M>::value,  M>::type
+  constexpr typename enable_if<std::is_default_constructible<M>::value,  M>::type
   make(type<M>)
   {
     return M();
@@ -295,15 +318,16 @@ inline namespace fundamental_v2
 
   // default customization point for constructor from X
   template <class M, class ...X>
-  typename enable_if<std::is_constructible<M, eval<deduced_type<X>>...>::value,  M>::type
+  constexpr typename enable_if<std::is_constructible<M, eval<deduced_type<X>>...>::value,  M>::type
   make(type<M>, X&& ...x)
   {
-    return M(std::forward<eval<deduced_type<X>>>(x)...);
+    //return M(std::forward<eval<deduced_type<X>>>(x)...);
+    return M(std::forward<X>(x)...);
   }
 
   // default customization point for in_place constructor
   template <class M, class ...Args>
-  typename enable_if<std::is_constructible<M, in_place_t, eval<deduced_type<Args>>...>::value,  M>::type
+  constexpr typename enable_if<std::is_constructible<M, in_place_t, eval<deduced_type<Args>>...>::value,  M>::type
   make(type<M>, in_place_t, Args&& ...args)
   {
     return M(in_place, std::forward<Args>(args)...);

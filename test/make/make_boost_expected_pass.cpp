@@ -106,5 +106,10 @@ int main()
     auto x = stde::make<boost::expected<stde::_t, std::string>>(v);
     BOOST_TEST(*x == 0);
   }
+//  {
+//    constexpr int v=0;
+//    constexpr boost::expected<int, int> x = stde::make<boost::expected<stde::_t, int>>(v);
+//    BOOST_TEST(*x == 0);
+//  }
   return ::boost::report_errors();
 }

@@ -92,5 +92,11 @@ int main()
     stde::optional<int> x = stde::make<stde::optional<stde::_t>>(v);
     BOOST_TEST(*x == 0);
   }
+//  {
+//    constexpr int v=0;
+//    constexpr stde::optional<int> x = stde::make<stde::optional>(v);
+//    BOOST_TEST(*x == 0);
+//  }
+
   return ::boost::report_errors();
 }
