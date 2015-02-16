@@ -18,11 +18,11 @@
 
 namespace boost {
 
-  none_t none_custom(std::experimental::type<optional<std::experimental::_t>>) { return boost::none; }
+  none_t none_custom(std::experimental::meta::type<optional<std::experimental::_t>>) { return boost::none; }
 
   // customization point for template (needed because boost::optional doesn't has experimental::in_place_t constructor)
   template <class X, class ...Args>
-  optional<X> make(std::experimental::type<optional<X>>, std::experimental::in_place_t, Args&& ...args)
+  optional<X> make(std::experimental::meta::type<optional<X>>, std::experimental::in_place_t, Args&& ...args)
   {
     optional<X> res;
     res.emplace(std::forward<Args>(args)...);
@@ -35,7 +35,7 @@ namespace boost {
   // Holder specialization
   template <>
   struct optional<std::experimental::_t>
-  //: std::experimental::quote<optional> {};
+  //: std::experimental::meta::quote<optional> {};
   {
     template <class  T>
     using apply = optional<T>;
@@ -48,9 +48,12 @@ namespace std
 {
   namespace experimental
   {
-    // type_constructor customization
-    template <class T>
-    struct type_constructor<boost::optional<T>> : id<boost::optional<_t>> {};
+    namespace meta
+    {
+      // type_constructor customization
+      template <class T>
+      struct type_constructor<boost::optional<T>> : id<boost::optional<_t>> {};
+    }
   }
 }
 #endif
@@ -66,7 +69,7 @@ struct A
 int main()
 {
   namespace stde = std::experimental;
-  static_assert(stde::is_applicable_with<boost::optional<stde::_t>, int>::value, "ERROR");
+  static_assert(stde::meta::is_applicable_with<boost::optional<stde::_t>, int>::value, "ERROR");
   {
     int v=0;
     boost::optional<int> x = stde::make<boost::optional>(v);

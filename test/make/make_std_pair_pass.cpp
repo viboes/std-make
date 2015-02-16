@@ -22,14 +22,14 @@ namespace std {
 
   // customization point for template (needed because std::unique_ptr doesn't has a conversion constructor)
   template <class T1, class T2, class X1, class X2>
-  constexpr pair<T1, T2> make(experimental::type<pair<T1, T2>>, X1&& x1, X2&& x2)
+  constexpr pair<T1, T2> make(experimental::meta::type<pair<T1, T2>>, X1&& x1, X2&& x2)
   {
     return pair<T1, T2>(forward<X1>(x1), forward<X2>(x2));
   }
 
   // customization point for template (needed because std::unique_ptr doesn't uses experimental::in_place_t)
   template <class T1, class T2, class ...Args>
-  constexpr pair<T1, T2> make(experimental::type<pair<T1, T2>>, experimental::in_place_t, Args&& ...args)
+  constexpr pair<T1, T2> make(experimental::meta::type<pair<T1, T2>>, experimental::in_place_t, Args&& ...args)
   {
     return pair<T1, T2>(forward<Args>(args)...);
   }
@@ -42,13 +42,13 @@ namespace std {
     template <class Types>
     struct impl;
     template <class T, class U>
-    struct impl<experimental::types<T, U>> : experimental::id<pair<T, U>>{};
+    struct impl<experimental::meta::types<T, U>> : experimental::meta::id<pair<T, U>>{};
     // this specialization is needed to avoid instantiation of pair<T>
     template <class T>
-    struct impl<experimental::types<T>> : experimental::id<T>{};
+    struct impl<experimental::meta::types<T>> : experimental::meta::id<T>{};
   public:
       template <class ...Ts>
-      using apply = experimental::eval<impl<experimental::types<Ts...>>>;
+      using apply = experimental::meta::eval<impl<experimental::meta::types<Ts...>>>;
   };
 
   // todo remove this specialization
@@ -58,9 +58,12 @@ namespace std {
 #ifdef VIBOES_STD_EXPERIMENTAL_FUNDAMENTALS_V2_MAKE_TYPE_CONSTRUCTOR
   namespace experimental
   {
-  // type_constructor customization
-    template <class T1, class T2>
-    struct type_constructor<pair<T1,T2>> : id<pair<_t, _t>> {};
+    namespace meta
+    {
+      // type_constructor customization
+      template <class T1, class T2>
+      struct type_constructor<pair<T1,T2>> : id<pair<_t, _t>> {};
+    }
   }
 #endif
 }

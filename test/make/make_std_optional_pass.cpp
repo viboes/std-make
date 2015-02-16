@@ -22,19 +22,22 @@ namespace std {
 
     // Holder specialization
     template <>
-    struct optional<_t>  : lift<optional> {};
+    struct optional<_t>  : meta::lift<optional> {};
 
     template <>
     struct optional<void> {};
 
 #ifdef VIBOES_STD_EXPERIMENTAL_FUNDAMENTALS_V2_MAKE_TYPE_CONSTRUCTOR
-    // type_constructor customization
-    template <class T>
-    struct type_constructor<optional<T>> : id<optional<_t>> {};
+    namespace meta
+    {
+      // type_constructor customization
+      template <class T>
+      struct type_constructor<optional<T>> : id<optional<_t>> {};
+    }
 #endif
 
-    nullopt_t none_custom(type<optional<_t>>) { return nullopt; }
-    nullopt_t none_custom(template_class<optional>) { return nullopt; }
+    nullopt_t none_custom(meta::type<optional<_t>>) { return nullopt; }
+    nullopt_t none_custom(meta::template_class<optional>) { return nullopt; }
   }
 }
 

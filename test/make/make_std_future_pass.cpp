@@ -27,9 +27,9 @@ namespace std {
   }
 
   template <int = 0, int..., class T>
-    future<experimental::deduced_type_t<T>> make_ready_future(T&& x)
+    future<experimental::meta::deduced_type_t<T>> make_ready_future(T&& x)
   {
-    promise<experimental::deduced_type_t<T>> p;
+    promise<experimental::meta::deduced_type_t<T>> p;
     p.set_value(forward<T>(x));
     return p.get_future();
   }
@@ -62,28 +62,28 @@ namespace std {
   }
 
   // customization point for template (needed because std::future doesn't has a default constructor)
-  future<void> make(experimental::type<future<void>>)
+  future<void> make(experimental::meta::type<future<void>>)
   {
     return make_ready_future();
   }
 
   // customization point for template (needed because std::future doesn't has a conversion constructor)
   template <class DX, class X>
-  future<DX> make(experimental::type<future<DX>>, X&& x)
+  future<DX> make(experimental::meta::type<future<DX>>, X&& x)
   {
     return make_ready_future<DX>(forward<X>(x));
   }
 
   // customization point for template (needed because std::future doesn't uses experimental::in_place_t)
   template <class X, class ...Args>
-  future<X> make(experimental::type<future<X>>, experimental::in_place_t, Args&& ...args)
+  future<X> make(experimental::meta::type<future<X>>, experimental::in_place_t, Args&& ...args)
   {
     return make_ready_future<X>(forward<Args>(args)...);
   }
 
   // Holder customization
   template <>
-  struct future<experimental::_t> : experimental::lift<future> {};
+  struct future<experimental::_t> : experimental::meta::lift<future> {};
 
 //  template <>
 //  struct future<experimental::_t&>
@@ -95,9 +95,12 @@ namespace std {
 #ifdef VIBOES_STD_EXPERIMENTAL_FUNDAMENTALS_V2_MAKE_TYPE_CONSTRUCTOR
   namespace experimental
   {
-    // type_constructor customization
-    template <class T>
-    struct type_constructor<future<T>> : id<future<_t>> {};
+    namespace meta
+    {
+      // type_constructor customization
+      template <class T>
+      struct type_constructor<future<T>> : id<future<_t>> {};
+    }
   }
 #endif
 

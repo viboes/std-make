@@ -19,7 +19,7 @@ namespace boost {
 
   // customization point for template (needed because boost::expected doesn't has experimental::in_place_t constructor)
   template <class X, class E, class ...Args>
-  expected<X, E> make(std::experimental::type<expected<X, E>>, std::experimental::in_place_t, Args&& ...args)
+  expected<X, E> make(std::experimental::meta::type<expected<X, E>>, std::experimental::in_place_t, Args&& ...args)
   {
     expected<X, E> res;
     res.emplace(std::forward<Args>(args)...);
@@ -28,7 +28,7 @@ namespace boost {
 
   // Holder specialization
   template <class E>
-  struct expected<std::experimental::_t, E>: std::experimental::reverse_lift<expected, E> {};
+  struct expected<std::experimental::_t, E>: std::experimental::meta::reverse_lift<expected, E> {};
 
 }
 #ifdef VIBOES_STD_EXPERIMENTAL_FUNDAMENTALS_V2_MAKE_TYPE_CONSTRUCTOR
@@ -37,12 +37,15 @@ namespace std
 {
   namespace experimental
   {
-    // type_constructor customization
-    template <class T, class E>
-    struct type_constructor<boost::expected<T, E>> : id<boost::expected<_t, E>> {};
-//    // underlying_type customization
-//    template <class T, class E>
-//    struct underlying_type<boost::expected<T, E>> : id<T> {};
+    namespace meta
+    {
+      // type_constructor customization
+      template <class T, class E>
+      struct type_constructor<boost::expected<T, E>> : id<boost::expected<_t, E>> {};
+  //    // underlying_type customization
+  //    template <class T, class E>
+  //    struct underlying_type<boost::expected<T, E>> : id<T> {};
+    }
   }
 }
 #endif

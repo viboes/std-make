@@ -21,7 +21,7 @@ namespace std {
 
   // customization point for template (needed because std::shared_future<X> doesn't has a constructor from X)
   template <class T, class X>
-  shared_future<T> make(experimental::type<shared_future<T>>, X&& x)
+  shared_future<T> make(experimental::meta::type<shared_future<T>>, X&& x)
   {
     promise<T> p;
     p.set_value(forward<X>(x));
@@ -30,7 +30,7 @@ namespace std {
 
   // customization point for template (needed because std::shared_future doesn't use experimental::in_place_t)
   template <class T, class ...Args>
-  shared_future<T> make(experimental::type<shared_future<T>>, experimental::in_place_t, Args&& ...args)
+  shared_future<T> make(experimental::meta::type<shared_future<T>>, experimental::in_place_t, Args&& ...args)
   {
     promise<T> p;
     p.set_value(T(forward<Args>(args)...));
@@ -39,7 +39,7 @@ namespace std {
 
   // Holder specialization
   template <>
-  struct shared_future<experimental::_t> : experimental::lift<shared_future> {};
+  struct shared_future<experimental::_t> : experimental::meta::lift<shared_future> {};
 
 //  template <>
 //  struct shared_future<experimental::_t&>
@@ -51,9 +51,12 @@ namespace std {
 #ifdef VIBOES_STD_EXPERIMENTAL_FUNDAMENTALS_V2_MAKE_TYPE_CONSTRUCTOR
   namespace experimental
   {
-    // type_constructor customization
-    template <class T>
-    struct type_constructor<shared_future<T>> : id<shared_future<_t>> {};
+    namespace meta
+    {
+      // type_constructor customization
+      template <class T>
+      struct type_constructor<shared_future<T>> : id<shared_future<_t>> {};
+    }
   }
 #endif
 }

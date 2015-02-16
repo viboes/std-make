@@ -19,19 +19,19 @@
 
 namespace std {
 
-  nullptr_t none_custom(experimental::template_class<shared_ptr>) { return nullptr; }
-  nullptr_t none_custom(experimental::type<shared_ptr<experimental::_t>>) { return nullptr; }
+  nullptr_t none_custom(experimental::meta::template_class<shared_ptr>) { return nullptr; }
+  nullptr_t none_custom(experimental::meta::type<shared_ptr<experimental::_t>>) { return nullptr; }
 
   // customization point for template (needed because std::shared_ptr doesn't has a conversion constructor)
   template <class DX, class X>
-  shared_ptr<DX> make(experimental::type<shared_ptr<DX>>, X&& x)
+  shared_ptr<DX> make(experimental::meta::type<shared_ptr<DX>>, X&& x)
   {
     return make_shared<DX>(forward<X>(x));
   }
 
   // customization point for template (needed because std::shared_ptr doesn't uses experimental::in_place_t)
   template <class X, class ...Args>
-  shared_ptr<X> make(experimental::type<shared_ptr<X>>, experimental::in_place_t, Args&& ...args)
+  shared_ptr<X> make(experimental::meta::type<shared_ptr<X>>, experimental::in_place_t, Args&& ...args)
   {
     return make_shared<X>(forward<Args>(args)...);
   }
@@ -53,9 +53,12 @@ namespace std {
 #ifdef VIBOES_STD_EXPERIMENTAL_FUNDAMENTALS_V2_MAKE_TYPE_CONSTRUCTOR
   namespace experimental
   {
-    // type_constructor customization
-    template <class T>
-    struct type_constructor<shared_ptr<T>> : id<shared_ptr<_t>> {};
+    namespace meta
+    {
+      // type_constructor customization
+      template <class T>
+      struct type_constructor<shared_ptr<T>> : id<shared_ptr<_t>> {};
+    }
   }
 #endif
 }
@@ -71,7 +74,7 @@ struct A
 int main()
 {
   namespace stde = std::experimental;
-  static_assert(stde::is_applicable_with<std::shared_ptr<stde::_t>, int>::value, "ERROR");
+  static_assert(stde::meta::is_applicable_with<std::shared_ptr<stde::_t>, int>::value, "ERROR");
 
   {
     std::unique_ptr<int> x = stde::none<std::shared_ptr>();
