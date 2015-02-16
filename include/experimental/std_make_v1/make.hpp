@@ -255,15 +255,9 @@ namespace meta
   template <class MFC>
   struct maker_mfc
   {
-    constexpr meta::apply<MFC, void> operator()() const
-    {
-      return make<MFC>();
-    }
-
-    // make overload: requires a type constructor, deduce the underlying type from Xs
     template <class ...Xs>
     constexpr meta::apply<MFC, meta::eval<meta::deduced_type<Xs>>...>
-    operator()(Xs&& ...xs)
+    operator()(Xs&& ...xs) const
     {
       return make<MFC>(std::forward<Xs>(xs)...);
     }
@@ -272,16 +266,9 @@ namespace meta
   template <template <class ...> class TC>
   struct maker_tc
   {
-    // make() overload
-    constexpr TC<void> operator()() const
-    {
-      //return make(type<TC<void>>{});
-      return make<TC>();
-    }
-
-    // make overload: deduce the underlying type from Xs
     template <class ...Xs>
-    constexpr TC<meta::eval<meta::deduced_type<Xs>>...> operator()(Xs&& ...xs) const
+    constexpr TC<meta::eval<meta::deduced_type<Xs>>...>
+    operator()(Xs&& ...xs) const
     {
       return make<TC>(std::forward<Xs>(xs)...);
     }
@@ -290,16 +277,9 @@ namespace meta
   template <class M>
   struct maker_t
   {
-    // make overload: requires a type with a specific underlying type, don't deduce the underlying type from X
-    template <class X>
-    constexpr M operator()(X&& x) const
-    {
-      return make<M>(std::forward<X>(x));
-    }
-
-    // make emplace overload: requires a type with a specific underlying type, don't deduce the underlying type from X
     template <class ...Args>
-    constexpr M operator()(Args&& ...args) const
+    constexpr M
+    operator()(Args&& ...args) const
     {
       return make<M>(std::forward<Args>(args)...);
     }
