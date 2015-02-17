@@ -53,17 +53,10 @@ namespace std {
   nullptr_t none_custom(experimental::meta::template_class<unique_ptr>) { return nullptr; }
 
   // customization point for template (needed because std::unique_ptr doesn't has a conversion constructor)
-  template <class T, class X>
-  unique_ptr<T> make(experimental::meta::type<unique_ptr<T>>, X&& x)
+  template <class T, class ...Xs>
+  unique_ptr<T> make(experimental::meta::type<unique_ptr<T>>, Xs&& ...xs)
   {
-    return make_unique<T>(forward<X>(x));
-  }
-
-  // customization point for template (needed because std::unique_ptr doesn't uses experimental::in_place_t)
-  template <class T, class ...Args>
-  unique_ptr<T> make(experimental::meta::type<unique_ptr<T>>, experimental::in_place_t, Args&& ...args)
-  {
-    return make_unique<T>(forward<Args>(args)...);
+    return make_unique<T>(forward<Xs>(xs)...);
   }
 
   // Holder customization

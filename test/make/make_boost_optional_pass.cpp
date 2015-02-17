@@ -80,12 +80,16 @@ int main()
   }
   {
     int v=1;
-    boost::optional<A> x = stde::make<boost::optional<A>>(v,v);
+    boost::optional<A> x = stde::make<boost::optional<A>>(stde::in_place, v,v);
     BOOST_TEST(x->v == 2);
   }
   {
-    boost::optional<int> x = stde::make<boost::optional<int>>();
+    boost::optional<int> x = stde::make<boost::optional<int>>(stde::in_place);
     BOOST_TEST_EQ(*x,  0);
+  }
+  {
+    boost::optional<int> x = stde::make<boost::optional<int>>();
+    BOOST_TEST(! x);
   }
 //  {
 //    int v=0;

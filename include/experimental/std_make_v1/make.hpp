@@ -105,15 +105,10 @@ namespace meta
 
   namespace detail {
     template <class TC, class List, class = void>
-    struct is_applicable_with
-    {
-      using type = std::false_type;
-    };
+    struct is_applicable_with : std::false_type {};
     template <class TC, class ...U>
     struct is_applicable_with<TC, types<U...>, void_<typename TC::template apply<U...>>>
-    {
-      using type = std::true_type;
-    };
+      : std::true_type {};
   }
 
   /// trait stating if a metafunction \p TC is applicable with the argument \p U
@@ -241,24 +236,14 @@ namespace meta
   }
 
   // make overload: requires a type with a specific underlying type, don't deduce the underlying type from X
-  template <class M, int = 0, int..., class X>
-  constexpr typename enable_if<   ! meta::is_applicable_with<M, meta::eval<meta::deduced_type<X>>>::value
+  template <class M, int = 0, int..., class ...Xs>
+  constexpr typename enable_if<   ! meta::is_applicable_with<M, meta::eval<meta::deduced_type<Xs>>...>::value
                      //&&   is_same<M, rebind_t<M, X>>::value
   , M
   >::type
-  make(X&& x)
+  make(Xs&& ...xs)
   {
-    return make(meta::type<M>{}, std::forward<X>(x));
-  }
-
-  // make emplace overload: requires a type with a specific underlying type, don't deduce the underlying type from X
-  template <class M, class ...Args>
-  constexpr typename enable_if<    ! meta::is_applicable_with<M, meta::eval<meta::deduced_type<Args>>...>::value
-  , M
-  >::type
-  make(Args&& ...args)
-  {
-    return make(meta::type<M>{}, in_place, std::forward<Args>(args)...);
+    return make(meta::type<M>{}, std::forward<Xs>(xs)...);
   }
 
   template <class MFC>
@@ -315,13 +300,6 @@ namespace meta
     return M(std::forward<X>(x)...);
   }
 
-  // default customization point for in_place constructor
-  template <class M, class ...Args>
-  constexpr typename enable_if<std::is_constructible<M, in_place_t, meta::eval<meta::deduced_type<Args>>...>::value,  M>::type
-  make(meta::type<M>, in_place_t, Args&& ...args)
-  {
-    return M(in_place, std::forward<Args>(args)...);
-  }
 }
 }
 }

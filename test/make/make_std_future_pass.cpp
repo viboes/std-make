@@ -68,17 +68,10 @@ namespace std {
   }
 
   // customization point for template (needed because std::future doesn't has a conversion constructor)
-  template <class DX, class X>
-  future<DX> make(experimental::meta::type<future<DX>>, X&& x)
+  template <class DX, class ...Xs>
+  future<DX> make(experimental::meta::type<future<DX>>, Xs&& ...xs)
   {
-    return make_ready_future<DX>(forward<X>(x));
-  }
-
-  // customization point for template (needed because std::future doesn't uses experimental::in_place_t)
-  template <class X, class ...Args>
-  future<X> make(experimental::meta::type<future<X>>, experimental::in_place_t, Args&& ...args)
-  {
-    return make_ready_future<X>(forward<Args>(args)...);
+    return make_ready_future<DX>(forward<Xs>(xs)...);
   }
 
   // Holder customization

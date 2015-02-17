@@ -78,20 +78,20 @@ int main()
   }
   {
     int v=1;
-    boost::expected<A> x = stde::make<boost::expected<A>>(v,v);
+    boost::expected<A> x = stde::make<boost::expected<A>>(stde::in_place, v,v);
     BOOST_TEST(x->v == 2);
   }
   {
     int v=1;
-    auto x = stde::make<boost::expected<A, std::string>>(v,v);
+    auto x = stde::make<boost::expected<A, std::string>>(stde::in_place, v,v);
     BOOST_TEST(x->v == 2);
   }
   {
-    boost::expected<int> x = stde::make<boost::expected<int>>();
+    boost::expected<int> x = stde::make<boost::expected<int>>(stde::in_place);
     BOOST_TEST_EQ(*x,  0);
   }
   {
-    auto x = stde::make<boost::expected<int, std::string>>();
+    auto x = stde::make<boost::expected<int, std::string>>(stde::in_place);
     BOOST_TEST_EQ(*x,  0);
   }
 //  {

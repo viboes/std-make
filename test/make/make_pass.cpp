@@ -60,11 +60,11 @@ int main()
   }
   {
     int v=1;
-    A<int> x = stde::make<A<int>>(v,v);
+    A<int> x = stde::make<A<int>>(stde::in_place, v,v);
     BOOST_TEST(x.v == 2);
   }
   {
-    A<int> x = stde::make<A<int>>();
+    A<int> x = stde::make<A<int>>(stde::in_place);
     BOOST_TEST(x.v == 3);
   }
   {

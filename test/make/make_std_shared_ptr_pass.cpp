@@ -23,17 +23,10 @@ namespace std {
   nullptr_t none_custom(experimental::meta::type<shared_ptr<experimental::_t>>) { return nullptr; }
 
   // customization point for template (needed because std::shared_ptr doesn't has a conversion constructor)
-  template <class DX, class X>
-  shared_ptr<DX> make(experimental::meta::type<shared_ptr<DX>>, X&& x)
+  template <class DX, class ...Xs>
+  shared_ptr<DX> make(experimental::meta::type<shared_ptr<DX>>, Xs&& ...xs)
   {
-    return make_shared<DX>(forward<X>(x));
-  }
-
-  // customization point for template (needed because std::shared_ptr doesn't uses experimental::in_place_t)
-  template <class X, class ...Args>
-  shared_ptr<X> make(experimental::meta::type<shared_ptr<X>>, experimental::in_place_t, Args&& ...args)
-  {
-    return make_shared<X>(forward<Args>(args)...);
+    return make_shared<DX>(forward<Xs>(xs)...);
   }
 
   // Holder customization
