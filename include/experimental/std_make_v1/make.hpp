@@ -77,39 +77,48 @@ namespace meta
   template <class T>
   using deduced_type_t = eval<deduced_type<T>>;
 
+  /// applies a meta-function \p TC to the arguments \p Args
+  template<class TC, class... Args>
+  using apply = typename TC::template apply<Args...>;
+
+  /// \brief A Metafunction Class that always returns \c T.
+  template<typename T>
+  struct always
+  {
+  private:
+    // Redirect through a class template for compilers that have not
+    // yet implemented CWG 1558:
+    // <http://www.open-std.org/jtc1/sc22/wg21/docs/cwg_defects.html#1558>
+    template<typename...>
+    struct impl
+    {
+      using type = T;
+    };
+  public:
+    template<typename...Ts>
+    using apply = eval<impl<Ts...>>;
+  };
+
+  /// \brief An alias for `void`.
+  template<typename...Ts>
+  using void_ = apply<always<void>, Ts...>;
+
   namespace detail {
-    template <class TC, class ...U>
+    template <class TC, class List, class = void>
     struct is_applicable_with
     {
-    private:
-        struct two {char a; char b;};
-        template <class X> static two test(...);
-        template <class X> static char test(typename X::template apply<U...>* = 0);
-    public:
-        static const bool value = sizeof(test<TC>(0)) == 1;
+      using type = std::false_type;
     };
-    template <class TC, class U>
-    struct is_applicable_with1
+    template <class TC, class ...U>
+    struct is_applicable_with<TC, types<U...>, void_<typename TC::template apply<U...>>>
     {
-    private:
-        struct two {char a; char b;};
-        template <class X> static two test(...);
-        template <class X> static char test(typename X::template apply<U>* = 0);
-    public:
-        static const bool value = sizeof(test<TC>(0)) == 1;
+      using type = std::true_type;
     };
   }
 
   /// trait stating if a metafunction \p TC is applicable with the argument \p U
   template <class TC, class ...U >
-  struct is_applicable_with : detail::is_applicable_with<TC, U...> {};
-
-  template <class TC, class U >
-  struct is_applicable_with1 : detail::is_applicable_with1<TC, U> {};
-
-  /// applies a meta-function \p TC to the arguments \p Args
-  template<class TC, class... Args>
-  using apply = typename TC::template apply<Args...>;
+  struct is_applicable_with : eval<detail::is_applicable_with<TC, types<U...>>> {};
 
 #ifdef VIBOES_STD_EXPERIMENTAL_FUNDAMENTALS_V2_MAKE_TYPE_CONSTRUCTOR
   // type constructor customization point.
@@ -205,7 +214,7 @@ namespace meta
 
   template <class TC, int = 0, int...>
   constexpr typename enable_if<
-  meta::is_applicable_with1<TC, void>::value,
+  meta::is_applicable_with<TC, void>::value,
   meta::apply<TC, void>
   >::type
   make()

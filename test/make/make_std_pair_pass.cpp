@@ -38,6 +38,10 @@ namespace std {
   template <>
   struct pair<experimental::_t, experimental::_t>
   {
+#ifdef __clang__
+    template <class T, class U>
+    using apply = pair<T, U>;
+#else
   private:
     template <class Types>
     struct impl;
@@ -47,8 +51,9 @@ namespace std {
     template <class T>
     struct impl<experimental::meta::types<T>> : experimental::meta::id<T>{};
   public:
-      template <class ...Ts>
-      using apply = experimental::meta::eval<impl<experimental::meta::types<Ts...>>>;
+    template <class ...Ts>
+    using apply = experimental::meta::eval<impl<experimental::meta::types<Ts...>>>;
+#endif
   };
 
   // todo remove this specialization
