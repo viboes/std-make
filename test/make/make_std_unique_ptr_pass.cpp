@@ -77,10 +77,6 @@ namespace std {
   template <>
   struct default_delete<experimental::_t> : experimental::meta::lift<default_delete> {};
 
-  // todo remove this specialization
-  template <>
-  struct unique_ptr<void> {};
-
 #ifdef VIBOES_STD_EXPERIMENTAL_FUNDAMENTALS_V2_MAKE_TYPE_CONSTRUCTOR
   namespace experimental
   {

@@ -24,9 +24,6 @@ namespace std {
     template <>
     struct optional<_t>  : meta::lift<optional> {};
 
-    template <>
-    struct optional<void> {};
-
 #ifdef VIBOES_STD_EXPERIMENTAL_FUNDAMENTALS_V2_MAKE_TYPE_CONSTRUCTOR
     namespace meta
     {

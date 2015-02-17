@@ -19,6 +19,7 @@
 namespace boost {
 
   none_t none_custom(std::experimental::meta::type<optional<std::experimental::_t>>) { return boost::none; }
+  none_t none_custom(std::experimental::meta::template_class<optional>) { return boost::none; }
 
   // customization point for template (needed because boost::optional doesn't has experimental::in_place_t constructor)
   template <class X, class ...Args>
@@ -28,9 +29,6 @@ namespace boost {
     res.emplace(std::forward<Args>(args)...);
     return std::move(res);
   }
-
-  template <>
-  struct optional<void> {};
 
   // Holder specialization
   template <>

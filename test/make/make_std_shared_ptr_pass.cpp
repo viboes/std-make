@@ -45,11 +45,6 @@ namespace std {
     using apply = shared_ptr<T>;
   };
 
-
-  // todo remove this specialization
-  template <>
-  struct shared_ptr<void> {};
-
 #ifdef VIBOES_STD_EXPERIMENTAL_FUNDAMENTALS_V2_MAKE_TYPE_CONSTRUCTOR
   namespace experimental
   {

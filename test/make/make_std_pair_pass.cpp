@@ -56,10 +56,6 @@ namespace std {
 #endif
   };
 
-  // todo remove this specialization
-  template <>
-  struct pair<void, void> {};
-
 #ifdef VIBOES_STD_EXPERIMENTAL_FUNDAMENTALS_V2_MAKE_TYPE_CONSTRUCTOR
   namespace experimental
   {
