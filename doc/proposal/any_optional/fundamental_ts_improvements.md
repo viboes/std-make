@@ -5,7 +5,7 @@
     </tr>
     <tr>
         <td width="172" align="left" valign="top">Date:</td>
-        <td width="435">2015-02-08</td>
+        <td width="435">2015-03-08</td>
     </tr>
     <tr>
         <td width="172" align="left" valign="top">Project:</td>
@@ -52,11 +52,11 @@ we can discuss of the whole view.
 We propose to: 
 
 * Make `in_place_t` a variadic template class.
-* Change the definition of `in_place` as a constant of type `in_place<>`. 
+* Change the definition of `in_place` as a constant of type `in_place_t<>`. 
 
 * To class `optional<T>`
   * Add a `reset` member function.
-  * Replace the uses of `in_place_t` by `in_place<>`.
+  * Replace the uses of `in_place_t` by `in_place_t<>`.
 
 * Add an `emplace_optional` factory.
 
@@ -102,6 +102,8 @@ An alternative is to have a template class in_place_t
 
 ```c++
 template <class ...T> struct in_place_t {};
+template <class ...T> 
+constexpr in_place_t<T...> in_place_v {};
 
 template <class T, class ...Args>
 any(in_place_t<T>, Args&& ...);
@@ -110,7 +112,7 @@ any(in_place_t<T>, Args&& ...);
 This can be used as 
 
 ```c++
-any(in_place_t<X>{}, v1, ..., vn);
+any(in_place_v<X>, v1, ..., vn);
 ```
 
 Adopting this template class to optional needs to change the definition of `in_place` to 
@@ -178,8 +180,6 @@ The problem is that then `none` can be seen as an `optional` or an `any` and cou
 
 We think that this implicit conversion goes against the raison d'être of `nullptr` and that we need explicit factories/constants.
 
-
-
 ## Do we need an explicit `make_any` factory? 
 
 `any` is not a generic type but a type erased type. `any` play the same role than a posible `make_any`.
@@ -196,15 +196,15 @@ However, we could consider an emplace_xxx factory that in place constructs a `T`
 optional<T> opt(in_place, v1, vn);
 f(optional<T>(in_place, v1, vn));
 
-any a(type<T>{}, in_place, v1, vn);
-f(any(type<T>{}, in_place, v1, vn));
+any a(in_place_v<T>, v1, vn);
+f(any(in_place_v<T>, v1, vn));
 ```
 
 When we use auto things change a little bit
 
 ```c++
 auto opt=optional<T>(in_place, v1, vn);
-auto a=any(type<T>{}, in_place, v1, vn);
+auto a=any(in_place_v<T>, v1, vn);
 ```
 
 This is not uniform. Having a `emplace_xxx` factory function would make the code more uniform
@@ -252,6 +252,8 @@ Move `in_place_t` and `in_place` to the <experimental/utility> synopsis
 ```c++
 template <class ...T> in_place_t {};
 constexpr in_place_t<> in_place {}
+template <class ...T>;
+constexpr in_place_t<T...> in_place_v {}
 ```
 
 Update 5.2 [optional.synopsis] adding after `make_optional`
@@ -411,7 +413,7 @@ Add in 6.4 Non-member functions
    
 # Acknowledgements 
 
-Thanks to Jeffrey Yasskin to encourage me to report these a possible issues of the TS, 
+Thanks to Jeffrey Yasskin to encourage me to report these as possible issues of the TS, 
 Agustin Bergé for his suggestions about `none` and `in_place`.  
 
 # References
