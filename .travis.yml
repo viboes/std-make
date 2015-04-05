@@ -59,6 +59,7 @@ before_install:
     - echo "Testing $PROJECT_TO_TEST"
     # Cloning Boost libraries (fast nondeep cloning)
     - BOOST=$HOME/boost-local
+    - PATH=$BOOST:$PATH
     - BOOST_ROOT=$BOOST
     - BOOST_BUILD_PATH=$BOOST
     - PROJ=$HOME/$PROJECT_TO_TEST
