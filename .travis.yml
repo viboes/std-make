@@ -61,8 +61,7 @@ before_install:
     - BOOST=$HOME/boost-local
     - PATH=$BOOST:$PATH
     - BOOST_ROOT=$BOOST
-    - BOOST_BUILD_PATH=$BOOST
-    - PROJ=$HOME/$PROJECT_TO_TEST
+    - BOOST_BUILD_PATH=$BOOST/tools/build
     - git init $BOOST
     - cd $BOOST
     - git remote add --no-tags -t $BRANCH_TO_TEST origin https://github.com/boostorg/boost.git
@@ -79,6 +78,7 @@ before_install:
     - ./bootstrap.sh
     - ./b2 headers
     - cd $TRAVIS_BUILD_DIR/test
+    - pwd
 
 script:
     # `--coverage` flags required to generate coverage info for Coveralls
