@@ -21,7 +21,7 @@ env:
 
         # Files, which coverage results must be ignored (files from other projects).
         # Example: - IGNORE_COVERAGE='*/boost/progress.hpp */filesystem/src/*'
-        #- IGNORE_COVERAGE=''
+        - IGNORE_COVERAGE=''
 
         # The next declaration is the encrypted COVERITY_SCAN_TOKEN, created
         # via the "travis encrypt" command using the project repo's public key.
@@ -33,16 +33,6 @@ env:
         - CXX_STANDARD=c++98
         - CXX_STANDARD=c++11
         - CXX_STANDARD=c++1y
-
-addons:
-  coverity_scan:
-    # Mail to send notification to
-    notification_email: vicente.botet@wanadoo.fr
-
-    # This specifies the branch pattern for Coverity tests. If git branch and pattern mismatch, 
-    # then coverity won't run. Set to `branch_pattern: $TRAVIS_BRANCH` if you want to do analisis on each build.
-    #branch_pattern: disable_coverity_scan
-    branch_pattern: $TRAVIS_BRANCH
 
 ###############################################################################################################
 # From this point and below code is same for all the Boost libs
@@ -78,17 +68,17 @@ before_install:
     - git status
     - ./bootstrap.sh
     - ./b2 headers
-    - cd $TRAVIS_BUILD_DIR/../$PROJECT_TO_TEST/test
+    - cd $TRAVIS_BUILD_DIR/test
 
 script:
     # `--coverage` flags required to generate coverage info for Coveralls
-    - ../../../b2 cxxflags="--coverage -std=$CXX_STANDARD" linkflags="--coverage"
+    - $BOOST/b2 cxxflags="--coverage -std=$CXX_STANDARD" linkflags="--coverage"
 
 after_success:
     # Copying Coveralls data to a separate folder
     - mkdir -p $TRAVIS_BUILD_DIR/coverals
-    - find ../../../bin.v2/ -name "*.gcda" -exec cp "{}" $TRAVIS_BUILD_DIR/coverals/ \;
-    - find ../../../bin.v2/ -name "*.gcno" -exec cp "{}" $TRAVIS_BUILD_DIR/coverals/ \;
+    - find bin/ -name "*.gcda" -exec cp "{}" $TRAVIS_BUILD_DIR/coverals/ \;
+    - find bin/ -name "*.gcno" -exec cp "{}" $TRAVIS_BUILD_DIR/coverals/ \;
 
     # Preparing Coveralls data by
     # ... installing the tools
