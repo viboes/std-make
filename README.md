@@ -14,9 +14,9 @@ This code is undocumented, untested, constantly changing, and generally not fit 
 
 # Test results
 
-@               | Build         | Tests coverage 
-----------------|-------------- | -------------- 
-Master branch:  | [![Build Status](https://travis-ci.org/viboes/std-make.svg?branch=master)](https://travis-ci.org/viboes/std-make)  | [![Coverage Status](https://coveralls.io/repos/viboes/std-make/badge.png?branch=master)](https://coveralls.io/r/viboes/std-make?branch=master) 
+@               | Build          
+----------------|--------------  
+Master branch:  | [![Build Status](https://travis-ci.org/viboes/std-make.svg?branch=master)](https://travis-ci.org/viboes/std-make) 
 
 
 # License
