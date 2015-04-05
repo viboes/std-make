@@ -10,7 +10,6 @@
 //  template <class M, class ...Args>
 //  auto make(Args&& ...args);
 
-
 #include <experimental/make.hpp>
 #include <boost/expected/expected.hpp>
 #include <boost/detail/lightweight_test.hpp>
