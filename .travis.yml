@@ -10,8 +10,15 @@
 #
 # File revision #2
 
+language: cpp
+compiler:
+- gcc
+# - clang
 os:
-    - linux
+- linux
+# - osx
+osx_image: xcode61
+
 
 env:
     global:
@@ -52,6 +59,7 @@ before_install:
     # Cloning Boost libraries (fast nondeep cloning)
     - BOOST=$HOME/boost-local
     - BOOST_ROOT=$BOOST
+    - BOOST_BUILD_PATH=$BOOST
     - PROJ=$HOME/$PROJECT_TO_TEST
     - git init $BOOST
     - cd $BOOST
