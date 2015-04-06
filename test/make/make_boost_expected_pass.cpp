@@ -10,6 +10,13 @@
 //  template <class M, class ...Args>
 //  auto make(Args&& ...args);
 
+#if defined VIBOES_STD_EXPERIMENTAL_FUNDAMENTALS_V2_BOOST_EXPECTED_NOT_INSTALLED
+#warning VIBOES_STD_EXPERIMENTAL_FUNDAMENTALS_V2_BOOST_EXPECTED_NOT_INSTALLED
+int main()
+{
+}
+#else
+
 #include <experimental/make.hpp>
 #include <boost/expected/expected.hpp>
 #include <boost/detail/lightweight_test.hpp>
@@ -115,3 +122,4 @@ int main()
 //  }
   return ::boost::report_errors();
 }
+#endif

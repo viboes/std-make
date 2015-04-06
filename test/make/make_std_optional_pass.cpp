@@ -12,6 +12,13 @@
 //  template <class M, class ...Args>
 //  auto make(Args&& ...args);
 
+#if defined VIBOES_STD_EXPERIMENTAL_FUNDAMENTALS_V2_STD_OPTIONAL_NOT_INSTALLED
+#warning VIBOES_STD_EXPERIMENTAL_FUNDAMENTALS_V2_STD_OPTIONAL_NOT_INSTALLED
+int main()
+{
+}
+#else
+
 #define VIBOES_STD_EXPERIMENTAL_FACTORIES_USE_OPTIONAL
 #include <experimental/make.hpp>
 #include <optional.hpp>
@@ -104,3 +111,4 @@ int main()
 
   return ::boost::report_errors();
 }
+#endif
