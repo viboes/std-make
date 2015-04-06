@@ -22,16 +22,22 @@ namespace std {
 
   future<void> make_ready_future()
   {
+    std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
     promise<void> p;
+    std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
     p.set_value();
+    std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
     return p.get_future();
   }
 
   template <int = 0, int..., class T>
     future<experimental::meta::deduced_type_t<T>> make_ready_future(T&& x)
   {
+    std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
     promise<experimental::meta::deduced_type_t<T>> p;
+    std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
     p.set_value(forward<T>(x));
+    std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
     return p.get_future();
   }
 
@@ -114,7 +120,9 @@ int main()
   std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
   {
     std::future<void> x = std::make_ready_future();
+    std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
     x.get();
+    std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
   }
   std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
   {
