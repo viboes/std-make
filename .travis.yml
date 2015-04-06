@@ -22,7 +22,7 @@ matrix:
     - compiler: gcc
       env: 
       - GCC_VERSION="4.9"
-      - TOOLSET=gcc
+      - TOOLSET=gcc-4.9
       - LIBCXX="libstdc++"
       - CXX_STANDARD=c++1y
       
@@ -97,7 +97,7 @@ before_install:
 
 script:
     # `--coverage` flags required to generate coverage info for Coveralls
-    - $BOOST/b2 toolset=$TOOLSET -sBOOST_ROOT=$BOOST cxxflags="--coverage -std=$CXX_STANDARD -stdlib=$LIBCPP" linkflags="--coverage -stdlib=$LIBCPP"
+    - $BOOST/b2 toolset=$TOOLSET -sBOOST_ROOT=$BOOST cxxflags="--coverage -std=$CXX_STANDARD -stdlib=$LIBCXX" linkflags="--coverage -stdlib=$LIBCXX"
 
 after_success:
     # Copying Coveralls data to a separate folder
