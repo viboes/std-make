@@ -16,6 +16,7 @@
 #include <experimental/make.hpp>
 #include <future>
 #include <boost/detail/lightweight_test.hpp>
+#include <iostream>
 
 namespace std {
 
@@ -110,86 +111,104 @@ struct A
 int main()
 {
   namespace stde = std::experimental;
+  std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
   {
     std::future<void> x = std::make_ready_future();
     x.get();
   }
+  std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
   {
     std::future<void> x = stde::make<std::future>();
     x.get();
   }
+  std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
   {
     int v=0;
     std::future<int> x = std::make_ready_future(v);
     BOOST_TEST(x.get() == 0);
   }
+  std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
   {
     int v=0;
     std::future<int> x = stde::make<std::future>(v);
     BOOST_TEST(x.get() == 0);
   }
+  std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
   {
     int v=0;
     std::future<int> x = std::make_ready_future<int>(v);
     BOOST_TEST(x.get() == 0);
   }
+  std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
   {
     int v=0;
     std::future<int> x = stde::make<std::future<int>>(v);
     BOOST_TEST(x.get() == 0);
   }
+  std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
   {
     int v=1;
     std::future<A> x = std::make_ready_future<A>(v,v);
     BOOST_TEST(x.get().v == 2);
   }
+  std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
   {
     int v=1;
     std::future<A> x = stde::make<std::future<A>>(v,v);
     BOOST_TEST(x.get().v == 2);
   }
+  std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
   {
     std::future<int> x = std::make_ready_future<int>();
     BOOST_TEST_EQ(x.get(),  0);
   }
+  std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
   {
     std::future<int> x = stde::make<std::future<int>>();
     BOOST_TEST_EQ(x.get(),  0);
   }
+  std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
   {
     int v=0;
     std::future<int&> x = std::make_ready_future<int&>(v);
     BOOST_TEST(&x.get() == &v);
   }
+  std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
   {
     int v=0;
     std::future<int&> x = std::make_ready_future(std::ref(v));
     BOOST_TEST(&x.get() == &v);
   }
+  std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
   {
     int v=0;
     std::future<int&> x = stde::make<std::future<int&>>(v);
     BOOST_TEST(&x.get() == &v);
   }
+  std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
   {
     int v=0;
     std::future<int&> x = stde::make<std::future>(std::ref(v));
     BOOST_TEST(&x.get() == &v);
   }
+  std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
   {
     int v=0;
     std::future<int> x = stde::make<std::future<stde::_t>>(v);
     BOOST_TEST(x.get() == 0);
   }
+  std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
   {
     int v=0;
     std::future<int&> x = stde::make<std::future<stde::_t>>(std::ref(v));
     BOOST_TEST(&x.get() == &v);
   }
+  std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
   {
     int v=0;
     auto x = stde::make<std::future<stde::_t>>(std::ref(v));
     BOOST_TEST(&x.get() == &v);
   }
+  std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
   return ::boost::report_errors();
 }
