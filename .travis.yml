@@ -78,14 +78,14 @@ before_install:
 #    - git fetch
 #    - git checkout master
     
-    #######################
-    - echo "Installing st-optional"
-    - STD_OPTIONAL=$HOME/std_optional
-    - git init $STD_OPTIONAL
-    - cd $STD_OPTIONAL
-    - git remote add --no-tags -t master origin git@github.com:viboes/Optional.git
-    - git fetch
-    - git checkout master
+#    #######################
+#    - echo "Installing st-optional"
+#    - STD_OPTIONAL=$HOME/std_optional
+#    - git init $STD_OPTIONAL
+#    - cd $STD_OPTIONAL
+#    - git remote add --no-tags -t master origin git@github.com:viboes/Optional.git
+#    - git fetch
+#    - git checkout master
    
    
     #######################
