@@ -25,8 +25,8 @@ project std_make
       <include>. # .cpp files in expected/test.
       <include>../include/ # make .hpp files.    
       <include>$(BOOST_ROOT) # boost .hpp files.    
-      #<include>$(STD_OPTIONAL) # optional.hpp file.    
-      #<include>$(BOOST_EXPECTED)/include # expected .hpp files.    
+      <include>$(STD_OPTIONAL) # optional.hpp file.    
+      <include>$(BOOST_EXPECTED)/include # expected .hpp files.    
     ;
 
 
@@ -40,13 +40,13 @@ test-suite boost_optional
       [ run make/make_boost_optional_pass.cpp  ]
     ;
 
-explicit boost_expected ;
+#explicit boost_expected ;
 test-suite boost_expected
     : 
       [ run make/make_boost_expected_pass.cpp  ]
     ;
 
-explicit std_optional ;
+#explicit std_optional ;
 test-suite std_optional
     : 
       [ run make/make_std_optional_pass.cpp  ]
