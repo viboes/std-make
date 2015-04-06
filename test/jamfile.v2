@@ -40,19 +40,19 @@ test-suite boost_optional
       [ run make/make_boost_optional_pass.cpp  ]
     ;
 
-explicit boost_expected ;
+#explicit boost_expected ;
 test-suite boost_expected
     : 
       [ run make/make_boost_expected_pass.cpp  ]
     ;
 
-explicit std_optional ;
+#explicit std_optional ;
 test-suite std_optional
     : 
       [ run make/make_std_optional_pass.cpp  ]
     ;
 
-explicit std_future ;
+#explicit std_future ;
 test-suite std_future
     : 
       [ run make/make_std_future_pass.cpp  ]

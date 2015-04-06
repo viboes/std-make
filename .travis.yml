@@ -34,6 +34,8 @@ matrix:
 
 env:
     global:
+    
+        - DEFINES="-DVIBOES_STD_EXPERIMENTAL_FUNDAMENTALS_V2_STD_OPTIONAL_NOT_INSTALLED -DVIBOES_STD_EXPERIMENTAL_FUNDAMENTALS_V2_BOOST_EXPECTED_NOT_INSTALLED"
         # Autodetect Boost branch by using the following code: - BRANCH_TO_TEST=`git rev-parse --abbrev-ref HEAD`
         # or by - BRANCH_TO_TEST=$TRAVIS_BRANCH or just directly specify it
         - BRANCH_TO_TEST=$TRAVIS_BRANCH
