@@ -21,12 +21,14 @@ matrix:
   include:
     - compiler: gcc
       env: 
-      - TOOLSET=gcc-4.9
+      - GCC_VERSION="4.9"
+      - TOOLSET=gcc
       - LIBCXX="libstdc++"
+      - CXX_STANDARD=c++1y
       
     - compiler: clang
       env: 
-      - TOOLSET:clang
+      - TOOLSET=clang
       - LIBCXX="libc++"
       - CXX_STANDARD=c++1y
 
@@ -49,6 +51,10 @@ env:
 
 
 before_install:
+    - sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
+    - sudo apt-get update -qq
+    - if [ -n "$GCC_VERSION" ]; then sudo apt-get install -qq g++-${GCC_VERSION}; fi
+    - if [ "$CXX" = "g++" ]; then export CXX="g++-${GCC_VERSION}" CC="gcc-${GCC_VERSION}"; fi
 
     # Install libc++
     - if [ "$LIBCXX" = "libc++" ]; then svn co --quiet http://llvm.org/svn/llvm-project/libcxx/trunk libcxx; fi
