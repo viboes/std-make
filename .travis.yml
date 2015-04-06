@@ -2,7 +2,7 @@
 # subject to the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 #
-# Copyright Antony Polukhin 2014-2015.
+# Copyright Vicente J. Botet Escribe 2015.
 
 #
 # See https://svn.boost.org/trac/boost/wiki/TravisCoverals for description of this file
@@ -14,8 +14,6 @@ language: cpp
  
 os:
 - linux
-
-
 
 matrix:
   include:
@@ -71,14 +69,14 @@ before_install:
     - if [ "$LIBCXX" = "libc++" ]; then cd /usr/lib && sudo ln -sf libc++.so.1.0 libc++.so; fi
     - if [ "$LIBCXX" = "libc++" ]; then sudo ln -sf libc++.so.1.0 libc++.so.1 && cd $cwd; fi
     
-    #######################
-    - echo "Installing Boost.Expected"
-    - BOOST_EXPECTED=$HOME/expected
-    - git init $BOOST_EXPECTED
-    - cd $BOOST_EXPECTED
-    - git remote add --no-tags -t master origin git@github.com:viboes/Boost.Expected.git
-    - git fetch
-    - git checkout master
+#    #######################
+#    - echo "Installing Boost.Expected"
+#    - BOOST_EXPECTED=$HOME/expected
+#    - git init $BOOST_EXPECTED
+#    - cd $BOOST_EXPECTED
+#    - git remote add --no-tags -t master origin git@github.com:viboes/Boost.Expected.git
+#    - git fetch
+#    - git checkout master
     
     #######################
     - echo "Installing st-optional"
