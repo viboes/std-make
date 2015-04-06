@@ -27,12 +27,12 @@ matrix:
       - STDLIB_LIBCXX=""
       - CXX_STANDARD=c++1y
       
-    - compiler: clang
-      env: 
-      - TOOLSET=clang
-      - LIBCXX="libc++"
-      - CXX_STANDARD=c++1y
-      - STDLIB_LIBCXX="-stdlib=$LIBCXX"
+#    - compiler: clang
+#      env: 
+#      - TOOLSET=clang
+#      - LIBCXX="libc++"
+#      - CXX_STANDARD=c++1y
+#      - STDLIB_LIBCXX="-stdlib=$LIBCXX"
 
 env:
     global:
