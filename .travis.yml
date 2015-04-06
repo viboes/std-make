@@ -77,7 +77,7 @@ before_install:
     - git init $BOOST_EXPECTED
     - cd $BOOST_EXPECTED
     - git remote add --no-tags -t master origin git@github.com:viboes/Boost.Expected.git
-    - git fetch --depth=1
+    - git fetch
     - git checkout master
     
     #######################
@@ -86,7 +86,7 @@ before_install:
     - git init $STD_OPTIONAL
     - cd $STD_OPTIONAL
     - git remote add --no-tags -t master origin git@github.com:viboes/Optional.git
-    - git fetch --depth=1
+    - git fetch
     - git checkout master
    
    
