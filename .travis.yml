@@ -24,6 +24,7 @@ matrix:
       - GCC_VERSION="4.9"
       - TOOLSET=gcc-4.9
       - LIBCXX="libstdc++"
+      - STDLIB_LIBCXX=""
       - CXX_STANDARD=c++1y
       
     - compiler: clang
@@ -31,6 +32,7 @@ matrix:
       - TOOLSET=clang
       - LIBCXX="libc++"
       - CXX_STANDARD=c++1y
+      - STDLIB_LIBCXX="-stdlib=$LIBCXX"
 
 env:
     global:
@@ -97,7 +99,7 @@ before_install:
 
 script:
     # `--coverage` flags required to generate coverage info for Coveralls
-    - $BOOST/b2 toolset=$TOOLSET -sBOOST_ROOT=$BOOST cxxflags="--coverage -std=$CXX_STANDARD -stdlib=$LIBCXX" linkflags="--coverage -stdlib=$LIBCXX"
+    - $BOOST/b2 toolset=$TOOLSET -sBOOST_ROOT=$BOOST cxxflags="--coverage -std=$CXX_STANDARD $STDLIB_LIBCXX" linkflags="--coverage $STDLIB_LIBCXX"
 
 after_success:
     # Copying Coveralls data to a separate folder
