@@ -116,7 +116,7 @@ before_install:
     #######################
     - env
     - clang --version
-    - which gcc-4.9
+    - gcc --version
 
     #######################
     # Set this to the name of the library
