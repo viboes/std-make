@@ -11,17 +11,24 @@
 # File revision #2
 
 language: cpp
-
-compiler:
-- gcc
-- clang
-
+ 
 os:
 - linux
-# - osx
 
-#osx_image: xcode61
 
+
+matrix:
+  include:
+    - compiler: gcc
+      env: 
+      - TOOLSET=gcc-4.9
+      - LIBCXX="libstdc++"
+      
+    - compiler: clang
+      env: 
+      - TOOLSET:clang
+      - LIBCXX="libc++"
+      - CXX_STANDARD=c++1y
 
 env:
     global:
@@ -39,10 +46,19 @@ env:
         # You can get it from "Configure TravisCI" on your Coverity project page
         #- secure: "WJQ9X51EmtIKOe7LTAKsGx/RTq60ENxSRdTvoJ2MWMHzD0+8mW32Qki60zXBaOrKuNAa0rBWj1dVIgKBxpQdWHJgSdZbBJzQ+ZLUVHB1fFMp/P8IITywceTdBw2WMqWML8pBpcXM/+mQXr+xjAVDDxcQ+7f7HKna4T7S3daN5x4="
 
-    matrix:
-        - CXX_STANDARD=c++1y
+
 
 before_install:
+
+    # Install libc++
+    - if [ "$LIBCXX" = "libc++" ]; then svn co --quiet http://llvm.org/svn/llvm-project/libcxx/trunk libcxx; fi
+    - if [ "$LIBCXX" = "libc++" ]; then cd libcxx/lib && bash buildit; fi
+    - if [ "$LIBCXX" = "libc++" ]; then sudo cp ./libc++.so.1.0 /usr/lib/; fi
+    - if [ "$LIBCXX" = "libc++" ]; then sudo mkdir /usr/include/c++/v1; fi
+    - if [ "$LIBCXX" = "libc++" ]; then cd .. && sudo cp -r include/* /usr/include/c++/v1/; fi
+    - if [ "$LIBCXX" = "libc++" ]; then cd /usr/lib && sudo ln -sf libc++.so.1.0 libc++.so; fi
+    - if [ "$LIBCXX" = "libc++" ]; then sudo ln -sf libc++.so.1.0 libc++.so.1 && cd $cwd; fi
+
     # Set this to the name of the library
     - PROJECT_TO_TEST=`basename $TRAVIS_BUILD_DIR`
     - echo "Testing $PROJECT_TO_TEST"
@@ -69,10 +85,13 @@ before_install:
     - ./b2 headers
     - cd $TRAVIS_BUILD_DIR/test
     - pwd
+    - env
+    - clang --version
+    - gcc --version
 
 script:
     # `--coverage` flags required to generate coverage info for Coveralls
-    - $BOOST/b2 toolset=clang -sBOOST_ROOT=$BOOST cxxflags="--coverage -std=$CXX_STANDARD" linkflags="--coverage"
+    - $BOOST/b2 toolset=$TOOLSET -sBOOST_ROOT=$BOOST cxxflags="--coverage -std=$CXX_STANDARD -stdlib=$LIBCPP" linkflags="--coverage -stdlib=$LIBCPP"
 
 after_success:
     # Copying Coveralls data to a separate folder
