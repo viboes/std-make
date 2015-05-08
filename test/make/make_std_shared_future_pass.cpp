@@ -21,7 +21,7 @@ namespace std {
 
   // customization point for template (needed because std::shared_future<X> doesn't has a constructor from X)
   template <class T, class ...Xs>
-  shared_future<T> make(experimental::meta::type<shared_future<T>>, Xs&& ...xs)
+  shared_future<T> make_custom(experimental::meta::type<shared_future<T>>, Xs&& ...xs)
   {
     promise<T> p;
     p.set_value(T(forward<Xs>(xs)...));

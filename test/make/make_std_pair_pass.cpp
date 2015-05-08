@@ -22,14 +22,14 @@ namespace std {
 
   // customization point for template (needed because std::unique_ptr doesn't has a conversion constructor)
   template <class T1, class T2, class X1, class X2>
-  constexpr pair<T1, T2> make(experimental::meta::type<pair<T1, T2>>, X1&& x1, X2&& x2)
+  constexpr pair<T1, T2> make_custom(experimental::meta::type<pair<T1, T2>>, X1&& x1, X2&& x2)
   {
     return pair<T1, T2>(forward<X1>(x1), forward<X2>(x2));
   }
 
   // customization point for template (needed because std::unique_ptr doesn't uses experimental::in_place_t)
   template <class T1, class T2, class ...Args>
-  constexpr pair<T1, T2> make(experimental::meta::type<pair<T1, T2>>, experimental::in_place_t, Args&& ...args)
+  constexpr pair<T1, T2> make_custom(experimental::meta::type<pair<T1, T2>>, experimental::in_place_t, Args&& ...args)
   {
     return pair<T1, T2>(forward<Args>(args)...);
   }

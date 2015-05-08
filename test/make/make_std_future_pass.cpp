@@ -69,14 +69,14 @@ namespace std {
   }
 
   // customization point for template (needed because std::future doesn't has a default constructor)
-  future<void> make(experimental::meta::type<future<void>>)
+  future<void> make_custom(experimental::meta::type<future<void>>)
   {
     return make_ready_future();
   }
 
   // customization point for template (needed because std::future doesn't has a conversion constructor)
   template <class DX, class ...Xs>
-  future<DX> make(experimental::meta::type<future<DX>>, Xs&& ...xs)
+  future<DX> make_custom(experimental::meta::type<future<DX>>, Xs&& ...xs)
   {
     return make_ready_future<DX>(forward<Xs>(xs)...);
   }

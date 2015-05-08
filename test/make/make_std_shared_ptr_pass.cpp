@@ -24,7 +24,7 @@ namespace std {
 
   // customization point for template (needed because std::shared_ptr doesn't has a conversion constructor)
   template <class DX, class ...Xs>
-  shared_ptr<DX> make(experimental::meta::type<shared_ptr<DX>>, Xs&& ...xs)
+  shared_ptr<DX> make_custom(experimental::meta::type<shared_ptr<DX>>, Xs&& ...xs)
   {
     return make_shared<DX>(forward<Xs>(xs)...);
   }

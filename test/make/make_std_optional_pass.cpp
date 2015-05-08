@@ -24,6 +24,83 @@ int main()
 #include <optional.hpp>
 #include <boost/detail/lightweight_test.hpp>
 
+
+template <class T>
+struct explicit_t {
+  explicit_t(T) {}
+};
+
+struct explicit_d {};
+
+template <class T>
+explicit_t<T> explicit_(T v){ return explicit_t<T>{v};}
+
+struct E {
+  explicit E() {}
+  explicit E(int) {}
+  E(explicit_d) {}
+  E(explicit_t<int>) {}
+};
+struct I {
+  I() {}
+  I(int) {}
+};
+
+struct IIL {
+  IIL(std::initializer_list<int>) {}
+};
+
+struct EIL {
+  explicit EIL(std::initializer_list<int>) {}
+};
+
+
+void ff(I p = {}) {}
+void f(I p = {}) {}
+//void f(E p = {}); // compile error
+void f(E p = explicit_d{});
+
+void f2(I p = 1) {}
+//void f2(E p = 1); // compile error
+void f2(E p = explicit_(1));
+
+void f3(IIL p = {}){}
+//void f3(EIL p = {}){} // compile error
+
+void f33(IIL p = {1, 2}){}
+//void f3(EIL p = {1, 2}){} // compile error
+
+
+void f4(I p){}
+void f5(E p){}
+
+void g() {
+  f4({});
+}
+
+void h() {
+  //f5({}); // compile error
+  f5(explicit_d{});
+}
+
+I g1() {
+  return {};
+}
+
+E h1() {
+  //return {}; // compile error
+  return explicit_d{};
+}
+
+I g2() {
+  return {1};
+}
+
+E h2() {
+  //return {1}; // compile error
+  return explicit_(1);
+}
+
 namespace std {
   namespace experimental {
 

@@ -23,7 +23,7 @@ namespace boost {
 
   // customization point for template (needed because boost::optional doesn't has experimental::in_place_t constructor)
   template <class X, class ...Args>
-  optional<X> make(std::experimental::meta::type<optional<X>>, std::experimental::in_place_t, Args&& ...args)
+  optional<X> make_custom(std::experimental::meta::type<optional<X>>, std::experimental::in_place_t, Args&& ...args)
   {
     optional<X> res;
     res.emplace(std::forward<Args>(args)...);
