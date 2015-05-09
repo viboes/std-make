@@ -9,22 +9,9 @@
 
 #include <utility>
 #include <type_traits>
-#include <experimental/fundamental/v1/in_place.hpp>
-#include <experimental/fundamental/v2/holder.hpp>
-#include <experimental/meta/v1/id.hpp>
 #include <experimental/meta/v1/types.hpp>
 #include <experimental/meta/v1/type.hpp>
-#include <experimental/meta/v1/template_class.hpp>
-#include <experimental/meta/v1/deduced_type.hpp>
-#include <experimental/meta/v1/eval.hpp>
-#include <experimental/meta/v1/always.hpp>
-#include <experimental/meta/v1/void_.hpp>
 #include <experimental/meta/v1/is_applicable_with.hpp>
-#include <experimental/meta/v1/rebind.hpp>
-#include <experimental/meta/v1/quote.hpp>
-#include <experimental/meta/v1/lift.hpp>
-#include <experimental/meta/v1/reverse_lift.hpp>
-#include <experimental/meta/v1/type_constructor.hpp>
 
 namespace std
 {

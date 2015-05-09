@@ -9,6 +9,10 @@
 #ifndef JASEL_META_V1_IS_APPLICABLE_WITH_HPP
 #define JASEL_META_V1_IS_APPLICABLE_WITH_HPP
 
+#include <experimental/meta/v1/void_.hpp>
+#include <experimental/meta/v1/eval.hpp>
+#include <type_traits> //false_type
+
 namespace std
 {
 namespace experimental
