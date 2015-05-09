@@ -548,7 +548,7 @@ namespace meta
   template <template <class ...> class M, class X>
     M<Y> make(X&& x);
 
-    // make overload: requires a type construcor, deduce the underlying type
+    // make overload: requires a type constructor, deduce the underlying type
   template <class TC, class X>
     meta::apply<TC, Y> make(X&& x);
     
@@ -571,10 +571,6 @@ namespace meta
   // default customization point for constructor from Xs
   template <class M, class ...Xs>
     M make_custom(meta::type<M>, Xs&& xs);
-
-  // default customization point for in_place constructor
-  template <class M, class ...Args>
-    M make_custom(meta::type<M>, in_place_t, Args&& ...args);
 }  
 }
 }
@@ -813,7 +809,7 @@ Scott Pager helped me to identify a minimal proposal, making optional
 the helper classes and of course the addition high order functional factory and 
 the missing reference_wrapper<T> overload.
 
-Thanks to Mike Spertus for its N4471 proposal that would help even to avoid the factories 
+Thanks to Mike Spertus for its N4471 proposal that would even help to avoid the factories 
 in the common cases. 
 
 # References
@@ -911,7 +907,7 @@ namespace meta
 
 ## v0.3 Take in account comments from the ML
 
- * Fix some product type and in_place factory issues.
+ * Fix some product type and emplace factories issues.
  * Rename customization point `make` to `make_custom`.
  * Reference N4471 as this proposal would simplify most of this proposal.
  
