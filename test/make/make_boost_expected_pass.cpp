@@ -18,7 +18,9 @@ int main()
 #else
 
 #include <experimental/make.hpp>
+#include <experimental/meta.hpp>
 #include <boost/expected/expected.hpp>
+#include <experimental/fundamental/v1/in_place.hpp>
 #include <boost/detail/lightweight_test.hpp>
 
 namespace boost {

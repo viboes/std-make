@@ -14,6 +14,7 @@
 
 
 #include <experimental/make.hpp>
+#include <experimental/meta.hpp>
 #include <memory>
 #include <boost/detail/lightweight_test.hpp>
 

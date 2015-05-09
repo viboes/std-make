@@ -13,6 +13,8 @@
 //  auto make(Args&& ...args);
 
 #include <experimental/make.hpp>
+#include <experimental/meta.hpp>
+#include <experimental/fundamental/v1/in_place.hpp>
 #include <boost/optional.hpp>
 #include <boost/detail/lightweight_test.hpp>
 

@@ -14,6 +14,9 @@
 
 
 #include <experimental/make.hpp>
+#include <experimental/meta.hpp>
+#include <experimental/fundamental/v1/in_place.hpp>
+
 #include <memory>
 #include <algorithm>
 #include <iterator>

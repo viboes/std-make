@@ -21,6 +21,7 @@ int main()
 
 #define VIBOES_STD_EXPERIMENTAL_FACTORIES_USE_OPTIONAL
 #include <experimental/make.hpp>
+#include <experimental/meta.hpp>
 #include <optional.hpp>
 #include <boost/detail/lightweight_test.hpp>
 

@@ -14,6 +14,7 @@
 
 
 #include <experimental/make.hpp>
+#include <experimental/meta.hpp>
 #include <future>
 #include <boost/detail/lightweight_test.hpp>
 #include <iostream>
@@ -22,22 +23,16 @@ namespace std {
 
   future<void> make_ready_future()
   {
-    std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
     promise<void> p;
-    std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
     p.set_value();
-    std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
     return p.get_future();
   }
 
   template <int = 0, int..., class T>
     future<experimental::meta::deduced_type_t<T>> make_ready_future(T&& x)
   {
-    std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
     promise<experimental::meta::deduced_type_t<T>> p;
-    std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
     p.set_value(forward<T>(x));
-    std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
     return p.get_future();
   }
 

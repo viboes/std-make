@@ -15,6 +15,7 @@
 //#define VIBOES_STD_EXPERIMENTAL_FUNDAMENTALS_V2_MAKE_TYPE_CONSTRUCTOR
 
 #include <experimental/make.hpp>
+#include <experimental/meta.hpp>
 #include <memory>
 #include <boost/detail/lightweight_test.hpp>
 
