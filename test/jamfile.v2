@@ -73,6 +73,11 @@ test-suite std_pair
       [ run make/make_std_pair_pass.cpp  ]
     ;
 
+test-suite std_tuple
+    : 
+      [ run make/make_std_tuple_pass.cpp  ]
+    ;
+
 explicit fix ;
 test-suite fix
     : 
