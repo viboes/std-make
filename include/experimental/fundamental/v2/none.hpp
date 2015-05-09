@@ -4,8 +4,8 @@
 //
 // Copyright (C) 2014-2015 Vicente J. Botet Escriba
 
-#ifndef VIBOES_STD_EXPERIMENTAL_FUNDAMENTALS_V2_NONE_HPP
-#define VIBOES_STD_EXPERIMENTAL_FUNDAMENTALS_V2_NONE_HPP
+#ifndef JASEL_FUNDAMENTAL_V2_NONE_HPP
+#define JASEL_FUNDAMENTAL_V2_NONE_HPP
 
 #include <utility>
 #include <type_traits>
