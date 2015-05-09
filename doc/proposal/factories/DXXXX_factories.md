@@ -5,7 +5,7 @@
     </tr>
     <tr>
         <td width="172" align="left" valign="top">Date:</td>
-        <td width="435">2015-03-08</td>
+        <td width="435">2015-05-09</td>
     </tr>
     <tr>
         <td width="172" align="left" valign="top">Project:</td>
@@ -27,6 +27,9 @@ Experimental generic factories library for C++17.
 This paper presents a proposal for a generic factory `make` that allows to make generic 
 algorithms that need to create an instance of a wrapped class from its underlying types.
 
+N4471 proposes extending template parameter deduction for functions to constructors of template classes.
+If this proposal is accepted, it would be clear that this proposal will lost most of its added value.
+
 
 # Motivation and Scope
 
@@ -36,6 +39,7 @@ All these types, `shared_ptr<T>`, `unique_ptr<T,D>`, `optional<T>`, `expected<T,
 There are two kind of factories: 
 * type constructor with the underlying types as parameter
 
+ * ```back_inserter```
  * ```make_optional```
  * ```make_ready_future```
  * ```make_expected```
@@ -55,6 +59,7 @@ unique_ptr<T> f() {
     T a,
     ...
     return make_unique(a);
+    //return unique_ptr(a); // would this be correct if N4471 is accepted?
 }
 ```
 
@@ -66,6 +71,7 @@ shared_ptr<T> f() {
     T a,
     ...
     return make_shared(a);
+    //return shared_ptr(a); // would this be correct if N4471 is accepted?
 }
 ```
 
@@ -78,6 +84,7 @@ TC<T> f() {
     T a,
     ...
     return make<TC>(a);
+    //return TC(a); // if N4471 is accepted
 }
 ```
 
@@ -87,9 +94,13 @@ In addition, we have factories for the product types such as `pair`and `tuple`
  * ```make_tuple```
 
 
-We can use the template class name as a type constructor
+We can use the class template name as a type constructor
 
 ```c++
+vector<int> vi1 = { 0, 1, 1, 2, 3, 5, 8 };
+vector<int> vi2;
+copy_n(vi1, 3, make<back_insert_iterator>(vi2));
+
 int v=0;
 auto x1 = make<shared_ptr>(v);
 auto x2 = make<unique_ptr>(v);
@@ -101,7 +112,7 @@ auto x7 = make<pair>(v, v);
 auto x8 = make<tuple>(v, v, 1u);
 ```
 
-or making use of reference_wrapper type deduction
+or making use of `reference_wrapper` type deduction
 
 ```c++
 int v=0;
@@ -117,6 +128,15 @@ auto x3 = make<optional<A>>();
 auto x4 = make<future<A>>(v);
 auto x5 = make<shared_future<A>>(v, v);
 auto x6 = make<expected<A>>(v, v);
+```
+
+Note, if N4471 is accepted, the following will be already possible
+
+```c++
+int v=0;
+auto x3 = optional(v);
+auto x7 = pair(v, v);
+auto x8 = tuple(v, v, 1u);
 ```
 
 We can also make use of the class name to avoid the type deduction
@@ -180,32 +200,30 @@ C();
 ```
 
 For the `make` copy/move constructor function, the class needs at least to have a 
-constructor from the underlying type.
+constructor from the underlying types.
 
 ```c++
-C(X&&);
+C(Xs&&...);
 ```
-
 
 ## How to customize an existing class
 
 When the existing class doesn't provide the needed constructor as e.g. `future<T>`, the 
-user needs to add the missing overloads so that they can be found by ADL.
+user needs to add the missing overloads for `make_custom` so that they can be found by ADL.
 
 ```c++
 namespace boost {
-  future<void> make(meta::type<future<void>>) 
+  future<void> make_custom(meta::type<future<void>>) 
   { 
     return make_ready_future(); 
     }
   template <class T, class ...Args>
-  future<T> make(meta::type<future<T>>, Args&& ...args)
+  future<T> make_custom(meta::type<future<T>>, Args&& ...args)
   { 
     return make_ready_future<T>(forward<Args>(x)...); 
   }
 }
 ```
-
 
 ## How to define a type constructor?
 
@@ -287,11 +305,11 @@ namespace meta
       using type = T;
     };
 
-  // lift a template class to a type constructor
+  // lift a class template to a type constructor
   template <template <class ...> class TC, class... Args>
     struct lift;
 
-  // reverse lift a template class to a type constructor
+  // reverse lift a class template to a type constructor
   template <template <class ...> class TC, class... Args>
     struct reverse_lift;
     
@@ -341,7 +359,14 @@ namespace boost
 
 # Design rationale
 
-## Why to have customization points?
+## Customization point
+
+This proposal takes advatage of overloading the `make_custom` functions adding the tag 
+`type<T>`.
+
+We have named the customization points `make_custom` to make more evident that these are customization points.
+
+## Why to have default customization points?
 
 The first factoy `make` uses default constructor to build a `C<void>`. 
 
@@ -350,14 +375,6 @@ The second factoy `make` uses conversion constructor from the underlying type(s)
 The third factory `make` is used to be able to do emplace construction given the specific 
 type.
 
-## Customization point
-
-This proposal takes advatage of overloading the `make` functions adding the tag 
-`type<T>`.
-
-We could rename the customization points `make` function to `make_custom` for example, to 
-make more evident that these are customization points.
-
 ## `reference_wrapper<T>` overload to deduce `T&`
 
 As it is the case for `make_pair` when the parameter is `reference_wrapper<T>`, 
@@ -365,7 +382,7 @@ the type deduced for the underlying type is `T&`.
 
 ## Product types factories
 
-This proposal take in account also product type factories (as `std::pair` or `std::tuple`). 
+This proposal takes into account also product type factories (as `std::pair` or `std::tuple`). 
 
 ```c++
   // make product factory overload: Deduce the resulting `Us` 
@@ -373,7 +390,7 @@ This proposal take in account also product type factories (as `std::pair` or `st
     T<Us...> make(Ts&& ...args);
   // make product factory overload: Deduce the resulting `Us` 
   template <class TC, class ...Ts>
-    apply<T, Us...> make(Ts&& ...args);
+    apply<TC, Us...> make(Ts&& ...args);
 ```
 
 ```c++
@@ -383,7 +400,8 @@ auto x = make<tuple>(1, 2u, string("a");
 
 ## High order factory
 
-It is simple to define a high order `maker<TC>` factory of factories that can be used in standard algorithms. 
+It is simple to define a high order `maker<TC>` factory of factories that can be used 
+in standard algorithms. 
 
 For example
 
@@ -405,12 +423,23 @@ std::transform(xs.begin(), xs.end(), std::back_inserter(ys), maker<Something>{})
   };
 ```
 
-The main problem defining function objects is that we can not have the same class with different template parameters.
-The `maker` template class has a template class parameter. 
-We need an additional class that takes a meta-function class and a type.
+The main problem defining function objects is that we can not have the same class with 
+different template parameters.
+The `maker` class template has a template class parameter. 
+We need an additional classes that takes a meta-function class and a type.
 
 ```c++
-  template <class MFC>
+  template <template <class> class T>
+  struct maker_tc {
+    template <typename ...X>
+    constexpr auto
+    operator()(X&& ...x) const
+    {
+        return make<T>(forward<X>(x)...);
+    }     
+  };
+  
+  template <class MFC> // requires MFC is a type constructor
   struct maker_mfc {
     template <class ...Xs>
     constexpr auto
@@ -420,7 +449,7 @@ We need an additional class that takes a meta-function class and a type.
     }
   };
   
-  template <class M>
+  template <class M> // requires M is a type
   struct maker_t
   {
     template <class ...Args>
@@ -433,31 +462,52 @@ We need an additional class that takes a meta-function class and a type.
 
 # Open points
 
-The authors would like to have an answer to the following points:
+The authors would like to have an answer to the following points if there is at all an 
+interest in this proposal:
+
+## Is there an interest on the make functions?
+
+## Is there an interest on the none functions?
 
 ## Should the customization be done with overloading or with traits?
 
-The current proposal uses overloading as customization point. The alternative is to use traits.
+The current proposal uses overloading as customization point. 
+The alternative is to use traits as e.g. the library Hana uses.
 
 If overloading is preferred, 
 
 * should the customization function names be suffixed e.g. with  `_custom`?
 
-* As `id` and `type` do the same, should the `type` be replaced by `id`?
+* As `id` and `type` do the same, should the `type` be replaced by `id` or the oposite?
 
 ## Should the namespace `meta` be used for the meta programming utilities `apply` and `type`?
 
 ## Should the function object factories be part of the proposal?
 
-The function objects `make_tc`, `make_mfc` and `make_t` could be quite useful. 
+The function objects `maker_tc`, `maker_mfc` and `maker_t` could be quite useful. 
 
-What should be the default fo `maker`? 
+What should be the default for `maker`? 
+
+## Should the function factories `make` and `none` be function objects?
+
+N4381 proposes to use function objects as customized points, so that ADL is not involved.
+
+This has the advantages to solve the function ans the high order function at once.
+
+The same technique is used a lot in other functional libraries as Range, Fit and Pure. 
+
+## Is there an interest on the helper holder `_t`?
+
+While not need absolutely, it helps to define the type constructors.
 
 ## Is there an interest on the helper meta-functions `id`, `types`, `lift`, `lift_reverse` and `rebind`?
 
-If yes, should them be part of this proposal?
+If yes, should them be part of a separated proposal?
+
+There is much more on meta-programming utilities as show on the Meta library.
 
 ## Should the customization of the standard classes `pair`, `tuple`,`optional`, `future`, `unique_ptr`, `shared_ptr` be part of this proposal?
+
 
 # Technical Specification
 
@@ -494,7 +544,7 @@ namespace meta
   template <class TC>
     meta::apply<TC, void> make();
   
-  // make overload: requires a template class, deduce the underlying type
+  // make overload: requires a template class parameter, deduce the underlying type
   template <template <class ...> class M, class X>
     M<Y> make(X&& x);
 
@@ -512,18 +562,20 @@ namespace meta
   template <class M, class ...Args>
     M make(Args&& ...args);
 
+namespace meta
+{
   // default customization point for TC<void> default constructor
   template <class M>
-    M make(meta::type<M>);
+    M make_custom(meta::type<M>);
 
-  // default customization point for constructor from X
-  template <class M, class X>
-    M make(meta::type<M>, X&& x);
+  // default customization point for constructor from Xs
+  template <class M, class ...Xs>
+    M make_custom(meta::type<M>, Xs&& xs);
 
   // default customization point for in_place constructor
   template <class M, class ...Args>
-    M make(meta::type<M>, in_place_t, Args&& ...args);
-  
+    M make_custom(meta::type<M>, in_place_t, Args&& ...args);
+}  
 }
 }
 }
@@ -610,14 +662,14 @@ template <class M, class ...Args>
 and `in_place_t`. As if
 
 ```c++
-    return make(meta::type<M>{}, in_place, std::forward<Args>(args)...);
+    return make(meta::type<M>{}, std::forward<Args>(args)...);
 ```
 
-### Template function `make` - default constructor customization point for void
+### Template function `make_custom` - default constructor customization point for void
 
 ```c++
   template <class M>
-  M make(meta::type<M>)
+  M make_custom(meta::type<M>)
 ```
 
 *Returns:* A `M` constructed using the constructor `M()`
@@ -627,23 +679,11 @@ and `in_place_t`. As if
 ### copy constructor customization point
 
 ```c++
-template <class M, class X>
-  M make(meta::type<M>, X&& x);
+template <class M, class ...Xs>
+  M make_custom(meta::type<M>, Xs&& xs);
 ```
 
-*Returns:* A `M` constructed using the constructor `M(std::forward<X>(x))`
-
-*Throws:* Any exception thrown by the constructor.
-
-### `in_place_t` - emplace customization point
-
-```c++
-make <class M, class ...Args>
-  M make(meta::type<M>, in_place_t, Args&& ...args);
-```
-
-*Returns:* A `M` constructed using the in place constructor 
-`M(in_place, std::forward<Args>(args)...)`
+*Returns:* A `M` constructed using the constructor `M(std::forward<Xs>(xs)...)`
 
 *Throws:* Any exception thrown by the constructor.
 
@@ -685,32 +725,32 @@ namespace std {
 
   // customization point for template 
   // (needed because std::experimental::future doesn't has a default constructor)
-  future<void> make(experimental::meta::type<future<void>>);
+  future<void> make_custom(experimental::meta::type<future<void>>);
 
   // customization point for template
   // (needed because std::experimental::future doesn't has a conversion constructor)
   template <class DX, class X>
-    future<DX> make(experimental::meta::type<future<DX>>, X&& x);
+    future<DX> make_custom(experimental::meta::type<future<DX>>, X&& x);
 
   // customization point for template 
   // (needed because std::experimental::future doesn't uses experimental::in_place_t)
   template <class X, class ...Args>
-    future<X> make(experimental::meta::type<future<X>>, experimental::in_place_t, Args&& ...args);
+    future<X> make_custom(experimental::meta::type<future<X>>, experimental::in_place_t, Args&& ...args);
 
 
   // customization point for template 
   // (needed because std::experimental::shared_future doesn't has a default constructor)
-  shared_future<void> make(experimental::meta::type<shared_future<void>>);
+  shared_future<void> make_custom(experimental::meta::type<shared_future<void>>);
 
   // customization point for template 
   // (needed because std::experimental::shared_future<X> doesn't has a constructor from X)
   template <class DX, class X>
-    shared_future<DX> make(experimental::meta::type<shared_future<DX>>, X&& x);
+    shared_future<DX> make_custom(experimental::meta::type<shared_future<DX>>, X&& x);
   
   // customization point for template 
   // (needed because std::experimental::shared_future doesn't use experimental::in_place_t)
   template <class X, class ...Args>
-    shared_future<X> make(experimental::meta::type<shared_future<X>>, experimental::in_place_t, Args&& ...args);
+    shared_future<X> make_custom(experimental::meta::type<shared_future<X>>, experimental::in_place_t, Args&& ...args);
     
   // Holder specializations
   template <>
@@ -732,14 +772,8 @@ namespace std {
 
   // customization point for template 
   // (needed because std::unique_ptr doesn't has a conversion constructor)
-  template <class DX, class X>
-    unique_ptr<DX> make(experimental::meta::type<unique_ptr<DX>>, X&& x);
-
-  // customization point for template 
-  // (needed because std::unique_ptr doesn't uses experimental::in_place_t)
-  template <class X, class ...Args>
-  unique_ptr<X> make(experimental::meta::type<unique_ptr<X>>, experimental::in_place_t, Args&& ...args);
-
+  template <class DX, class ...Xs>
+    unique_ptr<DX> make_custom(experimental::meta::type<unique_ptr<DX>>, Xs&& xs);
 
   // Holder customization
   template <class D>
@@ -758,13 +792,8 @@ namespace std {
 
   // customization point for template 
   // (needed because std::shared_ptr doesn't has a conversion constructor)
-  template <class DX, class X>
-  shared_ptr<DX> make(experimental::meta::type<shared_ptr<DX>>, X&& x);
-
-  // customization point for template 
-  // (needed because std::shared_ptr doesn't uses experimental::in_place_t)
-  template <class X, class ...Args>
-  shared_ptr<X> make(experimental::meta::type<shared_ptr<X>>, experimental::in_place_t, Args&& ...args);
+  template <class DX, class ...Xs>
+  shared_ptr<DX> make_custom(experimental::meta::type<shared_ptr<DX>>, Xs&& xs);
 
   // Holder customization
   template <>
@@ -784,11 +813,38 @@ Scott Pager helped me to identify a minimal proposal, making optional
 the helper classes and of course the addition high order functional factory and 
 the missing reference_wrapper<T> overload.
 
+Thanks to Mike Spertus for its N4471 proposal that would help even to avoid the factories 
+in the common cases. 
+
 # References
 
-## Hana
+* N4471 - Template parameter deduction for constructors (Rev. 2)
+http://open-std.org/JTC1/SC22/WG21/docs/papers/2015/n4471.html
 
-## Pure
+* N4381 - Suggested Design for Customization Points
+http://open-std.org/JTC1/SC22/WG21/docs/papers/2015/n4381.html
+
+* N4480 - Programming Languages — C++ Extensions for Library Fundamentals
+http://open-std.org/JTC1/SC22/WG21/docs/papers/2015/n4480.html
+
+* N4015 - A proposal to add a utility class to represent expected monad
+http://www.open-std.org/JTC1/SC22/WG21/docs/papers/2014/n4015.pdf
+
+* Range-V3
+https://github.com/ericniebler/range-v3
+
+* Meta
+https://github.com/ericniebler/meta
+
+* Hana
+https://github.com/ldionne/hana
+
+* Pure
+https://github.com/splinterofchaos/Pure
+
+* Fit
+https://github.com/pfultz2/Fit
+
 
 # Appendix - Non Mandatory Helper Classes
 
@@ -815,11 +871,11 @@ namespace meta
       using type = T;
     };
 
-  // lift a template class to a type constructor
+  // lift a class template to a type constructor
   template <template <class ...> class TC, class... Args>
     struct lift;
 
-  // reverse lift a template class to a type constructor
+  // reverse lift a class template to a type constructor
   template <template <class ...> class TC, class... Args>
     struct reverse_lift;
 
@@ -852,3 +908,10 @@ namespace meta
  * Remove `type_constructor_tag` as this was an implementation detail.
  * Refactored `rebind`.
  * Moved `rebind`, `lift`, `reverse_lift`, `_t` and `id` to appendix Non Mandatory Helper Classes and to to `meta` namespace. 
+
+## v0.3 Take in account comments from the ML
+
+ * Fix some product type and in_place factory issues.
+ * Rename customization point `make` to `make_custom`.
+ * Reference N4471 as this proposal would simplify most of this proposal.
+ 
