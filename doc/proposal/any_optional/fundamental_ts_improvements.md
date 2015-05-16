@@ -5,7 +5,7 @@
     </tr>
     <tr>
         <td width="172" align="left" valign="top">Date:</td>
-        <td width="435">2015-03-08</td>
+        <td width="435">2015-05-16</td>
     </tr>
     <tr>
         <td width="172" align="left" valign="top">Project:</td>
@@ -54,13 +54,13 @@ We propose to:
 * Make `in_place_t` a variadic template class.
 * Change the definition of `in_place` as a constant of type `in_place_t<>`. 
 
-* To class `optional<T>`
+* In class `optional<T>`
   * Add a `reset` member function.
   * Replace the uses of `in_place_t` by `in_place_t<>`.
 
 * Add an `emplace_optional` factory.
 
-* To class `any`
+* In class `any`
   * make the default constructor constexpr,
   * add in place forward constructors,
   * add emplace forward member functions,
@@ -163,9 +163,15 @@ For probably valued types (as are the smart pointers) the standard uses `reset` 
 Instead of an additional `none`, `any{}` plays well the role. 
 However, the authors think that using `none` is much more explicit.
 
+```c++
+any a = 1;
+a = none;
+```
+
 ## Do we need a specific type for `none` 
 
-Instead of an additional `constexpr none_t none{}`, `constexpr any none{}` plays well the role. 
+Instead of an additional type `none_t` to declare the constant `none` as `constexpr none_t none{}`,
+we can just declare it as `constexpr any none{}` which plays well its role. 
 
 The advantages of the `any` constant is that we don't need conversions.
 However, assignment from `none` could be less efficient. 
@@ -173,12 +179,12 @@ If performance is required the user should use the `reset` function.
 
 ## About a `none_t` type implicitly convertible to `any` and `optional` 
 
-An alternative to the clear member function would be to be able to assign a `none_t` to an `optional` and to an `any`. 
+An alternative to the reset member function would be to be able to assign a `none_t` to an `optional` and to an `any`. 
 We could consider that a default instance of `any` contains an instance of a `none_t` type, as `optional` contains a `nullopt`.
 
 The problem is that then `none` can be seen as an `optional` or an `any` and could result in posible ambiguity.
 
-We think that this implicit conversion goes against the raison d'être of `nullptr` and that we need explicit factories/constants.
+We think that this implicit conversions go against the raison d'être of `nullptr` and that we need explicit factories/constants.
 
 ## Do we need an explicit `make_any` factory? 
 
@@ -222,11 +228,12 @@ The implementation of `emplace_any` could be:
 ```c++
 template <class T, class ...Args>
 emplace_any(Args&& ...args) {
-    return any(in_place_t<T>, std::forward<Args>(args)...);
+    return any(in_place_v<T>, std::forward<Args>(args)...);
 }
 ```
 
-It is possible to replace `emplace_optional` by an overloaded `make_optional`. We have an implementation of this kind of overload in [GF](https://github.com/viboes/std-make/blob/master/doc/proposal/any_optional/fundamental_ts_improvements.md#c-generic-factory---implementation) as part of the  [DXXXX](https://github.com/viboes/std-make/blob/master/doc/proposal/any_optional/fundamental_ts_improvements.md#dxxxx---c-generic-factory) proposal. The problem is that this implementation is not portable and make use of UB. 
+It is possible to replace `emplace_optional` by an overloaded `make_optional`. 
+We have an implementation of this kind of overload in [GF](https://github.com/viboes/std-make/blob/master/doc/proposal/any_optional/fundamental_ts_improvements.md#c-generic-factory---implementation) as part of the  [DXXXX](https://github.com/viboes/std-make/blob/master/doc/proposal/any_optional/fundamental_ts_improvements.md#dxxxx---c-generic-factory) proposal. The problem is that this implementation is not portable and make use of UB. 
 The authors prefer the overloaded version, however the wording would be more difficult to write.
 
 ```c++
@@ -242,6 +249,19 @@ f(make_any<T>(v1, vn));
 As `in_place_t` is used by `optional` and `any` we need to move its definition to another file.
 The preference of the authors will be to place `in_place_t` in `<experimental/utility>`.
 For coherence purposes `in_place` would be moved also.
+
+# Open points
+
+* Do we want in place constructor for `any`?
+
+* Do we want to make `in_place_t` a template?
+
+* Do we prefer `clear` or `reset`?
+
+* Do we prefer `empty` or `operator bool`?
+
+* Do we want the `emplace_xxx` factories?
+
 
 # Technical Specification
 
