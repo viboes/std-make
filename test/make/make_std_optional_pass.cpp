@@ -12,95 +12,18 @@
 //  template <class M, class ...Args>
 //  auto make(Args&& ...args);
 
-#if defined VIBOES_STD_EXPERIMENTAL_FUNDAMENTALS_V2_STD_OPTIONAL_NOT_INSTALLED
-#warning VIBOES_STD_EXPERIMENTAL_FUNDAMENTALS_V2_STD_OPTIONAL_NOT_INSTALLED
+#if defined JASEL_STD_EXPERIMENTAL_FUNDAMENTALS_V2_STD_OPTIONAL_NOT_INSTALLED
+#warning JASEL_STD_EXPERIMENTAL_FUNDAMENTALS_V2_STD_OPTIONAL_NOT_INSTALLED
 int main()
 {
 }
 #else
 
-#define VIBOES_STD_EXPERIMENTAL_FACTORIES_USE_OPTIONAL
+#define JASEL_STD_EXPERIMENTAL_FACTORIES_USE_OPTIONAL
 #include <experimental/make.hpp>
 #include <experimental/meta.hpp>
 #include <optional.hpp>
 #include <boost/detail/lightweight_test.hpp>
-
-
-template <class T>
-struct explicit_t {
-  explicit_t(T) {}
-};
-
-struct explicit_d {};
-
-template <class T>
-explicit_t<T> explicit_(T v){ return explicit_t<T>{v};}
-
-struct E {
-  explicit E() {}
-  explicit E(int) {}
-  E(explicit_d) {}
-  E(explicit_t<int>) {}
-};
-struct I {
-  I() {}
-  I(int) {}
-};
-
-struct IIL {
-  IIL(std::initializer_list<int>) {}
-};
-
-struct EIL {
-  explicit EIL(std::initializer_list<int>) {}
-};
-
-
-void ff(I p = {}) {}
-void f(I p = {}) {}
-//void f(E p = {}); // compile error
-void f(E p = explicit_d{});
-
-void f2(I p = 1) {}
-//void f2(E p = 1); // compile error
-void f2(E p = explicit_(1));
-
-void f3(IIL p = {}){}
-//void f3(EIL p = {}){} // compile error
-
-void f33(IIL p = {1, 2}){}
-//void f3(EIL p = {1, 2}){} // compile error
-
-
-void f4(I p){}
-void f5(E p){}
-
-void g() {
-  f4({});
-}
-
-void h() {
-  //f5({}); // compile error
-  f5(explicit_d{});
-}
-
-I g1() {
-  return {};
-}
-
-E h1() {
-  //return {}; // compile error
-  return explicit_d{};
-}
-
-I g2() {
-  return {1};
-}
-
-E h2() {
-  //return {1}; // compile error
-  return explicit_(1);
-}
 
 namespace std {
   namespace experimental {
@@ -109,20 +32,16 @@ namespace std {
     template <>
     struct optional<_t>  : meta::lift<optional> {};
 
-#ifdef VIBOES_STD_EXPERIMENTAL_FUNDAMENTALS_V2_MAKE_TYPE_CONSTRUCTOR
     namespace meta
     {
       // type_constructor customization
       template <class T>
       struct type_constructor<optional<T>> : id<optional<_t>> {};
     }
-#endif
 
     nullopt_t none_custom(meta::type<optional<_t>>) { return nullopt; }
-    nullopt_t none_custom(meta::template_class<optional>) { return nullopt; }
   }
 }
-
 
 struct A
 {

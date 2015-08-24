@@ -11,7 +11,7 @@
 
 #include <experimental/meta/v1/id.hpp>
 #include <experimental/meta/v1/eval.hpp>
-#include <type_traits> //is_base_of
+#include <experimental/fundamental/v2/holder.hpp>
 
 namespace std
 {
@@ -21,25 +21,24 @@ namespace meta
 {
 inline namespace v1
 {
-#ifdef VIBOES_STD_EXPERIMENTAL_FUNDAMENTALS_V2_MAKE_TYPE_CONSTRUCTOR
 
-    // type constructor tag type used to check if a class is a type constructor
-    struct type_constructor_tag {};
+  // type constructor customization point.
+  // Default implementation make use of a nested type type_constructor
+  template <class M >
+  struct type_constructor : id<typename M::type_constructor>
+  {};
 
-    // type trait based on inheritance from type_constructor_tag
-    // todo change for has TC::template type
-    template <class TC >
-    struct is_type_constructor : is_base_of<type_constructor_tag, TC> {};
+  // type constructor getter meta-function
+  template <class M >
+  using type_constructor_t = eval<type_constructor<M>>;
 
-    // type constructor customization point.
-    // Default implementation make use of a nested type type_constructor
-    template <class M >
-    struct type_constructor : id<typename  M::type_constructor> {};
+  template <template <class...> class TC>
+  struct type_constructor_template : type_constructor<TC<_t> >
+  {};
 
-    // type constructor getter meta-function
-    template <class M >
-    using type_constructor_t = eval<type_constructor<M>>;
-#endif
+  // type constructor getter meta-function
+  template <template <class...> class TC>
+  using type_constructor_template_t = eval<type_constructor_template<TC>>;
 
 }
 }

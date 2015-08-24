@@ -10,8 +10,8 @@
 //  template <class M, class ...Args>
 //  auto make(Args&& ...args);
 
-#if defined VIBOES_STD_EXPERIMENTAL_FUNDAMENTALS_V2_BOOST_EXPECTED_NOT_INSTALLED
-#warning VIBOES_STD_EXPERIMENTAL_FUNDAMENTALS_V2_BOOST_EXPECTED_NOT_INSTALLED
+#if defined JASEL_STD_EXPERIMENTAL_FUNDAMENTALS_V2_BOOST_EXPECTED_NOT_INSTALLED
+#warning JASEL_STD_EXPERIMENTAL_FUNDAMENTALS_V2_BOOST_EXPECTED_NOT_INSTALLED
 int main()
 {
 }
@@ -29,9 +29,7 @@ namespace boost {
   template <class X, class E, class ...Args>
   expected<X, E> make_custom(std::experimental::meta::type<expected<X, E>>, std::experimental::in_place_t, Args&& ...args)
   {
-    expected<X, E> res;
-    res.emplace(std::forward<Args>(args)...);
-    return std::move(res);
+    return expected<X, E>(boost::in_place_t{}, std::forward<Args>(args)...);
   }
 
   // Holder specialization
@@ -39,7 +37,6 @@ namespace boost {
   struct expected<std::experimental::_t, E>: std::experimental::meta::reverse_lift<expected, E> {};
 
 }
-#ifdef VIBOES_STD_EXPERIMENTAL_FUNDAMENTALS_V2_MAKE_TYPE_CONSTRUCTOR
 
 namespace std
 {
@@ -50,13 +47,12 @@ namespace std
       // type_constructor customization
       template <class T, class E>
       struct type_constructor<boost::expected<T, E>> : id<boost::expected<_t, E>> {};
-  //    // underlying_type customization
+  //    // value_type customization
   //    template <class T, class E>
-  //    struct underlying_type<boost::expected<T, E>> : id<T> {};
+  //    struct value_type<boost::expected<T, E>> : id<T> {};
     }
   }
 }
-#endif
 
 struct A
 {

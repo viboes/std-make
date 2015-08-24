@@ -40,7 +40,6 @@ namespace std {
 #endif
   };
 
-#ifdef VIBOES_STD_EXPERIMENTAL_FUNDAMENTALS_V2_MAKE_TYPE_CONSTRUCTOR
   namespace experimental
   {
     namespace meta
@@ -50,7 +49,6 @@ namespace std {
       struct type_constructor<tuple<Ts...>> : id<tuple<_t>> {};
     }
   }
-#endif
 }
 
 int main()

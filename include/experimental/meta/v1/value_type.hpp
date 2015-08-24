@@ -6,8 +6,11 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef JASEL_META_V1_APPLY_HPP
-#define JASEL_META_V1_APPLY_HPP
+#ifndef JASEL_V1_META_VALUE_TYPE_HPP
+#define JASEL_V1_META_VALUE_TYPE_HPP
+
+#include <experimental/meta/v1/id.hpp>
+#include <experimental/meta/v1/eval.hpp>
 
 namespace std
 {
@@ -17,18 +20,18 @@ namespace meta
 {
 inline namespace v1
 {
-  /// applies a meta-function \p TC to the arguments \p Args
-  ///
-  /// apply<type_constructor_t<M>, value_type_t<M>> == M
-  /// value_type_t<apply<TC, T>> == T
-  /// type_constructor_t<apply<TC, T>> == TC
 
-  template<class TC, class... Args>
-  using apply = typename TC::template apply<Args...>;
+  // customization point defaults to nested type
+  template <class M >
+  struct value_type : id<typename M::value_type>
+  {};
+
+  // value_type getter meta-function
+  template <class M >
+  using value_type_t = eval<value_type<M>>;
 
 }
 }
 }
 }
-
 #endif // header

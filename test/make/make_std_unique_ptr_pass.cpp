@@ -12,7 +12,7 @@
 //  template <class M, class ...Args>
 //  auto make(Args&& ...args);
 
-//#define VIBOES_STD_EXPERIMENTAL_FUNDAMENTALS_V2_MAKE_TYPE_CONSTRUCTOR
+//#define JASEL_STD_EXPERIMENTAL_FUNDAMENTALS_V2_MAKE_TYPE_CONSTRUCTOR
 
 #include <experimental/make.hpp>
 #include <experimental/meta.hpp>
@@ -51,7 +51,6 @@ namespace std {
 
   template <class D>
   nullptr_t none_custom(experimental::meta::type<unique_ptr<experimental::_t, D>>) { return nullptr; }
-  nullptr_t none_custom(experimental::meta::template_class<unique_ptr>) { return nullptr; }
 
   // customization point for template (needed because std::unique_ptr doesn't has a conversion constructor)
   template <class T, class ...Xs>
@@ -71,7 +70,6 @@ namespace std {
   template <>
   struct default_delete<experimental::_t> : experimental::meta::lift<default_delete> {};
 
-#ifdef VIBOES_STD_EXPERIMENTAL_FUNDAMENTALS_V2_MAKE_TYPE_CONSTRUCTOR
   namespace experimental
   {
     namespace meta
@@ -83,7 +81,6 @@ namespace std {
       struct type_constructor<default_delete<T>> : id<default_delete<_t>> {};
     }
   }
-#endif
 
 }
 

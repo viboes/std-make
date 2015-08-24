@@ -27,6 +27,7 @@ template <class T>
 struct A
 {
   T v;
+  A(): v(2) {}
   A(T v): v(std::move(v)) {}
   A(std::experimental::in_place_t): v(3) {}
   A(std::experimental::in_place_t, T v): v(std::move(v)) {}
@@ -41,7 +42,8 @@ struct A<T&>
 template <>
 struct A<void>
 {
-  A() {}
+  int v;
+  A() : v(0) {}
 };
 
 // Holder specialization
@@ -52,9 +54,17 @@ int main()
 {
   namespace stde = std::experimental;
   {
+    A<void> x = stde::make<A>();
+    BOOST_TEST(x.v == 0);
+  }
+  {
     int v=0;
     A<int> x = stde::make<A>(v);
     BOOST_TEST(x.v == 0);
+  }
+  {
+    A<int> x = stde::make<A<int>>();
+    BOOST_TEST(x.v == 2);
   }
   {
     int v=0;

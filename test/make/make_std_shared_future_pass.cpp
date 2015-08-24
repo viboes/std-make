@@ -40,7 +40,6 @@ namespace std {
 //    using apply = shared_future<T& ...>;
 //  };
 
-#ifdef VIBOES_STD_EXPERIMENTAL_FUNDAMENTALS_V2_MAKE_TYPE_CONSTRUCTOR
   namespace experimental
   {
     namespace meta
@@ -50,7 +49,6 @@ namespace std {
       struct type_constructor<shared_future<T>> : id<shared_future<_t>> {};
     }
   }
-#endif
 }
 
 

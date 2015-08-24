@@ -9,7 +9,6 @@
 
 #include <experimental/fundamental/v2/holder.hpp>
 #include <experimental/meta/v1/type.hpp>
-#include <experimental/meta/v1/template_class.hpp>
 #include <experimental/meta/v1/type_constructor.hpp>
 
 namespace std
@@ -22,11 +21,7 @@ inline namespace fundamental_v2
   template <template <class ...> class TC>
   constexpr auto none()
   {
-#ifdef VIBOES_STD_EXPERIMENTAL_FUNDAMENTALS_V2_MAKE_TYPE_CONSTRUCTOR
-    return none_custom(meta::type<type_constructor_template_t<TC>>{});
-#else
-    return none_custom(meta::template_class<TC>{});
-#endif
+    return none_custom(meta::type<meta::type_constructor_template_t<TC>>{});
   }
 
   template <class TC>
@@ -38,4 +33,4 @@ inline namespace fundamental_v2
 }
 }
 
-#endif // VIBOES_STD_EXPERIMENTAL_FUNDAMENTALS_V2_MAKE_HPP
+#endif // header

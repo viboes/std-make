@@ -21,7 +21,6 @@
 namespace boost {
 
   none_t none_custom(std::experimental::meta::type<optional<std::experimental::_t>>) { return boost::none; }
-  none_t none_custom(std::experimental::meta::template_class<optional>) { return boost::none; }
 
   // customization point for template (needed because boost::optional doesn't has experimental::in_place_t constructor)
   template <class X, class ...Args>
@@ -35,15 +34,10 @@ namespace boost {
   // Holder specialization
   template <>
   struct optional<std::experimental::_t>
-  //: std::experimental::meta::quote<optional> {};
-  {
-    template <class  T>
-    using apply = optional<T>;
-  };
+  : std::experimental::meta::lift<optional> {};
 
 }
 
-#ifdef VIBOES_STD_EXPERIMENTAL_FUNDAMENTALS_V2_MAKE_TYPE_CONSTRUCTOR
 namespace std
 {
   namespace experimental
@@ -56,7 +50,6 @@ namespace std
     }
   }
 }
-#endif
 
 struct A
 {
@@ -70,6 +63,15 @@ int main()
 {
   namespace stde = std::experimental;
   static_assert(stde::meta::is_applicable_with<boost::optional<stde::_t>, int>::value, "ERROR");
+
+  {
+    boost::optional<int> x = stde::none<boost::optional>();
+    BOOST_TEST(! x);
+  }
+  {
+    boost::optional<int> x = stde::none<boost::optional<stde::_t>>();
+    BOOST_TEST(! x);
+  }
   {
     int v=0;
     boost::optional<int> x = stde::make<boost::optional>(v);
