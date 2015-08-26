@@ -39,14 +39,18 @@
 
 namespace std
 {
+namespace experimental
+{
+inline namespace fundamental_v2
+{
+
   // T* type constructor
   using add_pointer_f = experimental::meta::lift<add_pointer>;
 
   template <>
   struct add_pointer<experimental::_t> : add_pointer_f {};
+}
 
-namespace experimental
-{
 namespace meta
 {
 inline namespace v1

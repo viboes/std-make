@@ -12,8 +12,6 @@
 //  template <class M, class ...Args>
 //  auto make(Args&& ...args);
 
-//#define JASEL_STD_EXPERIMENTAL_FUNDAMENTALS_V2_MAKE_TYPE_CONSTRUCTOR
-
 #include <experimental/make.hpp>
 #include <experimental/meta.hpp>
 #include <memory>

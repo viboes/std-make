@@ -77,7 +77,7 @@ namespace meta
 {
 inline namespace v1
 {
-  // default customization point for TC<void> default constructor
+  // default customization point for M default constructor
   template <class M>
   constexpr typename enable_if<std::is_default_constructible<M>::value,  M>::type
   make_custom(meta::type<M>)
@@ -85,7 +85,7 @@ inline namespace v1
     return M();
   }
 
-  // default customization point for constructor from X
+  // default customization point for constructor from X...
   template <class M, class ...X>
   constexpr typename enable_if<std::is_constructible<M, meta::deduced_type_t<X>...>::value,  M>::type
   make_custom(meta::type<M>, X&& ...x)
@@ -93,6 +93,21 @@ inline namespace v1
     return M(std::forward<X>(x)...);
   }
 
+  // default customization point for M default constructor
+  template <class T>
+  constexpr typename enable_if<std::is_default_constructible<T>::value,  T*>::type
+  make_custom(meta::type<T*>)
+  {
+    return new T();
+  }
+
+  // default customization point for constructor from X...
+  template <class T, class ...X>
+  constexpr typename enable_if<std::is_constructible<T, meta::deduced_type_t<X>...>::value,  T*>::type
+  make_custom(meta::type<T*>, X&& ...x)
+  {
+    return T(std::forward<X>(x)...);
+  }
 }
 }
 }

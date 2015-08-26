@@ -30,6 +30,14 @@ inline namespace fundamental_v2
   }
 
 }
+namespace meta
+{
+inline namespace v1
+{
+  nullptr_t none_custom(type<add_pointer<_t>>) { return nullptr; }
+}
+}
+
 }
 }
 

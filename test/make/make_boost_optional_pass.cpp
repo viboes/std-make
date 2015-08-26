@@ -16,7 +16,42 @@
 #include <experimental/meta.hpp>
 #include <experimental/fundamental/v1/in_place.hpp>
 #include <boost/optional.hpp>
+#include <experimental/fundamental/v2/possible_valued/mcd/pointer_like_mcd.hpp>
+#include <experimental/fundamental/v2/functor/mcd/possible_valued_mcd.hpp>
+#include <experimental/fundamental/v2/monad/mcd/possible_valued_mcd.hpp>
+
 #include <boost/detail/lightweight_test.hpp>
+
+namespace boost {
+
+  // Holder specialization
+  template <>
+  struct optional<std::experimental::_t>
+  : std::experimental::meta::lift<optional> {};
+
+}
+
+namespace std
+{
+  namespace experimental
+  {
+    template <class T>
+    struct possible_value::tag<boost::optional<T>> : meta::id<pointer_like> {};
+
+    template <class T>
+    struct functor::tag<boost::optional<T>> : meta::id<possible_value> {};
+
+    template <class T>
+    struct monad::tag<boost::optional<T>> : meta::id<possible_value> {};
+
+    namespace meta
+    {
+      // type_constructor customization
+      template <class T>
+      struct type_constructor<boost::optional<T>> : id<boost::optional<_t>> {};
+    }
+  }
+}
 
 namespace boost {
 
@@ -30,25 +65,6 @@ namespace boost {
     res.emplace(std::forward<Args>(args)...);
     return std::move(res);
   }
-
-  // Holder specialization
-  template <>
-  struct optional<std::experimental::_t>
-  : std::experimental::meta::lift<optional> {};
-
-}
-
-namespace std
-{
-  namespace experimental
-  {
-    namespace meta
-    {
-      // type_constructor customization
-      template <class T>
-      struct type_constructor<boost::optional<T>> : id<boost::optional<_t>> {};
-    }
-  }
 }
 
 struct A
@@ -59,41 +75,80 @@ struct A
   A(int v1, int v2): v(v1+v2) {}
 };
 
+int twice(int i) {
+  return 2*i;
+}
+
+boost::optional<double> inverse(double x) {
+  if (x==0) return boost::none;
+  return 1/x;
+}
+
 int main()
 {
+
   namespace stde = std::experimental;
   static_assert(stde::meta::is_applicable_with<boost::optional<stde::_t>, int>::value, "ERROR");
+  static_assert(stde::meta::has_value_type_member<const boost::optional<int>>::value, "ERROR");
+  static_assert(! stde::meta::has_element_type_member<const boost::optional<int>>::value, "ERROR");
+  static_assert(!std::is_array<boost::optional<int> >::value, "ERROR");
+  static_assert(std::is_same<stde::meta::value_type_t<boost::optional<int>>, int>::value, "ERROR");
 
   {
     boost::optional<int> x = stde::none<boost::optional>();
     BOOST_TEST(! x);
+    BOOST_TEST(! stde::has_value(x));
+    boost::optional<int> y = stde::map(x, twice);
+    BOOST_TEST(! stde::has_value(y));
   }
   {
     boost::optional<int> x = stde::none<boost::optional<stde::_t>>();
     BOOST_TEST(! x);
+    BOOST_TEST(! stde::has_value(x));
   }
   {
-    int v=0;
+    int v=1;
     boost::optional<int> x = stde::make<boost::optional>(v);
-    BOOST_TEST(*x == 0);
+    BOOST_TEST(*x == 1);
+    BOOST_TEST(stde::value(x) == 1);
+    boost::optional<int> y = stde::map(x, twice);
+    BOOST_TEST(stde::value(y) == 2);
+  }
+  {
+    double v=2;
+    boost::optional<double> x = stde::make<boost::optional>(v);
+    BOOST_TEST(stde::value(x) == 2);
+    boost::optional<double> y = stde::bind(x, inverse);
+    BOOST_TEST(stde::value(y) == 1.0/2);
+  }
+  {
+    double v=0;
+    boost::optional<double> x = stde::make<boost::optional>(v);
+    BOOST_TEST(stde::value(x) == 0);
+    boost::optional<double> y = stde::bind(x, inverse);
+    BOOST_TEST(! stde::has_value(y));
   }
   {
     int v=0;
     boost::optional<int> x = stde::make<boost::optional<int>>(v);
     BOOST_TEST(*x == 0);
+    BOOST_TEST(stde::value(x) == 0);
   }
   {
     int v=1;
     boost::optional<A> x = stde::make<boost::optional<A>>(stde::in_place, v,v);
     BOOST_TEST(x->v == 2);
+    BOOST_TEST(stde::value(x).v == 2);
   }
   {
     boost::optional<int> x = stde::make<boost::optional<int>>(stde::in_place);
     BOOST_TEST_EQ(*x,  0);
+    BOOST_TEST(stde::value(x) == 0);
   }
   {
     boost::optional<int> x = stde::make<boost::optional<int>>();
     BOOST_TEST(! x);
+    BOOST_TEST(! stde::has_value(x));
   }
 //  {
 //    int v=0;
@@ -104,6 +159,7 @@ int main()
     int v=0;
     boost::optional<int> x = stde::make<boost::optional<stde::_t>>(v);
     BOOST_TEST(*x == 0);
+    BOOST_TEST(stde::value(x) == 0);
   }
   return ::boost::report_errors();
 }
