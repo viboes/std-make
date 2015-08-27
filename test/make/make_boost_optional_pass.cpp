@@ -18,6 +18,7 @@
 #include <boost/optional.hpp>
 #include <experimental/fundamental/v2/possible_valued/mcd/pointer_like_mcd.hpp>
 #include <experimental/fundamental/v2/functor/mcd/possible_valued_mcd.hpp>
+#include <experimental/fundamental/v2/applicative/mcd/possible_valued_mcd.hpp>
 #include <experimental/fundamental/v2/monad/mcd/possible_valued_mcd.hpp>
 
 #include <boost/detail/lightweight_test.hpp>
@@ -40,6 +41,9 @@ namespace std
 
     template <class T>
     struct functor::tag<boost::optional<T>> : meta::id<possible_value> {};
+
+    template <class T>
+    struct applicative::tag<boost::optional<T>> : meta::id<possible_value> {};
 
     template <class T>
     struct monad::tag<boost::optional<T>> : meta::id<possible_value> {};
@@ -84,6 +88,10 @@ boost::optional<double> inverse(double x) {
   return 1/x;
 }
 
+struct twice_fn {
+  int operator()(int i) const { return twice(i); }
+};
+
 int main()
 {
 
@@ -93,6 +101,7 @@ int main()
   static_assert(! stde::meta::has_element_type_member<const boost::optional<int>>::value, "ERROR");
   static_assert(!std::is_array<boost::optional<int> >::value, "ERROR");
   static_assert(std::is_same<stde::meta::value_type_t<boost::optional<int>>, int>::value, "ERROR");
+  static_assert(std::is_same<stde::concept_tag_t<stde::applicative, boost::optional<int>>, stde::possible_value>::value, "ERROR");
 
   {
     boost::optional<int> x = stde::none<boost::optional>();
@@ -112,6 +121,13 @@ int main()
     BOOST_TEST(*x == 1);
     BOOST_TEST(stde::value(x) == 1);
     boost::optional<int> y = stde::map(twice, x);
+    BOOST_TEST(stde::value(y) == 2);
+  }
+  {
+    boost::optional<int> x = stde::make<boost::optional>(1);
+    //auto f = stde::make<boost::optional>(twice_fn{});
+    auto f = stde::make<boost::optional>([](int a){return 2*a;});
+    boost::optional<int> y = stde::ap(f, x);
     BOOST_TEST(stde::value(y) == 2);
   }
   {
