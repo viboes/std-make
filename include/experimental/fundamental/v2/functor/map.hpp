@@ -21,22 +21,22 @@ namespace experimental
 inline namespace fundamental_v2
 {
 
-  template <class M, class F>
+  template <class F, class M>
   //  requires Function<F, ValueType<PV>>
-  auto map(const M& m, F&& f)
+  auto map(F&& f, const M& m)
     //-> meta::apply<meta::TypeConstructor<M>, meta::ResultType<F, meta::ValueType<PV>>>
-    -> decltype(map_custom(concept_tag_t<functor, M>{}, m, forward<F>(f)))
+    -> decltype(map_custom(concept_tag_t<functor, M>{}, forward<F>(f), m))
   {
-    return map_custom(concept_tag_t<functor, M>{}, m, forward<F>(f));
+    return map_custom(concept_tag_t<functor, M>{}, forward<F>(f), m);
   }
 
-  template <class M, class F>
+  template <class F, class M>
   //  requires Function<F, ValueType<PV>>
-  auto map(const M& m, F&& f)
+  auto map(F&& f, const M& m)
     // -> meta::apply<meta::TypeConstructor<M>, meta::ResultType<F, meta::ValueType<PV>>>
-    -> decltype(concept_instance_t<functor, M>::map_impl(m, forward<F>(f)))
+    -> decltype(concept_instance_t<functor, M>::map_impl(forward<F>(f), m))
   {
-    return concept_instance_t<functor, M>::map_impl(m, forward<F>(f));
+    return concept_instance_t<functor, M>::map_impl(forward<F>(f), m);
   }
 
 }

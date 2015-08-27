@@ -98,7 +98,7 @@ int main()
     boost::optional<int> x = stde::none<boost::optional>();
     BOOST_TEST(! x);
     BOOST_TEST(! stde::has_value(x));
-    boost::optional<int> y = stde::map(x, twice);
+    boost::optional<int> y = stde::map(twice, x);
     BOOST_TEST(! stde::has_value(y));
   }
   {
@@ -111,7 +111,7 @@ int main()
     boost::optional<int> x = stde::make<boost::optional>(v);
     BOOST_TEST(*x == 1);
     BOOST_TEST(stde::value(x) == 1);
-    boost::optional<int> y = stde::map(x, twice);
+    boost::optional<int> y = stde::map(twice, x);
     BOOST_TEST(stde::value(y) == 2);
   }
   {
