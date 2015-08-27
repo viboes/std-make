@@ -31,6 +31,22 @@ inline namespace fundamental_v2
     return concept_instance_t<possible_value, M>::has_value_impl(v);
   }
 
+  bool have_value() { return true; }
+
+  template <class M>
+  auto have_value(M const& v)
+    -> decltype(has_value(v))
+  {
+    return has_value(v) ;
+  }
+  template <class M1, class M2, class ...Ms>
+  auto have_value(M1 const& v1, M2 const& v2, Ms const& ...vs)
+    //-> decltype(has_value(v1) && have_value(v2, vs...))
+    -> decltype(has_value(v1))
+  {
+    return has_value(v1) && have_value(v2, vs...);
+  }
+
   template <class T>
   bool has_value(T* ptr) {
     return ptr != nullptr;

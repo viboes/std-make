@@ -25,14 +25,14 @@ namespace experimental
 inline namespace fundamental_v2
 {
 
-  template <class F, class PV>
+  template <class F, class PV, class ...PVs>
   //  requires PossibleValued<PV>
   //  && Function<F, ValueType<PV>>
-  auto map_custom(possible_value, F&& f, const PV& pv)
-    -> meta::apply<meta::TypeConstructor<PV>, meta::ResultType<F, meta::ValueType<PV>>>
+  auto map_custom(possible_value, F&& f, const PV& pv, const PVs& ...pvs)
+    -> meta::apply<meta::TypeConstructor<PV>, meta::ResultType<F, meta::ValueType<PV>, meta::ValueType<PVs>...>>
   {
-    if (has_value(pv))
-      return make<meta::TypeConstructor<PV>>(f(value(pv)));
+    if (have_value(pv, pvs...))
+      return make<meta::TypeConstructor<PV>>(f(value(pv), value(pvs)...));
     else
       return novalue(pv);
   }

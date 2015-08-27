@@ -115,6 +115,13 @@ int main()
     BOOST_TEST(stde::value(y) == 2);
   }
   {
+    boost::optional<int> x = stde::make<boost::optional>(1);
+    boost::optional<int> y = stde::make<boost::optional>(1);
+    boost::optional<int> z = stde::map([](int a, int b){return a+b;}, x, y);
+    BOOST_TEST_EQ(stde::value(z), 2);
+    BOOST_TEST(stde::have_value(x, y, z));
+  }
+  {
     double v=2;
     boost::optional<double> x = stde::make<boost::optional>(v);
     BOOST_TEST(stde::value(x) == 2);
