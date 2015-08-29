@@ -117,8 +117,6 @@ int main()
     BOOST_TEST(x == 1);
   }
   {
-
-    //stde::product<int> x = stde::monoid::instance<stde::product<int>>::monoid_id_impl(stde::meta::type<stde::product<int>>{});
     stde::product<int> x = stde::monoid_id<stde::product<int>>();
     BOOST_TEST_EQ(x, 1);
   }

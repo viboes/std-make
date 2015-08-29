@@ -23,7 +23,7 @@ inline namespace fundamental_v2
   using concept_tag_t = meta::eval<typename C::template tag<T>>;
 
   template <class C, class T>
-  using concept_instance_t = meta::eval<typename C::template instance<concept_tag_t<C,T>>>;
+  using concept_instance_t = typename C::template instance<concept_tag_t<C,T>>;
 }
 }
 }

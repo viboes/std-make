@@ -21,10 +21,10 @@ inline namespace fundamental_v2
   using product = newtype<T, struct product_tag
       // deriving Num
       >;
-#if 0
+#if 1
   template <class T>
   // requires Num<T>
-  struct monoid::instance<product<T>> {
+  struct monoid::instance<meta::type<product<T>>> {
     static product<T> monoid_id_impl(meta::type<product<T>>)
     {
       return product<T>(1);

@@ -10,6 +10,7 @@
 #define JASEL_FUNDAMENTAL_V2_APPLICATIVE_APPLICATIVE_TAG_HPP
 
 #include <experimental/meta/v1/id.hpp>
+#include <experimental/meta/v1/type.hpp>
 
 namespace std
 {
@@ -23,7 +24,7 @@ inline namespace fundamental_v2
     struct instance;
 
     template <class T>
-    struct tag : meta::id <T> {};
+    struct tag : meta::id <meta::type<T>> {};
   };
 
 }
