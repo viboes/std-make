@@ -20,6 +20,9 @@
 #include <experimental/fundamental/v2/functor/mcd/possible_valued_mcd.hpp>
 #include <experimental/fundamental/v2/applicative/mcd/possible_valued_mcd.hpp>
 #include <experimental/fundamental/v2/monad/mcd/possible_valued_mcd.hpp>
+#include <experimental/fundamental/v2/monoid/mcd/possible_valued_mcd.hpp>
+#include <experimental/fundamental/v2/product.hpp>
+#include <experimental/fundamental/v2/sum.hpp>
 
 #include <boost/detail/lightweight_test.hpp>
 
@@ -36,8 +39,13 @@ namespace std
 {
   namespace experimental
   {
+
     template <class T>
     struct possible_value::tag<boost::optional<T>> : meta::id<pointer_like> {};
+
+    template <class T>
+    // requires Monoid<T>
+    struct monoid::tag<boost::optional<T>> : meta::id<possible_value> {};
 
     template <class T>
     struct functor::tag<boost::optional<T>> : meta::id<possible_value> {};
@@ -102,7 +110,38 @@ int main()
   static_assert(!std::is_array<boost::optional<int> >::value, "ERROR");
   static_assert(std::is_same<stde::meta::value_type_t<boost::optional<int>>, int>::value, "ERROR");
   static_assert(std::is_same<stde::concept_tag_t<stde::applicative, boost::optional<int>>, stde::possible_value>::value, "ERROR");
+  static_assert(std::is_same<stde::concept_tag_t<stde::monoid, stde::product<int>>, stde::meta::type<stde::product<int>>>::value, "ERROR");
 
+  {
+    stde::product<int> x(1);
+    BOOST_TEST(x == 1);
+  }
+  {
+
+    //stde::product<int> x = stde::monoid::instance<stde::product<int>>::monoid_id_impl(stde::meta::type<stde::product<int>>{});
+    stde::product<int> x = stde::monoid_id<stde::product<int>>();
+    BOOST_TEST_EQ(x, 1);
+  }
+  {
+    auto x = stde::make<boost::optional>(stde::sum<int>(2));
+    auto y = stde::make<boost::optional>(stde::sum<int>(3));
+    auto z = stde::monoid_op(x, y);
+    BOOST_TEST( *z == 5);
+    boost::optional<stde::sum<int>> w = stde::monoid_op(x, y, z);
+    BOOST_TEST( *w == 10);
+  }
+  {
+    boost::optional<stde::product<int>> x = stde::none<boost::optional>();
+    auto y = stde::make<boost::optional>(stde::product<int>(3));
+    auto z = stde::monoid_op(x, y);
+    BOOST_TEST( ! z);
+  }
+  {
+    boost::optional<stde::product<int>> y = stde::none<boost::optional>();
+    auto x = stde::make<boost::optional>(stde::product<int>(3));
+    auto z = stde::monoid_op(x, y);
+    BOOST_TEST( ! z);
+  }
   {
     boost::optional<int> x = stde::none<boost::optional>();
     BOOST_TEST(! x);
