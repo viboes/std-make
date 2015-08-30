@@ -21,10 +21,13 @@ inline namespace fundamental_v2
   using product = newtype<T, struct product_tag
       // deriving Num
       >;
+
 #if 1
+
   template <class T>
   // requires Num<T>
   struct monoid::instance<meta::type<product<T>>> {
+
     static product<T> monoid_id_impl(meta::type<product<T>>)
     {
       return product<T>(1);
@@ -36,7 +39,9 @@ inline namespace fundamental_v2
       return product<T>(T(x) * T(y));
     }
   };
+
 #else
+
   template <class T>
   // requires Num<T>
   product<T> monoid_id_custom(meta::type<product<T>>, meta::type<product<T>>)
@@ -50,6 +55,7 @@ inline namespace fundamental_v2
     //return x * y; if product<T> derives Num<T> operations
     return product<T>(T(x) * T(y));
   }
+
 #endif
 }
 }

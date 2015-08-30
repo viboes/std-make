@@ -31,8 +31,6 @@ inline namespace fundamental_v2
     return concept_instance_t<possible_value, M>::has_value_impl(v);
   }
 
-  bool have_value() { return true; }
-
   template <class M>
   auto have_value(M const& v)
     -> decltype(has_value(v))

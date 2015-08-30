@@ -44,11 +44,12 @@ inline namespace fundamental_v2
     return *ptr;
   }
 
-  template <class M>
-  auto novalue(M const& ptr)
-  {
-    return none<meta::type_constructor_t<M>>();
-  }
+//  template <class M>
+//  auto novalue(pointer_like, M const& ptr)
+//  -> decltype(none<meta::type_constructor_t<M>>())
+//  {
+//    return none<meta::type_constructor_t<M>>();
+//  }
 
 }
 }

@@ -32,7 +32,8 @@ inline namespace fundamental_v2
   }
 
   template <class F, class M, class ...Ms>
-  //  requires Function<F, ValueType<M>>
+  //  requires Function<F, ValueType<M>...>
+  // && Same<meta::TypeConstructor<M>, meta::TypeConstructor<M>>...
   auto map(F&& f, const M& m, const Ms& ...ms)
     // -> meta::apply<meta::TypeConstructor<M>, meta::ResultType<F, meta::ValueType<M>...>>
     -> decltype(concept_instance_t<functor, M>::map_impl(forward<F>(f), m, ms...))

@@ -9,6 +9,7 @@
 
 #include <experimental/fundamental/v2/possible_valued/possible_value_tag.hpp>
 #include <experimental/fundamental/v2/concept_map.hpp>
+#include <experimental/fundamental/v2/none.hpp>
 
 namespace std
 {
@@ -29,6 +30,16 @@ inline namespace fundamental_v2
     decltype(concept_instance_t<possible_value, M>::novalue_impl(m))
   {
     return concept_instance_t<possible_value, M>::novalue_impl(m);
+  }
+
+  // this overload a little bit intrusive. It must be mappedfrom the customization.
+  // it is used by the pointer-like mappings.
+
+  template <class M>
+  auto novalue(M const& ptr)
+  -> decltype(none<meta::type_constructor_t<M>>())
+  {
+    return none<meta::type_constructor_t<M>>();
   }
 
   template <class T>

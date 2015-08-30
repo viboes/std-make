@@ -106,7 +106,7 @@ inline namespace v1
   constexpr typename enable_if<std::is_constructible<T, meta::deduced_type_t<X>...>::value,  T*>::type
   make_custom(meta::type<T*>, X&& ...x)
   {
-    return T(std::forward<X>(x)...);
+    return new T(std::forward<X>(x)...);
   }
 }
 }
