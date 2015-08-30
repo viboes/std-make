@@ -22,11 +22,12 @@ inline namespace fundamental_v2
       // deriving Num
       >;
 
-#if 0
+#if 1
   template <class T>
   // requires Num<T>
-  struct monoid::instance<product<T>> {
-    static sum<T> monoid_id_impl(meta::type<product<T>>)
+  struct monoid::instance<meta::type<sum<T>>> {
+
+    static sum<T> monoid_id_impl(meta::type<sum<T>>)
     {
       return sum<T>(0);
     }

@@ -121,6 +121,10 @@ int main()
     BOOST_TEST_EQ(x, 1);
   }
   {
+    stde::sum<int> x = stde::monoid_id<stde::sum<int>>();
+    BOOST_TEST(x == 0);
+  }
+  {
     auto x = stde::make<boost::optional>(stde::sum<int>(2));
     auto y = stde::make<boost::optional>(stde::sum<int>(3));
     auto z = stde::monoid_op(x, y);
