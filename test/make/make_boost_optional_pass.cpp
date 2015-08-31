@@ -148,7 +148,7 @@ int main()
     boost::optional<int> x = stde::none<boost::optional>();
     BOOST_TEST(! x);
     BOOST_TEST(! stde::has_value(x));
-    boost::optional<int> y = stde::map(twice, x);
+    boost::optional<int> y = stde::fmap(twice, x);
     BOOST_TEST(! stde::has_value(y));
   }
   {
@@ -161,7 +161,7 @@ int main()
     boost::optional<int> x = stde::make<boost::optional>(v);
     BOOST_TEST(*x == 1);
     BOOST_TEST(stde::value(x) == 1);
-    boost::optional<int> y = stde::map(twice, x);
+    boost::optional<int> y = stde::fmap(twice, x);
     BOOST_TEST(stde::value(y) == 2);
   }
   {
@@ -174,7 +174,7 @@ int main()
   {
     boost::optional<int> x = stde::make<boost::optional>(1);
     boost::optional<int> y = stde::make<boost::optional>(1);
-    boost::optional<int> z = stde::map([](int a, int b){return a+b;}, x, y);
+    boost::optional<int> z = stde::fmap([](int a, int b){return a+b;}, x, y);
     BOOST_TEST_EQ(stde::value(z), 2);
     BOOST_TEST(stde::have_value(x, y, z));
   }
@@ -182,14 +182,14 @@ int main()
     double v=2;
     boost::optional<double> x = stde::make<boost::optional>(v);
     BOOST_TEST(stde::value(x) == 2);
-    boost::optional<double> y = stde::bind(x, inverse);
+    boost::optional<double> y = stde::mbind(x, inverse);
     BOOST_TEST(stde::value(y) == 1.0/2);
   }
   {
     double v=0;
     boost::optional<double> x = stde::make<boost::optional>(v);
     BOOST_TEST(stde::value(x) == 0);
-    boost::optional<double> y = stde::bind(x, inverse);
+    boost::optional<double> y = stde::mbind(x, inverse);
     BOOST_TEST(! stde::has_value(y));
   }
   {

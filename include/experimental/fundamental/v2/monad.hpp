@@ -19,6 +19,6 @@
 
 #include <experimental/fundamental/v2/functor.hpp>
 #include <experimental/fundamental/v2/monad/monad_tag.hpp>
-#include <experimental/fundamental/v2/monad/bind.hpp>
+#include <experimental/fundamental/v2/monad/mbind.hpp>
 
 #endif // header

@@ -4,8 +4,8 @@
 //
 // Copyright (C) 2015 Vicente J. Botet Escriba
 
-#ifndef JASEL_FUNDAMENTAL_V2_FUNCTOR_MAP_HPP
-#define JASEL_FUNDAMENTAL_V2_FUNCTOR_MAP_HPP
+#ifndef JASEL_FUNDAMENTAL_V2_FUNCTOR_FMAP_HPP
+#define JASEL_FUNDAMENTAL_V2_FUNCTOR_FMAP_HPP
 
 #include <experimental/fundamental/v2/functor/functor_tag.hpp>
 #include <experimental/fundamental/v2/concept_map.hpp>
@@ -24,21 +24,21 @@ inline namespace fundamental_v2
   template <class F, class M, class ...Ms>
   //  requires Function<F, ValueType<M>...>
   // && Same<meta::TypeConstructor<M>, meta::TypeConstructor<M>>...
-  auto map(F&& f, const M& m, const Ms& ...ms)
+  auto fmap(F&& f, const M& m, const Ms& ...ms)
     //-> meta::apply<meta::TypeConstructor<M>, meta::ResultType<F, meta::ValueType<M>...>>
-    -> decltype(map_custom(concept_tag_t<functor, M>{}, forward<F>(f), m, ms...))
+    -> decltype(fmap_custom(concept_tag_t<functor, M>{}, forward<F>(f), m, ms...))
   {
-    return map_custom(concept_tag_t<functor, M>{}, forward<F>(f), m, ms...);
+    return fmap_custom(concept_tag_t<functor, M>{}, forward<F>(f), m, ms...);
   }
 
   template <class F, class M, class ...Ms>
   //  requires Function<F, ValueType<M>...>
   // && Same<meta::TypeConstructor<M>, meta::TypeConstructor<M>>...
-  auto map(F&& f, const M& m, const Ms& ...ms)
+  auto fmap(F&& f, const M& m, const Ms& ...ms)
     // -> meta::apply<meta::TypeConstructor<M>, meta::ResultType<F, meta::ValueType<M>...>>
-    -> decltype(concept_instance_t<functor, M>::map_impl(forward<F>(f), m, ms...))
+    -> decltype(concept_instance_t<functor, M>::fmap_impl(forward<F>(f), m, ms...))
   {
-    return concept_instance_t<functor, M>::map_impl(forward<F>(f), m, ms...);
+    return concept_instance_t<functor, M>::fmap_impl(forward<F>(f), m, ms...);
   }
 
 }

@@ -34,7 +34,7 @@ inline namespace fundamental_v2
     -> meta::apply<meta::TypeConstructor<PV>, meta::ResultType<meta::ValueType<F>, meta::ValueType<PV>>>
   {
     if (has_value(f))
-      return map(value(f), pv);
+      return fmap(value(f), pv);
     else
       return novalue(f);
   }

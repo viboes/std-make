@@ -26,6 +26,6 @@
 
 #include <experimental/fundamental/v2/make.hpp>
 #include <experimental/fundamental/v2/functor/functor_tag.hpp>
-#include <experimental/fundamental/v2/functor/map.hpp>
+#include <experimental/fundamental/v2/functor/fmap.hpp>
 
 #endif // header
