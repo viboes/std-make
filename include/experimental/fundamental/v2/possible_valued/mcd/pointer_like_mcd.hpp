@@ -17,6 +17,7 @@
 
 #include <experimental/fundamental/v2/possible_valued.hpp>
 #include <experimental/fundamental/v2/pointer_like.hpp>
+#include <experimental/fundamental/v2/none.hpp>
 
 namespace std
 {
@@ -44,12 +45,16 @@ inline namespace fundamental_v2
     return *ptr;
   }
 
-//  template <class M>
-//  auto novalue(pointer_like, M const& ptr)
-//  -> decltype(none<meta::type_constructor_t<M>>())
-//  {
-//    return none<meta::type_constructor_t<M>>();
-//  }
+  // This overload a little bit intrusive as it requires in addition to the pointer semantic that none<TC>().
+  // That means that either we have no pointer-like mapping,
+  //    that the mapping must be partial (we need to use instance<Tag>) or
+  //    that this operation should be moved outside the concept.
+  template <class M>
+  auto novalue_custom(pointer_like, M const& ptr)
+  -> decltype(none<meta::type_constructor_t<M>>())
+  {
+    return none<meta::type_constructor_t<M>>();
+  }
 
 }
 }
