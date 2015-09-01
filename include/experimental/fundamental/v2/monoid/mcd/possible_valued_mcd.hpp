@@ -17,6 +17,7 @@
 
 #include <experimental/fundamental/v2/monoid.hpp>
 #include <experimental/fundamental/v2/possible_valued.hpp>
+#include <experimental/meta/v1/type_constructor.hpp>
 
 namespace std
 {
@@ -29,7 +30,7 @@ inline namespace fundamental_v2
   // requires Monoid<ValueType<PV>>
   PV monoid_id_custom(possible_value, meta::type<PV>)
   {
-    return none<PV>();
+    return none<meta::type_constructor_t<PV>>();
   }
 
   template <class PV>
