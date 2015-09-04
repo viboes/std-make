@@ -53,7 +53,7 @@ we can discuss of the whole view.
 
 We propose to: 
 
-* Make `in_place` a template function [eggs::variant](see https://github.com/eggs-cpp/variant).
+* Make `in_place` a template function (see [eggs::variant](https://github.com/eggs-cpp/variant)).
 * Change the definition of `in_place` as function `in_place`. 
 * Add template overload for `in_place<T>`. 
 
