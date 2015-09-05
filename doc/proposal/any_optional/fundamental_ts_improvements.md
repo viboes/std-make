@@ -26,11 +26,15 @@ This paper identifies some minor inconveniences in the design of `variant<Ts...>
 diagnoses them as owing to unnecessary asymmetry between those classes, 
 and proposes wording to eliminate the asymmetry (and thus the inconveniences). 
 
-The identified issues are related to the last Fundamental TS proposal concerning mainly 
+The identified issues are related to the last Fundamental TS proposal [n4335] (https://github.com/viboes/std-make/blob/master/doc/proposal/any_optional/fundamental_ts_improvements.md#n4335) and the variant proposal [n4542] (https://github.com/viboes/std-make/blob/master/doc/proposal/any_optional/fundamental_ts_improvements.md#n4542) and  concerns mainly:
 * coherency of functions that behave the same but that are named differently,
-* emplace functions that are missing for `any` class,
-* new emplace factories for `any` and `optional` classes.
-
+* addition of emplace functions for `any` class,
+* addition of emplace factories for `any` and `optional` classes.
+* replacement of `emplace_type<T>`/`emplace_index<I>` by `in_place_f<T>`/`in_place_f<T>`
+* replacement of the proposed variant `get/get_if` interbace by the something like the `any_cast`, `variant_cast`
+* replacement of `bad_optional_access` by `bad_optional_cast`
+* replacement of `bad_variant_access` by `bad_optional_cast`
+* make `bad_optional_cast` and `bad_variant_cast` inherit from `bad_cast`
 
 # Motivation and Scope
 
@@ -42,13 +46,13 @@ The following incoherencies have been identified:
 
 * `variant<Ts...>` and `optional` provides emplace assignment while `any` requires a specific instance to be assigned. 
  
-* The in place tags `variant<Ts...>` and `optional` are different.
+* The in place tags for `variant<Ts...>` and `optional` are different, and we don't know how they could be the same. However the name should be as close as possible.
 
 * `any` provides a `any::clear()` to unset the value while `optional` uses assignment from a `nullopt_t`. If `variant<Ts...>`proposal ends been possibly empty, we expect that it will have a `reset()` member function.
 
 * `optional` provides a `explicit bool` conversion while `any` provides an `any::empty` member function. If `variant<Ts...>` proposal ends been possibly empty, we expect that it will have a  `explicit bool` conversion.
 
-* `variant<Ts...>` and `any` provides different interface to get the stored value. `variant` uses a tuple like interface, while `any` uses a cast like interface. As both classes can contain a variable number of types, one limited and know at compile time, the unlimited, it seems natural that both provide the same kind of interface. 
+* `optional<T>`, `variant<Ts...>` and `any` provides different interface to get the stored value. `optional` uses a `value` member function, `variant` uses a tuple like interface, while `any` uses a cast like interface. As all these classes are in someway sum types, the first two limited and know at compile time, the last unlimited, it seems natural that both provide the same kind of interface. In addition it seems natural that the exception thrown when the access/cast fails inherits from a common exception.
 
 The C++ standard should be coherent for features that behave the same way on different types. 
 Instead of creating specific issues, we have preferred to write a specific paper so that 
@@ -63,6 +67,10 @@ We propose to:
 * In class `optional<T>`
   * Add a `reset` member function.
 
+* Add an `optional_cast` factory.
+
+* Replace `bad_optional_access` by `bad_optional_cast` and make it inherit from `bad_cast`.
+ 
 * Add an `emplace_optional` factory.
 
 * In class `any`
@@ -86,6 +94,8 @@ We propose to:
   * Replace the `get<I>(variant<Ts...>)` by `variant_cast<I>(variant<Ts...>)`
   * Replace the `get_if<T>(variant<Ts...>)` by `variant_cast<T>(variant<Ts...>*)`.
   * Replace the `get_if<I>(variant<Ts...>*)` by `variant_cast<I>(variant<Ts...>*)`
+
+* Replace `bad_variant_access` by `bad_variant_cast` and make it inherit from `bad_cast`.
  
 # Design rationale
 
@@ -251,7 +261,7 @@ emplace_any(Args&& ...args) {
 ```
 
 It is possible to replace `emplace_optional` by an overloaded extension of `make_optional`. 
-We have an implementation of this kind of overload in [GF](https://github.com/viboes/std-make/blob/master/doc/proposal/any_optional/fundamental_ts_improvements.md#c-generic-factory---implementation) as part of the  [DXXXX](https://github.com/viboes/std-make/blob/master/doc/proposal/any_optional/fundamental_ts_improvements.md#dxxxx---c-generic-factory) proposal. 
+We have an implementation of this kind of overload in [GF](https://github.com/viboes/std-make/blob/master/doc/proposal/any_optional/fundamental_ts_improvements.md#c-generic-factory---implementation) as part of the  [DXXXX](https://github.com/viboes/std-make/blob/master/doc/proposal/any_optional/fundamental_ts_improvements.md#dxxxx) proposal. 
 
 The authors prefer the overloaded version, however this is not part of this proposal.
 
@@ -273,7 +283,9 @@ Note that `in_place_f`can also be used by `experimental::variant` and that in th
 
 ## Getters versus cast
 
-The generic `get<T>(t)` and `get<I>(t)` is convenient for prodcut types as we know that the product type will contain an instance of any one of its parts. However, both `any` and `variant` are sum types, andso we are not sure the sumtype stores the request type. This is why `any` propose the useof `any-cast`. We suggest that variant sould usesome kind of cast, e.g. `variant_cast`, and in the same way we have `get` for product types, why not have the same generic name for sum types `sum_cast`.       
+The generic `get<T>(t)` and `get<I>(t)` is convenient for prodcut types as we know that the product type will contain an instance of any one of its parts. However, both `any` and `variant` are sum types, andso we are not sure the sumtype stores the request type. This is why `any` propose the useof `any-cast`. We suggest that variant sould usesome kind of cast, e.g. `variant_cast`, and in the same way we have `get` for product types, why not have the same generic name for sum types `sum_cast`.      
+
+Moving to a cast like interface goes together with changing of`bad_xxx_access` to `bad_xxx_cast` both for `optional` and `variant`.
 
 
 # Open points
@@ -288,7 +300,7 @@ The generic `get<T>(t)` and `get<I>(t)` is convenient for prodcut types as we kn
 
 * Do we want the `emplace_xxx` factories?
 
-* Do we want to move `variant` geterinterface from `get`/`get_if` to a cast like interface?
+* Do we want to move `variant` access interface from `get`/`get_if` to a cast like `variant_cast` interface?
 
 * If yes, do we want a generic `sum_cast`? 
 
@@ -296,7 +308,12 @@ The generic `get<T>(t)` and `get<I>(t)` is convenient for prodcut types as we kn
 
 # Technical Specification
 
-The wording is relative to [n4335] (https://github.com/viboes/std-make/blob/master/doc/proposal/any_optional/fundamental_ts_improvements.md#n4335---working-draft-c-extensions-for-library-fundamentals).
+The wording is relative to [n4335] (https://github.com/viboes/std-make/blob/master/doc/proposal/any_optional/fundamental_ts_improvements.md#n4335).
+
+TODO update to the newer version [n4480] - Working Draft, C++ Extensions for Library Fundamentals 
+(https://github.com/viboes/std-make/blob/master/doc/proposal/any_optional/fundamental_ts_improvements.md#n4480
+
+The present wording doesn't contain any modification to the variant proposal, as it is not yet on the TS. 
 
 Move `in_place_t` and `in_place` to the <experimental/utility> synopsis and add `in_place_f`.
 
@@ -331,6 +348,8 @@ Add in 5.10 [optional.specalg]
 
   *Returns*:
     optional<T>(in_place, std::forward<Args>(args)...). 
+
+
 
 Update 6.1 [any.synopsis] adding
 
@@ -470,8 +489,13 @@ Agustin Bergé for his suggestions about `none` and `in_place`.
 
 # References
 
-## n4335 - Working Draft, C++ Extensions for Library Fundamentals 
-http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n4335.html
+## n4480
+Working Draft, C++ Extensions for Library Fundamentals 
+http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/n4480.html
+
+## n4542
+Variant: a type-safe union (v4) 
+http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/n4542.pdf
 
 ## DXXXX - C++ generic factory 
 https://github.com/viboes/std-make/blob/master/doc/proposal/factories/DXXXX_factories.md
