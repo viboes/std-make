@@ -5,7 +5,7 @@
     </tr>
     <tr>
         <td width="172" align="left" valign="top">Date:</td>
-        <td width="435">2015-05-16</td>
+        <td width="435">2015-09-05</td>
     </tr>
     <tr>
         <td width="172" align="left" valign="top">Project:</td>
@@ -53,13 +53,10 @@ we can discuss of the whole view.
 
 We propose to: 
 
-* Make `in_place` a template function (see [eggs::variant](https://github.com/eggs-cpp/variant)).
-* Change the definition of `in_place` as function `in_place`. 
-* Add template overload for `in_place<T>`. 
+* Add `in_place_f` a template function (see [eggs::variant](https://github.com/eggs-cpp/variant)).
 
 * In class `optional<T>`
   * Add a `reset` member function.
-  * Replace the uses of `in_place_t p` by `in_place_t(*p)()`.
 
 * Add an `emplace_optional` factory.
 
@@ -86,11 +83,9 @@ constexpr explicit optional<T>::optional(in_place_t, Args&&... args);
 ```
 
 In place construct for `any` can not have an implicit type `T`. We need a way to state explicitly which `T` must be constructed in place.
-The template class `type` is used to convey the type `T` participating in overload resolution.
+The function `in_place_t(*)(unspecified<T>)` is used to convey the type `T` participating in overload resolution.
 
 ```c++
-template <class T> struct type {};
-
 template <class T, class ...Args>
 any(in_place_t(*)(unspecified<T>), , Args&& ...);
 ```
@@ -101,7 +96,7 @@ This can be used as
 any(in_place<X>, v1, ..., vn);
 ```
 
-Adopting this template class to optional needs to change the definition of `in_place` to 
+Adopting this template class to optional would needs to change the definition of `in_place` to 
 
 ```c++
 constexpr in_place_t in_place() { return {} };
@@ -114,6 +109,19 @@ template <class... Args>
 constexpr explicit optional<T>::optional(in_place_t (*)(), Args&&... args);
 ```
 
+But this doesn't works as
+
+```c++
+optional<int>(0) 
+```
+
+is ambiguous, as convertible to `in_place_t (*)()` and to `int`.
+
+So we need can not use `in_place` for both cases. We propose `in_place_f` 
+
+```c++
+any(in_place_f<X>, v1, ..., vn);
+```
 
 ## `any` emplace forward member function
 
@@ -169,6 +177,8 @@ The advantages of the `any` constant is that we don't need conversions.
 However, assignment from `none` could be less efficient. 
 If performance is required the user should use the `reset` function.
 
+Alternatively we can add `none_t` and define the corresponding conversions.
+
 ## About a `none_t` type implicitly convertible to `any` and `optional` 
 
 An alternative to the reset member function would be to be able to assign a `none_t` to an `optional` and to an `any`. 
@@ -191,21 +201,21 @@ However, we could consider an emplace_xxx factory that in place constructs a `T`
 `optional<T>` and `any` could be in place constructed as follows:
 
 ```c++
-optional<T> opt(in_place_t (*)(), v1, vn);
+optional<T> opt(in_place_t, v1, vn);
 f(optional<T>(in_place, v1, vn));
 
 any a(in_place_t(*)(unspecified<T>), v1, vn);
-f(any(in_place<T>, v1, vn));
+f(any(in_place_f<T>, v1, vn));
 ```
 
 When we use auto things change a little bit
 
 ```c++
 auto opt=optional<T>(in_place, v1, vn);
-auto a=any(in_place_v<T>, v1, vn);
+auto a=any(in_place_f<T>, v1, vn);
 ```
 
-This is not uniform. Having a `emplace_xxx` factory function would make the code more uniform
+This is not uniform. Having an `emplace_xxx` factory function would make the code more uniform
 
 ```c++
 auto opt=emplace_optional<T>(v1, vn);
@@ -220,13 +230,14 @@ The implementation of `emplace_any` could be:
 ```c++
 template <class T, class ...Args>
 emplace_any(Args&& ...args) {
-    return any(in_place<T>, std::forward<Args>(args)...);
+    return any(in_place_f<T>, std::forward<Args>(args)...);
 }
 ```
 
-It is possible to replace `emplace_optional` by an overloaded `make_optional`. 
+It is possible to replace `emplace_optional` by an overloaded extension of `make_optional`. 
 We have an implementation of this kind of overload in [GF](https://github.com/viboes/std-make/blob/master/doc/proposal/any_optional/fundamental_ts_improvements.md#c-generic-factory---implementation) as part of the  [DXXXX](https://github.com/viboes/std-make/blob/master/doc/proposal/any_optional/fundamental_ts_improvements.md#dxxxx---c-generic-factory) proposal. 
-The authors prefer the overloaded version, however the wording would be more difficult to write and so we don't include this in this proposal.
+
+The authors prefer the overloaded version, however this is not part of this proposal.
 
 ```c++
 auto opt=emplace_optional<T>(v1, vn);
@@ -236,21 +247,23 @@ auto a=emplace_any<T>(v1, vn);
 f(make_any<T>(v1, vn));
 ```
 
-## Which file for `in_place_t`?
+## Which file for `in_place_t`, `in_place` and `in_place_f`?
 
 As `in_place_t` is used by `optional` and `any` we need to move its definition to another file.
 The preference of the authors will be to place `in_place_t` in `<experimental/utility>`.
-For coherence purposes `in_place` would be moved also.
+For coherence purposes `in_place` and  `in_place_f` would be moved also.
+
+Note that `in_place_f`can also be used by `experimental::variant` and that in this case it couldalso take an int as template parameter.
 
 # Open points
 
 * Do we want in place constructor for `any`?
 
-* Do we want to adopt the new `in_place` definition?
+* Do we want to adopt the new `in_place_f` definition? 
 
-* Do we prefer `clear` or `reset`?
+* Do we want the `clear` and `reset` changes?
 
-* Do we prefer `empty` or `operator bool`?
+* Do we want the `operator bool` changes?
 
 * Do we want the `emplace_xxx` factories?
 
@@ -259,13 +272,15 @@ For coherence purposes `in_place` would be moved also.
 
 The wording is relative to [n4335] (https://github.com/viboes/std-make/blob/master/doc/proposal/any_optional/fundamental_ts_improvements.md#n4335---working-draft-c-extensions-for-library-fundamentals).
 
-Replace `in_place_t` and `in_place` and move it to the <experimental/utility> synopsis
+Move `in_place_t` and `in_place` to the <experimental/utility> synopsis and add `in_place_f`.
 
 ```c++
 struct in_place_t {};
-constexpr in_place_t in_place();
+constexpr in_place_t in_place;
 template <class ...T>;
-constexpr in_place_t in_place(unspecified<T...>);
+constexpr in_place_t in_place_f(unspecified<T...>);
+template <size N>;
+constexpr in_place_t in_place_f(unspecified<N>);
 ```
 
 Update 5.2 [optional.synopsis] adding after `make_optional`
@@ -275,8 +290,7 @@ Update 5.2 [optional.synopsis] adding after `make_optional`
     optional<T> emplace_optional(Args&& ...args);
 ```
 
-Update 5.3 [optional.object] updating `in_place_t` by  `in_place_t (*)()` and 
-adding 
+Add to 5.3 [optional.object]  
 
 ```c++
     void reset() noexcept;
