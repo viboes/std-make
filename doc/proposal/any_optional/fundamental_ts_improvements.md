@@ -308,14 +308,11 @@ Moving to a cast like interface goes together with changing of`bad_xxx_access` t
 
 # Technical Specification
 
-The wording is relative to [n4335] (https://github.com/viboes/std-make/blob/master/doc/proposal/any_optional/fundamental_ts_improvements.md#n4335).
-
-TODO update to the newer version [n4480] - Working Draft, C++ Extensions for Library Fundamentals 
-(https://github.com/viboes/std-make/blob/master/doc/proposal/any_optional/fundamental_ts_improvements.md#n4480
+The wording is relative to [n4480] (https://github.com/viboes/std-make/blob/master/doc/proposal/any_optional/fundamental_ts_improvements.md#n4480).
 
 The present wording doesn't contain any modification to the variant proposal, as it is not yet on the TS. 
 
-Move `in_place_t` and `in_place` to the <experimental/utility> synopsis and add `in_place_f`.
+Move `in_place_t` and `in_place` from [optional/synop] and [optional/inplace] to the <experimental/utility> synopsis and add `in_place_f`.
 
 ```c++
 struct in_place_t {};
@@ -326,20 +323,20 @@ template <size N>;
 constexpr in_place_t in_place_f(unspecified<N>);
 ```
 
-Update 5.2 [optional.synopsis] adding after `make_optional`
+Update [optional.synopsis] adding after `make_optional`
 
 ```c++
   template <class T, class ...Args>
     optional<T> emplace_optional(Args&& ...args);
 ```
 
-Add to 5.3 [optional.object]  
+Add to [optional.object]  
 
 ```c++
     void reset() noexcept;
 ```
 
-Add in 5.10 [optional.specalg]
+Add in [optional.specalg]
 
 ```c++
   template <class T, class ...Args>
@@ -351,7 +348,7 @@ Add in 5.10 [optional.specalg]
 
 
 
-Update 6.1 [any.synopsis] adding
+Update [any.synopsis] adding
 
 ```c++
   template <class T, class ...Args>
@@ -390,7 +387,7 @@ Add after class `any`
 
   constexpr any none{};
 
-Add in 6.3.1 `any` construct/destruc after p14
+Add in [any/cons]  `any` construct/destruc after p14
 
 ```c++
     template <class T, class ...Args>
@@ -427,7 +424,7 @@ Add in 6.3.1 `any` construct/destruc after p14
     The function shall not participate in overload resolution unless `is_constructible_v<T, initializer_list<U>&, Args&&...>` is true. 
     
 
-Add in 6.3.3 `any` modifiers
+Add in [any/modifiers] `any` modifiers
 
 ```c++
     template <class T, class ...Args>
@@ -468,11 +465,11 @@ Add in 6.3.3 `any` modifiers
 
     The function shall not participate in overload resolution unless `is_constructible_v<T, initializer_list<U>&, Args&&...>` is true.
 
-Replace in 6.3.3 `any` modifiers, `clear` by `reset`.
+Replace in [any/modifier], `clear` by `reset`.
 
-Replace in 6.3.4 `any` observers, `empty` by `explicit operator bool.
+Replace in [any/observers], `empty` by `explicit operator bool.
 
-Add in 6.4 Non-member functions
+Add in [any/nonmember]
 
 ```c++
   template <class T, class ...Args>
@@ -485,7 +482,8 @@ Add in 6.4 Non-member functions
 # Acknowledgements 
 
 Thanks to Jeffrey Yasskin to encourage me to report these as possible issues of the TS, 
-Agustin Bergé for his suggestions about `none` and `in_place`.  
+Agustin Bergé for his suggestions about `none` and `in_place_f`.  
+Giovanni Pietro Dereta for its comments concerning `in_place`
 
 # References
 
