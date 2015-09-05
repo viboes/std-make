@@ -17,13 +17,13 @@
     </tr>
 </table>
 
-Adding Coherency Between `any` and `optional<T>`
+Adding Coherency Between `variant<Ts...>`,  `any` and `optional<T>`
 ===============================================
 
 # Introduction
 
-This paper identifies some minor inconveniences in the design of `any` and `optional`, 
-diagnoses them as owing to unnecessary asymmetry between those two classes, 
+This paper identifies some minor inconveniences in the design of `variant<Ts...>`,  `any` and `optional`, 
+diagnoses them as owing to unnecessary asymmetry between those classes, 
 and proposes wording to eliminate the asymmetry (and thus the inconveniences). 
 
 The identified issues are related to the last Fundamental TS proposal concerning mainly 
@@ -34,16 +34,21 @@ The identified issues are related to the last Fundamental TS proposal concerning
 
 # Motivation and Scope
 
-Both `optional` and `any` are classes that can store possibly some underlying type. In the case of optional the underlying type is know at compile time, for `any` the underlying type is any and know at run-time.
+Both `optional` and `any` are classes that can store possibly some underlying type. In the case of `optional` the underlying type is know at compile time, for `any` the underlying type is any and know at run-time.
+If `variant<Ts...>`proposal ends been possibly empty, the stored type is any of the `Ts` and know at run-time.
 
 The following incoherencies have been identified:
-* `optional` provides in place construction while `any` requires a specific instance.
+* `variant<Ts...>` and `optional` provides in place construction while `any` requires a specific instance.
 
-* `optional` provides emplace assignment while `any` requires a specific instance to be assigned. 
+* `variant<Ts...>` and `optional` provides emplace assignment while `any` requires a specific instance to be assigned. 
+ 
+* The in place tags `variant<Ts...>` and `optional` are different.
 
-* `any` provides a `any::clear()` to unset the value while `optional` uses assignment from a `nullopt_t`.
+* `any` provides a `any::clear()` to unset the value while `optional` uses assignment from a `nullopt_t`. If `variant<Ts...>`proposal ends been possibly empty, we expect that it will have a `reset()` member function.
 
-* `optional` provides a `explicit bool` conversion while `any` provides an `any::empty` member function.
+* `optional` provides a `explicit bool` conversion while `any` provides an `any::empty` member function. If `variant<Ts...>` proposal ends been possibly empty, we expect that it will have a  `explicit bool` conversion.
+
+* `variant<Ts...>` and `any` provides different interface to get the stored value. `variant` uses a tuple like interface, while `any` uses a cast like interface. As both classes can contain a variable number of types, one limited and know at compile time, the unlimited, it seems natural that both provide the same kind of interface. 
 
 The C++ standard should be coherent for features that behave the same way on different types. 
 Instead of creating specific issues, we have preferred to write a specific paper so that 
@@ -67,10 +72,21 @@ We propose to:
   * rename the `empty` function with an `explicit bool` conversion,
   * rename the `clear` member function to `reset`,
 
-* Add a `none` constexpr variable of type `any`.
+* Add a `none` constexpr variable of type `any` (or type `none_t`).
 
 * Add an `emplace_any` factory.
   
+* In class `variant<T>`
+  * Replace the uses of `emplace_type_t<T>`/`emplace_index_t<I>` by `in_place_t (*)(unspecified<T>)`/`in_place_t (*)(unspecified<I>)` 
+  * Replace the uses of `emplace_type<T>`/`emplace_index<I>` by `in_place_f<T>`/`in_place_f<I>` 
+  * If `variant<Ts...>` proposal ends been possibly empty, 
+    * Add a `reset` member function.
+    * Add an `explicit bool` conversion
+  * Replace the `get<T>(variant<Ts...>)` by `variant_cast<T>(variant<Ts...>)`.
+  * Replace the `get<I>(variant<Ts...>)` by `variant_cast<I>(variant<Ts...>)`
+  * Replace the `get_if<T>(variant<Ts...>)` by `variant_cast<T>(variant<Ts...>*)`.
+  * Replace the `get_if<I>(variant<Ts...>*)` by `variant_cast<I>(variant<Ts...>*)`
+ 
 # Design rationale
 
 ## `any` in_place constructor
@@ -255,11 +271,16 @@ For coherence purposes `in_place` and  `in_place_f` would be moved also.
 
 Note that `in_place_f`can also be used by `experimental::variant` and that in this case it couldalso take an int as template parameter.
 
+## Getters versus cast
+
+The generic `get<T>(t)` and `get<I>(t)` is convenient for prodcut types as we know that the product type will contain an instance of any one of its parts. However, both `any` and `variant` are sum types, andso we are not sure the sumtype stores the request type. This is why `any` propose the useof `any-cast`. We suggest that variant sould usesome kind of cast, e.g. `variant_cast`, and in the same way we have `get` for product types, why not have the same generic name for sum types `sum_cast`.       
+
+
 # Open points
 
 * Do we want in place constructor for `any`?
 
-* Do we want to adopt the new `in_place_f` definition? 
+* Do we want to adopt the new `in_place_f` definition for `any` and `variant`? 
 
 * Do we want the `clear` and `reset` changes?
 
@@ -267,6 +288,11 @@ Note that `in_place_f`can also be used by `experimental::variant` and that in th
 
 * Do we want the `emplace_xxx` factories?
 
+* Do we want to move `variant` geterinterface from `get`/`get_if` to a cast like interface?
+
+* If yes, do we want a generic `sum_cast`? 
+
+* If yes, do we want a generic `sum_cast` overload for `optional`?  
 
 # Technical Specification
 
