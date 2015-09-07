@@ -30,7 +30,7 @@ The identified issues are related to the last Fundamental TS proposal [n4335] (h
 * coherency of functions that behave the same but that are named differently,
 * addition of emplace functions for `any` class,
 * addition of emplace factories for `any` and `optional` classes.
-* replacement of `emplace_type<T>`/`emplace_index<I>` by `in_place_f<T>`/`in_place_f<T>`
+* replacement of `emplace_type<T>`/`emplace_index<I>` by `in_place<T>`/`in_place<I>`
 * replacement of the proposed variant `get/get_if` interbace by the something like the `any_cast`, `variant_cast`
 * replacement of `bad_optional_access` by `bad_optional_cast`
 * replacement of `bad_variant_access` by `bad_optional_cast`
@@ -62,7 +62,7 @@ we can discuss of the whole view.
 
 We propose to: 
 
-* Add `in_place_f` a template function (see [eggs::variant](https://github.com/eggs-cpp/variant)).
+* Add `in_place` a template function (see [eggs::variant](https://github.com/eggs-cpp/variant)).
 
 * In class `optional<T>`
   * Add a `reset` member function.
@@ -85,8 +85,8 @@ We propose to:
 * Add an `emplace_any` factory.
   
 * In class `variant<T>`
-  * Replace the uses of `emplace_type_t<T>`/`emplace_index_t<I>` by `in_place_t (*)(unspecified<T>)`/`in_place_t (*)(unspecified<I>)` 
-  * Replace the uses of `emplace_type<T>`/`emplace_index<I>` by `in_place_f<T>`/`in_place_f<I>` 
+  * Replace the uses of `emplace_type_t<T>`/`emplace_index_t<I>` by `in_place_t (&)(unspecified<T>)`/`in_place_t (&)(unspecified<I>)` 
+  * Replace the uses of `emplace_type<T>`/`emplace_index<I>` by `in_place<T>`/`in_place<I>` 
   * If `variant<Ts...>` proposal ends been possibly empty, 
     * Add a `reset` member function.
     * Add an `explicit bool` conversion
@@ -109,11 +109,11 @@ constexpr explicit optional<T>::optional(in_place_t, Args&&... args);
 ```
 
 In place construct for `any` can not have an implicit type `T`. We need a way to state explicitly which `T` must be constructed in place.
-The function `in_place_t(*)(unspecified<T>)` is used to convey the type `T` participating in overload resolution.
+The function `in_place_t(&)(unspecified<T>)` is used to convey the type `T` participating in overload resolution.
 
 ```c++
 template <class T, class ...Args>
-any(in_place_t(*)(unspecified<T>), , Args&& ...);
+any(in_place_t(&)(unspecified<T>), , Args&& ...);
 ```
 
 This can be used as 
@@ -125,29 +125,18 @@ any(in_place<X>, v1, ..., vn);
 Adopting this template class to optional would needs to change the definition of `in_place` to 
 
 ```c++
-constexpr in_place_t in_place() { return {} };
+constexpr in_place_t in_place(unspecified) { return {} };
 ```
 
 and 
 
 ```c++
 template <class... Args> 
-constexpr explicit optional<T>::optional(in_place_t (*)(), Args&&... args);
+constexpr explicit optional<T>::optional(in_place_t (&)(unspecified), Args&&... args);
 ```
 
-But this doesn't works as
+Fortunatelly using function references would work for any unary function taken the unspecified type and returning `in_place_t` in addition to `in_place`. Of course defining such a function wouldimply to hack thi unspecified type. This can be seen as a hole on this proposal, but the author think that it is better to have a uniform interface than protecting from malicious attacks from a haler.
 
-```c++
-optional<int>(0) 
-```
-
-is ambiguous, as convertible to `in_place_t (*)()` and to `int`.
-
-So we need can not use `in_place` for both cases. We propose `in_place_f` 
-
-```c++
-any(in_place_f<X>, v1, ..., vn);
-```
 
 ## `any` emplace forward member function
 
@@ -227,18 +216,18 @@ However, we could consider an emplace_xxx factory that in place constructs a `T`
 `optional<T>` and `any` could be in place constructed as follows:
 
 ```c++
-optional<T> opt(in_place_t, v1, vn);
+optional<T> opt(in_place_t(&)(unspecified), v1, vn);
 f(optional<T>(in_place, v1, vn));
 
-any a(in_place_t(*)(unspecified<T>), v1, vn);
-f(any(in_place_f<T>, v1, vn));
+any a(in_place_t(&)(unspecified<T>), v1, vn);
+f(any(in_place<T>, v1, vn));
 ```
 
 When we use auto things change a little bit
 
 ```c++
 auto opt=optional<T>(in_place, v1, vn);
-auto a=any(in_place_f<T>, v1, vn);
+auto a=any(in_place<T>, v1, vn);
 ```
 
 This is not uniform. Having an `emplace_xxx` factory function would make the code more uniform
@@ -256,7 +245,7 @@ The implementation of `emplace_any` could be:
 ```c++
 template <class T, class ...Args>
 emplace_any(Args&& ...args) {
-    return any(in_place_f<T>, std::forward<Args>(args)...);
+    return any(in_place<T>, std::forward<Args>(args)...);
 }
 ```
 
@@ -273,13 +262,12 @@ auto a=emplace_any<T>(v1, vn);
 f(make_any<T>(v1, vn));
 ```
 
-## Which file for `in_place_t`, `in_place` and `in_place_f`?
+## Which file for `in_place_t` and `in_place`?
 
-As `in_place_t` is used by `optional` and `any` we need to move its definition to another file.
-The preference of the authors will be to place `in_place_t` in `<experimental/utility>`.
-For coherence purposes `in_place` and  `in_place_f` would be moved also.
+As `in_place_t` and `in_place` are used by `optional` and `any` we need to move its definition to another file.
+The preference of the authors will be to place them in `<experimental/utility>`.
 
-Note that `in_place_f`can also be used by `experimental::variant` and that in this case it couldalso take an int as template parameter.
+Note that `in_place`can also be used by `experimental::variant` and that in this case it could also take an index as template parameter.
 
 ## Getters versus cast
 
@@ -292,7 +280,7 @@ Moving to a cast like interface goes together with changing of`bad_xxx_access` t
 
 * Do we want in place constructor for `any`?
 
-* Do we want to adopt the new `in_place_f` definition for `any` and `variant`? 
+* Do we want to adopt the new `in_place` definition ? 
 
 * Do we want the `clear` and `reset` changes?
 
@@ -312,16 +300,17 @@ The wording is relative to [n4480] (https://github.com/viboes/std-make/blob/mast
 
 The present wording doesn't contain any modification to the variant proposal, as it is not yet on the TS. 
 
-Move `in_place_t` and `in_place` from [optional/synop] and [optional/inplace] to the <experimental/utility> synopsis and add `in_place_f`.
+Move `in_place_t` from [optional/synop] and [optional/inplace] to the <experimental/utility> synopsis, replace  `in_place` by`
 
 ```c++
 struct in_place_t {};
-constexpr in_place_t in_place;
+constexpr in_place_t in_place(unspecified);
 template <class ...T>;
-constexpr in_place_t in_place_f(unspecified<T...>);
+constexpr in_place_t in_place(unspecified<T...>);
 template <size N>;
-constexpr in_place_t in_place_f(unspecified<N>);
+constexpr in_place_t in_place(unspecified<N>);
 ```
+
 
 Update [optional.synopsis] adding after `make_optional`
 
@@ -330,7 +319,7 @@ Update [optional.synopsis] adding after `make_optional`
     optional<T> emplace_optional(Args&& ...args);
 ```
 
-Add to [optional.object]  
+Update  [optional.object] updating `in_place_t` by  `in_place_t (&)(unspecified)` and add
 
 ```c++
     void reset() noexcept;
@@ -359,9 +348,9 @@ Add inside class `any`
 
 ```c++
     template <class T, class ...Args>
-      any(in_place_t (*)unspecified<T>, Args&& ...);
+      any(in_place_t (&)(unspecified<T>), Args&& ...);
     template <class T, class U, class... Args>
-      explicit any(in_place_t (*)(unspecified<T>), initializer_list<U>, Args&&...);
+      explicit any(in_place_t (&)(unspecified<T>), initializer_list<U>, Args&&...);
     
     template <class T, class ...Args>
       void emplace(Args&& ...);
@@ -391,7 +380,7 @@ Add in [any/cons]  `any` construct/destruc after p14
 
 ```c++
     template <class T, class ...Args>
-    any(in_place_t(*)(unspecified<T>), Args&& ...);   
+    any(in_place_t(&)(unspecified<T>), Args&& ...);   
   };
 ```
 
@@ -408,7 +397,7 @@ Add in [any/cons]  `any` construct/destruc after p14
 
 ```c++
     template <class T, class U, class ...Args>
-    any(in_place_t (*)(unspecified<T>), initializer_list<U> il, Args&& ...args);   
+    any(in_place_t (&)(unspecified<T>), initializer_list<U> il, Args&& ...args);   
   };
 ```
 
@@ -477,12 +466,12 @@ Add in [any/nonmember]
 ```
 
   *Returns*:
-    any(in_place_t<T>{}, std::forward<Args>(args)...). 
+    any(in_place<T>, std::forward<Args>(args)...). 
    
 # Acknowledgements 
 
 Thanks to Jeffrey Yasskin to encourage me to report these as possible issues of the TS, 
-Agustin Bergé for his suggestions about `none` and `in_place_f`.  
+Agustin Bergé for his suggestions about `none` and `in_place`.  
 Giovanni Pietro Dereta for its comments concerning `in_place`
 
 # References
