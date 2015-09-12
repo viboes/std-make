@@ -9,7 +9,6 @@
 
 #include <experimental/fundamental/v2/monoid/monoid_tag.hpp>
 #include <experimental/fundamental/v2/concept_map.hpp>
-#include <experimental/meta/v1/type.hpp>
 
 namespace std
 {

@@ -26,9 +26,9 @@ inline namespace fundamental_v2
 
   template <class T>
   // requires Num<T>
-  struct monoid::instance<meta::type<product<T>>> {
+  struct monoid::instance<meta::id<product<T>>> {
 
-    static product<T> monoid_id_impl(meta::type<product<T>>)
+    static product<T> monoid_id_impl(meta::id<product<T>>)
     {
       return product<T>(1);
     }
@@ -44,13 +44,13 @@ inline namespace fundamental_v2
 
   template <class T>
   // requires Num<T>
-  product<T> monoid_id_custom(meta::type<product<T>>, meta::type<product<T>>)
+  product<T> monoid_id_custom(meta::id<product<T>>, meta::id<product<T>>)
   {
     return product<T>(1);
   }
 
   template <class T>
-  product<T> monoid_op_custom(meta::type<product<T>>, product<T> const& x, product<T> const& y)
+  product<T> monoid_op_custom(meta::id<product<T>>, product<T> const& x, product<T> const& y)
   {
     //return x * y; if product<T> derives Num<T> operations
     return product<T>(T(x) * T(y));

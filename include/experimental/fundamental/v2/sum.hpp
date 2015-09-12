@@ -25,9 +25,9 @@ inline namespace fundamental_v2
 #if 1
   template <class T>
   // requires Num<T>
-  struct monoid::instance<meta::type<sum<T>>> {
+  struct monoid::instance<meta::id<sum<T>>> {
 
-    static sum<T> monoid_id_impl(meta::type<sum<T>>)
+    static sum<T> monoid_id_impl(meta::id<sum<T>>)
     {
       return sum<T>(0);
     }
@@ -42,13 +42,13 @@ inline namespace fundamental_v2
 #else
   template <class T>
   // requires Num<T>
-  sum<T> monoid_id_custom(meta::type<sum<T>>, meta::type<sum<T>>)
+  sum<T> monoid_id_custom(meta::id<sum<T>>, meta::id<sum<T>>)
   {
     return sum<T>(0);
   }
 
   template <class T>
-  sum<T> monoid_op_custom(meta::type<sum<T>>, sum<T> const& x, sum<T> const& y)
+  sum<T> monoid_op_custom(meta::id<sum<T>>, sum<T> const& x, sum<T> const& y)
   {
     //return x + y; if product<T> derives Num<T> operations
     return sum<T>(T(x) + T(y));

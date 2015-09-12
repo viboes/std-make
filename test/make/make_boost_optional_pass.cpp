@@ -71,7 +71,7 @@ namespace boost {
 
   // customization point for template (needed because boost::optional doesn't has experimental::in_place_t constructor)
   template <class X, class ...Args>
-  optional<X> make_custom(std::experimental::meta::type<optional<X>>, std::experimental::in_place_t, Args&& ...args)
+  optional<X> make_custom(std::experimental::meta::id<optional<X>>, std::experimental::in_place_t, Args&& ...args)
   {
     optional<X> res;
     res.emplace(std::forward<Args>(args)...);
@@ -110,7 +110,7 @@ int main()
   static_assert(!std::is_array<boost::optional<int> >::value, "ERROR");
   static_assert(std::is_same<stde::meta::value_type_t<boost::optional<int>>, int>::value, "ERROR");
   static_assert(std::is_same<stde::concept_tag_t<stde::applicative, boost::optional<int>>, stde::possible_value>::value, "ERROR");
-  static_assert(std::is_same<stde::concept_tag_t<stde::monoid, stde::product<int>>, stde::meta::type<stde::product<int>>>::value, "ERROR");
+  static_assert(std::is_same<stde::concept_tag_t<stde::monoid, stde::product<int>>, stde::meta::id<stde::product<int>>>::value, "ERROR");
 
   {
     stde::product<int> x(1);

@@ -28,7 +28,7 @@ inline namespace fundamental_v2
 
   template <class PV>
   // requires Monoid<ValueType<PV>>
-  PV monoid_id_custom(possible_value, meta::type<PV>)
+  PV monoid_id_custom(possible_value, meta::id<PV>)
   {
     return none<meta::type_constructor_t<PV>>();
   }

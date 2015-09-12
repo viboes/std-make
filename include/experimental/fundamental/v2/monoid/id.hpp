@@ -9,7 +9,7 @@
 
 #include <experimental/fundamental/v2/monoid/monoid_tag.hpp>
 #include <experimental/fundamental/v2/concept_map.hpp>
-#include <experimental/meta/v1/type.hpp>
+#include <experimental/meta/v1/id.hpp>
 
 namespace std
 {
@@ -20,16 +20,16 @@ inline namespace fundamental_v2
 
   template <class M>
   auto monoid_id()
-    -> decltype(monoid_id_custom(concept_tag_t<monoid, M>{}, meta::type<M>{}))
+    -> decltype(monoid_id_custom(concept_tag_t<monoid, M>{}, meta::id<M>{}))
   {
-    return monoid_id_custom(concept_tag_t<monoid, M>{}, meta::type<M>{});
+    return monoid_id_custom(concept_tag_t<monoid, M>{}, meta::id<M>{});
   }
 
   template <class M>
   auto monoid_id()
-    -> decltype(concept_instance_t<monoid, M>::monoid_id_impl(meta::type<M>{}))
+    -> decltype(concept_instance_t<monoid, M>::monoid_id_impl(meta::id<M>{}))
   {
-    return concept_instance_t<monoid, M>::monoid_id_impl(meta::type<M>{});
+    return concept_instance_t<monoid, M>::monoid_id_impl(meta::id<M>{});
   }
 
 

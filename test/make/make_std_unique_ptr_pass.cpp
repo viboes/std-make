@@ -52,7 +52,7 @@ namespace std {
 
   // customization point for template (needed because std::unique_ptr doesn't has a conversion constructor)
   template <class T, class ...Xs>
-  unique_ptr<T> make_custom(experimental::meta::type<unique_ptr<T>>, Xs&& ...xs)
+  unique_ptr<T> make_custom(experimental::meta::id<unique_ptr<T>>, Xs&& ...xs)
   {
     return make_unique<T>(forward<Xs>(xs)...);
   }

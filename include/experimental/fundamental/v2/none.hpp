@@ -8,7 +8,6 @@
 #define JASEL_FUNDAMENTAL_V2_NONE_HPP
 
 #include <experimental/fundamental/v2/holder.hpp>
-#include <experimental/meta/v1/type.hpp>
 #include <experimental/meta/v1/id.hpp>
 #include <experimental/meta/v1/type_constructor.hpp>
 
