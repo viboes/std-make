@@ -40,7 +40,7 @@ namespace std {
     }
   }
 
-  nullptr_t none_custom(experimental::meta::type<shared_ptr<experimental::_t>>) { return nullptr; }
+  nullptr_t none_custom(experimental::meta::id<shared_ptr<experimental::_t>>) { return nullptr; }
 
   // customization point for template (needed because std::shared_ptr doesn't has a conversion constructor)
   template <class DX, class ...Xs>

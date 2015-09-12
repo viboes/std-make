@@ -56,7 +56,7 @@ namespace std {
       struct value_type<optional<T>> : id<T> { };
     }
 
-    nullopt_t none_custom(meta::type<optional<_t>>) { return nullopt; }
+    nullopt_t none_custom(meta::id<optional<_t>>) { return nullopt; }
 
   }
 }

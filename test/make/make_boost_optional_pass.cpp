@@ -67,7 +67,7 @@ namespace std
 
 namespace boost {
 
-  none_t none_custom(std::experimental::meta::type<optional<std::experimental::_t>>) { return boost::none; }
+  none_t none_custom(std::experimental::meta::id<optional<std::experimental::_t>>) { return boost::none; }
 
   // customization point for template (needed because boost::optional doesn't has experimental::in_place_t constructor)
   template <class X, class ...Args>

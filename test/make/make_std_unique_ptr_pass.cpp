@@ -48,7 +48,7 @@ namespace std {
 #endif
 
   template <class D>
-  nullptr_t none_custom(experimental::meta::type<unique_ptr<experimental::_t, D>>) { return nullptr; }
+  nullptr_t none_custom(experimental::meta::id<unique_ptr<experimental::_t, D>>) { return nullptr; }
 
   // customization point for template (needed because std::unique_ptr doesn't has a conversion constructor)
   template <class T, class ...Xs>

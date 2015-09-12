@@ -9,6 +9,7 @@
 
 #include <experimental/fundamental/v2/holder.hpp>
 #include <experimental/meta/v1/type.hpp>
+#include <experimental/meta/v1/id.hpp>
 #include <experimental/meta/v1/type_constructor.hpp>
 
 namespace std
@@ -18,15 +19,18 @@ namespace experimental
 inline namespace fundamental_v2
 {
 
-  template <template <class ...> class TC>
+  template <class TC>
   constexpr auto none()
+    -> decltype(none_custom(meta::id<TC>{}))
   {
-    return none_custom(meta::type<meta::type_constructor_template_t<TC>>{});
+    return none_custom(meta::id<TC>{});
   }
 
-  template <class TC>
-  constexpr auto none() {
-    return none_custom(meta::type<TC>{});
+  template <template <class ...> class TC>
+  constexpr auto none()
+  ->  decltype(none<meta::type_constructor_template_t<TC>>())
+  {
+    return none<meta::type_constructor_template_t<TC>>();
   }
 
 }
@@ -34,7 +38,7 @@ namespace meta
 {
 inline namespace v1
 {
-  nullptr_t none_custom(type<add_pointer<_t>>) { return nullptr; }
+  nullptr_t none_custom(id<add_pointer<_t>>) { return nullptr; }
 }
 }
 
