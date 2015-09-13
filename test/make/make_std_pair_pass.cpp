@@ -48,6 +48,9 @@ namespace std {
       // type_constructor customization
       template <class T1, class T2>
       struct type_constructor<pair<T1,T2>> : id<pair<_t, _t>> {};
+
+      template <>
+      struct type_constructor_template<pair> : id<pair<_t, _t>> {};
     }
   }
 }

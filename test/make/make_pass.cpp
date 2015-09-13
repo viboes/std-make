@@ -50,6 +50,21 @@ struct A<void>
 template <>
 struct A<std::experimental::_t> : std::experimental::meta::lift<A> {};
 
+namespace std
+{
+  namespace experimental
+  {
+    namespace meta
+    {
+      // type_constructor customization
+      template <class T>
+      struct type_constructor<A<T>> : id<A<_t>>
+      {
+      };
+    }
+  }
+}
+
 int main()
 {
   namespace stde = std::experimental;
