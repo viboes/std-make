@@ -54,7 +54,7 @@ inline namespace fundamental_v2
   };
 
   template <template <class ...> class TC>
-  struct maker : maker_tc<TC> {};
+  using maker = maker_tc<TC>;
 
 }
 }
