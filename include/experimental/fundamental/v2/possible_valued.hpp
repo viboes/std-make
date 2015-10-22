@@ -15,20 +15,20 @@
 ///
 ///   std::experimental::TypeConstructor<PV>
 ///   std::experimental::ValueType<PV> -> PV
-///   std::experimental::NoValueType_t<PV> -> PV
+///   std::experimental::NoneType<PV> -> PV
 ///
 ///   make<TypeConstructor<PV>>(const ValueType<PV>& v) -> PV
-///   none<TypeConstructor<PV>>() -> NoValueType<PV>
+///   none<TypeConstructor<PV>>() -> NoneType<PV>
 ///   has_value(const PV &) -> bool
 ///   value(PV& ) -> ValueType<PV>&
 ///   value(const PV &) -> const ValueType<PV> &
-///   novalue(const PV &) -> NoValueType<PV>
+///   novalue(const PV &) -> NoneType<PV>
 ///
 ///////////////////////////////////////////////////////////////////////////////////////
 
 #include <experimental/meta/v1/type_constructor.hpp>
 #include <experimental/meta/v1/value_type.hpp>
-#include <experimental/meta/v1/novalue_type.hpp>
+#include <experimental/meta/v1/none_type.hpp>
 
 #include <experimental/fundamental/v2/make.hpp>
 #include <experimental/fundamental/v2/none.hpp>
