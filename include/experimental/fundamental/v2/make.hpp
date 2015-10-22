@@ -38,7 +38,7 @@ inline namespace fundamental_v2
   constexpr M<void> make()
   {
     //return make_custom(meta::id<M<void>>{});
-    return make<meta::type_constructor_template_t<M>>();
+    return make<meta::type_constructor_t<meta::template_class<M>>>();
 
   }
 
@@ -70,7 +70,7 @@ inline namespace fundamental_v2
   make(X&& ...x)
   {
     //return make_custom(meta::id<M<meta::deduced_type_t<X>...>>{}, std::forward<X>(x)...);
-    return make<meta::type_constructor_template_t<M>>(std::forward<X>(x)...);
+    return make<meta::type_constructor_t<meta::template_class<M>>>(std::forward<X>(x)...);
   }
 }
 }
