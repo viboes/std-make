@@ -20,11 +20,6 @@ namespace meta
 {
 inline namespace v1
 {
-  template< class, class = void >
-  struct has_none_type_member : false_type { };
-  template< class T >
-  struct has_none_type_member<T, void_<typename T::none_type>> : true_type { };
-
   template <class T, class Enabler =  void >
   struct none_type {};
 
@@ -45,16 +40,19 @@ inline namespace v1
 
 
   namespace detail {
-    template <class T, class IsArray, class HasValueTypeMember>
+    template< class, class = void >
+    struct has_none_type_member : false_type { };
+    template< class T >
+    struct has_none_type_member<T, void_<typename T::none_type>> : true_type { };
+
+    template <class T, class Enabler>
     struct none_type;
-    template <class T>
-    struct none_type<T, true_type, false_type>: none_type_t<decay_t<T>> {};
     template <class T >
-    struct none_type<T, false_type, true_type>: id<typename T::none_type> {};
+    struct none_type<T, true_type>: id<typename T::none_type> {};
 
   }
   template <class T >
-  struct none_type<T> : detail::none_type<T, is_array<T>, has_value_type_member<T>> {};
+  struct none_type<T> : detail::none_type<T, detail::has_none_type_member<T>> {};
 
 //  template<class I, enable_if<is_array<I>::value>>
 //    //requires is_array<I>::value
@@ -63,8 +61,6 @@ inline namespace v1
 //  struct none_type<T>
 //    //requires requires { typename T::none_type; }
 //    : enable_if<is_object<typename T::none_type>::value, typename T::none_type> { };
-
-
 
 }
 }

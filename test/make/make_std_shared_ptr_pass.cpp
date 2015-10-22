@@ -37,6 +37,9 @@ namespace std {
       // type_constructor customization
       template <class T>
       struct type_constructor<shared_ptr<T>> : id<shared_ptr<_t>> {};
+
+      template <class T>
+      struct none_type<shared_ptr<T>> : id<nullptr_t> { };
     }
   }
 

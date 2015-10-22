@@ -54,6 +54,10 @@ namespace std {
 
       template <class T>
       struct value_type<optional<T>> : id<T> { };
+
+      template <class T>
+      struct none_type<optional<T>> : id<nullopt_t> { };
+
     }
 
     nullopt_t none_custom(meta::id<optional<_t>>) { return nullopt; }
