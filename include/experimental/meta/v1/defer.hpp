@@ -6,12 +6,13 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef JASEL_META_V1_LIFT_HPP
-#define JASEL_META_V1_LIFT_HPP
+#ifndef JASEL_META_V1_DEFER_HPP
+#define JASEL_META_V1_DEFER_HPP
 
 #include <experimental/meta/v1/id.hpp>
 #include <experimental/meta/v1/eval.hpp>
-#include <experimental/meta/v1/defer.hpp>
+#include <experimental/meta/v1/void_.hpp>
+#include <experimental/meta/v1/types.hpp>
 
 namespace std
 {
@@ -21,13 +22,24 @@ namespace meta
 {
 inline namespace v1
 {
-  // transforms a template class into a type_constructor that adds the parameter at the end
-
-  template <template <class ...> class TC, class... Ts>
-  struct lift
+  namespace detail
   {
-    template <typename... Us>
-    using apply = eval<defer<TC, Ts..., Us...>>;
+    template <template <typename...> class, typename, typename = void>
+    struct defer
+    {
+    };
+
+    template <template <typename...> class C, typename... Ts>
+    struct defer<C, types<Ts...>, void_<C<Ts...>>>
+    {
+        using type = C<Ts...>;
+    };
+
+  }
+
+  template <template <typename...> class C, typename... Ts>
+  struct defer : detail::defer<C, types<Ts...>>
+  {
   };
 
 }

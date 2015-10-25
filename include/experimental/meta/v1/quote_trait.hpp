@@ -1,17 +1,17 @@
 //////////////////////////////////////////////////////////////////////////////
 //
-// (C) Copyright Vicente J. Botet Escriba 2014-2015.
+// (C) Copyright Vicente J. Botet Escriba 2015.
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file // LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef JASEL_META_V1_LIFT_HPP
-#define JASEL_META_V1_LIFT_HPP
+#ifndef JASEL_META_V1_QUOTE_TRAIT_HPP
+#define JASEL_META_V1_QUOTE_TRAIT_HPP
 
-#include <experimental/meta/v1/id.hpp>
+#include <experimental/meta/v1/compose.hpp>
 #include <experimental/meta/v1/eval.hpp>
-#include <experimental/meta/v1/defer.hpp>
+#include <experimental/meta/v1/quote.hpp>
 
 namespace std
 {
@@ -21,14 +21,9 @@ namespace meta
 {
 inline namespace v1
 {
-  // transforms a template class into a type_constructor that adds the parameter at the end
 
-  template <template <class ...> class TC, class... Ts>
-  struct lift
-  {
-    template <typename... Us>
-    using apply = eval<defer<TC, Ts..., Us...>>;
-  };
+  template <template <class ...> class TC>
+  using quote_trait = compose<quote<eval>, quote<TC>>;
 
 }
 }

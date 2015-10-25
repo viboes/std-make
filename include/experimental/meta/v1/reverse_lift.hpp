@@ -21,18 +21,13 @@ namespace meta
 inline namespace v1
 {
   // transforms a template class into a type_constructor that adds the parameter at the begining
-  template <template <class ...> class TC, class... Args>
+
+  template <template <class ...> class TC, class... Ts>
   struct reverse_lift
   {
-  private:
-    /// Indirection here needed to avoid Core issue 1430
-    /// http://open-std.org/jtc1/sc22/wg21/docs/cwg_active.html#1430
-    template <class... Args2> struct impl : id<TC<Args2..., Args...>> {};
-  public:
-    template<class... Args2>
-    using apply = eval<impl<Args2...>>;
+    template <typename... Us>
+    using apply = eval<defer<TC, Us..., Ts...>>;
   };
-
 }
 }
 }
