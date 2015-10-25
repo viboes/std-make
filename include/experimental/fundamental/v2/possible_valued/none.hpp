@@ -4,8 +4,8 @@
 //
 // Copyright (C) 2015 Vicente J. Botet Escriba
 
-#ifndef JASEL_FUNDAMENTAL_V2_POSSIBLEVALUED_NOVALUE_HPP
-#define JASEL_FUNDAMENTAL_V2_POSSIBLEVALUED_NOVALUE_HPP
+#ifndef JASEL_FUNDAMENTAL_V2_POSSIBLEVALUED_NONE_HPP
+#define JASEL_FUNDAMENTAL_V2_POSSIBLEVALUED_NONE_HPP
 
 #include <experimental/fundamental/v2/possible_valued/possible_value_tag.hpp>
 #include <experimental/fundamental/v2/concept_map.hpp>
