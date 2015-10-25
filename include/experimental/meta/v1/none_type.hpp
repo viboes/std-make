@@ -20,8 +20,11 @@ namespace meta
 {
 inline namespace v1
 {
+  template <class TC>
+  struct not_a_value {};
+
   template <class T, class Enabler =  void >
-  struct none_type {};
+  struct none_type : id<not_a_value<T>> {};
 
   // none_type getter meta-function
   template <class T>
@@ -54,9 +57,6 @@ inline namespace v1
   template <class T >
   struct none_type<T> : detail::none_type<T, detail::has_none_type_member<T>> {};
 
-//  template<class I, enable_if<is_array<I>::value>>
-//    //requires is_array<I>::value
-//  struct none_type<I> :  none_type<decay_t<I>> { };
 //  // customization point defaults to nested type
 //  struct none_type<T>
 //    //requires requires { typename T::none_type; }
