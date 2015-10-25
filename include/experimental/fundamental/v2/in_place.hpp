@@ -16,8 +16,9 @@ namespace std
 {
 namespace experimental
 {
-//inline namespace fundamental_v1
-  //{
+inline namespace fundamental_v2
+{
+
 #if ! defined STDEF_VERSION
 
 constexpr struct in_place_t{} in_place{};
@@ -33,7 +34,8 @@ using in_place_t = in_place_tag (&)();
 inline in_place_tag in_place() { return {}; }
 
 #endif
-//}
+
+}
 }
 }
 #endif

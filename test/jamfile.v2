@@ -27,6 +27,7 @@ project std_make
       <include>$(BOOST_ROOT) # boost .hpp files.    
       <include>$(STD_OPTIONAL) # optional.hpp file.    
       <include>$(BOOST_EXPECTED)/include # expected .hpp files.    
+      <cxxflags>-DSTDEF_VERSION=2
     ;
 
 

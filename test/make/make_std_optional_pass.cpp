@@ -120,6 +120,12 @@ int main()
     BOOST_TEST(*x == 0);
     BOOST_TEST(value(x) == 0);
   }
+  static_assert(std::is_constructible<A,int, int>::value, "a");
+  static_assert(std::is_constructible<A>::value, "b");
+
+  static_assert(std::is_constructible<stde::optional<A>, stde::in_place_t,int, int>::value, "a");
+  static_assert(std::is_constructible<stde::optional<A>, stde::in_place_t>::value, "b");
+
   {
     int v=1;
     stde::optional<A> x = stde::make<stde::optional<A>>(stde::in_place, v,v);
@@ -132,6 +138,12 @@ int main()
     BOOST_TEST(value(x) == 0);
   }
   {
+    stde::optional<int> o((stde::in_place));
+    BOOST_TEST(o);
+    BOOST_TEST(has_value(o));
+  }
+  {
+    stde::optional<int> o((stde::in_place));
     stde::optional<int> x = stde::make<stde::optional<int>>();
     BOOST_TEST(! x);
     BOOST_TEST(! has_value(x));

@@ -15,7 +15,7 @@
 
 #include <experimental/make.hpp>
 #include <experimental/meta.hpp>
-#include <experimental/fundamental/v1/in_place.hpp>
+#include <experimental/fundamental/v2/in_place.hpp>
 
 #include <memory>
 #include <algorithm>
@@ -65,9 +65,26 @@ namespace std
   }
 }
 
+template <class Tag>
+void xx(Tag&& ) {
+  namespace stde = std::experimental;
+  static_assert(std::is_same<Tag, stde::in_place_t>::value, "b");
+}
 int main()
 {
   namespace stde = std::experimental;
+  xx(stde::in_place);
+  static_assert(std::is_constructible<A<int>, stde::in_place_t,int, int>::value, "a");
+  static_assert(std::is_constructible<A<int>, stde::in_place_t>::value, "b");
+
+  {
+    stde::in_place_t f = stde::in_place;
+    (void)f;
+  }
+//  {
+//    stde::in_place_t f = 0; // compile fails :)
+//    (void)f;
+//  }
   {
     A<void> x = stde::make<A>();
     BOOST_TEST(x.v == 0);

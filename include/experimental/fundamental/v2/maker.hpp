@@ -8,9 +8,6 @@
 #define JASEL_FUNDAMENTAL_V2_MAKER_HPP
 
 #include <utility>
-//#include <type_traits>
-#include <experimental/meta/v1/deduced_type.hpp>
-#include <experimental/meta/v1/always.hpp>
 #include <experimental/fundamental/v2/make.hpp>
 
 namespace std
@@ -24,8 +21,9 @@ inline namespace fundamental_v2
   struct maker_mfc
   {
     template <class ...Xs>
-    constexpr meta::apply<MFC, meta::deduced_type_t<Xs>...>
+    constexpr auto
     operator()(Xs&& ...xs) const
+    -> decltype(make<MFC>(std::forward<Xs>(xs)...))
     {
       return make<MFC>(std::forward<Xs>(xs)...);
     }
@@ -35,8 +33,9 @@ inline namespace fundamental_v2
   struct maker_tc
   {
     template <class ...Xs>
-    constexpr TC<meta::deduced_type_t<Xs>...>
+    constexpr auto
     operator()(Xs&& ...xs) const
+    -> decltype(make<TC>(std::forward<Xs>(xs)...))
     {
       return make<TC>(std::forward<Xs>(xs)...);
     }
@@ -46,8 +45,9 @@ inline namespace fundamental_v2
   struct maker_t
   {
     template <class ...Args>
-    constexpr M
+    constexpr auto
     operator()(Args&& ...args) const
+    -> decltype(make<M>(std::forward<Args>(args)...))
     {
       return make<M>(std::forward<Args>(args)...);
     }

@@ -13,6 +13,7 @@
 #include <experimental/meta/v1/id.hpp>
 #include <experimental/meta/v1/is_applicable_with.hpp>
 #include <experimental/meta/v1/type_constructor.hpp>
+#include <experimental/meta/v1/deduced_type.hpp>
 
 namespace std
 {
@@ -85,16 +86,18 @@ inline namespace v1
 {
   // default customization point for constructor from X...
   template <class M, class ...X>
-  constexpr typename enable_if<std::is_constructible<M, meta::deduced_type_t<X>...>::value,  M>::type
+  constexpr auto
   make_custom(meta::id<M>, X&& ...x)
+  -> decltype(M(std::forward<X>(x)...))
   {
     return M(std::forward<X>(x)...);
   }
 
   // default customization point for constructor from X...
   template <class T, class ...X>
-  constexpr typename enable_if<std::is_constructible<T, meta::deduced_type_t<X>...>::value,  T*>::type
+  constexpr auto
   make_custom(meta::id<T*>, X&& ...x)
+  -> decltype(new T(std::forward<X>(x)...))
   {
     return new T(std::forward<X>(x)...);
   }
