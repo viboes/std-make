@@ -41,7 +41,7 @@ inline namespace fundamental_v2
     if (has_value(x) && has_value(y))
       return make<PV>(monoid_op(value(x), value(y)));
     else
-      return novalue(x);
+      return none(x);
   }
 
 }

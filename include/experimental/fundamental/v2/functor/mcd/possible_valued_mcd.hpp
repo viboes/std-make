@@ -34,7 +34,7 @@ inline namespace fundamental_v2
     if (have_value(pv, pvs...))
       return make<meta::TypeConstructor<PV>>(f(value(pv), value(pvs)...));
     else
-      return novalue(pv);
+      return none(pv);
   }
 
 }

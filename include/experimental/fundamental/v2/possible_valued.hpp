@@ -22,7 +22,7 @@
 ///   has_value(const PV &) -> bool
 ///   value(PV& ) -> ValueType<PV>&
 ///   value(const PV &) -> const ValueType<PV> &
-///   novalue(const PV &) -> NoneType<PV>
+///   none(const PV &) -> NoneType<PV>
 ///
 ///////////////////////////////////////////////////////////////////////////////////////
 

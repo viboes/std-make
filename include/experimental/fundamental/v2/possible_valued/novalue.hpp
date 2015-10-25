@@ -19,21 +19,21 @@ inline namespace fundamental_v2
 {
 
   template <class M>
-  auto novalue(M const& m) ->
-    decltype(novalue_custom(concept_tag_t<possible_value, M>{}, m))
+  auto none(M const& m) ->
+    decltype(none_custom(concept_tag_t<possible_value, M>{}, m))
   {
-    return novalue_custom(concept_tag_t<possible_value, M>{}, m);
+    return none_custom(concept_tag_t<possible_value, M>{}, m);
   }
 
   template <class M>
-  auto novalue(M const& m) ->
-    decltype(concept_instance_t<possible_value, M>::novalue_impl(m))
+  auto none(M const& m) ->
+    decltype(concept_instance_t<possible_value, M>::none_impl(m))
   {
-    return concept_instance_t<possible_value, M>::novalue_impl(m);
+    return concept_instance_t<possible_value, M>::none_impl(m);
   }
 
   template <class T>
-  nullptr_t novalue(const T*) {
+  nullptr_t none(const T*) {
     return nullptr;
   }
 }

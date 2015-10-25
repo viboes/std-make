@@ -36,7 +36,7 @@ inline namespace fundamental_v2
     if (has_value(f))
       return fmap(value(f), pv);
     else
-      return novalue(f);
+      return none(f);
   }
 
 
