@@ -70,6 +70,24 @@ void xx(Tag&& ) {
   namespace stde = std::experimental;
   static_assert(std::is_same<Tag, stde::in_place_t>::value, "b");
 }
+
+void accept_in_place_t(std::experimental::in_place_t) {
+}
+void accept_nullptr_t(std::nullptr_t) {
+}
+
+struct nullopt_t2
+{
+  struct init{};
+  constexpr nullopt_t2(init){};
+  //constexpr nullopt_t2(){};
+};
+constexpr nullopt_t2 nullopt2{nullopt_t2::init{}};
+
+void accept_nullopt_t2(nullopt_t2) {
+}
+
+
 int main()
 {
   namespace stde = std::experimental;
@@ -78,13 +96,50 @@ int main()
   static_assert(std::is_constructible<A<int>, stde::in_place_t>::value, "b");
 
   {
-    stde::in_place_t f = stde::in_place;
-    (void)f;
+    nullopt_t2 ip = nullopt2;
+    accept_nullopt_t2(ip);
+    accept_nullopt_t2(nullopt2);
+    ip = nullopt2;
+  }
+  {
+    //accept_nullopt_t2(nullopt_t2{}); // compile fails
+    //accept_nullopt_t2(nullopt_t2()); // compile fails
+    //accept_nullopt_t2({}); // compile fails
+    //nullopt_t2 ip = {};  // compile fails
+    //accept_nullopt_t2(ip);
+  }
+  {
+    stde::in_place_t ip = stde::in_place;
+    accept_in_place_t(ip);
+    accept_in_place_t(stde::in_place);
+    //ip = stde::in_place;
   }
 //  {
-//    stde::in_place_t f = 0; // compile fails :)
-//    (void)f;
+//    stde::in_place_t ip = 0; // compile fails :)
+//    (void)ip;
 //  }
+//  {
+//    stde::in_place_t ip1 = stde::in_place_t();  // compile fails
+//    accept_in_place_t(ip1); // compile fails :)
+//    accept_in_place_t(stde::in_place_t()); // compile fails
+//    stde::in_place_t ip2 = {}; // compile fails :)
+//    accept_in_place_t({}); // compile fails :)
+//    auto x = stde::in_place_t{}; // compile fails :)
+//  }
+  {
+    std::nullptr_t ip = nullptr;
+    accept_nullptr_t(ip);
+    accept_nullptr_t(nullptr);
+    ip = nullptr;
+  }
+  {
+    auto np = std::nullptr_t{}; // shouldn't compile fails :(
+    accept_nullptr_t(np);
+    std::nullptr_t np1 = {}; // // shouldn't compile fails :(
+    accept_nullptr_t(np1);
+    accept_nullptr_t(std::nullptr_t()); // shouldn't compile fails :)
+    accept_nullptr_t({}); // shouldn't compile fails :)
+  }
   {
     A<void> x = stde::make<A>();
     BOOST_TEST(x.v == 0);
