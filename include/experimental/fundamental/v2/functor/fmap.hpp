@@ -31,6 +31,16 @@ inline namespace fundamental_v2
     return fmap_custom(concept_tag_t<functor, M>{}, forward<F>(f), m, ms...);
   }
 
+//  template <class F, class M, class ...Ms>
+//  //  requires Function<F, ValueType<M>...>
+//  // && Same<meta::TypeConstructor<M>, meta::TypeConstructor<M>>...
+//  auto fmap(F&& f, M&& m, Ms&& ...ms)
+//    // -> meta::apply<meta::TypeConstructor<M>, meta::ResultType<F, meta::ValueType<M>...>>
+//    -> decltype(concept_instance_t<functor, decay_t<M>>::fmap_impl(forward<F>(f), forward<M>(m), forward<Ms>(ms)...))
+//  {
+//    return concept_instance_t<functor, decay_t<M>>::fmap_impl(forward<F>(f), forward<M>(m), forward<Ms>(ms)...);
+//  }
+
   template <class F, class M, class ...Ms>
   //  requires Function<F, ValueType<M>...>
   // && Same<meta::TypeConstructor<M>, meta::TypeConstructor<M>>...

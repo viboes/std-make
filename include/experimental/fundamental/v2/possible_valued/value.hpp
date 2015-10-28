@@ -17,6 +17,10 @@ namespace experimental
 inline namespace fundamental_v2
 {
 
+  /**
+   * @Requires has_value(m)
+   */
+
   // define value for pointers
   template <class T>
   T& value(T* ptr)

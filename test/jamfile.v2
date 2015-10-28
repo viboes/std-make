@@ -79,6 +79,11 @@ test-suite std_tuple
       [ run make/make_std_tuple_pass.cpp  ]
     ;
 
+test-suite signature
+    : 
+      [ run make/signature_pass.cpp  ]
+    ;
+
 explicit fix ;
 test-suite fix
     : 

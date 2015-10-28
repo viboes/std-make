@@ -18,6 +18,9 @@ namespace experimental
 inline namespace fundamental_v2
 {
 
+  /**
+   * @Requires ! has_value(m)
+   */
   template <class M>
   auto none(M const& m) ->
     decltype(none_custom(concept_tag_t<possible_value, M>{}, m))

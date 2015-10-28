@@ -23,7 +23,8 @@ inline namespace fundamental_v2
     struct instance;
 
     template <class T>
-    struct tag : meta::id <meta::id<T>> {};
+    struct tag : meta::id <T> {};
+    //struct tag : meta::id <meta::id<T>> {};
   };
 
 }
