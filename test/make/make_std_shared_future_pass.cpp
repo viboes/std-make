@@ -33,12 +33,12 @@ namespace std {
   template <>
   struct shared_future<experimental::_t> : experimental::meta::lift<shared_future> {};
 
-//  template <>
-//  struct shared_future<experimental::_t&>
-//  {
-//    template<class ...T>
-//    using apply = shared_future<T& ...>;
-//  };
+  template <>
+  struct shared_future<experimental::_t&>
+  {
+    template<class ...T>
+    using apply = shared_future<T& ...>;
+  };
 
   namespace experimental
   {
@@ -47,6 +47,8 @@ namespace std {
       // type_constructor customization
       template <class T>
       struct type_constructor<shared_future<T>> : id<shared_future<_t>> {};
+      template <class T>
+      struct type_constructor<shared_future<T&>> : id<shared_future<_t&>> {};
     }
   }
 }
@@ -85,6 +87,11 @@ int main()
   {
     int v=0;
     std::shared_future<int&> x = stde::make<std::shared_future<int&>>(v);
+    BOOST_TEST(&x.get() == &v);
+  }
+  {
+    int v=0;
+    std::shared_future<int&> x = stde::make<std::shared_future<stde::_t&>>(v);
     BOOST_TEST(&x.get() == &v);
   }
   {

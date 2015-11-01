@@ -80,12 +80,12 @@ namespace std {
   template <>
   struct future<experimental::_t> : experimental::meta::lift<future> {};
 
-//  template <>
-//  struct future<experimental::_t&>
-//  {
-//    template<class ...T>
-//    using apply = future<T& ...>;
-//  };
+  template <>
+  struct future<experimental::_t&>
+  {
+    template<class ...T>
+    using apply = future<T& ...>;
+  };
 
   namespace experimental
   {
@@ -94,6 +94,8 @@ namespace std {
       // type_constructor customization
       template <class T>
       struct type_constructor<future<T>> : id<future<_t>> {};
+      template <class T>
+      struct type_constructor<future<T&>> : id<future<_t&>> {};
     }
   }
 
@@ -202,6 +204,11 @@ int main()
   {
     int v=0;
     std::future<int&> x = stde::make<std::future<stde::_t>>(std::ref(v));
+    BOOST_TEST(&x.get() == &v);
+  }
+  {
+    int v=0;
+    std::future<int&> x = stde::make<std::future<stde::_t&>>(v);
     BOOST_TEST(&x.get() == &v);
   }
   std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;

@@ -221,11 +221,11 @@ int main()
     BOOST_TEST(! x);
     BOOST_TEST(! stde::has_value(x));
   }
-//  {
-//    int v=0;
-//    boost::optional<int&> x = stde::make<boost::optional<int&>>(v);
-//    BOOST_TEST(&v == x.get());
-//  }
+  {
+    int v=0;
+    boost::optional<int&> x = stde::make<boost::optional<int&>>(v);
+    BOOST_TEST(&v == &(x.get()));
+  }
   {
     int v=0;
     boost::optional<int> x = stde::make<boost::optional<stde::_t>>(v);

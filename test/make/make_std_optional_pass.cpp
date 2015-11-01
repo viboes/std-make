@@ -161,11 +161,14 @@ int main()
     BOOST_TEST(*x == 0);
     BOOST_TEST(value(x) == 0);
   }
-//  {
-//    constexpr int v=0;
-//    constexpr stde::optional<int> x = stde::make<stde::optional>(v);
+  {
+//    make/make_std_optional_pass.cpp:166:35: error: constexpr variable 'x' must be initialized by a constant expression
+//        constexpr stde::optional<int> x = v;
+//
+//    constexpr int const v=0;
+//    constexpr stde::optional<int> x = v;
 //    BOOST_TEST(*x == 0);
-//  }
+  }
 
   return ::boost::report_errors();
 }
