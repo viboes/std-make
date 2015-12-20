@@ -5,11 +5,15 @@
     </tr>
     <tr>
         <td width="172" align="left" valign="top">Date:</td>
-        <td width="435">2015-05-09</td>
+        <td width="435">2015-12-19</td>
     </tr>
     <tr>
         <td width="172" align="left" valign="top">Project:</td>
-        <td width="435">Programming Language C++, Library Evolution Working Group</td>
+        <td width="435">ISO/IEC JTC1 SC22 WG21 Programming Language C++</td>
+    </tr>
+    <tr>
+        <td width="172" align="left" valign="top">Audience:</td>
+        <td width="435">Library Evolution Working Group</td>
     </tr>
     <tr>
         <td width="172" align="left" valign="top">Reply-to:</td>
@@ -509,9 +513,21 @@ There is much more on meta-programming utilities as show on the Meta library.
 ## Should the customization of the standard classes `pair`, `tuple`,`optional`, `future`, `unique_ptr`, `shared_ptr` be part of this proposal?
 
 
-# Technical Specification
+# Proposed wording
 
-## Synopsis 
+The proposed changes are expressed as edits to [N4564] the Working Draft - C++ Extensions for Library Fundamentals V2.
+
+## General utilities library
+
+***-------------------------------------------------------***
+Insert a new section.
+***-------------------------------------------------------***
+
+**X.Y Factories [functional.factorires]**
+
+**X.Y.1 In General**
+
+**X.Y.2 Header <experimental/factories> synopsis**
 
 ```c++
 namespace std
@@ -578,10 +594,12 @@ namespace meta
 
 ```
 
-## Template function `make` 
 
-### template + void
+**X.Y.3 Template function `make`**
 
+**X.Y.4 template + void**
+
+###########################################################################
 ```c++
   template <template <class ...> class M>
   M<void> make();
@@ -590,12 +608,14 @@ namespace meta
 *Effects:* Forwards to the customization point `make` with a template constructor 
 `type<M<void>>`. As if
 
+###########################################################################
 ```c++
     return make(meta::type<M<void>>{});
 ```
 
-### template + deduced underlying type
+**X.Y.5 template + deduced underlying type**
 
+###########################################################################
 ```c++
 template <template <class ...> class M, class T>
   M<V> make(T&& x);
@@ -611,8 +631,9 @@ if `U` equals `reference_wrapper<X>`, otherwise `V` is `U`.
     return make(meta::type<M<V>>{}, std::forward<T>(x));
 ```
 
-### type constructor + deduced underlying type
+**X.Y.6 type constructor + deduced underlying type**
 
+###########################################################################
 ```c++
   template <class TC, class T>
     meta::apply<TC, V> make(T&& x);
@@ -630,8 +651,9 @@ if `U` equals `reference_wrapper<X>`, otherwise `V` is `U`.
     return make(meta::type<meta::apply<TC, V>>{}, std::forward<T>(x));
 ```
 
-### type + non deduced underlying type
+**X.Y.7 type + non deduced underlying type**
 
+###########################################################################
 ```c++
 template <class M, class X>
   M make(X&& x);
@@ -647,8 +669,9 @@ convertible from `X`.
     return meta::make(meta::type<M>{}, std::forward<X>(x));
 ```
 
-### type + emplace args 
+**X.Y.8 type + emplace args**
 
+###########################################################################
 ```c++
 template <class M, class ...Args>
   M make(Args&& ...args);
@@ -661,8 +684,9 @@ and `in_place_t`. As if
     return make(meta::type<M>{}, std::forward<Args>(args)...);
 ```
 
-### Template function `make_custom` - default constructor customization point for void
+**X.Y.9 Template function `make_custom` - default constructor customization point for void**
 
+###########################################################################
 ```c++
   template <class M>
   M make_custom(meta::type<M>)
@@ -672,8 +696,9 @@ and `in_place_t`. As if
 
 *Throws:* Any exception thrown by the constructor.
 
-### copy constructor customization point
+**X.Y.10 copy constructor customization point**
 
+###########################################################################
 ```c++
 template <class M, class ...Xs>
   M make_custom(meta::type<M>, Xs&& xs);
@@ -909,5 +934,7 @@ namespace meta
 
  * Fix some product type and emplace factories issues.
  * Rename customization point `make` to `make_custom`.
- * Reference N4471 as this proposal would simplify most of this proposal.
+ * Reference N4471 as that proposal would simplify most of this proposal.
+
+## v0.4 Move to Markdown source
  
