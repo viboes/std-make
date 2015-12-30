@@ -39,15 +39,14 @@ type `E`. It requires no changes to core language, and breaks no existing code.
 * Fix default constructor to `T`. [N4109] should change the default constructor to `T`, but there were some inconsistencies.
 * *TODO* As `variant`, `epected` requires some properties in order to never-empty guaranties. Add more on never-empty guaranties. 
 * *TODO* Add more alternative about the exception throw by `value()`.  
-* Adapt to last version of referenced proposals.
-* Move alternative designs from open questions to an Appendix.
-* Move already answered open points to a Rationale section.
-* Move open points that can be decided later to a future directions section
+* Adapted to last version of referenced proposals.
+* Moved alternative designs from open questions to an Appendix.
+* Moved already answered open points to a Rationale section.
+* Moved open points that can be decided later to a future directions section
 * *TODO* Complete wording comparison
-* *TODO* Complete wording hash
-* *TODO* Add a section for adapting to `await`.
-* *TODO* Add a section in future work about a possible variadic.
-* *TODO* Add a section for possible alternatived for how to adapt FileSystem TS to expected.
+* Complete wording hash
+* Add a section for adapting to `await`.
+* Add a section in future work about a possible variadic.
 * Fix minor typos.
 
 ## Revision 1 - Revision of [N4015] after Rapperswil feedback:
@@ -736,22 +735,20 @@ The example section shows how these operations are important to `expected`. The 
 The operation `map` consider `expected` as a `Functor` and just apply a function on the contained value, if any. The types of the two overloads are presented using a functional notation and the `[]` represent a context in which the value `T` or `U` is contained. The current context is expected and thus `[T]` is equivalent to `expected<T,E>`.
 
 * (T -> U) -> [U]
-* (T -> [U]) -> [[U]]
 
 Whatever the return type of the continuation, we observe that it is always wrapped into a context. The
 monadic bind do it differently.
 
 ### Monadic `bind`
 
-A `Monad` is defined with a type constructor and two operations `mreturn` and `mbind`. The type constructor simply build a monad for a specific type, in the C++ jargon it is referred to template instantiation (we build expected from a type Value and Error).
+A `Monad` is defined with a type constructor and two operations `make` and `bind`. The type constructor simply build a monad for a specific type, in the C++ jargon it is referred to template instantiation (we build expected from a type Value and Error).
 
-The `mreturn` operation wraps a value of type `T` inside a context `[T]`. In C++ we can consider the constructors as a `mreturn` operation.
+The `make` operation wraps a value of type `T` inside a context `[T]`. In C++ we can consider the constructors as a `make` operation.
 
-Finally, the `mbind` operation is similar to `map` but doesn’t wrap the value if the function already wraps it up.
+Finally, the `bind` operation is similar to `map` but doesn’t wrap the value if the function already wraps it up.
 
 The functional signature of bind can be described as follow:
 
-* (T -> U) -> [U]
 * (T -> [U]) -> [U]
 
 If a do-notation is introduced in C++, as proposed in section [Do-Notation], these operations can become a powerful abstraction, they have been proven very useful in Haskell. For example, a similar interface could be used with `optional`.
@@ -763,7 +760,7 @@ The last operation has no direct counterpart in functional language and is inspi
 * ([T] -> U) -> [U]
 * ([T] -> [U]) -> [U]
 
-It has the same wrapping strategy than `mbind`: it doesn’t wrap if the continuation already wraps it up.
+It has a conditional wrapping strategy: it doesn’t wrap if the continuation already wraps it up.
 
 
 ### Exception thrown in the continuation
@@ -810,6 +807,7 @@ expected<T,E> unwrap<expected<T,E>> e) {
 
 We could add such a function to the standard, either as a free function or as a member function. The
 authors propose to add it as a member function to be in line with [N3857].
+
 # Related types
 
 ## Variant
@@ -1073,14 +1071,6 @@ The implicit conversion from `E` has been forbidden to avoid ambiguity when `E` 
 
 Should the implicit conversion be allowed in this case?
 
-## Should a specific exception be thrown when the `expected<T>` doesn’t have a value neither an exception stored?
-
-The following call in (1) is undefined behavior. Should a specific exception be thrown instead?
-
-```c++
-expected<int> e;
-e.value(); // (1)
-```
 
 ## Should map/bind/then/catch_error catch the exceptions throw by the continuation?
 
@@ -1180,7 +1170,7 @@ bool has_error(expected<T,E> const&, E err) {
 }
 ```
 
-Do we need to add such a `has_error` function? as member?
+Do we want to add such a `has_error` function? as member?
 # Proposed WordingThe proposed changes are expressed as edits to [N4564] the Working Draft - C++ Extensions for Library Fundamentals V2. The wording has been adapted from the section "Optional objects".
 
 ## General utilities library
@@ -1398,7 +1388,6 @@ inline namespace fundamentals_v2 {
 	template <class T, class E> constexpr bool operator>=(const unexpected<E>&, const expected<T,E>&);
 
 	// X.Z.10, Specialized algorithms
-	void swap(expected<E,T>&, expected<E,T>&) noexcept(see below);
 	void swap(expected<T,E>&, expected<T,E>&) noexcept(see below);
 
 	// X.Z.11, Factories
@@ -1418,8 +1407,8 @@ inline namespace fundamentals_v2 {
 	make_expected_from_call(F f);
 	
 	// X.Z.12, hash support
-	template <class T> struct hash;
-	template <class T> struct hash<expected<T,E>>;
+	template <class T, class E> struct hash<expected<T,E>>;
+	template <class E> struct hash<expected<void,E>>;
 }}}
 ```
 
@@ -2369,15 +2358,15 @@ struct hash<expected<T,E>>;
 ```
 
 *Requires*:
-The template specialization `hash<T>` and `hash<E>` shall meet the requirements of class template `hash`
-(Z.X.Y). The template specialization `hash<expected<T,E>>` shall meet the requirements of class template
-`hash`. For an object `e` of type `expected<T,E>`, if `bool(e)`, `hash<expected<T,E>>()(e)` shall evaluate to the same value as `hash<T, E>()(*e)`; otherwise it evaluates to an unspecified value if E is `exception_ptr` or `hash<T, E>()(e.error())`.
+The template specializations `hash<T>` and `hash<E>`(if E is not `exception_ptr`)  shall meet the requirements of class template `hash` (Z.X.Y). The template specialization `hash<expected<T,E>>` shall meet the requirements of class template `hash`. For an object `e` of type `expected<T,E>`, if `bool(e)`, `hash<expected<T,E>>()(e)` shall evaluate to a combination of the hashing `true` and `hash<T>()(*e)`; otherwise it evaluates to an unspecified value if E is `exception_ptr` or a combination of hashing `false` and `hash<E>()(e.error())`.
 
 ###########################################################################
-```template <class E>
+```c++
+template <class E>
 struct hash<expected<void, E>>;
 ```
 *Requires*:
+The template specialization `hash<E>`(if E is not `exception_ptr`)  shall meet the requirements of class template `hash` (Z.X.Y). The template specialization `hash<expected<void,E>>` shall meet the requirements of class template `hash`. For an object `e` of type `expected<void,E>`, if `bool(e)`, `hash<expected<void,E>>()(e)` shall evaluate to the hashing `true`; otherwise it evaluates to an unspecified value if E is `exception_ptr` or a combination of hashing `false` and `hash<E>()(e.error())`.
 	# Implementability
 
 This proposal can be implemented as pure library extension, without any compiler magic support, in C++14.
@@ -2397,6 +2386,9 @@ MyVec v{ v2, MyAlloc{} };
 One could expect that the allocator argument is forwarded in this constructor call to the nested vectors that use the same allocator. Allocator support would enable this. `std::tuple offers this functionality.
 
 ## Variadic expected
+
+A typical case could combine expected and variant `expected<T,variant<E1, ..., En>>`. We could extend `expected` to take a variadic number of errors `expected<T, E1, ..., En>` in order to provide a adapted interface.
+
 # Acknowledgements
 
 We are very grateful to Andrei Alexandrescu for his talk, which was the origin of this work. We thanks also to every one that has contributed to the Haskell either monad, as either’s interface was a source of inspiration.
@@ -2406,8 +2398,9 @@ and the rationale of N3793 [N3793].
 
 Vicente thanks personnaly Evgeny Panasyuk and Johannes Kapfhammer for their remarks on the DO-expression.
 Pierre thanks the IRCAM and Carlos Agon who allowed him to work on this proposal during its internship.
-# References[N4564]: http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/n4564.pdf "N4564 - Working Draft, C++ Extensions for Library Fundamentals"[Alexandrescu.Expected]: http://channel9.msdn.com/Shows/Going+Deep/C-and-Beyond-2012-Andrei-Alexandrescu-Systematic-Error-Handling-in-C "A. Alexandrescu. C++ and Beyond 2012 - Systematic Error Handling in C++, 2012." 
-[N3527]: http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2013/n3527.html. "Fernando Cacciola and Andrzej Krzemieński. N3527 - A proposal to add a utility class to represent optional objects (Revision 3), March 2013." 
+# References[Alexandrescu.Expected]: http://channel9.msdn.com/Shows/Going+Deep/C-and-Beyond-2012-Andrei-Alexandrescu-Systematic-Error-Handling-in-C "A. Alexandrescu. C++ and Beyond 2012 - Systematic Error Handling in C++, 2012." 
+
+[N3527]: http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2013/n3527.html. "Fernando Cacciola and Andrzej Krzemieński. N3527 - A proposal to add a utility class to represent optional objects (Revision 3), March 2013." 
 [N3672]: http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2013/n3672.html "Fernando Cacciola and Andrzej Krzemieński. N3672 - A proposal to add a utility class to represent optional objects (Revision 4), June 2013." 
 
 [N3793]: http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2013/n3793.html "Fernando Cacciola and Andrzej Krzemieński. N3793 - A proposal to add a utility class to represent optional objects (Revision 5), October 2013."
@@ -2415,27 +2408,27 @@ Pierre thanks the IRCAM and Carlos Agon who allowed him to work on this proposal
 [N3865]: http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n4048.pdf "Vicente J. Botet Escriba. N3865, more improvements to std::future<t> - revision 1, 2014."
 [N3857]: http://www.open-std.org/JTC1/SC22/WG21/docs/papers/2014/n3857.pdf "H. Sutter S. Mithani N. Gustafsson, A. Laksberg. N3857, improvements to std::future<t> and related apis, 2013."
 
-[TBoost.Expected]: https://github.com/ptal/Boost.Expected "Pierre Talbot and Vicente J. Botet Escriba. TBoost.Expected, 2014."
-
 [N4015]: http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n4015.pdf "Pierre talbot Vicente J. Botet Escriba. N4015, a proposal to add a utility class to represent expected monad, 2014."
 
 [N4109]: http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n4109.pdf "Pierre talbot Vicente J. Botet Escriba. N4109, a proposal to add a utility class to represent expected monad (Revision 1), 2014."
-[N4233]: http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n4233.html "L. Crowl, C. Mysen. N4233, A Class for Status and Optional Value, 2014." 
-
-[P0088R0]: http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/p0088r0.pdf "Variant: a type-safe union that is rarely invalid (v5)." 
- 
+[N4233]: http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n4233.html "L. Crowl, C. Mysen. N4233, A Class for Status and Optional Value, 2014." 
+[N4564]: http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/n4564.pdf "N4564 - Working Draft, C++ Extensions for Library Fundamentals"[P0088R0]: http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/p0088r0.pdf "Variant: a type-safe union that is rarely invalid (v5)." 
+ 
 [P0157R0]: http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/p0157r0.html "L. Crowl. P0157R0, Handling Disappointment in C++, 2015." 
-
 
 [P0159R0]: http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/p0159r0.html "Artur Laksberg. P0159R0, Draft of Technical Specification for C++ Extensions for Concurrency, 2015." 
 
-[N4099]: http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n4099.html "Beman Dawes, N4099 - Working Draft, Technical Specification — File System"
-	
+[TBoost.Expected]: https://github.com/ptal/Boost.Expected "Pierre Talbot and Vicente J. Botet Escriba. TBoost.Expected, 2014."
+
 [ERR]: https://github.com/psiha/err "err - yet another take on C++ error handling."
 
-* [Alexandrescu.Expected] A. Alexandrescu. C++ and Beyond 2012 - Systematic Error Handling in C++, 2012. 
+* [Alexandrescu.Expected] A. Alexandrescu. C++ and Beyond 2012 - Systematic Error Handling in C++, 2012. 
 
 	http://channel9.msdn.com/Shows/Going+Deep/C-and-Beyond-2012-Andrei-Alexandrescu-Systematic-Error-Handling-in-C
+
+* [ERR] err - yet another take on C++ error handling, 2015.
+
+	https://github.com/psiha/err
 
 * [N3527] Fernando Cacciola and Andrzej Krzemieński. N3527 - A proposal to add a utility class to represent optional objects (Revision 3), March 2013. 
 
@@ -2457,17 +2450,10 @@ Pierre thanks the IRCAM and Carlos Agon who allowed him to work on this proposal
 
 	http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n4048.pdf
 
-* [TBoost.Expected] Pierre Talbot and Vicente J. Botet Escriba. TBoost.Expected, 2014. 
-
-	https://github.com/ptal/Boost.Expected
 
 * [N4015] Pierre talbot Vicente J. Botet Escriba. N4015, a proposal to add a utility class to represent expected monad, 2014. 
 
 	http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n4015.pdf
-
-* [N4099] Beman Dawes, N4099 - Working Draft, Technical Specification — File System
-
-	http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n4099.html
 
 * [N4109] Pierre talbot Vicente J. Botet Escriba. N4109, a proposal to add a utility class to represent expected monad (Revision 1), 2014. 
 
@@ -2491,9 +2477,9 @@ Pierre thanks the IRCAM and Carlos Agon who allowed him to work on this proposal
 
 	http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/p0159r0.html
 
-* [ERR] err - yet another take on C++ error handling, 2015.
+* [TBoost.Expected] Pierre Talbot and Vicente J. Botet Escriba. TBoost.Expected, 2014. 
 
-	https://github.com/psiha/err
+	https://github.com/ptal/Boost.Expected
 
 
 # Appendix I - Language support
