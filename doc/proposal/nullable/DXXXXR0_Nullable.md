@@ -5,7 +5,7 @@
     </tr>
     <tr>
         <td width="172" align="left" valign="top">Date:</td>
-        <td width="435">2016-01-13</td>
+        <td width="435">2016-01-15</td>
     </tr>
     <tr>
         <td width="172" align="left" valign="top">Project:</td>
@@ -76,7 +76,7 @@ Note however that we would not be able to define interesting algorithms without 
 
 There is a proliferation of “unit” types that mean no-value type, 
 
-* `nullptr_t` for pointer-like objects, 
+* `nullptr_t` for pointer-like objects and `std::function`, 
 * `std::experimental::nullopt_t` for `optional<T>`,
 * `std::experimental::monostate` unit type for `variant<monostate_t, Ts...>` (in ([P0088R0]),
 * `none_t` for `any` (in [P0032R0] - rejected as a specific unit type for any) 
@@ -113,8 +113,6 @@ However, if we have an overloaded function as e.g. print
 
 ```c++
 	template <class T>
-	void print(T* ptr);
-	template <class T>
 	void print(unique_ptr<T> ptr);
 	template <class T>
 	void print(shared_ptr<T> ptr);
@@ -126,7 +124,7 @@ The following call would be ambiguous
 	print(nullptr);
 ```
 
-Wait, who want to print `nullptr`? WSurely nobody. Anyway we could add an overload for `nullptr_t`
+Wait, who wants to print `nullptr`? Surely nobody. Anyway we could add an overload for `nullptr_t`
 
 ```c++
 	void print(nullptr_t ptr);
@@ -220,6 +218,33 @@ So now we can see `any` as a *Nullable* if we provide the conversions from `none
 	a = none;
 	print(any{});
 ```
+
+## Nesting *Nullable* types
+
+We don't provide a solution to the following use case. How to initialize an `optional<any>` with an `any`  none
+
+```c++
+optional<any> = none;
+```
+
+```c++
+optional<any> = any{};
+```
+
+Note that `any` is already `Nullable`, so how will this case be different from 
+
+```c++
+optional<optional<int>> = optional<int>{};
+```
+
+Not proposed by this paper, would be the possibility to lift `none`. This lifted value would express explicitly that the wrapped value would be used to emplace the optional wrapped valued. 
+
+```c++
+optional<any> o = lift(none);
+```
+
+The result of lift would be a type that will wrap `none_t`. `optional<T>` will need to accept a conversion from this `lifted<U>` by emplacing the type `T` from the type `U`.
+
 
 ## Other operations with no-value type
 
@@ -467,7 +492,7 @@ This proposal can be implemented as pure library extension, without any compiler
 
 # Acknowledgements
 
-Thanks to Tony Van Eerd for championing this proposal during the C++ standard committee meetings and helping me to improve globally the paper.
+Thanks to Tony Van Eerd for championing this proposal during the C++ standard committee meetings and helping me to improve globally the paper. Thanks to Agustín Bergé K-ballo for his useful comments.
 
 # References
 
