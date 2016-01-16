@@ -5,7 +5,7 @@
     </tr>
     <tr>
         <td width="172" align="left" valign="top">Date:</td>
-        <td width="435">2016-01-15</td>
+        <td width="435">2016-01-16</td>
     </tr>
     <tr>
         <td width="172" align="left" valign="top">Project:</td>
@@ -178,7 +178,7 @@ We could generate also the explicit conversion operator, but the syntax is less 
 
 Based on a future reflection library e.g. [N4428] or [N4451], we could define the tuple-like access instead of generating it (of course, for classes satisfying the tuple-like access generation requirements).  
 
-Next follows a draft when inheritance is not considered.
+Next follows a incomplete implementation when inheritance is not considered.
 
 ```c++
 namespace std {namespace experimental {namespace reflect { inline namespace v1 {
@@ -195,12 +195,12 @@ namespace std {namespace experimental {namespace reflect { inline namespace v1 {
         
     template <class C, class Enabler=void>
     struct tuple_size
-    template <class C, class Enabler=is_tuple_like_generation_enabled<C> >
+    template <class C, class Enabler=enable_if_t<is_tuple_like_generation_enabled<C>{}> >
     struct tuple_size<C> : size_t_constant<class_public_non_static_data_members<C>::size> {};
 
     template <size_t N, class C, class Enabler=void>>
     struct tuple_element;
-    template <size_t N, class C, class Enabler=is_tuple_like_generation_enabled<C> >
+    template <size_t N, class C, class Enabler=enable_if_t<is_tuple_like_generation_enabled<C>{}>>
     struct tuple_element<N, C> { 
         using pointer = class_public_non_static_data_members<C>::get<N>::pointer
         using type = decltype(std::declval<C>().*declval<pointer>());
@@ -217,21 +217,21 @@ template <size_t N, class C>
 struct tuple_element { using type = typename reflect::tuple_element<N, C>::type; }
 
 // overloads of get when reflect::is_tuple_like_generation_enabled<C>
-template <size_t N, class C, class Enabler=void_< N < tuple_size<C>{} and reflect::is_tuple_like_generation_enabled<C>{}> >
+template <size_t N, class C, class Enabler=enable_if_t< N < tuple_size<C>{} and reflect::is_tuple_like_generation_enabled<C>{} >>
  constexpr reflect::tuple_element_t<N,C>& get(C & that) noexcept
 {
     typename reflect::tuple_element<N,C>::pointer pm;
     return that.*pm;
 }
 
-template <size_t N, class C, class Enabler=void_< N < tuple_size<C>{} and reflect::is_tuple_like_generation_enabled<C>> >
+template <size_t N, class C, class Enabler=enable_if_t< N < tuple_size<C>{} and reflect::is_tuple_like_generation_enabled<C>> >
 constexpr const tuple_element_t<N,C>& get(const C & that) noexcept
 {
     typename reflect::tuple_element<N,C>::pointer pm;
     return that.*pm;
 }
 
-template <size_t N, class C, class Enabler=void_< N < tuple_size<C>{} and reflect::is_tuple_like_generation_enabled<C>> >
+template <size_t N, class C, class Enabler=enable_if_t< N < tuple_size<C>{} and reflect::is_tuple_like_generation_enabled<C>> >
 constexpr reflect::tuple_element_t<N,C>&& get(C && that) noexcept
 {
     typename reflect::tuple_element<N,C>::pointer pm;
