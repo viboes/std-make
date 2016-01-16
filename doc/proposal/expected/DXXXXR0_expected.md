@@ -5,7 +5,7 @@
     </tr>
     <tr>
         <td width="172" align="left" valign="top">Date:</td>
-        <td width="435">2015-12-19</td>
+        <td width="435">2016-01-09</td>
     </tr>
     <tr>
         <td width="172" align="left" valign="top">Revises:</td>
@@ -29,16 +29,14 @@
 ====================================================================
  
 
-This paper is the 2nd revision of [N4109] taking in account the feedback from the mailing lists.
-Class template `expected<T,E>` proposed here is a type that may contain a value of type `T` or a value of type `E` in its storage space. `T` represents the expected value, `E` represents the reason explaining why it doesn’t contains a value of type `T`, that is, the unexpected value. Its interface allows to query if the underlying value is either the expected value (of type `T`) or an unexpected value (of type `E`). The original idea comes from Andrei Alexandrescu C++ and Beyond 2012: Systematic Error Handling in C++ talk [Alexandrescu.Expected]. The interface and the rational are based on `std::experimental::optional` [N3793] and Haskell monads. We can consider that `expected<T,E>` is a generalization of `optional<T>` providing in addition a monad interface and some specific functions associated to the unexpected
-type `E`. It requires no changes to core language, and breaks no existing code.
+This paper is the 2nd revision of [N4109] taking in account the feedback from the mailing lists and some fixes that were forgotten in revision 1. 
+Class template `expected<T,E>` proposed here is a type that may contain a value of type `T` or a value of type `E` in its storage space. `T` represents the expected value, `E` represents the reason explaining why it doesn’t contains a value of type `T`, that is, the unexpected value. Its interface allows to query if the underlying value is either the expected value (of type `T`) or an unexpected value (of type `E`). The original idea comes from Andrei Alexandrescu C++ and Beyond 2012: Systematic Error Handling in C++ talk [Alexandrescu.Expected]. The interface and the rational are based on `std::experimental::optional` [N3793] and Haskell monads. We can consider that `expected<T,E>` is a generalization of `optional<T>` providing in addition a monad interface and some specific functions associated to the unexpected type `E`. It requires no changes to core language, and breaks no existing code.
 # History
 
 ## Revision 2 - Revision of [N4109] after discussion on the ML
 
 * Fix default constructor to `T`. [N4109] should change the default constructor to `T`, but there were some inconsistencies.
-* *TODO* As `variant`, `epected` requires some properties in order to never-empty guaranties. Add more on never-empty guaranties. 
-* *TODO* Add more alternative about the exception throw by `value()`.  
+* *TODO* As `variant`, `expected` requires some properties in order to never-empty guaranties. Add more on never-empty guaranties. 
 * Adapted to last version of referenced proposals.
 * Moved alternative designs from open questions to an Appendix.
 * Moved already answered open points to a Rationale section.
@@ -54,13 +52,12 @@ type `E`. It requires no changes to core language, and breaks no existing code.
 * Make the unexpected value a salient attribute of the expected class concerning the relational operators.
 * Removed open point about making expected<T,E> and expected<T> different classes.
 # Introduction
-Class template `expected<T,E>` proposed here is a type that may contain a value of type `T` or a value of type `E` in its storage space. `T` represents the expected value, `E` represents the reason explaining why it doesn’t contains a value of type `T`, that is, the unexpected value. Its interface allows to query if the underlying value is either the expected value (of type `T`) or an unexpected value (of type `E`). The original idea comes from Andrei Alexandrescu C++ and Beyond 2012: Systematic Error Handling in C++ talk [Alexandrescu.Expected]. The interface and the rational are based on `std::experimental::optional` [N3793] and Haskell monads. We can consider that `expected<T,E>` is a generalization of `optional<T>` providing in addition a monad interface and some specific functions associated to the unexpected
-type `E`. It requires no changes to core language, and breaks no existing code.
+Class template `expected<T,E>` proposed here is a type that may contain a value of type `T` or a value of type `E` in its storage space. `T` represents the expected value, `E` represents the reason explaining why it doesn’t contains a value of type `T`, that is, the unexpected value. Its interface allows to query if the underlying value is either the expected value (of type `T`) or an unexpected value (of type `E`). The original idea comes from Andrei Alexandrescu C++ and Beyond 2012: Systematic Error Handling in C++ talk [Alexandrescu.Expected]. The interface and the rational are based on `std::experimental::optional` [N3793] and Haskell monads. We can consider that `expected<T,E>` is a generalization of `optional<T>` providing in addition a monad interface and some specific functions associated to the unexpected type `E`. It requires no changes to core language, and breaks no existing code.
 
  # Motivation and Scope
 Basically, the two main error mechanisms are exceptions and return codes. Before further explanation, we should ask us what are the characteristics of a good error mechanism.
 
-* **Error visibility**: Failure cases should appears throughout the code review. Because the debug can be painful if the errors are hidden.
+* **Error visibility**: Failure cases should appear throughout the code review. Because the debug can be painful if the errors are hidden.
 * **Information on errors**: The errors should carry out as most as possible information from their origin, causes and possibly the ways to resolve it.
 * **Clean code**: The treatment of errors should be in a separate layer of code and as much invisible as possible. So the code reader could notice the presence of exceptional cases without stop his reading.
 * **Non-Intrusive error** The errors should not monopolize a communication channel dedicated to the normal code flow. They must be as discrete as possible. For instance, the return of a function is a channel that should not be exclusively reserved for errors.
@@ -128,7 +125,7 @@ It worths mentioning the other characteristics of `expected<T,E>`:
 * Naturally allows multiple errors inflight.
 * Teleportation possible.
 * Across thread boundaries.
-* Across nothrow subsystem boundaries.
+* Across no-throw subsystem boundaries.
 * Across time: save now, throw later.
 * Collect, group, combine errors.
 # Use cases
@@ -316,7 +313,7 @@ The same rationale described in [N3672] for `optional<T>` applies to `expected<T
 
 The interface in this model requires operations such as comparison to `T`, comparison to `E`, assignment and creation from either. It is easy to determine what the value of the expected object is in this model: the type it stores (`T` or `E`) and either the value of `T` or the value of `E`.
 
-Additionally, within the affordable limits, we propose the view that `expected<T,E>` extends the set of the values of `T` by the values of type `E`. This is reflected in initialization, assignment, ordering, and equality comparison with both `T` and `E`. In the case of `optional<T>`, `T` can not be a `nullopt_t`. As the types `T` and `E` could be the same. In `expected<T,E>`, there is need to tag the values of `E` to avoid ambiguous expressions. The `make_unexpected(E)` function is proposed for this purpose. However `T` can not be `unexpected_type<E>` for a given `E`.
+Additionally, within the affordable limits, we propose the view that `expected<T,E>` extends the set of the values of `T` by the values of type `E`. This is reflected in initialization, assignment, ordering, and equality comparison with both `T` and `E`. In the case of `optional<T>`, `T` cannot be a `nullopt_t`. As the types `T` and `E` could be the same. In `expected<T,E>`, there is need to tag the values of `E` to avoid ambiguous expressions. The `make_unexpected(E)` function is proposed for this purpose. However `T` can not be `unexpected_type<E>` for a given `E`.
 
 ```c++
 expected<int, string> ei = 0;
@@ -332,7 +329,7 @@ ej = 0;
 ek = 1;
 ```
 
-## Initialization of expected<T,E>
+## Initialization of `expected<T,E>`
 
 In cases `T` and `E` have value semantic types capable of storing `n` and `m` distinct values respectively, `expected<T,E>` can be seen as an extended `T` capable of storing `n + m` values: these that `T` and `E` stores. Any valid initialization scheme must provide a way to put an expected object to any of these states. In addition, some `T`’s are not `CopyConstructible` and their expected variants still should be constructible with any set of arguments that work for `T`.
 
@@ -562,7 +559,9 @@ expected<pair<int, int>, errc> getIntRange(istream_range& r) {
 
 ### Function `value_or`
 
-The function member ```value_or()``` has the same semantics than `optional` [N3672] since the type of `E` doesn’t matter; hence we can consider that `E == nullopt_t` and the `optional` semantics yields. Using the monadic interface, we can achieve a similar behavior:
+The function member ```value_or()``` has the same semantics than `optional` [N3672] since the type of `E` doesn’t matter; hence we can consider that `E == nullopt_t` and the `optional` semantics yields.
+
+Using the monadic error interface, we can achieve a similar behavior:
 
 ```c++
 auto x = getInt();
@@ -573,8 +572,7 @@ int x = *(x.catch_error([](auto)return 0;)); // identical to x.value_or(0);
 
 As `optional`, one of the design goals of `expected` is that objects of type `expected<T,E>` should be valid elements in STL containers and usable with STL algorithms (at least if objects of type `T` and `E` are). Equality comparison is essential for `expected<T,E>` to model concept `Regular`. C++ does not have concepts yet, but being regular is still essential for the type to be effectively used with STL. 
 
-Ordering is essential if we want to store expected values in ordered associative containers. A number of ways of including the unexpected state in comparisons have been suggested. The ones proposed, have been crafted such that the axioms of equivalence and strict weak ordering are preserved: `unexpected` values stored in `expected<T,E>` are simply treated as additional values that
-are always different from `T`; these values are always compared as less than any value of `T` when stored in an `expected` object.
+Ordering is essential if we want to store expected values in ordered associative containers. A number of ways of including the unexpected state in comparisons have been suggested. The ones proposed, have been crafted such that the axioms of equivalence and strict weak ordering are preserved: `unexpected` values stored in `expected<T,E>` are simply treated as additional values that are always different from `T`; these values are always compared as less than any value of `T` when stored in an `expected` object.
 
 The main issue is how to compare the `unexpected` values between them. `operator==()` is defined for
 `exception_ptr`, using shallow semantics but there is no order between two `exception_ptr`.
@@ -633,7 +631,7 @@ assert (eN < 1);
 assert (e0 > make_unexpected(1));
 ```
 
-Although it is difficult to imagine any practical use case of ordering relation between `expected<T,E>` and `unexpected_type<E>`, we still provide it for completness sake.
+Although it is difficult to imagine any practical use case of ordering relation between `expected<T,E>` and `unexpected_type<E>`, we still provide it for completeness sake.
 
 The mixed relational operators, especially those representing order, between `expected<T,E>` and `T` have been accused of being dangerous. In code examples like the following, it may be unclear if the author did not really intend to compare two `T`’s.
 
@@ -736,8 +734,7 @@ The operation `map` consider `expected` as a `Functor` and just apply a function
 
 * (T -> U) -> [U]
 
-Whatever the return type of the continuation, we observe that it is always wrapped into a context. The
-monadic bind do it differently.
+Whatever the return type of the continuation, we observe that it is always wrapped into a context. The monadic bind do it differently.
 
 ### Monadic `bind`
 
@@ -751,7 +748,7 @@ The functional signature of bind can be described as follow:
 
 * (T -> [U]) -> [U]
 
-If a do-notation is introduced in C++, as proposed in section [Do-Notation], these operations can become a powerful abstraction, they have been proven very useful in Haskell. For example, a similar interface could be used with `optional`.
+If a *do-notation* is introduced in C++, as proposed in section [Do-Notation], these operations can become a powerful abstraction, they have been proven very useful in Haskell. For example, a similar interface could be used with `optional`.
 
 ### `then` function
 
@@ -786,8 +783,7 @@ getInt().map([](int i){return i * 2;})
 ```
 
 This last example shows we can return a new value from the continuation passed to `catch_error`.
-The `catch_error` member doesn’t catch exceptions that could be thrown by the continuation. Since we
-already try to recover from an error it makes little sense to prevent the user to launch an exception.
+The `catch_error` member doesn’t catch exceptions that could be thrown by the continuation. Since we already try to recover from an error it makes little sense to prevent the user to launch an exception.
 
 ### `unwrap` function
 
@@ -805,243 +801,9 @@ expected<T,E> unwrap<expected<T,E>> e) {
 }
 ```
 
-We could add such a function to the standard, either as a free function or as a member function. The
-authors propose to add it as a member function to be in line with [N3857].
+We could add such a function to the standard, either as a free function or as a member function. The authors propose to add it as a member function to be in line with [N3857].
 
-# Related types
-
-## Variant
-
-`expected<T,E>` can be seen as a specialization of `boost::variant<unexpected<E>,T>` which gives a specific intent to its first parameter, that is, it represents the type of the expected contained value. This specificity allows to provide a pointer like interface, as it is the case for `std::experimental::optional<T>`. Even if the standard included a class `variant<T,E>`, the interface provided by `expected<T,E>` is more specific and closer to what the
-user could expect as the result type of a function. In addition, `expected<T,E>` doesn’t intend to be used to define recursive data as `boost::variant<>` does.
-
-The following table presents a brief comparison between `boost::variant<unexpected<E>, T>` and `expected<T,E>`.
-
-
-<table border="0" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" >
-    <tr>
-        <td align="left" valign="top"> </td>
-        <td align="left" valign="top"><strong>boost::variant<unexpected<E>,
-T></strong></td>
-        <td align="left" valign="top"><strong>expected<T,E></strong></td>
-    </tr>
-    <tr>
-        <td align="left" valign="top"> <strong>never-empty warranty</strong> </td>
-        <td align="left" valign="top">yes</td>
-        <td align="left" valign="top">yes</td>
-    </tr>
-    <tr>
-        <td align="left" valign="top"> <strong>accepts is_same<T,E></strong> </td>
-        <td align="left" valign="top">yes</td>
-        <td align="left" valign="top">yes</td>
-    </tr>
-    <tr>
-        <td align="left" valign="top"> <strong>swap</strong> </td>
-        <td align="left" valign="top">yes</td>
-        <td align="left" valign="top">yes</td>
-    </tr>
-    <tr>
-        <td align="left" valign="top"> <strong>factories</strong> </td>
-        <td align="left" valign="top">no</td>
-        <td align="left" valign="top">make_expected / make_unexpected</td>
-    </tr>
-    <tr>
-        <td align="left" valign="top"> <strong>hash</strong> </td>
-        <td align="left" valign="top">yes</td>
-        <td align="left" valign="top">yes</td>
-    </tr>
-    <tr>
-        <td align="left" valign="top"> <strong>value_type</strong> </td>
-        <td align="left" valign="top">no</td>
-        <td align="left" valign="top">yes</td>
-    </tr>
-    <tr>
-        <td align="left" valign="top"> <strong>swap</strong> </td>
-        <td align="left" valign="top">yes</td>
-        <td align="left" valign="top">yes</td>
-    </tr>
-    <tr>
-        <td align="left" valign="top"> <strong>swap</strong> </td>
-        <td align="left" valign="top">yes</td>
-        <td align="left" valign="top">yes</td>
-    </tr>
-    <tr>
-        <td align="left" valign="top"> <strong>default constructor</strong> </td>
-        <td align="left" valign="top">yes (if T is default constructible) </td>
-        <td align="left" valign="top">yes (if T is default constructible)</td>
-    </tr>
-    <tr>
-        <td align="left" valign="top"> <strong>observers</strong> </td>
-        <td align="left" valign="top">boost::get<T> and boost::get<E></td>
-        <td align="left" valign="top">pointer-like / value / error / value_or</td>
-    </tr>
-    <tr>
-        <td align="left" valign="top"> <strong>continuations</strong> </td>
-        <td align="left" valign="top">apply_visitor</td>
-        <td align="left" valign="top">map/bind/then/catch_error</td>
-    </tr>
-</table>
-
-## Optional
-
-We can see `expected<T,E>` as an `std::experimental::optional<T>` that collapse all the values of `E` to `nullopt`.
-
-We can convert an `expected<T,E>` to an `optional<T>` with the possible loss of information.
-
-```c++
-template <class T>
-optional<T> make_optional(expected<T,E> v) {
-	if (v) return make_optional(*v);
-	else nullopt;
-}
-```
-
-We can convert an ```optional<T>``` to an ```expected<T,E>``` without knowledge of the root cause. We consider that `E()` is equal to `nullopt` since it shouldn’t bring more informations (however it depends on the underlying error — we considered `exception_ptr` and `error_condition`).
-
-```c++
-template <class T, class E>
-expected<T,E> make_expected(optional<T> v) {
-	if (v) return make_expected(*v);
-	else make_unexpected(E());
-}
-```
-
-## Promise and Future
-
-We can see `expected<T>` as an always ready `future<T>`. While `promise<>`/`future<>` focuses on inter-thread asynchronous communication, `excepted<E,T>` focus on eager and synchronous computations. We can move a ready `future<T>` to an `expected<T>` with no loss of information.
-
-```c++
-template <class T>
-expected<T> make_expected(future<T>&& f) {
-	assert (f.ready() && "future not ready");
-	try {
-		return f.get();
-	} catch (...) {
-		return make_unexpected_from_exception();
-	}
-}
-```
-
-We could also create a `future<T>` from an `expected<T>`
-
-```c++
-template <class T>
-future<T> make_future(expected<T> e) {
-	if (e)
-		return make_ready_future(*e);
-	else
-		return make_exceptional_future<T>(e.error());
-};
-```
-
-## Comparison between optional, expected and futureThe following table presents a brief comparison between `optional<T>`, `expected<T,E>` and `promise<T>`/`future<T>`.
-
-<table border="0" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" >
-    <tr>
-        <td align="left" valign="top"> </td>
-        <td align="left" valign="top"><strong>optional</strong></td>
-        <td align="left" valign="top"><strong>expected</strong></td>
-        <td align="left" valign="top"><strong>promise/future</strong></td>
-    </tr>
-    <tr>
-        <td align="left" valign="top"> <strong>specific null value</strong> </td>
-        <td align="left" valign="top">yes</td>
-        <td align="left" valign="top">no</td>
-        <td align="left" valign="top">non</td>
-    </tr>
-    <tr>
-        <td align="left" valign="top"> <strong>relational operators</strong> </td>
-        <td align="left" valign="top">yes</td>
-        <td align="left" valign="top">yes</td>
-        <td align="left" valign="top">no</td>
-    </tr>
-    <tr>
-        <td align="left" valign="top"> <strong>swap</strong> </td>
-        <td align="left" valign="top">yes</td>
-        <td align="left" valign="top">yes</td>
-        <td align="left" valign="top">yes</td>
-    </tr>
-    <tr>
-        <td align="left" valign="top"> <strong>factories</strong> </td>
-        <td align="left" valign="top">make_optional / nullopt</td>
-        <td align="left" valign="top">make_expected /
-make_unexpected</td>
-        <td align="left" valign="top">make_ready_future /
-(make_exceptional, see
-[P0159R0])</td>
-    </tr>
-    <tr>
-        <td align="left" valign="top"> <strong>hash</strong> </td>
-        <td align="left" valign="top">yes</td>
-        <td align="left" valign="top">yes</td>
-        <td align="left" valign="top">yes</td>
-    </tr>
-    <tr>
-        <td align="left" valign="top"> <strong>value_type</strong> </td>
-        <td align="left" valign="top">yes</td>
-        <td align="left" valign="top">yes</td>
-        <td align="left" valign="top">no / (yes, see [N3865]).</td>
-    </tr>
-    <tr>
-        <td align="left" valign="top"> <strong>default constructor</strong> </td>
-        <td align="left" valign="top">yes</td>
-        <td align="left" valign="top">yes (if T is default
-constructible)</td>
-        <td align="left" valign="top">yes</td>
-    </tr>
-    <tr>
-        <td align="left" valign="top"> <strong>allocators</strong> </td>
-        <td align="left" valign="top">no</td>
-        <td align="left" valign="top">no</td>
-        <td align="left" valign="top">yes</td>
-    </tr>
-    <tr>
-        <td align="left" valign="top"> <strong>emplace</strong> </td>
-        <td align="left" valign="top">yes</td>
-        <td align="left" valign="top">yes</td>
-        <td align="left" valign="top">no</td>
-    </tr>
-    <tr>
-        <td align="left" valign="top"> <strong>bool conversion</strong> </td>
-        <td align="left" valign="top">yes</td>
-        <td align="left" valign="top">yes</td>
-        <td align="left" valign="top">no</td>
-    </tr>
-    <tr>
-        <td align="left" valign="top"> <strong>state</strong> </td>
-        <td align="left" valign="top">bool() </td>
-        <td align="left" valign="top">bool() / valid </td>
-        <td align="left" valign="top">valid / ready /
-(has_value, see [N3865])</td>
-    </tr>
-    <tr>
-        <td align="left" valign="top"> <strong>observers</strong> </td>
-        <td align="left" valign="top">pointer-like / value /
-value_or</td>
-        <td align="left" valign="top">pointer-like / value /
-error / value_or</td>
-        <td align="left" valign="top">get /
-(get_exception_ptr, see
-[N3865])</td>
-    </tr>
-    <tr>
-        <td align="left" valign="top"> <strong>visitation</strong> </td>
-        <td align="left" valign="top">no</td>
-        <td align="left" valign="top">map / bind / then /
-catch_error</td>
-        <td align="left" valign="top">then / (next/recover see
-[N3865])</td>
-    </tr>
-    <tr>
-        <td align="left" valign="top"> <strong>grouping</strong> </td>
-        <td align="left" valign="top">n/a</td>
-        <td align="left" valign="top">n/a</td>
-        <td align="left" valign="top">when_all / when_any</td>
-    </tr>
-</table>
-
-# Open points
-
+# Open points
 
 
 
@@ -1324,7 +1086,7 @@ Insert a new section.
 
 This subclause describes class template expected that represents expected objects. An `expected<T,E>` object is an object that contains the storage for another object and manages the lifetime of this contained object `T`, alternatively it could contain the storage for another unexpected object `E`. The contained object may not be initialized after the expected object has been initialized, and may not be destroyed before the expected object has been destroyed. The initialization state of the contained object is tracked by the expected object.
 
-**X.Y.7 Header <experimental/expected> synopsis [expected.synop]**
+**X.Y.7 Header `<experimental/expected>` synopsis [expected.synop]**
 
 ```c++
 namespace std {
@@ -1774,8 +1536,7 @@ expected<T,E>& operator=(unexpected_type<E>&& e);
 ```
 
 *Effects*:
-If `! bool(*this)` assigns `std::forward<E>(e.value())` to the contained value; otherwise destroys the contained
-value by calling `val->T::~T()` and initializes the contained value as if direct-non-list-initializing object of type `E` with `std::forward<unexpected_type<E>>(e).value()`.
+If `! bool(*this)` assigns `std::forward<E>(e.value())` to the contained value; otherwise destroys the contained value by calling `val->T::~T()` and initializes the contained value as if direct-non-list-initializing object of type `E` with `std::forward<unexpected_type<E>>(e).value()`.
 
 *Returns*: `*this`.
 
@@ -1842,8 +1603,7 @@ if `bool(*this) and bool(rhs)`, calls `swap(val, rhs.val)`, otherwise
 if `! bool(*this) and ! bool(rhs)`, calls `swap(err, rhs.err)`, otherwise
 if `bool(*this) and ! bool(rhs)`, initializes a temporary variable `e` by direct-initialization with `std::move(rhs.err))`, initializes the contained value of rhs by direct-initialization with `std::move(*(*this))`, initializes the expected
 value of `*this` by direct-initialization with `std::move(rhs.err)` and swaps `has_value` and `rhs.has_value`,
-otherwise
-calls to `rhs.swap(*this)`.
+otherwise calls to `rhs.swap(*this)`.
 
 *Exception Safety*: 
     *TODO: This must be worded.*
@@ -2150,7 +1910,7 @@ if `! bool(*this)` returns `unwrap(expected<decltype(func(val)), E>(funct(**this
 result of the call continuation function `fuct` possibly wrapped on a `expected<T,E>`, otherwise, returns
 `*this`.
 
-**X.Y.10 expected as a meta-fuction [expected.object.meta]**
+**X.Y.10 `expected` as a meta-fuction [expected.object.meta]**
 
 ```c++
 template <class E>
@@ -2162,7 +1922,7 @@ public:
 };
 ```
 
-**X.Y.11 expected for void [expected.object.void]**
+**X.Y.11 `expected` for `void` [expected.object.void]**
 
 ```c++
 template <class E>
@@ -2224,14 +1984,14 @@ private:
 ```
 *TODO: Describe the functions*
 
-**X.Y.12 unexpect tag [expected.unexpect]**
+**X.Y.12 `unexpect` tag [expected.unexpect]**
 
 ```c++
 struct unexpet_t;
 constexpr unexpet_t unexpet;
 ```
 
-**X.Y.13 Template Class bad_expected_access [expected.bad_expected_access]**
+**X.Y.13 Template Class `bad_expected_access` [expected.bad_expected_access]**
 
 ```
 template <class E>
@@ -2244,8 +2004,7 @@ public:
 ```
 
 
-The template class `bad_expected_access` defines the type of objects thrown as exceptions to report the
-situation where an attempt is made to access the value of a unexpected expected object.
+The template class `bad_expected_access` defines the type of objects thrown as exceptions to report the situation where an attempt is made to access the value of a unexpected expected object.
 
 ###########################################################################
 ```c++
@@ -2270,11 +2029,11 @@ The first function shall be a constexpr function.
 
 *TODO: Describe the functions.*
 
-**X.Y.15 Comparison with T [expected.comparison_T]**
+**X.Y.15 Comparison with `T` [expected.comparison_T]**
 
 *TODO: Describe the functions.*
 
-**X.Y.16 Comparison with unexpected<E> [expected.comparison_unexpected_E]**
+**X.Y.16 Comparison with `unexpected<E>` [expected.comparison_unexpected_E]**
 
 *TODO: Describe the functions.*
 
@@ -2387,7 +2146,7 @@ One could expect that the allocator argument is forwarded in this constructor ca
 
 ## Variadic expected
 
-A typical case could combine expected and variant `expected<T,variant<E1, ..., En>>`. We could extend `expected` to take a variadic number of errors `expected<T, E1, ..., En>` in order to provide a adapted interface.
+A typical case could combine expected and variant `expected<T,variant<E1, ..., En>>`. We could extend `expected` to take a variadic number of errors `expected<T, E1, ..., En>` in order to provide an adapted interface.
 
 # Acknowledgements
 
@@ -2396,7 +2155,7 @@ We are very grateful to Andrei Alexandrescu for his talk, which was the origin o
 Thanks to Fernando Cacciola, Andrzej KrzemieÃĚâĂđski and every one that has contributed to the wording
 and the rationale of N3793 [N3793].
 
-Vicente thanks personnaly Evgeny Panasyuk and Johannes Kapfhammer for their remarks on the DO-expression.
+Vicente thanks personally Evgeny Panasyuk and Johannes Kapfhammer for their remarks on the DO-expression.
 Pierre thanks the IRCAM and Carlos Agon who allowed him to work on this proposal during its internship.
 # References[Alexandrescu.Expected]: http://channel9.msdn.com/Shows/Going+Deep/C-and-Beyond-2012-Andrei-Alexandrescu-Systematic-Error-Handling-in-C "A. Alexandrescu. C++ and Beyond 2012 - Systematic Error Handling in C++, 2012." 
 
@@ -2488,8 +2247,7 @@ Pierre thanks the IRCAM and Carlos Agon who allowed him to work on this proposal
 
 In the use-cases section, we present expected as a better way to handle errors than error codes. However the current syntax using lambda and chaining monadic operations (such as `map`) can be tedious to use. We propose different solutions to overcome this problem, since the solutions are more general than the scope of this proposal we discuss them in this appendix.
 
-A first solution that do not require change in the language is the use of variadic monadic operation. For
-example using a variadic free function map, we can write the `i/k + j/k` function as following:
+A first solution that do not require change in the language is the use of variadic monadic operation. For example using a variadic free function map, we can write the `i/k + j/k` function as following:
 
 ```
 expected<int> f(int i, int j, int k)
@@ -2500,15 +2258,13 @@ expected<int> f(int i, int j, int k)
 }
 ```
 
-This is most readable than the member map function and the use of lambda. However it suffers from two
-major deficiencies:
+This is most readable than the member map function and the use of lambda. However it suffers from two major deficiencies:
 
 * *Eager evaluation* All arguments are evaluated even if the first fails.
-* *Unordered evaluation* We cannot control the order of evaluation thus it presupposed the function to
-have no side effects.
+* *Unordered evaluation* We cannot control the order of evaluation thus it presupposed the function to have no side effects.
 
-Considering these two problems we consider a possible C++ language extension: a do-notation similar to
-the one in Haskell [Do-Notation]. As with the variadic `map` function, it is not limited to expected but could work with any kind of monad [Monad]. Next follow the grammar:
+Considering these two problems we consider a possible C++ language extension: a *do-notation* similar to
+the one provided by Haskell [Do-Notation]. As with the variadic `map` function, it is not limited to expected but could work with any kind of monad [Monad]. Next follows the grammar:
 
 ```
 expression ::= ...
@@ -2531,8 +2287,7 @@ expected<int, error_condition> f2(int i, int j, int k)
 }
 ```
 
-This syntax is far easier to read and to understand. A lazy evaluation of statement is possible and the
-order is well-defined. Nevertheless, it can be considered as a syntactic sugar for bind. We give a syntactic transformation following:
+This syntax is far easier to read and to understand. A lazy evaluation of statement is possible and the order is well-defined. Nevertheless, it can be considered as a syntactic sugar for bind. We give a syntactic transformation following:
 
 ```
 [[do-expression]] =
@@ -2555,11 +2310,10 @@ expected<int, error_condition> f2(int i, int j, int k)
 }
 ```
 
-This would give the exact same results as the previous version. However, the function `f2` is much simpler
-and clearer than f because it doesn’t have to explicitly handle any of the error cases. When an error case occurs, it is returned as the result of the function, but if not, the correct result of a subexpression is bound to a name `(s1 or s2)`, and that result can be used in later parts of the computation. The code is a lot simpler to write.
+This would give the exact same results as the previous version. However, the function `f2` is much simpler and clearer than f because it doesn’t have to explicitly handle any of the error cases. When an error case occurs, it is returned as the result of the function, but if not, the correct result of a subexpression is bound to a name `(s1 or s2)`, and that result can be used in later parts of the computation. The code is a lot simpler to write.
 
 The more complicated the error-handling function, the more important this will be.
-But, the standard doesn’t have this DO expression yet. Waiting for a do-statement the user could define
+But, the standard doesn’t have this DO expression yet. Waiting for a *do-statement* the user could define
 some macros [DO-Macro] and define `f2` as
 
 ```c++
@@ -2573,8 +2327,7 @@ expected<int> f2(int i, int j, int k)
 }
 ```
 
-In the case of expected and optional, and similarly to the proposed `await` keyword we could use an expect
-keyword (it returns the unexpected value if the expected is not valued):
+In the case of expected and optional, and similarly to the proposed `await` keyword we could use an `expect` keyword (it returns the unexpected value if the expected is not valued):
 
 ```c++
 expected<int> f2(int i, int j, int k)
@@ -2585,7 +2338,7 @@ expected<int> f2(int i, int j, int k)
 }
 ```
 
-We coald even nest the expect expression as in
+We could even nest the expect expression as in
 
 ```c++
 expected<int> f2(int i, int j, int k)
@@ -2593,7 +2346,8 @@ expected<int> f2(int i, int j, int k)
 	return expect safe_divide(i, k) + expect safe_divide(j, k);
 }
 ```
-but these expressions can not be computed concurrently, we need a specific order of evaluation. 
+
+but these expressions cannot be computed concurrently, we need a specific order of evaluation. 
 
 Waiting for this, the user would define a macro [EXPECT-Macro]
 
@@ -2612,7 +2366,7 @@ Note that the meaning of EXPECT macro is not valid for all Monads, in particular
 
 # await adaptation
 
-The following is an squetch of the adaptation of a basic expected class provided by Gor [await_expected].
+The following is a draft of the adaptation of a basic expected class provided by Gor [await_expected].
 
 ```c++
 namespace std
@@ -2709,7 +2463,7 @@ struct expected_traits<expected<T, error_condition>>
 };
 ```
 
-The semantics of `catch_exception` is to rethrow the current exception and catch only the exceptions we are interested in. The default behavior lets flight the exception thrown by the continuation. We created a bridge between an `error_condition` and the `error_cond` exception.
+The semantics of `catch_exception` is to re-throw the current exception and catch only the exceptions we are interested in. The default behavior lets flight the exception thrown by the continuation. We created a bridge between an `error_condition` and the `error_cond` exception.
 
 ## Which exception throw when the user try to get the expected value but there is none?
 
@@ -2803,4 +2557,236 @@ It has been suggested also to extend the design into something that contains
 Again there is no major difficulty to implement it, but instead of having one variation point we have two,
 that is, is there a value, and if not, if is there an `exception_ptr`. While this would need only an extra test on the exceptional case, the authors think that it is not worth doing it as all the copy/move/swap operations would be less efficient.
 
+
+# Appendix III - Related types
+
+## Variant
+
+`expected<T,E>` can be seen as a specialization of `boost::variant<unexpected<E>,T>` which gives a specific intent to its first parameter, that is, it represents the type of the expected contained value. This specificity allows to provide a pointer like interface, as it is the case for `std::experimental::optional<T>`. Even if the standard included a class `variant<T,E>`, the interface provided by `expected<T,E>` is more specific and closer to what the
+user could expect as the result type of a function. In addition, `expected<T,E>` doesn’t intend to be used to define recursive data as `boost::variant<>` does.
+
+The following table presents a brief comparison between `boost::variant<unexpected<E>, T>` and `expected<T,E>`.
+
+
+<table border="0" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" >
+    <tr>
+        <td align="left" valign="top"> </td>
+        <td align="left" valign="top"><strong>boost::variant<unexpected<E>,
+T></strong></td>
+        <td align="left" valign="top"><strong>expected<T,E></strong></td>
+    </tr>
+    <tr>
+        <td align="left" valign="top"> <strong>never-empty warranty</strong> </td>
+        <td align="left" valign="top">yes</td>
+        <td align="left" valign="top">yes</td>
+    </tr>
+    <tr>
+        <td align="left" valign="top"> <strong>accepts is_same<T,E></strong> </td>
+        <td align="left" valign="top">yes</td>
+        <td align="left" valign="top">yes</td>
+    </tr>
+    <tr>
+        <td align="left" valign="top"> <strong>swap</strong> </td>
+        <td align="left" valign="top">yes</td>
+        <td align="left" valign="top">yes</td>
+    </tr>
+    <tr>
+        <td align="left" valign="top"> <strong>factories</strong> </td>
+        <td align="left" valign="top">no</td>
+        <td align="left" valign="top">make_expected / make_unexpected</td>
+    </tr>
+    <tr>
+        <td align="left" valign="top"> <strong>hash</strong> </td>
+        <td align="left" valign="top">yes</td>
+        <td align="left" valign="top">yes</td>
+    </tr>
+    <tr>
+        <td align="left" valign="top"> <strong>value_type</strong> </td>
+        <td align="left" valign="top">no</td>
+        <td align="left" valign="top">yes</td>
+    </tr>
+    <tr>
+        <td align="left" valign="top"> <strong>swap</strong> </td>
+        <td align="left" valign="top">yes</td>
+        <td align="left" valign="top">yes</td>
+    </tr>
+    <tr>
+        <td align="left" valign="top"> <strong>swap</strong> </td>
+        <td align="left" valign="top">yes</td>
+        <td align="left" valign="top">yes</td>
+    </tr>
+    <tr>
+        <td align="left" valign="top"> <strong>default constructor</strong> </td>
+        <td align="left" valign="top">yes (if T is default constructible) </td>
+        <td align="left" valign="top">yes (if T is default constructible)</td>
+    </tr>
+    <tr>
+        <td align="left" valign="top"> <strong>observers</strong> </td>
+        <td align="left" valign="top">boost::get<T> and boost::get<E></td>
+        <td align="left" valign="top">pointer-like / value / error / value_or</td>
+    </tr>
+    <tr>
+        <td align="left" valign="top"> <strong>continuations</strong> </td>
+        <td align="left" valign="top">apply_visitor</td>
+        <td align="left" valign="top">map/bind/then/catch_error</td>
+    </tr>
+</table>
+
+## Optional
+
+We can see `expected<T,E>` as an `std::experimental::optional<T>` that collapse all the values of `E` to `nullopt`.
+
+We can convert an `expected<T,E>` to an `optional<T>` with the possible loss of information.
+
+```c++
+template <class T>
+optional<T> make_optional(expected<T,E> v) {
+	if (v) return make_optional(*v);
+	else nullopt;
+}
+```
+
+We can convert an ```optional<T>``` to an ```expected<T,E>``` without knowledge of the root cause. We consider that `E()` is equal to `nullopt` since it shouldn’t bring more informations (however it depends on the underlying error — we considered `exception_ptr` and `error_condition`).
+
+```c++
+template <class T, class E>
+expected<T,E> make_expected(optional<T> v) {
+	if (v) return make_expected(*v);
+	else make_unexpected(E());
+}
+```
+
+## Promise and Future
+
+We can see `expected<T>` as an always ready `future<T>`. While `promise<>`/`future<>` focuses on inter-thread asynchronous communication, `excepted<E,T>` focus on eager and synchronous computations. We can move a ready `future<T>` to an `expected<T>` with no loss of information.
+
+```c++
+template <class T>
+expected<T> make_expected(future<T>&& f) {
+	assert (f.ready() && "future not ready");
+	try {
+		return f.get();
+	} catch (...) {
+		return make_unexpected_from_exception();
+	}
+}
+```
+
+We could also create a `future<T>` from an `expected<T>`
+
+```c++
+template <class T>
+future<T> make_future(expected<T> e) {
+	if (e)
+		return make_ready_future(*e);
+	else
+		return make_exceptional_future<T>(e.error());
+};
+```
+
+## Comparison between optional, expected and futureThe following table presents a brief comparison between `optional<T>`, `expected<T,E>` and `promise<T>`/`future<T>`.
+
+<table border="0" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" >
+    <tr>
+        <td align="left" valign="top"> </td>
+        <td align="left" valign="top"><strong>optional</strong></td>
+        <td align="left" valign="top"><strong>expected</strong></td>
+        <td align="left" valign="top"><strong>promise/future</strong></td>
+    </tr>
+    <tr>
+        <td align="left" valign="top"> <strong>specific null value</strong> </td>
+        <td align="left" valign="top">yes</td>
+        <td align="left" valign="top">no</td>
+        <td align="left" valign="top">non</td>
+    </tr>
+    <tr>
+        <td align="left" valign="top"> <strong>relational operators</strong> </td>
+        <td align="left" valign="top">yes</td>
+        <td align="left" valign="top">yes</td>
+        <td align="left" valign="top">no</td>
+    </tr>
+    <tr>
+        <td align="left" valign="top"> <strong>swap</strong> </td>
+        <td align="left" valign="top">yes</td>
+        <td align="left" valign="top">yes</td>
+        <td align="left" valign="top">yes</td>
+    </tr>
+    <tr>
+        <td align="left" valign="top"> <strong>factories</strong> </td>
+        <td align="left" valign="top">make_optional / nullopt</td>
+        <td align="left" valign="top">make_expected /
+make_unexpected</td>
+        <td align="left" valign="top">make_ready_future /
+(make_exceptional, see
+[P0159R0])</td>
+    </tr>
+    <tr>
+        <td align="left" valign="top"> <strong>hash</strong> </td>
+        <td align="left" valign="top">yes</td>
+        <td align="left" valign="top">yes</td>
+        <td align="left" valign="top">yes</td>
+    </tr>
+    <tr>
+        <td align="left" valign="top"> <strong>value_type</strong> </td>
+        <td align="left" valign="top">yes</td>
+        <td align="left" valign="top">yes</td>
+        <td align="left" valign="top">no / (yes, see [N3865]).</td>
+    </tr>
+    <tr>
+        <td align="left" valign="top"> <strong>default constructor</strong> </td>
+        <td align="left" valign="top">yes</td>
+        <td align="left" valign="top">yes (if T is default
+constructible)</td>
+        <td align="left" valign="top">yes</td>
+    </tr>
+    <tr>
+        <td align="left" valign="top"> <strong>allocators</strong> </td>
+        <td align="left" valign="top">no</td>
+        <td align="left" valign="top">no</td>
+        <td align="left" valign="top">yes</td>
+    </tr>
+    <tr>
+        <td align="left" valign="top"> <strong>emplace</strong> </td>
+        <td align="left" valign="top">yes</td>
+        <td align="left" valign="top">yes</td>
+        <td align="left" valign="top">no</td>
+    </tr>
+    <tr>
+        <td align="left" valign="top"> <strong>bool conversion</strong> </td>
+        <td align="left" valign="top">yes</td>
+        <td align="left" valign="top">yes</td>
+        <td align="left" valign="top">no</td>
+    </tr>
+    <tr>
+        <td align="left" valign="top"> <strong>state</strong> </td>
+        <td align="left" valign="top">bool() </td>
+        <td align="left" valign="top">bool() / valid </td>
+        <td align="left" valign="top">valid / ready /
+(has_value, see [N3865])</td>
+    </tr>
+    <tr>
+        <td align="left" valign="top"> <strong>observers</strong> </td>
+        <td align="left" valign="top">pointer-like / value /
+value_or</td>
+        <td align="left" valign="top">pointer-like / value /
+error / value_or</td>
+        <td align="left" valign="top">get /
+(get_exception_ptr, see
+[N3865])</td>
+    </tr>
+    <tr>
+        <td align="left" valign="top"> <strong>visitation</strong> </td>
+        <td align="left" valign="top">no</td>
+        <td align="left" valign="top">map / bind / then /
+catch_error</td>
+        <td align="left" valign="top">then / (next/recover see
+[N3865])</td>
+    </tr>
+    <tr>
+        <td align="left" valign="top"> <strong>grouping</strong> </td>
+        <td align="left" valign="top">n/a</td>
+        <td align="left" valign="top">n/a</td>
+        <td align="left" valign="top">when_all / when_any</td>
+    </tr>
+</table>
 
