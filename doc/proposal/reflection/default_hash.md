@@ -5,7 +5,7 @@
     </tr>
     <tr>
         <td width="172" align="left" valign="top">Date:</td>
-        <td width="435">2016-01-14</td>
+        <td width="435">2016-01-16</td>
     </tr>
     <tr>
         <td width="172" align="left" valign="top">Project:</td>
@@ -26,7 +26,7 @@
 
 **Abstract**
 
-Defining `hash_value` or specializing `is_uniquely_represented` [P0029R0] as comparison operators, as proposed in [N4475], for simple classes is tedious, repetitive, slightly error-prone, and easily automated. 
+Defining `hash_value` or specializing `is_uniquely_represented` as defined in [P0029R0] for simple classes is tedious, repetitive, slightly error-prone, and easily automated. 
 
 I propose to (implicitly) supply default versions of this operation, if needed.  The meaning of `hash_value` is to combine the members using `hash_combine`. 
 
@@ -44,7 +44,7 @@ I propose to (implicitly) supply default versions of this operation, if needed. 
 
 # Introduction
 
-Defining `hash_value` [P0029R0] as comparison operators, as proposed in [N4475], for simple classes is tedious, repetitive, slightly error-prone, and easily automated. 
+Defining `hash_value` or specializing `is_uniquely_represented` as defined in [P0029R0] for simple classes is tedious, repetitive, slightly error-prone, and easily automated. 
 
 I propose to (implicitly) supply default versions of this operation, if needed.  The meaning of `hash_value` is to combine the members using `hash_combine`. 
 
@@ -127,11 +127,11 @@ The natural definition which combines, using `hash_combine`, each one of the dat
 
 ## When `hash_value` could be applied?
 
-In addition to the common restrictions defined above, the following restricts the generation of `has_value`
+The following restricts the generation of `has_value` for a class C
 
 * has that operation defined or deleted before the first need for `hash_value` or
-* the `==` operator is user defined or cannot be generated,
-* `is_uniquely_represented<C>{}==false`, or
+* the `==` operator is user defined or cannot be generated, or
+* `is_uniquely_represented<C>{}==true`, or
 * has a user-defined or deleted copy or move operation, or
 * has a virtual base, or
 * has a virtual function, or
@@ -143,7 +143,7 @@ Mutable members are ignored for the generated implementations.
 
 [Note: If the overload of `hash_value` appears after its first need or in another translation unit, the program would be already ill-formed as there is a violation of the ODR. -- end]
 
-[Note: Identifying this violation would require link-time checking],
+[Note: Identifying this violation would require link-time checking. -- end].
 
 # Design Rationale
 
@@ -160,6 +160,29 @@ Based on a future reflection library e.g. [N4428] or [N4451], we could define th
 
 This proposal needs some compiler magic, either by generating directly the `hash_value` function or by providing the reflection traits as e.g. in [N4428] or [N4451].
 
+Next follows un incomplete implementation
+
+```c++
+namespace std {
+namespace experimental {namespace reflect { inline namespace v1 {
+
+    template <class C>
+    struct is_hash_value_generation_enabled;
+
+}}}
+
+template <class H, class C, class Enabler=enable_if<reflect::is_hash_value_generation_enabled<C>{}) >
+H hash_value(H h, C & x) 
+{
+    // hash_combine the non-static non-mutable data-member
+    return hash_combine(h, ...)
+}
+
+} // namespace std
+
+```
+
+
 # Open Questions
 
 * Do we want a default or a reflection solution?
@@ -171,7 +194,9 @@ Defaulting `hash_value` operation is simple, removes a common annoyance. It is c
 
 # Acknowledgments
 
-Thanks to Bjarne Strustrup for its clear identification of the types that are subject to this kind of default generation in [N4475]. Many thanks to Howard Hinnant, his comments in the ML, that allowed me to  better understand how the user customization must be used and think about adding `is_uniquely_represented` specialization was introduced. Thanks to all those that have commented the idea on the std-standard ML helping to better identify the constraints and improve the proposal in general, in particular Andrzej Krzemieński and Tomasz Kamiński 
+Thanks to Bjarne Strustrup for its clear identification of the types that are subject to this kind of default generation in [N4475]. Many thanks to Howard Hinnant, his comments in the ML, that allowed me to  better understand how the user customization must be used and think about adding `is_uniquely_represented` specialization was introduced. 
+
+Thanks to all those that have commented the idea on the std-standard ML helping to better identify the constraints and improve the proposal in general. 
 
 # References
 
