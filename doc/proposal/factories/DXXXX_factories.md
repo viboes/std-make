@@ -24,21 +24,33 @@
 C++ generic factory 
 ===================
 
+**Abstract**
+
 Experimental generic factories library for C++17. 
+
+# Table of Contents
+
+1. [Introduction](#introduction)
+2. [Motivation and scope](#motivation-and-scope)
+3. [Proposal](#proposal)
+4. [Design rationale](#design-rationale)
+5. [Proposed wording](#proposed-wording)
+6. [Implementability](#implementability)
+7. [Open points](#open-points)
+8. [Acknowledgements](#acknowledgements)
+9. [References](#references)
 
 # Introduction
 
-This paper presents a proposal for a generic factory `make` that allows to make generic 
-algorithms that need to create an instance of a wrapped class from its underlying types.
+This paper presents a proposal for a generic factory `make` that allows to make generic algorithms that need to create an instance of a wrapped class from its underlying types.
 
 N4471 proposes extending template parameter deduction for functions to constructors of template classes.
 If this proposal is accepted, it would be clear that this proposal will lost most of its added value.
 
 
-# Motivation and Scope
+# Motivation and scope
 
-All these types, `shared_ptr<T>`, `unique_ptr<T,D>`, `optional<T>`, `expected<T,E>` and 
-`future<T>`, have in common that all of them have an underlying type `T'.
+All these types, `shared_ptr<T>`, `unique_ptr<T,D>`, `optional<T>`, `expected<T,E>` and `future<T>`, have in common that all of them have an underlying type `T'.
 
 There are two kind of factories: 
 * type constructor with the underlying types as parameter
@@ -53,9 +65,7 @@ There are two kind of factories:
  * ```make_shared``` 
  * ```make_unique```
 
-When writing an application, the user knows if the function to write should return a specific type,  
-as `shared_ptr<T>`, `unique_ptr<T,D>`, `optional<T>`, `expected<T,E>` or `future<T>`. E.g.
-when the user knows that the function must return a owned smart pointer it would use `unique_ptr<T>`.
+When writing an application, the user knows if the function to write should return a specific type, as `shared_ptr<T>`, `unique_ptr<T,D>`, `optional<T>`, `expected<T,E>` or `future<T>`. E.g. when the user knows that the function must return a owned smart pointer it would use `unique_ptr<T>`.
 
 ```c++
 template <class T>
@@ -150,9 +160,7 @@ int i;
 auto x1 = make<future<long>>(i);
 ```
 
-Sometimes the user wants that the underlying type be deduced from the parameter, but the 
-type constructor needs more information. A type holder ```_t```can be used to mean any 
-type `T`.
+Sometimes the user wants that the underlying type be deduced from the parameter, but the type constructor needs more information. A type holder ```_t```can be used to mean any type `T`.
 
 ```c++
 auto x2 = make<expected<_t, E>>(v);
@@ -160,8 +168,7 @@ auto x2 = make<unique_ptr<_t, MyDeleter>>(v);
 ```
 
 
-
-# Tutorial
+# Proposal
 
 ## Type constructor factory
 
@@ -193,7 +200,6 @@ auto x = safe_divide<expected<_t>>(1, 0);
 ## Emplace factory
 
 
-
 ## How to define a class that wouldn't need customization? 
 
 For the `make` default constructor function, the class needs at least to have a 
@@ -203,8 +209,7 @@ default constructor
 C();
 ```
 
-For the `make` copy/move constructor function, the class needs at least to have a 
-constructor from the underlying types.
+For the `make` copy/move constructor function, the class needs at least to have a constructor from the underlying types.
 
 ```c++
 C(Xs&&...);
@@ -212,8 +217,7 @@ C(Xs&&...);
 
 ## How to customize an existing class
 
-When the existing class doesn't provide the needed constructor as e.g. `future<T>`, the 
-user needs to add the missing overloads for `make_custom` so that they can be found by ADL.
+When the existing class doesn't provide the needed constructor as e.g. `future<T>`, the user needs to add the missing overloads for `make_custom` so that they can be found by ADL.
 
 ```c++
 namespace boost {
@@ -244,8 +248,7 @@ namespace boost
 }
 ```
 
-When the class has two parameter and the underlying type is the first template parameter, 
-as it is the case for `expected`, 
+When the class has two parameter and the underlying type is the first template parameter, as it is the case for `expected`, 
 
 ```c++
 namespace boost
@@ -258,8 +261,7 @@ namespace boost
 }
 ```
 
-If the second template depends on the first one as it is the case of `unique_ptr<T, D>`, 
-the rebind of the second parameter must be done explicitly. 
+If the second template depends on the first one as it is the case of `unique_ptr<T, D>`, the rebind of the second parameter must be done explicitly. 
 
 ```c++
 namespace boost
@@ -365,8 +367,7 @@ namespace boost
 
 ## Customization point
 
-This proposal takes advatage of overloading the `make_custom` functions adding the tag 
-`type<T>`.
+This proposal takes advatage of overloading the `make_custom` functions adding the tag `type<T>`.
 
 We have named the customization points `make_custom` to make more evident that these are customization points.
 
@@ -404,8 +405,7 @@ auto x = make<tuple>(1, 2u, string("a");
 
 ## High order factory
 
-It is simple to define a high order `maker<TC>` factory of factories that can be used 
-in standard algorithms. 
+It is simple to define a high order `maker<TC>` factory of factories that can be used in standard algorithms. 
 
 For example
 
@@ -427,10 +427,7 @@ std::transform(xs.begin(), xs.end(), std::back_inserter(ys), maker<Something>{})
   };
 ```
 
-The main problem defining function objects is that we can not have the same class with 
-different template parameters.
-The `maker` class template has a template class parameter. 
-We need an additional classes that takes a meta-function class and a type.
+The main problem defining function objects is that we cannot have the same class with different template parameters. The `maker` class template has a template class parameter. We need an additional classes that takes a meta-function class and a type.
 
 ```c++
   template <template <class> class T>
@@ -464,53 +461,6 @@ We need an additional classes that takes a meta-function class and a type.
   };
 ```
 
-# Open points
-
-The authors would like to have an answer to the following points if there is at all an 
-interest in this proposal:
-
-## Is there an interest on the make functions?
-
-## Is there an interest on the none functions?
-
-## Should the customization be done with overloading or with traits?
-
-The current proposal uses overloading as customization point. 
-The alternative is to use traits as e.g. the library Hana uses.
-
-If overloading is preferred, 
-
-* should the customization function names be suffixed e.g. with  `_custom`?
-
-* As `id` and `type` do the same, should the `type` be replaced by `id` or the oposite?
-
-## Should the namespace `meta` be used for the meta programming utilities `apply` and `type`?
-
-## Should the function object factories be part of the proposal?
-
-The function objects `maker_tc`, `maker_mfc` and `maker_t` could be quite useful. 
-
-What should be the default for `maker`? 
-
-## Should the function factories `make` and `none` be function objects?
-
-N4381 proposes to use function objects as customized points, so that ADL is not involved.
-
-This has the advantages to solve the function ans the high order function at once.
-
-The same technique is used a lot in other functional libraries as Range, Fit and Pure. 
-
-## Is there an interest on the helper holder `_t`?
-
-While not need absolutely, it helps to define the type constructors.
-
-## Is there an interest on the helper meta-functions `id`, `types`, `lift`, `lift_reverse` and `rebind`?
-
-If yes, should them be part of a separated proposal?
-
-There is much more on meta-programming utilities as show on the Meta library.
-
-## Should the customization of the standard classes `pair`, `tuple`,`optional`, `future`, `unique_ptr`, `shared_ptr` be part of this proposal?
 
 
 # Proposed wording
@@ -823,19 +773,65 @@ namespace std {
 }
 ```
 
-## Implementation
+# Implementability
+
+This proposal can be implemented as pure library extension, without any compiler magic support, in C++14.
 
 There is an implementation at https://github.com/viboes/std-make.
 
+# Open points
+
+The authors would like to have an answer to the following points if there is at all an interest in this proposal:
+
+* Is there an interest on the `make` functions?
+
+* Is there an interest on the `none` functions?
+
+* Should the customization be done with overloading or with traits?
+
+    The current proposal uses overloading as customization point. 
+    The alternative is to use traits as e.g. the library Hana uses.
+
+    If overloading is preferred, 
+
+    * should the customization function names be suffixed e.g. with  `_custom`?
+
+    * As `id` and `type` do the same, should the `type` be replaced by `id` or the opposite?
+
+* Should the namespace `meta` be used for the meta programming utilities `apply` and `type`?
+
+* Should the function object factories be part of the proposal?
+
+    The function objects `maker_tc`, `maker_mfc` and `maker_t` could be quite useful. 
+
+    What should be the default for `maker`? 
+
+* Should the function factories `make` and `none` be function objects?
+
+    N4381 proposes to use function objects as customized points, so that ADL is not involved.
+
+    This has the advantages to solve the function and the high order function at once.
+
+    The same technique is used a lot in other functional libraries as Range, Fit and Pure. 
+
+* Is there an interest on the helper holder `_t`?
+
+    While not need absolutely, it helps to define the type constructors.
+
+* Is there an interest on the helper meta-functions `id`, `types`, `lift`, `lift_reverse` and `rebind`?
+
+    If yes, should them be part of a separated proposal?
+
+    There is much more on meta-programming utilities as show on the Meta library.
+
+* Should the customization of the standard classes `pair`, `tuple`,`optional`, `future`, `unique_ptr`, `shared_ptr` be part of this proposal?
+
+
 # Acknowledgements 
 
-Many thanks to Agustín K-ballo Bergé from which I learn the trick to implement the different overloads. 
-Scott Pager helped me to identify a minimal proposal, making optional 
-the helper classes and of course the addition high order functional factory and 
-the missing reference_wrapper<T> overload.
+Many thanks to Agustín K-ballo Bergé from which I learn the trick to implement the different overloads. Scott Pager helped me to identify a minimal proposal, making optional the helper classes and of course the addition high order functional factory and the missing reference_wrapper<T> overload.
 
-Thanks to Mike Spertus for its N4471 proposal that would even help to avoid the factories 
-in the common cases. 
+Thanks to Mike Spertus for its N4471 proposal that would even help to avoid the factories in the common cases. 
 
 # References
 
