@@ -220,9 +220,11 @@ If the implicitly-declared `swap` operation is not deleted, it is defined (that 
 
 # Alternative solution
 
-Based on a future reflection library e.g. [N4428] or [N4451], we could define the `swap` function instead of generating it.  
+Based on a future reflection library e.g. [N4428] or [N4451], we could define a generic `swap` function instead of generating it. However, to the author knowledge, this would need to declare a friend function, which is more intrusive. 
 
-Next follows how the specialization could be defined
+## Helper `swap_generated` and forward
+
+Next follows how the generic overload could be defined making use of some reflection
 
 ```c++
 namespace std {
@@ -234,18 +236,55 @@ namespace experimental {namespace reflect { inline namespace v1 {
     template <class C>
     struct is_nothrow_swapable_generated_swap;
 
+    // this swap_generated  would need a friend declaration
+    template <class C>
+    void swap_generated(C & x, C & y) noexcept(is_nothrow_swapable_generated_swap<C>{})
+    {
+        using std::swap
+        // swap the base classes (needs friend access)
+        ...
+        // swap the non-static data-member (needs friend access)
+        ...
+    }
+
+}}}
+
+void swap(C & x, C & y)
+    noexcept(reflect::swap_generated(x,y))
+{
+    reflect::swap_generated(x,y);
+}
+
+} // namespace std
+
+```
+
+
+## Generic `swap` and friend
+
+Next follows how the generic overload could be defined making use of some reflection
+
+```c++
+namespace std {
+namespace experimental {namespace reflect { inline namespace v1 {
+
+    template <class C>
+    struct is_swap_generation_enabled;
+
+    template <class C>
+    struct is_nothrow_swapable_generated_swap;
 
 }}}
 
 // However this swap overload would need a friend declaration
 template <class C>
-enable_if<reflect::is_swap_generation_enabled<C>{}> swap(C & x, C & y) 
+enable_if<reflect::is_swap_generation_enabled<C>{}> swap(C & x, C & y)
     noexcept(is_nothrow_swapable_generated_swap<C>{})
 {
     using std::swap
-    // swap the base classes
+    // swap the base classes (needs friend access)
     ...
-    // swap the non-static data-member
+    // swap the non-static data-member (needs friend access)
     ...
 }
 
@@ -253,15 +292,7 @@ enable_if<reflect::is_swap_generation_enabled<C>{}> swap(C & x, C & y)
 
 ```
 
-Note that the `swap`overload would need to be declared as friend on the class. This is almost a showstopper and one of the reason that even with reflection a compiler generated version is a better choice.
-
-In addition, the swap overload would not be available for overload resolution of the user class until the user add a 
-
-```c++
-MyNs::MyC a, b;
-using std::swap;
-swap(a,b)
-```
+Note that the `swap` overload would need to be declared as friend on the class. This would be almost a showstopper and one of the reason, that even with reflection, a compiler generated version is a better and less intrusive choice.
 
 The user could also add the 
 
@@ -274,6 +305,13 @@ namespace MyNS {
         return std::swap(x,y);
     }
 }
+```
+
+so that there is no more need to introduce `std::swap`.
+
+```c++
+MyNs::MyC a, b;
+MyNs::swap(a,b)
 ```
  
 # Implementability
