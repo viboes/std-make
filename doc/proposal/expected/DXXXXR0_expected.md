@@ -1102,7 +1102,7 @@ inline namespace fundamentals_v2 {
 	
 	// X.Z.5, unexpect tag
 	struct unexpect_t{};
-	constexpr unexpet_t unexpect{};
+	constexpr unexpect_t unexpect{};
 	
 	// X.Z.6, class bad_expected_access
 	class bad_expected_access;
@@ -1987,8 +1987,8 @@ private:
 **X.Y.12 `unexpect` tag [expected.unexpect]**
 
 ```c++
-struct unexpet_t;
-constexpr unexpet_t unexpet;
+struct unexpect_t;
+constexpr unexpect_t unexpect;
 ```
 
 **X.Y.13 Template Class `bad_expected_access` [expected.bad_expected_access]**
