@@ -308,15 +308,6 @@ This proposal doesn't impose a specific implementation. The `std::experimental::
 
 A possible implementation could be based on the current definition of `std::experimental::nulopt_t` and `std::experimental::nulopt`.  
 
-# Open points
- 
-The authors would like to have an answer to the following points if there is at all an interest in this proposal:
-
-* Should we include `none` in `<experimental/functional>` or in a specif file? 
-	* We believe that a specific file is a better choice as this is needed in `<experimental/optional>`, `<experimental/any>` and `<experimental/variant>`. I propose `<experimental/none>`.
-
-* Should the mixed comparison with `none_t` be defined implicitly? 
-    * An alternative is to don't define them. In this case it coul dbe better to remove the *Nullable* and *StrictWeaklyOrderedNullable* requirements as the reason d'êtr of those requirements is to define these operations.
  
 # Proposed WordingThe proposed changes are expressed as edits to [N4564] the Working Draft - C++ Extensions for Library Fundamentals V2. 
 
@@ -488,6 +479,17 @@ Waiting for a specific wording in the TS.
 # Implementability
 
 This proposal can be implemented as pure library extension, without any compiler magic support, in C++14.
+
+# Open points
+ 
+The authors would like to have an answer to the following points if there is at all an interest in this proposal:
+
+* Should we include `none` in `<experimental/functional>` or in a specific file? 
+	* We believe that a specific file is a better choice as this is needed in `<experimental/optional>`, `<experimental/any>` and `<experimental/variant>`. I propose `<experimental/none>`.
+
+* Should the mixed comparison with `none_t` be defined implicitly? 
+
+    * An alternative is to don't define them. In this case it could be better to remove the *Nullable* and *StrictWeaklyOrderedNullable* requirements as the reason d'être of those requirements is to define these operations.
 
 
 # Acknowledgements
