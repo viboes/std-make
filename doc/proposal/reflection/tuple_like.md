@@ -45,7 +45,7 @@ I propose to (implicitly) supply default versions of these operations, if needed
 
 # Introduction
 
-Defining tuple-like access `tuple_size`, `tuple_element` and `get<I>/get<T>` as comparison operators,  as proposed in [N4475], for simple classes is tedious, repetitive, slightly error-prone, and easily automated. 
+Defining tuple-like access `tuple_size`, `tuple_element` and `get<I>/get<T>`, as defining comparison operators as proposed in [N4475], for simple classes is tedious, repetitive, slightly error-prone, and easily automated. 
 
 I propose to (implicitly) supply default versions of these operations, if needed. The meaning `get<I>` is to return a reference to the I<sup>th</sup> member. 
 
@@ -59,14 +59,13 @@ This paper contains no proposed wording. This is a discussion paper to determine
 
 # Motivation
 
-Some algorithms as `std::tuple_cat` and `std::experimental::apply` should work as well with tuple-like types. There are many more of them, a lot of the homogeneous container algorithm are applicable to heterogeneous containers and functions, see Boost.Fusion and Boost.Hana, algorithms such as `fold`, `accumulate`, `for_each` `any_of`,  `all_of`, `none_of`, `find`, `count`, `filter`, `transform`, `replace`, `join`, `zip`, `flatten`.
+Algorithms as `std::tuple_cat` and `std::experimental::apply` work as well with tuple-like types. There are many more of them, a lot of the homogeneous container algorithm are applicable to heterogeneous containers and functions, see [Boost.Fusion] and [Boost.Hana]. Some examples os such algorithms are  `fold`, `accumulate`, `for_each` `any_of`,  `all_of`, `none_of`, `find`, `count`, `filter`, `transform`, `replace`, `join`, `zip`, `flatten`.
 
-Beside `std::pair`, `std::tuple` and `std::array` we have that in particular aggregates are a good candidate to be considered as tuple-like types. However defining the tuple-like access functions is tedious, repetitive, slightly error-prone, and easily automated. 
+Beside `std::pair`, `std::tuple` and `std::array` we have that in particular aggregates are good candidate to be considered as tuple-like types. However defining the tuple-like access functions is tedious, repetitive, slightly error-prone, and easily automated. 
 
-Some libraries, in particular [Boost.Fusion] and [Boost.Hana] provide some macros to generate the needed reflection instantiations. Once this reflection is available for a type, the user can use the type on  algorithm working with heterogeneous sequences. Very often, when macros are used for something, it is hiding a language feature.
+Some libraries, in particular [Boost.Fusion] and [Boost.Hana] provide some macros to generate the needed reflection instantiations. Once this reflection is available for a type, the user can use the struct on  algorithm working with heterogeneous sequences. Very often, when macros are used for something, it is hiding a language feature.
 
-Proposals such as [P0144R0] (or its competitor [P0151R0]) would provide already a positional access and both proposal should use the same restrictions if adopted.
-
+Proposals such as Structural binding [P0144R0] (or its competitor [P0151R0]) would provide already a positional access. This proposal and structural binding should use the same restrictions on the types that can be applied.
 
 # Proposal
 
@@ -117,7 +116,7 @@ namespace std {
 ```
 
 
-The definition is in line with the tuple-like access as defined for `std::tuple`. 
+This definition would be in line with the tuple-like access as defined for `std::tuple`. 
 
 ## Explicit conversion to `std::pair<T,U>` and `std::tuple<Ts...>`
 
@@ -260,6 +259,8 @@ struct tuple_element { using type = typename reflect::tuple_element<N, C>::type;
 This proposal needs some compiler magic, either by generating directly the tuple-like access or by providing the reflection traits as e.g. in [N4428] or [N4451].
 
 # Open Questions
+
+The authors would like to have an answer to the following points if there is at all an interest in this proposal:
 
 * Do we want a default or a reflection solution?
 
