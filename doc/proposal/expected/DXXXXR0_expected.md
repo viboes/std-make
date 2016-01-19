@@ -955,10 +955,10 @@ namespace experimental {
 inline namespace fundamentals_v2 {
 	// X.Y.3, Unexpected object type
 	template <class E>
-	  struct unexpected_type;
+	  class unexpected_type;
 	// X.Y.4, Unexpected exception_ptr specialization
 	template <>
-	  struct unexpected_type<exception_ptr>;
+	  class unexpected_type<exception_ptr>;
 	// X.Y.5, Unexpected factories
 	template <class E>
 	  constexpr unexpected_type<decay_t<E>> make_unexpected(E&& v);
