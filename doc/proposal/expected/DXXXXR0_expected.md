@@ -207,7 +207,7 @@ expected<double, error_condition> f1(double i, double j, double k)
 We can use `expected<T, E>` to represent different error conditions. For instance, with integer division, we might want to fail if the two numbers are not evenly divisible as well as checking for division by zero. We can overload our `safe_divide` function accordingly:
 
 ```c++
-expected<error_condition, int> safe_divide(int i, int j)
+expected<int, error_condition> safe_divide(int i, int j)
 {
 	if (j == 0) return make_unexpected(arithmetic_errc::divide_by_zero);
 	if (i%j != 0) return make_unexpected(arithmetic_errc::not_integer_division);
@@ -555,7 +555,7 @@ expected<pair<int, int>, errc> getIntRange(istream_range& r) {
 }
 ```
 
-`get_unexpected` is also provided for symmetry purpose. On one side, there is an implicit conversion from `unexpected<E>` to `expected<T,E>` and on the other side there is an explicit conversion from `expected<T,E>` to `unexpected<E>`. A more pleasant function manipulating error is `catch_error(F)` and is explained in the monadic operations section.
+`get_unexpected` is also provided for symmetry purpose. On one side, there is an implicit conversion from `unexpected_type<E>` to `expected<T,E>` and on the other side there is an explicit conversion from `expected<T,E>` to `unexpected_type<E>`. A more pleasant function manipulating error is `catch_error(F)` and is explained in the monadic operations section.
 
 ### Function `value_or`
 
@@ -1064,14 +1064,14 @@ template <class E>
 constexpr unexpected_type<decay_t<E>> make_unexpected(E&& v);
 ```
 
-*Returns*: `unexpected<decay_t<E>>(v)`.
+*Returns*: `unexpected_type<decay_t<E>>(v)`.
 
 ###########################################################################
 ```c++
 constexpr unexpected_type<std::exception_ptr> make_unexpected_from_current_exception();
 ```
 
-*Returns*: `unexpected<std::exception_ptr>(std::current_exception())`.
+*Returns*: `unexpected_type<std::exception_ptr>(std::current_exception())`.
 
 
 
@@ -1136,18 +1136,18 @@ inline namespace fundamentals_v2 {
 	template <class T, class E> constexpr bool operator>=(const T&, const expected<T,E>&);
 
 	// X.Z.9, Comparison with unexpected_type<E>
-	template <class T, class E> constexpr bool operator==(const expected<T,E>&, const unexpected<E>&);
-	template <class T, class E> constexpr bool operator==(const unexpected<E>&, const expected<T,E>&);
-	template <class T, class E> constexpr bool operator!=(const expected<T,E>&, const unexpected<E>&);
-	template <class T, class E> constexpr bool operator!=(const unexpected<E>&, const expected<T,E>&);
-	template <class T, class E> constexpr bool operator<(const expected<T,E>&, const unexpected<E>&);
-	template <class T, class E> constexpr bool operator<(const unexpected<E>&, const expected<T,E>&);
-	template <class T, class E> constexpr bool operator<=(const expected<T,E>&, const unexpected<E>&);
-	template <class T, class E> constexpr bool operator<=(const unexpected<E>&, const expected<T,E>&);
-	template <class T, class E> constexpr bool operator>(const expected<T,E>&, const unexpected<E>&);
-	template <class T, class E> constexpr bool operator>(const unexpected<E>&, const expected<T,E>&);
-	template <class T, class E> constexpr bool operator>=(const expected<T,E>&, const unexpected<E>&);
-	template <class T, class E> constexpr bool operator>=(const unexpected<E>&, const expected<T,E>&);
+	template <class T, class E> constexpr bool operator==(const expected<T,E>&, const unexpected_type<E>&);
+	template <class T, class E> constexpr bool operator==(const unexpected_type<E>&, const expected<T,E>&);
+	template <class T, class E> constexpr bool operator!=(const expected<T,E>&, const unexpected_type<E>&);
+	template <class T, class E> constexpr bool operator!=(const unexpected_type<E>&, const expected<T,E>&);
+	template <class T, class E> constexpr bool operator<(const expected<T,E>&, const unexpected_type<E>&);
+	template <class T, class E> constexpr bool operator<(const unexpected_type<E>&, const expected<T,E>&);
+	template <class T, class E> constexpr bool operator<=(const expected<T,E>&, const unexpected_type<E>&);
+	template <class T, class E> constexpr bool operator<=(const unexpected_type<E>&, const expected<T,E>&);
+	template <class T, class E> constexpr bool operator>(const expected<T,E>&, const unexpected_type<E>&);
+	template <class T, class E> constexpr bool operator>(const unexpected_type<E>&, const expected<T,E>&);
+	template <class T, class E> constexpr bool operator>=(const expected<T,E>&, const unexpected_type<E>&);
+	template <class T, class E> constexpr bool operator>=(const unexpected_type<E>&, const expected<T,E>&);
 
 	// X.Z.10, Specialized algorithms
 	void swap(expected<T,E>&, expected<T,E>&) noexcept(see below);
@@ -1209,6 +1209,10 @@ public:
 	constexpr expected(unexpected_type<E> const&);
 	template <class Err>
 		constexpr expected(unexpected_type<Err> const&);
+	template <class... Args>
+		constexpr explicit expected(unexpect_t, Args&&...);
+	template <class U, class... Args>
+		constexpr explicit expected(unexpect_t, initializer_list<U>, Args&&...);
 
 	// X.Z.4.2, destructor
 	~expected();
@@ -1240,7 +1244,7 @@ public:
 	constexpr E const& error() const&;
 	E& error() &;
 	constexpr E&& error() &&;
-	constexpr unexpected<E> get_unexpected() const;
+	constexpr unexpected_type<E> get_unexpected() const;
 	template <typename Ex>
 		bool has_exception() const;
 	template <class U> 
@@ -1432,6 +1436,44 @@ constexpr expected(unexpected_type<E>&& e);
 
 *Remark*: This signature shall not participate in overload resolution unless
 `is_move_constructible<E>::value`.
+
+
+###########################################################################
+```c++
+template <class... Args>
+constexpr explicit expected(unexpect_t, Args&&... args);
+```
+
+*Effects*: Initializes the unexpected value as if direct-non-list-initializing an object of type `E` with the arguments `std::forward<Args>(args)...`.
+
+*Postconditions*: `! bool(*this)`.
+
+*Throws*: Any exception thrown by the selected constructor of `E`.
+
+*Remarks*: If `E`’s constructor selected for the initialization is a constexpr constructor, this constructor shall be a constexpr constructor.
+
+*Remarks*: This signature shall not participate in overload resolution unless
+`is_constructible<E, Args&&...>::value`.
+
+###########################################################################
+```c++
+template <class U, class... Args>
+constexpr explicit expected(unexpect_t, initializer_list<U> il, Args&&... args);
+```
+
+*Effects*: Initializes the unexpected value as if direct-non-list-initializing an object of type `E` with the arguments `il, std::forward<Args>(args)...`.
+
+*Postconditions*: `! bool(*this)`.
+
+*Throws*: Any exception thrown by the selected constructor of `E`.
+
+*Remarks*: The function shall not participate in overload resolution unless:
+`is_constructible<E, initializer_list<U>&, Args&&...>::value`.
+
+If `E`’s constructor selected for the initialization is a constexpr constructor, this constructor shall be a constexpr constructor.
+
+*Remarks*: This signature shall not participate in overload resolution unless
+`is_constructible<E, initializer_list<U>&, Args&&...>::value`.
 
 **X.Y.9.2 Destructor [expected.object.dtor]**
 
@@ -1735,7 +1777,7 @@ bool expected<T>::has_exception() const;
 
 ###########################################################################
 ```c++
-constexpr unexpected<E> get_unexpected() const;
+constexpr unexpected_type<E> get_unexpected() const;
 ```
 
 *Requires*:
@@ -1957,7 +1999,7 @@ public:
 	constexpr E const& error() const&;
 	constexpr E& error() &;
 	constexpr E&& error() &&;
-	constexpr unexpected<E> get_unexpected() const;
+	constexpr unexpected_type<E> get_unexpected() const;
 	template <typename Ex>
 	bool has_exception() const;
 	template constexpr ’see below’ unwrap() const&;
@@ -2033,7 +2075,7 @@ The first function shall be a constexpr function.
 
 *TODO: Describe the functions.*
 
-**X.Y.16 Comparison with `unexpected<E>` [expected.comparison_unexpected_E]**
+**X.Y.16 Comparison with `unexpected_type<E>` [expected.comparison_unexpected_E]**
 
 *TODO: Describe the functions.*
 
@@ -2562,16 +2604,16 @@ that is, is there a value, and if not, if is there an `exception_ptr`. While thi
 
 ## Variant
 
-`expected<T,E>` can be seen as a specialization of `boost::variant<unexpected<E>,T>` which gives a specific intent to its first parameter, that is, it represents the type of the expected contained value. This specificity allows to provide a pointer like interface, as it is the case for `std::experimental::optional<T>`. Even if the standard included a class `variant<T,E>`, the interface provided by `expected<T,E>` is more specific and closer to what the
+`expected<T,E>` can be seen as a specialization of `boost::variant<unexpected_type<E>,T>` which gives a specific intent to its first parameter, that is, it represents the type of the expected contained value. This specificity allows to provide a pointer like interface, as it is the case for `std::experimental::optional<T>`. Even if the standard included a class `variant<T,E>`, the interface provided by `expected<T,E>` is more specific and closer to what the
 user could expect as the result type of a function. In addition, `expected<T,E>` doesn’t intend to be used to define recursive data as `boost::variant<>` does.
 
-The following table presents a brief comparison between `boost::variant<unexpected<E>, T>` and `expected<T,E>`.
+The following table presents a brief comparison between `boost::variant<unexpected_type<E>, T>` and `expected<T,E>`.
 
 
 <table border="0" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" >
     <tr>
         <td align="left" valign="top"> </td>
-        <td align="left" valign="top"><strong>boost::variant<unexpected<E>,
+        <td align="left" valign="top"><strong>boost::variant<unexpected_type<E>,
 T></strong></td>
         <td align="left" valign="top"><strong>expected<T,E></strong></td>
     </tr>
