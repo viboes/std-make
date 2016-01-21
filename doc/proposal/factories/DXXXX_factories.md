@@ -5,7 +5,7 @@
     </tr>
     <tr>
         <td width="172" align="left" valign="top">Date:</td>
-        <td width="435">2015-12-19</td>
+        <td width="435">2015-01-21</td>
     </tr>
     <tr>
         <td width="172" align="left" valign="top">Project:</td>
@@ -21,8 +21,11 @@
     </tr>
 </table>
 
-C++ generic factory 
-===================
+C++ generic factories 
+=====================
+
+**---------------------- DRAFT ----------------------**
+
 
 **Abstract**
 
@@ -42,9 +45,9 @@ Experimental generic factories library for C++17.
 
 # Introduction
 
-This paper presents a proposal for a generic factory `make` that allows to make generic algorithms that need to create an instance of a wrapped class from its underlying types.
+This paper presents a proposal for a generic factory `make` that allows to make generic algorithms that need to create an instance of a wrapped class from their underlying types.
 
-N4471 proposes extending template parameter deduction for functions to constructors of template classes.
+[N4471] proposes extending template parameter deduction for functions to constructors of template classes. 
 If this proposal is accepted, it would be clear that this proposal will lost most of its added value.
 
 
@@ -53,6 +56,7 @@ If this proposal is accepted, it would be clear that this proposal will lost mos
 All these types, `shared_ptr<T>`, `unique_ptr<T,D>`, `optional<T>`, `expected<T,E>` and `future<T>`, have in common that all of them have an underlying type `T'.
 
 There are two kind of factories: 
+
 * type constructor with the underlying types as parameter
 
  * ```back_inserter```
@@ -77,7 +81,7 @@ unique_ptr<T> f() {
 }
 ```
 
-If the user knows that the function must return a shared smart pointer
+If the user knows that the function must return a shared pointer
 
 ```c++
 template <class T>
@@ -191,7 +195,7 @@ auto x = safe_divide<optional<_t>>(1, 0);
 ```
 
 or
-
+**todo: expected don't works for none :(**
 ```c++
 auto x = safe_divide<expected<_t>>(1, 0);
 ```
