@@ -5,7 +5,7 @@
     </tr>
     <tr>
         <td width="172" align="left" valign="top">Date:</td>
-        <td width="435">2015-01-11</td>
+        <td width="435">2016-01-30</td>
     </tr>
     <tr>
         <td width="172" align="left" valign="top">Project:</td>
@@ -24,13 +24,28 @@
 Adding Emplace Factories for `promise<T>/future<T>/exception_ptr`
 ===================================================
 
+**Abstract**
+
+This paper proposes the addition of emplace factories for `future<T>` as we have proposed for of `any` and `optional` in [P0032R1].
+
+# Table of Contents
+
+1. [Introduction](#introduction)
+2. [Motivation](#motivation)
+3. [Proposal](#proposal)
+4. [Design rationale](#design-rationale)
+5. [Proposed wording](#proposed-wording)
+6. [Implementability](#implementability)
+7. [Open points](#open-points)
+8. [Acknowledgements](#acknowledgements)
+9. [References](#references)
+
+
 # Introduction
 
 This paper proposes the addition of emplace factories for `future<T>` as we have proposed for of `any` and `optional` in [P0032R1].
 
-In addition this paper suggest some type traits as `decay_unwrap` and why not `unwrap_reference`. Now that we have replaced `INVOKE` by `std::invoke`, maybe `decay_copy` could be standardized also. These last propositions are completely independent and could be the subject of another paper. 
-
-# Motivation and Scope
+# Motivation
 
 While we have added the `future<T>` factories `make_ready_future` and `make_exceptional_future` into [P0159R0], we don't have emplace factories as we have for `shared_ptr`and `unique_ptr` and we could have for `any` and `optional` if [P0032R1] is accepted.  
 
@@ -52,14 +67,6 @@ We propose to:
 
 * Add `future<T>` emplace factory `emplace_exceptional_future<T,E>(Args...)/make_exceptional_future<T,E>(Args...)`.
 
-We propose also to:
-
-* Add an `unwrap_reference` type trait
-* Add a `decay_unwrap` type trait
-* Add `decay_copy` function
-
-
-# Tutorial
 
 ## Emplace factory for exception_ptr
 
@@ -99,12 +106,11 @@ Some future producer functions may know how to build the value at the point of c
 Before
 
 ```c++
-	future<int> futureProducer(bool cnd1, bool cnd2) {
+	future<X> futureProducer(bool cnd1, bool cnd2) {
 	  if (cnd1) 
 	    return make_ready_future(X(a, b, c));
 	  if (cnd2) 
-	    return make_exceptional_future<MyException>(
-		MyException(__FILE_, __LINE__));
+	    return make_exceptional_future<X>(MyException(__FILE_, __LINE__));
 	  else 
 	    return somethingElse();
 	}
@@ -115,9 +121,9 @@ The same reasoning than the previous section applies here. With this proposal we
 ```c++
 future<int> futureProducer(bool cnd1, bool cnd2) {
 	  if (cnd1) 
-	    return make_ready_future(a, b, c);
+	    return make_ready_future<X>(a, b, c);
 	  if (cnd2) 
-	    return make_exceptional_future<myException>(__FILE_, __LINE__);
+	    return make_exceptional_future<X, MyException>(__FILE_, __LINE__);
 	  else 
 	    return somethingElse();
 	}
@@ -144,92 +150,15 @@ Should we provide a future `in_place` constructor? For coherency purposes and in
 
 `std::experimental::optional` provides emplace assignments via `optional::emplace()` and it could provide emplace factory if [P0032R0] is accepted.
 
-## `decay_unwrap` type trait
+# Impact on the standard
 
-`decay_unwrap` is an implementation detail and doesn't impact the other features. However, the author find that it makes the wording simpler.
-
-Compare
-
-*Returns*: `pair<V1, V2>(std::forward<T1>(x), std::forward<T2>(y));` where `V1` and `V2` are determined as follows: Let `Ui` be `decay_t<Ti>` for each `Ti`. Then each `Vi` is `X&` if `Ui` equals `reference_wrapper<X>`, otherwise `Vi` is `Ui`. 
-
-With
-
-*Returns*: `pair<decay_unwrap_t<T1>, decay_unwrap_t<T2>>(std::forward<T1>(x), std::forward<T2>(y));` 
-
-If the trait is not adopted, the author suggest to use `DECAY_UNWRAP(T)` and define it only once on the standard. 
-
-This trait can already be used in the following cases
-
-* [pair.spec] p8
-* [tuple.creation] p2,3
- 
-To the knowledge of the author `decay_unwrap` is used already in [HPX], and in [Boost.Thread] as `deduce_type`.
-
-## `unwrap_reference` type trait
-
-`decay_unwrap` can be defined n function of `decay` and a more specific `unwrap_reference` type trait.
-
-
-# Open Points
-
-The authors would like to have an answer to the following points if there is at all an interest in this proposal. Most of them are bike-shedding about the name of the proposed functions:
-
-## `emplace_` versus `make_` factories
-
-`shared_ptr` and `unique_ptr` factories `make_shared` and `make_unique` emplace already the underlying type and are prefixed by `make_`.   For coherency purposes the function emplacing future should use also `make_` prefix.
-
-
-## `promise::emplace` versus `promise::set_value`
-
-`promise<R>` has a `set_value` member function that accepts a
-
-```c++ 
-void promise::set_value(const R& r);
-void promise::set_value(R&& r);
-void promise<R&>::set_value(R& r);
-void promise<void>::set_value();
-```
-
-There is no reason for constructing an additional `R` to set the value, we can emplace it
-
-```c++
-template <typename ...Args>
-void promise::set_value(Args&& as);
-```
-
-However optional names this member function `emplace`. Should we add a new member `emplace` function or overload `set_value`?
-
-
-## `promise::emplace_exception<E>` versus `promise<T>::set_exception<E>`
-
-The same applies to `promise<R>::set_exception` member function that could accept 
-
-```c++
-template < typename E, typename ...Args>
-void promise<R>::set_exception(Args&& ...as);
-```
-
-Alternatively we could name this function emplace_exception. What do we prefer?
-
-## Do we want a decay_unwrap type trait?
-
-If the traits is not adopted, the author suggest to use `DECAY_UNWRAP(T)`, define it only once on the standard and adapt [pair.spec] p8 and [tuple.creation] p2,3.
-
-Do we want `DECAY_UNWRAP` instead?
-
-## Should it be named `unwrap_decay` instead?
-
-As what it is really done is to first decay and then unwrap reversing would swapping the two words be better in English? A better name for `decay_unwrap`?
-
-## Do we want a unwrap_reference ?
-
-## Do we want to adopt the decay_copy function?
-
-If `decay_unwrap` is adopted, do we want to adopt the `decay_copy` function that would replace `DECAY_COPY`?
+These changes are entirely based on library extensions and do not require any language features beyond what is available in C++ 14. 
 
 # Proposed wording
 
-The wording is relative to [P0159R0] 
+The wording is relative to [P0159R0].
+
+The current wording make use of `decay_unwrap_t` as proposed in [decay_unwrap], but if this is not accepted the wording can be changed without too much troubles.
 
 ## Language support library
 
@@ -245,31 +174,12 @@ template <class E, class ...Args>
 exception_ptr make_exception_ptr(Args&& ...args) noexcept;
 ```
 
-## General utilities library
-
-**X.Y Header `<experimental/type_traits>` synopsis**
-
-```Add```
-
-```c++
-template <class T>
-struct decay_unwrap;
-
-template <class T>
-using decay_unwrap_t = typename decay_unwrap<T>::type;
-```
-
-Let `U` be `decay_t<T>`. Then `decay_unwrap<T>::type` is 
-`X&` if `U` equals `reference_wrapper<X>`, `U` otherwise. 
-
-**X.Y Header `<experimental/utility>` synopsis**
-
 
 ## Thread library
 
 **X.Y Header `<experimental/future>` synopsis**
 
-```Replace the make_ready_future declaration in [header.future.synop] by```
+*Replace the make_ready_future declaration in [header.future.synop] by*
 
 ```c++
 template <int=0, int ..., class T>
@@ -282,7 +192,7 @@ template <class T, class ...Args>
 future<T> make_ready_future(Args&& ...args) noexcept;
 ```
 
-```Add the `make_exceptional_future` declaration in [header.future.synop] by```
+*Add the `make_exceptional_future` declaration in [header.future.synop]*
 
 ```c++
 template <class T, class E, class ...Args>
@@ -406,9 +316,51 @@ future<T> make_exceptional_future(Args&& ...args);
 
 
    
-# Implementation
+# Implementability
 
-[Boost.Thread] contains an implementation of the future interface. However the exception_ptr emplace functions have not been implemented yet, and so  `promise::set_exception<E>(a1, …, aN)` as it can not ensure a real emplace.
+[Boost.Thread] contains an implementation of the future interface. However the `exception_ptr` emplace functions have not been implemented yet, and so `promise::set_exception<E>(a1, …, aN)` as it can not implemented ensuring a real emplace.
+
+# Open Points
+
+The authors would like to have an answer to the following points if there is at all an interest in this proposal. Most of them are bike-shedding about the name of the proposed functions:
+
+## `emplace_` versus `make_` factories
+
+`shared_ptr` and `unique_ptr` factories `make_shared` and `make_unique` emplace already the underlying type and are prefixed by `make_`.   For coherency purposes the function emplacing future should use also `make_` prefix.
+
+
+## `promise::emplace` versus `promise::set_value`
+
+`promise<R>` has a `set_value` member function that accepts a
+
+```c++ 
+void promise::set_value(const R& r);
+void promise::set_value(R&& r);
+void promise<R&>::set_value(R& r);
+void promise<void>::set_value();
+```
+
+There is no reason for constructing an additional `R` to set the value, we can emplace it
+
+```c++
+template <typename ...Args>
+void promise::set_value(Args&& as);
+```
+
+However optional names this member function `emplace`. Should we add a new member `emplace` function or overload `set_value`?
+
+
+## `promise::emplace_exception<E>` versus `promise<T>::set_exception<E>`
+
+The same applies to `promise<R>::set_exception` member function that could accept 
+
+```c++
+template < typename E, typename ...Args>
+void promise<R>::set_exception(Args&& ...as);
+```
+
+Alternatively we could name this function emplace_exception. What do we prefer?
+
 
 # Acknowledgements 
 
@@ -427,8 +379,10 @@ Thanks to ...
 
 [make.impl]: https://github.com/viboes/std-make/blob/master/include/experimental/std_make_v1/make.hpp "C++ generic factory - Implementation" 
 
-[Boost.Thread]: https: ""
+[Boost.Thread]: http://www.boost.org/doc/libs/1_60_0/doc/html/thread.html
 
+[decay_unwrap]: https://github.com/viboes/std-make/blob/master/doc/proposal/utilities/decay_unwrap.md "`decay_unwrap` and `unwrap_reference`"
+       
 
 * [N4480] N4480 - Working Draft, C++ Extensions for Library Fundamentals
 	http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/n4480.html 
@@ -453,4 +407,8 @@ Thanks to ...
 
 	https://github.com/viboes/std-make/blob/master/include/experimental/std_make_v1/make.hpp
 
-* [Boost.Thread] ""
+* [Boost.Thread] http://www.boost.org/doc/libs/1_60_0/doc/html/thread.html
+
+* [decay_unwrap] `decay_unwrap` and `unwrap_reference`
+ 
+    https://github.com/viboes/std-make/blob/master/doc/proposal/utilities/decay_unwrap.md  
