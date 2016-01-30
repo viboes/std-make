@@ -5,7 +5,7 @@
     </tr>
     <tr>
         <td width="172" align="left" valign="top">Date:</td>
-        <td width="435">2015-01-21</td>
+        <td width="435">2016-01-30</td>
     </tr>
     <tr>
         <td width="172" align="left" valign="top">Project:</td>
@@ -29,7 +29,7 @@ C++ generic factories
 
 **Abstract**
 
-Experimental generic factories library for C++17. 
+Experimental generic factories library for C++. 
 
 # Table of Contents
 
@@ -45,11 +45,9 @@ Experimental generic factories library for C++17.
 
 # Introduction
 
-This paper presents a proposal for a generic factory `make` that allows to make generic algorithms that need to create an instance of a wrapped class from their underlying types.
+This paper presents a proposal for two generic factories `make<TC>(v)` that allows to make generic algorithms that need to create an instance of a wrapped class `TC` from their underlying types and `no_value<TC>()` that creates an instance meaning the not-a-value associated to a type constructor.
 
-[N4471] proposes extending template parameter deduction for functions to constructors of template classes. 
-If this proposal is accepted, it would be clear that this proposal will lost most of its added value.
-
+[P0091R0] proposes extending template parameter deduction for functions to constructors of template classes. If this proposal is accepted, it would be clear that this proposal will lost most of its added value.
 
 # Motivation and scope
 
@@ -77,7 +75,7 @@ unique_ptr<T> f() {
     T a,
     ...
     return make_unique(a);
-    //return unique_ptr(a); // would this be correct if N4471 is accepted?
+    //return unique_ptr(a); // would this be correct if [P0091R0] is accepted?
 }
 ```
 
@@ -89,7 +87,7 @@ shared_ptr<T> f() {
     T a,
     ...
     return make_shared(a);
-    //return shared_ptr(a); // would this be correct if N4471 is accepted?
+    //return shared_ptr(a); // would this be correct if P0091R0 is accepted?
 }
 ```
 
@@ -102,7 +100,7 @@ TC<T> f() {
     T a,
     ...
     return make<TC>(a);
-    //return TC(a); // if N4471 is accepted
+    //return TC(a); // if [P0091R0] is accepted
 }
 ```
 
@@ -148,7 +146,7 @@ auto x5 = make<shared_future<A>>(v, v);
 auto x6 = make<expected<A>>(v, v);
 ```
 
-Note, if N4471 is accepted, the following will be already possible
+Note, if [P0091R0] is accepted, the following will be already possible
 
 ```c++
 int v=0;
@@ -182,7 +180,7 @@ template <class TC>
   apply<TC, int> safe_divide(int i, int j)
 {
   if (j == 0)
-    return none<TC>();
+    return no_value<TC>();
   else
     return make<TC>(i / j);
 }
@@ -195,7 +193,7 @@ auto x = safe_divide<optional<_t>>(1, 0);
 ```
 
 or
-**todo: expected don't works for none :(**
+**todo: expected don't works for no_value :(**
 ```c++
 auto x = safe_divide<expected<_t>>(1, 0);
 ```
@@ -465,11 +463,17 @@ The main problem defining function objects is that we cannot have the same class
   };
 ```
 
+# Impact on the standard
+
+These changes are entirely based on library extensions and do not require any language features beyond what is available in C++ 14. 
 
 
 # Proposed wording
 
 The proposed changes are expressed as edits to [N4564] the Working Draft - C++ Extensions for Library Fundamentals V2.
+
+The current wording make use of `decay_unwrap_t` as proposed in [decay_unwrap], but if this is not accepted the wording can be changed without too much troubles.
+
 
 ## General utilities library
 
@@ -502,10 +506,10 @@ namespace meta
 }
 
   template <template <class ...> class TC>
-  constexpr auto none();
+  constexpr auto no_value();
 
   template <class TC>
-  constexpr auto none();
+  constexpr auto no_value();
 
   // make() overload
   template <template <class ...> class M>
@@ -789,12 +793,12 @@ The authors would like to have an answer to the following points if there is at 
 
 * Is there an interest on the `make` functions?
 
-* Is there an interest on the `none` functions?
+* Is there an interest on the `no_value` functions?
 
 * Should the customization be done with overloading or with traits?
 
     The current proposal uses overloading as customization point. 
-    The alternative is to use traits as e.g. the library Hana uses.
+    The alternative is to use traits as e.g. the library [Boost.Hana] uses.
 
     If overloading is preferred, 
 
@@ -810,9 +814,9 @@ The authors would like to have an answer to the following points if there is at 
 
     What should be the default for `maker`? 
 
-* Should the function factories `make` and `none` be function objects?
+* Should the function factories `make` and `no_value` be function objects?
 
-    N4381 proposes to use function objects as customized points, so that ADL is not involved.
+    [N4381] proposes to use function objects as customized points, so that ADL is not involved.
 
     This has the advantages to solve the function and the high order function at once.
 
@@ -835,39 +839,76 @@ The authors would like to have an answer to the following points if there is at 
 
 Many thanks to Agustín K-ballo Bergé from which I learn the trick to implement the different overloads. Scott Pager helped me to identify a minimal proposal, making optional the helper classes and of course the addition high order functional factory and the missing reference_wrapper<T> overload.
 
-Thanks to Mike Spertus for its N4471 proposal that would even help to avoid the factories in the common cases. 
+Thanks to Mike Spertus for its [P0091R0] proposal that would even help to avoid the factories in the common cases. 
 
 # References
 
-* N4471 - Template parameter deduction for constructors (Rev. 2)
-http://open-std.org/JTC1/SC22/WG21/docs/papers/2015/n4471.html
 
-* N4381 - Suggested Design for Customization Points
-http://open-std.org/JTC1/SC22/WG21/docs/papers/2015/n4381.html
+[N4381]: http://open-std.org/JTC1/SC22/WG21/docs/papers/2015/n4381.html "Suggested Design for Customization Points"
 
-* N4480 - Programming Languages — C++ Extensions for Library Fundamentals
-http://open-std.org/JTC1/SC22/WG21/docs/papers/2015/n4480.html
+[N4480]: http://open-std.org/JTC1/SC22/WG21/docs/papers/2015/n4480.html "Programming Languages — C++ Extensions for Library Fundamentals"
 
-* N4015 - A proposal to add a utility class to represent expected monad
-http://www.open-std.org/JTC1/SC22/WG21/docs/papers/2014/n4015.pdf
+[N4015]: http://www.open-std.org/JTC1/SC22/WG21/docs/papers/2014/n4015.pdf "A proposal to add a utility class to represent expected monad"
 
-* Range-V3
-https://github.com/ericniebler/range-v3
+[P0091R0]: http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/p0091r0.html "Template parameter deduction for constructors (Rev. 3)"
 
-* Meta
-https://github.com/ericniebler/meta
+[Range-V3]: https://github.com/ericniebler/range-v3
 
-* Hana
-https://github.com/ldionne/hana
+[Meta]: https://github.com/ericniebler/meta
 
-* Pure
-https://github.com/splinterofchaos/Pure
+[Boost.Hana]: https://github.com/ldionne/hana
 
-* Fit
-https://github.com/pfultz2/Fit
+[Pure]: https://github.com/splinterofchaos/Pure
+
+[Fit]: https://github.com/pfultz2/Fit
+
+[decay_unwrap]: https://github.com/viboes/std-make/blob/master/doc/proposal/utilities/decay_unwrap.md "`decay_unwrap` and `unwrap_reference`"
 
 
-# Appendix - Non Mandatory Helper Classes
+
+* [N4381] - Suggested Design for Customization Points
+
+    http://open-std.org/JTC1/SC22/WG21/docs/papers/2015/n4381.html
+
+* [N4480] - Programming Languages — C++ Extensions for Library Fundamentals
+
+    http://open-std.org/JTC1/SC22/WG21/docs/papers/2015/n4480.html
+
+* [N4015] - A proposal to add a utility class to represent expected monad
+
+    http://www.open-std.org/JTC1/SC22/WG21/docs/papers/2014/n4015.pdf
+
+
+* [P0091R0] - Template parameter deduction for constructors (Rev. 3)
+
+    http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/p0091r0.html
+
+* [Range-V3]
+
+    https://github.com/ericniebler/range-v3
+
+* [Meta]
+
+    https://github.com/ericniebler/meta
+
+* [Boost.Hana]
+
+    https://github.com/ldionne/hana
+
+* [Pure]
+
+    https://github.com/splinterofchaos/Pure
+
+* [Fit]
+
+    https://github.com/pfultz2/Fit
+
+* [decay_unwrap] `decay_unwrap` and `unwrap_reference`
+ 
+    https://github.com/viboes/std-make/blob/master/doc/proposal/utilities/decay_unwrap.md  
+
+
+# Appendix - Helper Classes
 
 In the original proposal there were some helper classes as 
 `lift`, `reverse_lift`, `_t` and `id`  that are not mandatory for this proposal. 
@@ -923,7 +964,7 @@ namespace meta
  * Added product type factory overload `make` to support `pair/tuple` types.
  * Fix the signature of `make` to support `reference_wrapper` types.
  * Added factory function object `maker`.
- * Added `none` factory.
+ * Added `no_value` factory.
  * Removed the emplace `make` factory specialization.
  * Remove `type_constructor` as out of the scope of the proposal. It was used by `unique_ptr<_t, D>` specialization, but this can be seen as an implementation detail.
  * Remove `type_constructor_tag` as this was an implementation detail.
@@ -934,7 +975,7 @@ namespace meta
 
  * Fix some product type and emplace factories issues.
  * Rename customization point `make` to `make_custom`.
- * Reference N4471 as that proposal would simplify most of this proposal.
+ * Reference [P0091R0] as that proposal would simplify most of this proposal.
 
 ## v0.4 Move to Markdown source
  
