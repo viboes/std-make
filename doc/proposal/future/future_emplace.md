@@ -5,7 +5,7 @@
     </tr>
     <tr>
         <td width="172" align="left" valign="top">Date:</td>
-        <td width="435">2016-01-30</td>
+        <td width="435">2016-01-31</td>
     </tr>
     <tr>
         <td width="172" align="left" valign="top">Project:</td>
@@ -168,10 +168,17 @@ The current wording make use of `decay_unwrap_t` as proposed in [decay_unwrap], 
 ```Replace the `make_exception_ptr` declaration in [support.exception] by```
 
 ```c++
+namespace std {
+namespace experimental {
+inline namespace concurrency_v2 {
+
 template <class E>
 exception_ptr make_exception_ptr(E e) noexcept;
 template <class E, class ...Args>
 exception_ptr make_exception_ptr(Args&& ...args) noexcept;
+
+}}
+}
 ```
 
 
@@ -182,6 +189,10 @@ exception_ptr make_exception_ptr(Args&& ...args) noexcept;
 *Replace the make_ready_future declaration in [header.future.synop] by*
 
 ```c++
+namespace std {
+namespace experimental {
+inline namespace concurrency_v2 {
+
 template <int=0, int ..., class T>
 future<decay_unwrap_t<T>> make_ready_future(T&& x) noexcept;
 template <class T>
@@ -190,6 +201,8 @@ template <class T>
 future<T> make_ready_future(remove_reference<T> && x) noexcept;
 template <class T, class ...Args>
 future<T> make_ready_future(Args&& ...args) noexcept;
+}}
+}
 ```
 
 *Add the `make_exceptional_future` declaration in [header.future.synop]*
