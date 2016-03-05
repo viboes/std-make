@@ -5,7 +5,7 @@
     </tr>
     <tr>
         <td width="172" align="left" valign="top">Date:</td>
-        <td width="435">2016-01-30</td>
+        <td width="435">2016-03-05</td>
     </tr>
     <tr>
         <td width="172" align="left" valign="top">Project:</td>
@@ -45,7 +45,7 @@ Experimental generic factories library for C++.
 
 # Introduction
 
-This paper presents a proposal for two generic factories `make<TC>(v)` that allows to make generic algorithms that need to create an instance of a wrapped class `TC` from their underlying types and `no_value<TC>()` that creates an instance meaning the not-a-value associated to a type constructor.
+This paper presents a proposal for two generic factories `make<TC>(v)` that allows to make generic algorithms that need to create an instance of a wrapped class `TC` from their underlying types and `none<TC>()` that creates an instance meaning the not-a-value associated to a type constructor.
 
 [P0091R0] proposes extending template parameter deduction for functions to constructors of template classes. If this proposal is accepted, it would be clear that this proposal will lost most of its added value.
 
@@ -180,7 +180,7 @@ template <class TC>
   apply<TC, int> safe_divide(int i, int j)
 {
   if (j == 0)
-    return no_value<TC>();
+    return none<TC>();
   else
     return make<TC>(i / j);
 }
@@ -193,7 +193,7 @@ auto x = safe_divide<optional<_t>>(1, 0);
 ```
 
 or
-**todo: expected don't works for no_value :(**
+**todo: expected don't works for none :(**
 ```c++
 auto x = safe_divide<expected<_t>>(1, 0);
 ```
@@ -492,7 +492,7 @@ namespace std
 {
 namespace experimental
 {
-inline namespace fundamental_v2
+inline namespace fundamental_v3
 {
 namespace meta
 {
@@ -506,10 +506,10 @@ namespace meta
 }
 
   template <template <class ...> class TC>
-  constexpr auto no_value();
+  constexpr auto none();
 
   template <class TC>
-  constexpr auto no_value();
+  constexpr auto none();
 
   // make() overload
   template <template <class ...> class M>
@@ -793,7 +793,7 @@ The authors would like to have an answer to the following points if there is at 
 
 * Is there an interest on the `make` functions?
 
-* Is there an interest on the `no_value` functions?
+* Is there an interest on the `none` functions?
 
 * Should the customization be done with overloading or with traits?
 
@@ -814,7 +814,7 @@ The authors would like to have an answer to the following points if there is at 
 
     What should be the default for `maker`? 
 
-* Should the function factories `make` and `no_value` be function objects?
+* Should the function factories `make` and `none` be function objects?
 
     [N4381] proposes to use function objects as customized points, so that ADL is not involved.
 
@@ -919,7 +919,7 @@ namespace std
 {
 namespace experimental
 {
-inline namespace fundamental_v2
+inline namespace fundamental_v3
 {
   // type holder
   struct _t {};
@@ -964,7 +964,7 @@ namespace meta
  * Added product type factory overload `make` to support `pair/tuple` types.
  * Fix the signature of `make` to support `reference_wrapper` types.
  * Added factory function object `maker`.
- * Added `no_value` factory.
+ * Added `none` factory.
  * Removed the emplace `make` factory specialization.
  * Remove `type_constructor` as out of the scope of the proposal. It was used by `unique_ptr<_t, D>` specialization, but this can be seen as an implementation detail.
  * Remove `type_constructor_tag` as this was an implementation detail.
