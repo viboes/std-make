@@ -65,8 +65,8 @@ namespace std {
       using apply = unique_ptr<T..., experimental::meta::eval<experimental::meta::rebind<D, T...>>>;
   };
 
-  template <>
-  struct default_delete<experimental::_t> : experimental::meta::lift<default_delete> {};
+//  template <>
+//  struct default_delete<experimental::_t> : experimental::meta::lift<default_delete> {};
 
   namespace experimental
   {
@@ -75,8 +75,8 @@ namespace std {
       // type_constructor customization
       template <class T, class D>
       struct type_constructor<unique_ptr<T,D>> : id<unique_ptr<_t, D>> {};
-      template <class T>
-      struct type_constructor<default_delete<T>> : id<default_delete<_t>> {};
+//      template <class T>
+//      struct type_constructor<default_delete<T>> : id<default_delete<_t>> {};
 
       template <class T, class D>
       struct none_type<unique_ptr<T,D>> : id<nullptr_t> { };

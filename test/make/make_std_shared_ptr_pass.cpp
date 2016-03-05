@@ -24,11 +24,7 @@ namespace std {
   // Holder customization
   template <>
   struct shared_ptr<experimental::_t>
-  //: public experimental::lift<shared_ptr> {};
-  {
-    template <class  T>
-    using apply = shared_ptr<T>;
-  };
+  : public experimental::meta::lift<shared_ptr>  {  };
 
   namespace experimental
   {

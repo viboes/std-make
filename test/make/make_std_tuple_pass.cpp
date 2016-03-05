@@ -14,31 +14,18 @@
 
 
 #include <experimental/make.hpp>
+#include <experimental/meta.hpp>
 #include <tuple>
 #include <boost/detail/lightweight_test.hpp>
 
 namespace std {
 
-// There is no way to have a variadic type constructor so we opt for a type construcotr with a single type holder
+// There is no way to have a variadic type constructor so we opt for a type constructor with a single type holder
 
   // Holder customization
   template <>
   struct tuple<experimental::_t>
-  {
-#ifdef __clang__
-    template <class ...Ts>
-    using apply = tuple<Ts...>;
-#else
-  private:
-    template <class Types>
-    struct impl;
-    template <class ...Ts>
-    struct impl<experimental::meta::types<Ts...>> : experimental::meta::id<tuple<Ts...>>{};
-  public:
-    template <class ...Ts>
-    using apply = experimental::meta::eval<impl<experimental::meta::types<Ts...>>>;
-#endif
-  };
+  : public experimental::meta::lift<tuple>  {  };
 
   namespace experimental
   {

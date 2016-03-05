@@ -14,6 +14,7 @@
 
 
 #include <experimental/make.hpp>
+#include <experimental/meta.hpp>
 #include <utility>
 #include <boost/detail/lightweight_test.hpp>
 
@@ -23,10 +24,6 @@ namespace std {
   template <>
   struct pair<experimental::_t, experimental::_t>
   {
-#ifdef __clang__
-    template <class T, class U>
-    using apply = pair<T, U>;
-#else
   private:
     template <class Types>
     struct impl;
@@ -38,7 +35,6 @@ namespace std {
   public:
     template <class ...Ts>
     using apply = experimental::meta::eval<impl<experimental::meta::types<Ts...>>>;
-#endif
   };
 
   namespace experimental
@@ -58,6 +54,7 @@ namespace std {
 int main()
 {
   namespace stde = std::experimental;
+  static_assert(stde::meta::is_applicable_with<std::pair<stde::_t,stde::_t>, int>::value, "ERROR");
   {
     int v=0;
     std::pair<int, int> x = stde::make<std::pair>(v, v);
