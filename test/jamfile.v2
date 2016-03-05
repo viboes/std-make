@@ -87,4 +87,5 @@ test-suite signature
 explicit fix ;
 test-suite fix
     : 
+      [ run make/pair_pass.cpp  ]
     ;
