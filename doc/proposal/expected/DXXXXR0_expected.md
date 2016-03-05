@@ -5,7 +5,7 @@
     </tr>
     <tr>
         <td width="172" align="left" valign="top">Date:</td>
-        <td width="435">2016-01-09</td>
+        <td width="435">2016-01-31</td>
     </tr>
     <tr>
         <td width="172" align="left" valign="top">Revises:</td>
@@ -28,9 +28,23 @@
 # A proposal to add a utility class to represent expected monad (Revision 2)
 ====================================================================
  
+**Abstract**
 
 This paper is the 2nd revision of [N4109] taking in account the feedback from the mailing lists and some fixes that were forgotten in revision 1. 
 Class template `expected<T,E>` proposed here is a type that may contain a value of type `T` or a value of type `E` in its storage space. `T` represents the expected value, `E` represents the reason explaining why it doesn’t contains a value of type `T`, that is, the unexpected value. Its interface allows to query if the underlying value is either the expected value (of type `T`) or an unexpected value (of type `E`). The original idea comes from Andrei Alexandrescu C++ and Beyond 2012: Systematic Error Handling in C++ talk [Alexandrescu.Expected]. The interface and the rational are based on `std::experimental::optional` [N3793] and Haskell monads. We can consider that `expected<T,E>` is a generalization of `optional<T>` providing in addition a monad interface and some specific functions associated to the unexpected type `E`. It requires no changes to core language, and breaks no existing code.
+
+# Table of Contents
+
+1. [Introduction](#introduction)
+2. [Motivation](#motivation)
+3. [Proposal](#proposal)
+4. [Design rationale](#design-rationale)
+5. [Proposed wording](#proposed-wording)
+6. [Implementability](#implementability)
+7. [Open points](#open-points)
+8. [Acknowledgements](#acknowledgements)
+9. [References](#references)
+
 # History
 
 ## Revision 2 - Revision of [N4109] after discussion on the ML
@@ -54,7 +68,7 @@ This paper is the 2nd revision of [N4109] taking in account the feedback from th
 # Introduction
 Class template `expected<T,E>` proposed here is a type that may contain a value of type `T` or a value of type `E` in its storage space. `T` represents the expected value, `E` represents the reason explaining why it doesn’t contains a value of type `T`, that is, the unexpected value. Its interface allows to query if the underlying value is either the expected value (of type `T`) or an unexpected value (of type `E`). The original idea comes from Andrei Alexandrescu C++ and Beyond 2012: Systematic Error Handling in C++ talk [Alexandrescu.Expected]. The interface and the rational are based on `std::experimental::optional` [N3793] and Haskell monads. We can consider that `expected<T,E>` is a generalization of `optional<T>` providing in addition a monad interface and some specific functions associated to the unexpected type `E`. It requires no changes to core language, and breaks no existing code.
 
- # Motivation and Scope
+ # Motivation
 Basically, the two main error mechanisms are exceptions and return codes. Before further explanation, we should ask us what are the characteristics of a good error mechanism.
 
 * **Error visibility**: Failure cases should appear throughout the code review. Because the debug can be painful if the errors are hidden.
@@ -453,7 +467,8 @@ expected<vector<int>, int> get3() {
 
 The usage of `make_unexpected` is also a consequence of the adapted model for `expected`: a discriminated union of `T` and `unexpected_type<E>`. While `make_unexpected(E)` has been chosen because it clearly indicates that we are interested in creating an unexpected `expected<T,E>` (of unspecified type `T`), it could be also used to make a ready future with a specific error, but this is outside the scope of this proposal. 
 
-# Should we support the `exp2 = {}`?
+## Should we support the `exp2 = {}`?
+
 Note also that the definition of the result type of `make_unexpected` has an explicitly deleted default constructor. This is in order to enable the reset idiom `exp2 = {}` which would otherwise not work due to the ambiguity when deducing the right-hand side argument.
 
 *TODO: What is the meaning of exp2 = {}, now that expected defalts to T{}?*
@@ -952,7 +967,7 @@ wrapped unexpected object is used to be implicitly convertible to other objects.
 ```c++
 namespace std {
 namespace experimental {
-inline namespace fundamentals_v2 {
+inline namespace fundamentals_v3 {
 	// X.Y.3, Unexpected object type
 	template <class E>
 	  class unexpected_type;
@@ -1091,7 +1106,7 @@ This subclause describes class template expected that represents expected object
 ```c++
 namespace std {
 namespace experimental {
-inline namespace fundamentals_v2 {
+inline namespace fundamentals_v3 {
 	// X.Z.3, expected for object types
 	template <class T, class E= exception_ptr>
 		class expected;
