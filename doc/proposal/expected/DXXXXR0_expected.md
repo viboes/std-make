@@ -5,7 +5,7 @@
     </tr>
     <tr>
         <td width="172" align="left" valign="top">Date:</td>
-        <td width="435">2016-01-31</td>
+        <td width="435">2016-03-12</td>
     </tr>
     <tr>
         <td width="172" align="left" valign="top">Revises:</td>
@@ -54,9 +54,9 @@ This paper is the 2nd revision of [N4109] taking in account the feedback from th
 * Adapted to last version of referenced proposals.
 * Moved alternative designs from open questions to an Appendix.
 * Moved already answered open points to a Rationale section.
-* Moved open points that can be decided later to a future directions section
-* *TODO* Complete wording comparison
-* Complete wording hash
+* Moved open points that can be decided later to a future directions section.
+* *TODO* Complete wording comparison.
+* Complete wording hash.
 * Add a section for adapting to `await`.
 * Add a section in future work about a possible variadic.
 * Fix minor typos.
