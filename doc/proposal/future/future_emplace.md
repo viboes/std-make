@@ -13,7 +13,7 @@
     </tr>
     <tr>
         <td width="172" align="left" valign="top">Audience:</td>
-        <td width="435">Library Evolution Working Group</td>
+        <td width="435">Library Evolution Working Group / Concurrency Working Group</td>
     </tr>
     <tr>
         <td width="172" align="left" valign="top">Reply-to:</td>
