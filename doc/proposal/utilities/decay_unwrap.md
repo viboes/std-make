@@ -5,7 +5,7 @@
     </tr>
     <tr>
         <td width="172" align="left" valign="top">Date:</td>
-        <td width="435">2016-01-30</td>
+        <td width="435">2016-03-05</td>
     </tr>
     <tr>
         <td width="172" align="left" valign="top">Project:</td>
@@ -56,7 +56,7 @@ There are some places in the standard where we can find wording such as
 
 The intent is hard to catch and should be described  only once as it is the case of `DECAY_COPY`, e.g. `DECAY_UNWRAP`.
 
-In addition the author believe that using these kind of macros when we are able to define them using  functions or traits makes the standard don't any value.
+In addition the author believes that using these kind of macros when we are able to define them using  functions or traits makes the standard less clear.
 
 
 Compare the previous wording to
@@ -69,7 +69,7 @@ This trait can already be used in the following cases
 
 * [pair.spec] p8
 * [tuple.creation] p2,3
-* Concurrent TS `make_ready_future`
+* Concurrent TS [P0159R0] `make_ready_future`
 
  
 To the knowledge of the author `decay_unwrap` is used already in [HPX], and in [Boost.Thread] as `deduced_type`.
@@ -88,9 +88,9 @@ We propose to:
 
 ## `unwrap_reference` type trait
 
-Having a way to wrap a reference with reference_wrapper needs a way to unwrap it.
+Having a way to wrap a reference with `reference_wrapper` needs a way to unwrap it.
 
-`decay_unwrap` can be defined in function of `decay` and a `unwrap_reference` .
+`decay_unwrap` can be defined in function of `decay` and a `unwrap_reference`.
 
 It could be seen as an implementation detail, but seems useful.
 
@@ -102,12 +102,12 @@ It could be seen as an implementation detail, but seems useful.
 
 # Impact on the standard
 
-These changes are entirely based on library extensions and do not require any language features beyond what is available in C++ 14. 
+These changes are entirely based on library extensions and do not require any language features beyond what is available in C++14. 
 
 
 # Proposed wording
 
-This wording is relative to [N4527].
+This wording is relative to [N4480].
 
 ## General utilities library
 
@@ -145,7 +145,7 @@ template <class T>
 struct unwrap_reference;
 ```
 
-The member typedef type of `decay_unwrap<T>` shall equal `X&` if `T` equals `reference_wrapper<X>`, `T` otherwise. 
+The member typedef type of `unwrap_reference <T>` shall equal `X&` if `T` equals `reference_wrapper<X>`, `T` otherwise. 
 
 
 **20.3.3 Specialized algorithms [pairs.spec]** 
@@ -208,7 +208,8 @@ Thanks to Agustín Bergé K-ballo who show me that [HPX] uses these traits alre
 
 # References
 
-[N4480]: http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/n4480.html "N4480- Working Draft, C++ Extensions for Library Fundamentals"
+[N4480]: http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/n4480.html "N4480- Working Draft, C++ Extensions for Library Fundamentals"[P0159R0]: http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/p0159r0.html "Draft of Technical Specification for C++ Extensions for Concurrency "
+
 [MAKEF]: https://github.com/viboes/std-make/blob/master/doc/proposal/factories/DXXXX_factories.md "C++ generic factory" 
 
 [make.impl]: https://github.com/viboes/std-make/blob/master/include/experimental/std_make_v1/make.hpp "C++ generic factory - Implementation" 
@@ -220,8 +221,13 @@ Thanks to Agustín Bergé K-ballo who show me that [HPX] uses these traits alre
 
 [HPX]: http://stellar.cct.lsu.edu/files/hpx_0.9.8/html/hpx.html
 
+
 * [N4480] N4480 - Working Draft, C++ Extensions for Library Fundamentals
 	http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/n4480.html 
+
+* [P0159R0] - Draft of Technical Specification for C++ Extensions for Concurrency 
+
+	http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/p0159r0.html
 	
 * [MAKEF] - C++ generic factory 
 
