@@ -47,7 +47,7 @@ Experimental generic factories library for C++.
 
 This paper presents a proposal for two generic factories `make<TC>(v)` that allows to make generic algorithms that need to create an instance of a wrapped class `TC` from their underlying types and `none<TC>()` that creates an instance meaning the not-a-value associated to a type constructor.
 
-[P0091R0] proposes extending template parameter deduction for functions to constructors of template classes. If this proposal is accepted, it would be clear that this proposal will lost most of its added value.
+[P0091R0] proposes extending template parameter deduction for functions to constructors of template classes. If this proposal is accepted, it would be clear that this proposal will lost most of its added value but not all.
 
 # Motivation and scope
 
@@ -67,7 +67,7 @@ There are two kind of factories:
  * ```make_shared``` 
  * ```make_unique```
 
-When writing an application, the user knows if the function to write should return a specific type, as `shared_ptr<T>`, `unique_ptr<T,D>`, `optional<T>`, `expected<T,E>` or `future<T>`. E.g. when the user knows that the function must return a owned smart pointer it would use `unique_ptr<T>`.
+When writing an application, the user knows if the function to write should return a specific type, as `shared_ptr<T>`, `unique_ptr<T,D>`, `optional<T>`, `expected<T,E>` or `future<T>`. E.g. when the user knows that the function must return an owned smart pointer it would use `unique_ptr<T>`.
 
 ```c++
 template <class T>
@@ -75,7 +75,7 @@ unique_ptr<T> f() {
     T a,
     ...
     return make_unique(a);
-    //return unique_ptr(a); // would this be correct if [P0091R0] is accepted?
+    //return unique_ptr(a); // this should be correct if [P0091R0] is accepted?
 }
 ```
 
@@ -87,7 +87,7 @@ shared_ptr<T> f() {
     T a,
     ...
     return make_shared(a);
-    //return shared_ptr(a); // would this be correct if P0091R0 is accepted?
+    //return shared_ptr(a); // this should be correct if P0091R0 is accepted?
 }
 ```
 
@@ -100,11 +100,11 @@ TC<T> f() {
     T a,
     ...
     return make<TC>(a);
-    //return TC(a); // if [P0091R0] is accepted
+    //return TC(a); // This should not work even if [P0091R0] is accepted
 }
 ```
 
-In addition, we have factories for the product types such as `pair`and `tuple`
+In addition, we have factories for the product types such as `pair` and `tuple`
 
  * ```make_pair```
  * ```make_tuple```
@@ -369,7 +369,7 @@ namespace boost
 
 ## Customization point
 
-This proposal takes advatage of overloading the `make_custom` functions adding the tag `type<T>`.
+This proposal takes advantage of overloading the `make_custom` functions adding the tag `type<T>`.
 
 We have named the customization points `make_custom` to make more evident that these are customization points.
 
@@ -434,34 +434,45 @@ The main problem defining function objects is that we cannot have the same class
 ```c++
   template <template <class> class T>
   struct maker_tc {
-    template <typename ...X>
+    template <typename ...Args>
     constexpr auto
-    operator()(X&& ...x) const
+    operator()(Args&& ...args) const
     {
-        return make<T>(forward<X>(x)...);
+        return make<T>(forward<Args>(args)...);
     }     
-  };
-  
-  template <class MFC> // requires MFC is a type constructor
-  struct maker_mfc {
-    template <class ...Xs>
-    constexpr auto
-    operator()(Xs&& ...xs)
-    {
-      return make<MFC>(std::forward<Xs>(xs)...);
-    }
-  };
-  
-  template <class M> // requires M is a type
+  };  
+ 
+  template <class T>
   struct maker_t
   {
     template <class ...Args>
-    constexpr M operator()(Args&& ...args) const
+    constexpr auto 
+    operator()(Args&& ...args) const -> decltype(auto)
     {
-      return make<M>(std::forward<Args>(args)...);
+      return make<T>(std::forward<Args>(args)...);
     }
   };
 ```
+
+Now we can define a `maker` factory for high-ordef make functions
+
+```c++
+template <class T>
+maker_t<T> maker() { return maker_t<T>{}; }
+
+template <template <class ...> class TC>
+maker_tc<TC> maker() { return maker_tc<TC>{}; }
+
+```
+
+so the previous example would be instead
+
+```c++
+std::vector<X> xs;
+std::vector<Something<X>> ys;
+std::transform(xs.begin(), xs.end(), std::back_inserter(ys), maker<Something>());
+```
+
 
 # Impact on the standard
 
@@ -520,11 +531,11 @@ namespace meta
   
   // make overload: requires a template class parameter, deduce the underlying type
   template <template <class ...> class M, class X>
-    M<Y> make(X&& x);
+    M<decay_unwrap<X>> make(X&& x);
 
-    // make overload: requires a type constructor, deduce the underlying type
+  // make overload: requires a type constructor, deduce the underlying type
   template <class TC, class X>
-    meta::apply<TC, Y> make(X&& x);
+    meta::apply<TC, decay_unwrap<X>> make(X&& x);
     
   // make overload: requires a type with a specific underlying type, 
   // don't deduce the underlying type from X
@@ -535,6 +546,19 @@ namespace meta
   // don't deduce the underlying type from Args
   template <class M, class ...Args>
     M make(Args&& ...args);
+    
+  template <template <class> class T>
+  struct maker_tc;  
+ 
+  template <class T>
+  struct maker_t;
+  
+  template <class T>
+    maker_t<T> maker();
+
+  template <template <class ...> class TC>
+    maker_tc<TC> maker();
+    
 
 namespace meta
 {
@@ -568,7 +592,7 @@ namespace meta
 
 ###########################################################################
 ```c++
-    return make(meta::type<M<void>>{});
+    return make_custom(meta::type<M<void>>{});
 ```
 
 **X.Y.5 template + deduced underlying type**
@@ -576,17 +600,14 @@ namespace meta
 ###########################################################################
 ```c++
 template <template <class ...> class M, class T>
-  M<V> make(T&& x);
+  M<decay_unwrap<T>> make(T&& x);
 ```
-
-where `V` is determined as follows: Let `U` be `decay_t<T>`. Then `V` is `X&`
-if `U` equals `reference_wrapper<X>`, otherwise `V` is `U`.
 
 *Effects:* Forwards to the customization point `make` with a template constructor 
 `meta::type<M<V>>`. As if
 
 ```c++
-    return make(meta::type<M<V>>{}, std::forward<T>(x));
+    return make_custom(meta::type<M<V>>{}, std::forward<T>(x));
 ```
 
 **X.Y.6 type constructor + deduced underlying type**
@@ -594,11 +615,8 @@ if `U` equals `reference_wrapper<X>`, otherwise `V` is `U`.
 ###########################################################################
 ```c++
   template <class TC, class T>
-    meta::apply<TC, V> make(T&& x);
+    meta::apply<TC, decay_unwrap<T>> make(T&& x);
 ```
-
-where `V` is determined as follows: Let `U` be `decay_t<T>`. Then `V` is `X&`
-if `U` equals `reference_wrapper<X>`, otherwise `V` is `U`.
 
 *Requires:* `TC` is a type constructor.
 
@@ -606,7 +624,7 @@ if `U` equals `reference_wrapper<X>`, otherwise `V` is `U`.
 `meta::type<meta::apply<TC, V>>`. As if
 
 ```c++
-    return make(meta::type<meta::apply<TC, V>>{}, std::forward<T>(x));
+    return make_custom(meta::type<meta::apply<TC, V>>{}, std::forward<T>(x));
 ```
 
 **X.Y.7 type + non deduced underlying type**
@@ -624,7 +642,7 @@ convertible from `X`.
 `meta::type<M>`. As if
 
 ```c++
-    return meta::make(meta::type<M>{}, std::forward<X>(x));
+    return make_custom(meta::type<M>{}, std::forward<X>(x));
 ```
 
 **X.Y.8 type + emplace args**
@@ -639,7 +657,7 @@ template <class M, class ...Args>
 and `in_place_t`. As if
 
 ```c++
-    return make(meta::type<M>{}, std::forward<Args>(args)...);
+    return make_custom(meta::type<M>{}, std::forward<Args>(args)...);
 ```
 
 **X.Y.9 Template function `make_custom` - default constructor customization point for void**
@@ -772,7 +790,7 @@ namespace std {
   // customization point for template 
   // (needed because std::shared_ptr doesn't has a conversion constructor)
   template <class DX, class ...Xs>
-  shared_ptr<DX> make_custom(experimental::meta::type<shared_ptr<DX>>, Xs&& xs);
+  shared_ptr<DX> make_custom(experimental::meta::type<shared_ptr<DX>>, Xs&& xs...);
 
   // Holder customization
   template <>
@@ -921,7 +939,7 @@ namespace experimental
 {
 inline namespace fundamental_v3
 {
-  // type holder
+  // type placeholder
   struct _t {};
   
 namespace meta
