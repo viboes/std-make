@@ -27,6 +27,9 @@
 
 # A proposal to add a utility class to represent expected monad (Revision 2)
 ====================================================================
+
+***--------------------- DRAFT - DRAFT - DRAFT - DRAFT - DRAFT - DRAFT - DRAFT - DRAFT - DRAFT - DRAFT - DRAFT ---------------------***
+
  
 **Abstract**
 
@@ -239,7 +242,7 @@ int f2(int i, int j, int k)
 }
 ```
 
-Now let’s write this code using an `expected<T,E>` type and the functional map already used previously. 
+Now let’s write this code using an `expected<T,E>` type and the functional `map` already used previously. 
 
 ```c++
 expected<int,error_condition> f(int i, int j, int k)
@@ -267,7 +270,7 @@ expected<int, error_condition> f(int i, int j, int k)
 ```
 
 The error-handling code has completely disappeared but the lambda functions are a new source of noise,
-and this is even more important with n expected variables. Propositions for a better monadic experience are discussed in section [Do-Notation], the subject is left open and is considered out of scope of this proposal.
+and this is even more important with `n` `expected` variables. Propositions for a better monadic experience are discussed in section [Do-Notation], the subject is left open and is considered out of scope of this proposal.
 
 ## Error retrieval and correction
 
@@ -327,7 +330,7 @@ The same rationale described in [N3672] for `optional<T>` applies to `expected<T
 
 The interface in this model requires operations such as comparison to `T`, comparison to `E`, assignment and creation from either. It is easy to determine what the value of the expected object is in this model: the type it stores (`T` or `E`) and either the value of `T` or the value of `E`.
 
-Additionally, within the affordable limits, we propose the view that `expected<T,E>` extends the set of the values of `T` by the values of type `E`. This is reflected in initialization, assignment, ordering, and equality comparison with both `T` and `E`. In the case of `optional<T>`, `T` cannot be a `nullopt_t`. As the types `T` and `E` could be the same. In `expected<T,E>`, there is need to tag the values of `E` to avoid ambiguous expressions. The `make_unexpected(E)` function is proposed for this purpose. However `T` can not be `unexpected_type<E>` for a given `E`.
+Additionally, within the affordable limits, we propose the view that `expected<T,E>` extends the set of the values of `T` by the values of type `E`. This is reflected in initialization, assignment, ordering, and equality comparison with both `T` and `E`. In the case of `optional<T>`, `T` cannot be a `nullopt_t`. As the types `T` and `E` could be the same in `expected<T,E>`, there is need to tag the values of `E` to avoid ambiguous expressions. The `make_unexpected(E)` function is proposed for this purpose. However `T` cannot be `unexpected_type<E>` for a given `E`.
 
 ```c++
 expected<int, string> ei = 0;
@@ -386,16 +389,17 @@ expected<int, string> ej{unexpect, "arg"}; // unexpected value, calls string{"ar
 ```
 
 An alternative name for `in_place` that is coherent with `unexpect` could be `expect`. Being compatible with `optional<T>` seems more important. So this proposal doesn’t propose such a `expect` tag.
-The alternative and also comprehensive initialization approach, which is not compatible with the default construction of `expected<T,E>` to `E()`, could have been a variadic perfect forwarding constructor that just forwards any set of arguments to the constructor of the contained object of type `T`.
+
+The alternative and also comprehensive initialization approach, which is compatible with the default construction of `expected<T,E>` as `T()`, could have been a variadic perfect forwarding constructor that just forwards any set of arguments to the constructor of the contained object of type `T`.
 
 ## Almost never-empty guaranty
 
 *TODO: revise this section as it cannot always be ensured*
 
 
-As `boost::variant<unexpected_type<E>,T>`, `expected<T,E>` ensures that it is never empty. All instances `v` of type `expected<T,E>` guarantee that `v` has constructed content of one of the types `T` or `E`, even if an operation on `v` has previously failed.
+As `boost::variant<T,unexpected_type<E>>`, `expected<T,E>` ensures that it is never empty. All instances `v` of type `expected<T,E>` guarantee that `v` has constructed content of one of the types `T` or `E`, even if an operation on `v` has previously failed.
 
-This implies that expected may be viewed precisely as a union of exactly its bounded types. This “never-empty” property insulates the user from the possibility of undefined expected content and the significant additional complexity-of-use attendant with such a possibility.
+This implies that expected may be viewed precisely as a union of exactly its bounded types. This “never-empty” property insulates the user from the possibility of undefined `expected` content and the significant additional complexity-of-use attendant with such a possibility.
 
 ## The default constructor
 
@@ -408,9 +412,9 @@ Similar data structure includes `optional<T>`, `variant<T1,...,Tn>` and `future<
 
 It raises several questions about `expected<T,E>`:
 
-* Should the default constructor of `expected<T,E>` behave like `variant<T,E>` or as `variant<E,T>`?
+* Should the default constructor of `expected<T,E>` behave like `variant<T, unexpected_type<E>>` or as `variant<unexpected_type<E>,T>`?
 * Should the default constructor of `expected<T,E>` behave like `optional<variant<T,E>>`?
-* Should the default constructor of `expected<T, nullopt_t>` behave like `optional<T>`? If yes, how should behave the default constructor of `expected<T,E>`? As if initialized with `make_unexpected(E())`? This would be equivalent to the initialization of `variant<E,T>`.
+* Should the default constructor of `expected<T, nullopt_t>` behave like `optional<T>`? If yes, how should behave the default constructor of `expected<T,E>`? As if initialized with `make_unexpected(E())`? This would be equivalent to the initialization of `variant<unexpected_type<E>,T>`.
 * Should `expected<T,E>` provide a default constructor at all? [N3527] presents valid arguments against this approach, e.g. `array<expected<T,E>>` would not be possible.
 
 Requiring `E` to be default constructible seems less constraining than requiring `T` to be default constructible (e.g. consider the `Date` example in [N3527]). With the same semantics `expected<Date,E>` would be `Regular` with a meaningful not-a-date state created by default.
@@ -421,7 +425,7 @@ The authors consider the arguments in [N3527] valid for `optional<T>`, however p
 
 ## Conversion from `T`
 
-An object of type `T` is convertible to an expected object of type `expected<T,E>`:
+An object of type `T` is implicitly convertible to an expected object of type `expected<T,E>`:
 
 ```c++
 expected<int, error_condition> ei = 1; // works
@@ -461,7 +465,7 @@ expected<vector<int>, int> get2() {
 	return make_unexpected(1);
 }
 expected<vector<int>, int> get3() {
-	return expected<vector<int>, int>unexpect, 1;
+	return expected<vector<int>, int>{unexpect, 1};
 }
 ```
 
@@ -487,11 +491,15 @@ if (expected<char, error_condition> ch = readNextChar()) {
 }
 ```
 
+### `has_value`
+
+*TODO: Add has_value to follow P0032
+
 ### Accessing the contained value
 
-Even if ```expected<T,E>``` has not been used in practice for a while as Boost.Optional, we consider that following the same interface that ```std::experimental::optional<T>``` makes the C++ standard library more homogeneous.
+Even if ```expected<T,E>``` has not been used in practice for a while as Boost.Optional, we consider that following the same interface that `std::experimental::optional<T>` makes the C++ standard library more homogeneous.
 
-The rational described in [N3672] for ```optional<T>``` applies to ```expected<T,E>```.
+The rational described in [N3672] for `optional<T>` applies to `expected<T,E>`.
 
 ### Dereference operator
 
@@ -527,7 +535,7 @@ void interact() {
 }
 ```
 
-The exception thrown depend on the expected error type. By default it throws `bad_expected_access<E>`
+The exception thrown depends on the expected error type. By default it throws `bad_expected_access<E>`
 (derived from `std::logic_error`) which will contain the stored error. In the case of `expected<T, exception_ptr>`, it throws the exception stored in the `exception_ptr`. An approach enabling customization of this behavior is presented in the section [Customizing the exception thrown].
 `bad_expected_access<E>` and `bad_optional_access` could inherit both from a `bad_access` exception derived from `logic_error`, but this is not proposed yet.
 
@@ -574,13 +582,13 @@ expected<pair<int, int>, errc> getIntRange(istream_range& r) {
 
 ### Function `value_or`
 
-The function member ```value_or()``` has the same semantics than `optional` [N3672] since the type of `E` doesn’t matter; hence we can consider that `E == nullopt_t` and the `optional` semantics yields.
+The function member `value_or()` has the same semantics than `optional` [N3672] since the type of `E` doesn’t matter; hence we can consider that `E == nullopt_t` and the `optional` semantics yields.
 
 Using the monadic error interface, we can achieve a similar behavior:
 
 ```c++
 auto x = getInt();
-int x = *(x.catch_error([](auto)return 0;)); // identical to x.value_or(0);
+int x = *(x.catch_error([](auto) return 0;)); // identical to x.value_or(0);
 ```
 
 ### Relational operators
@@ -616,7 +624,7 @@ respective `E` relational operators when `E` defines these operators and follows
 
 The case of `unexpected_type<std::exception_ptr>` could follow the `optional<T>` semantics as the shallow comparison is not very useful.
 
-This limitation is one of the main motivations for having a user defined type with strict weak ordering. E.g. if the user know the exact types of the exceptions that can be thrown `E1`, ..., `En`, the error parameter could be some kind of `variant<E1, ... En>` for which a strict weak ordering can be defined. If the user would like to take care of unknown exceptions something like `optional<variant<E1, ... En>>` would be a quite appropriated model.
+This limitation is one of the main motivations for having a user defined type with strict weak ordering. E.g. if the user know the exact types of the exceptions that can be thrown `E1`, ..., `En`, the error parameter could be some kind of `variant<E1, ... En>` for which a strict weak ordering can be defined. If the user would like to take care of unknown exceptions something like `variant<monostate,E1, ... En>` would be a quite appropriated model.
 
 ```c++
 expected<unsigned, int> e0{0};
@@ -718,6 +726,8 @@ doesn’t propose it.
 Class template `expected` imposes little requirements on `T` and `E`: they have to be complete object type satisfying the requirements of `Destructible`. Each operations on `expected<T,E>` have different requirements and may be disable if `T` or `E` doesn’t respect these requirements. For example, `expected<T,E>`’s move constructor requires that `T` and `E` are `MoveConstructible`, `expected<T,E>`’s copy constructor requires that `T` and `E` are `CopyConstructible`, and so on. This is because `expected<T,E>` is a wrapper for `T` or `E`: it should resemble `T` as much as possible. If `T`
 is `EqualityComparable` then (and only then) we expect `expected<T,E>` to be `EqualityComparable`.
 
+*todo Refine the requirements, as this is not completly true, we need nothrow ...*
+
 ## Expected references
 
 This proposal doesn’t include `expected` references as `optional` [N3793] doesn’t include references neither.
@@ -732,6 +742,7 @@ In [N3672], they propose to make `optional` a literal type, the same reasoning c
 
 
 ## Moved from state
+
 We follow the approach taken in `optional` [N3672]. Moving `expected<T,E>` do not modify the state of the source (valued or erroneous) of `expected` and the move semantics is up to `T` or `E`.
 
 ## IO operations
@@ -745,7 +756,7 @@ The example section shows how these operations are important to `expected`. The 
 
 ### Functor `map`
 
-The operation `map` consider `expected` as a `Functor` and just apply a function on the contained value, if any. The types of the two overloads are presented using a functional notation and the `[]` represent a context in which the value `T` or `U` is contained. The current context is expected and thus `[T]` is equivalent to `expected<T,E>`.
+The operation `map` consider `expected` as a `Functor` and just apply a function on the contained value, if any. The types of the two overloads are presented using a functional notation and the `[]` represents a context in which the value `T` or `U` is contained. The current context is `expected<_t,E>` and thus `[T]` is equivalent to `expected<T,E>`.
 
 * (T -> U) -> [U]
 
@@ -818,6 +829,7 @@ expected<T,E> unwrap<expected<T,E>> e) {
 
 We could add such a function to the standard, either as a free function or as a member function. The authors propose to add it as a member function to be in line with [N3857].
 
+*todo this is not more inline as unwrap has been removed*
 # Open points
 
 
@@ -826,9 +838,9 @@ We could add such a function to the standard, either as a free function or as a 
 
 This proposal makes `expected<T, exception_ptr>` equality comparable making all the unexpected values equals as `exception_ptr` equality comparison is shallow and doesn’t provides relational operators.
 
-Should `expected<T, exception_ptr> not be equality comparable?
+Should `expected<T, exception_ptr>` not be equality comparable?
 
-Should `expected<T, exception_ptr> be equality comparable using shallow comparison?
+Should `expected<T, exception_ptr>` be equality comparable using shallow comparison?
 
 
 
@@ -849,7 +861,7 @@ The implicit conversion from `E` has been forbidden to avoid ambiguity when `E` 
 Should the implicit conversion be allowed in this case?
 
 
-## Should map/bind/then/catch_error catch the exceptions throw by the continuation?
+## Should `map`/`bind`/`then`/`catch_error` catch the exceptions throw by the continuation?
 
 It is easy to catch the exceptions when the type is `expected<T>`. However, doing it for `expected<T,E>` needs a conversion from the current exception and the error `E`.
 
