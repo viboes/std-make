@@ -205,17 +205,18 @@ int main()
   {
     std::vector<int> xs;
     std::vector<A<int> > ys;
-    std::transform(xs.begin(), xs.end(), std::back_inserter(ys), stde::maker<A>{});
+    std::transform(xs.begin(), xs.end(), std::back_inserter(ys), stde::maker<A>());
   }
   {
     std::vector<int> xs;
     std::vector<A<int> > ys;
-    std::transform(xs.begin(), xs.end(), std::back_inserter(ys), stde::maker_mfc<A<stde::_t>>{});
+    //std::transform(xs.begin(), xs.end(), std::back_inserter(ys), stde::maker_mfc<A<stde::_t>>{});
+    std::transform(xs.begin(), xs.end(), std::back_inserter(ys), stde::maker<A<stde::_t>>());
   }
   {
     std::vector<int> xs;
     std::vector<A<long> > ys;
-    std::transform(xs.begin(), xs.end(), std::back_inserter(ys), stde::maker_t<A<long>>{});
+    std::transform(xs.begin(), xs.end(), std::back_inserter(ys), stde::maker<A<long>>());
   }
   return ::boost::report_errors();
 }
