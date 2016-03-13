@@ -53,12 +53,12 @@ This paper is the 2nd revision of [N4109] taking in account the feedback from th
 ## Revision 2 - Revision of [N4109] after discussion on the ML
 
 * Fix default constructor to `T`. [N4109] should change the default constructor to `T`, but there were some inconsistencies.
-* *TODO* As `variant`, `expected` requires some properties in order to never-empty guaranties. Add more on never-empty guaranties. 
+* *TODO* As `variant`, `expected` requires some properties in order to ensure the never-empty waranties. Add more on never-empty waranties. 
+* Complete wording comparison.
 * Adapted to last version of referenced proposals.
 * Moved alternative designs from open questions to an Appendix.
 * Moved already answered open points to a Rationale section.
 * Moved open points that can be decided later to a future directions section.
-* *TODO* Complete wording comparison.
 * Complete wording hash.
 * Add a section for adapting to `await`.
 * Add a section in future work about a possible variadic.
@@ -989,7 +989,37 @@ inline namespace fundamentals_v3 {
 	// X.Y.5, Unexpected factories
 	template <class E>
 	  constexpr unexpected_type<decay_t<E>> make_unexpected(E&& v);
-	  unexpected_type<std::exception_ptr> make_unexpected_from_current_exception();
+   unexpected_type<std::exception_ptr> make_unexpected_from_current_exception();
+   
+ 	// X.Y.6, unexpected_type relational operators
+	template <class T, class E>
+		constexpr bool operator==(const unexpected_type<T,E>&, const unexpected_type<T,E>&);
+	template <class T, class E>
+		constexpr bool operator!=(const unexpected_type<T,E>&, const unexpected_type<T,E>&);
+	template <class T, class E>
+		constexpr bool operator<(const unexpected_type<T,E>&, const unexpected_type<T,E>&);
+	template <class T, class E>
+		constexpr bool operator>(const unexpected_type<T,E>&, const unexpected_type<T,E>&);
+	template <class T, class E>
+		constexpr bool operator<=(const unexpected_type<T,E>&, const unexpected_type<T,E>&);
+	template <class T, class E>
+		constexpr bool operator>=(const unexpected_type<T,E>&, const unexpected_type<T,E>&);
+		
+	// X.Y.7, unexception_ptrxpexception_ptrctexception_ptrd_typexception_ptr rexception_ptrlational opexception_ptrrators
+	texception_ptrmplatexception_ptr <class T, class exception_ptr>
+		constexception_ptrxpr bool opexception_ptrrator==(const unexception_ptrxpexception_ptrctexception_ptrd_typexception_ptr<T,exception_ptr>&, const unexception_ptrxpexception_ptrctexception_ptrd_typexception_ptr<T,exception_ptr>&);
+	texception_ptrmplatexception_ptr <class T, class exception_ptr>
+		constexception_ptrxpr bool opexception_ptrrator!=(const unexception_ptrxpexception_ptrctexception_ptrd_typexception_ptr<T,exception_ptr>&, const unexception_ptrxpexception_ptrctexception_ptrd_typexception_ptr<T,exception_ptr>&);
+	texception_ptrmplatexception_ptr <class T, class exception_ptr>
+		constexception_ptrxpr bool opexception_ptrrator<(const unexception_ptrxpexception_ptrctexception_ptrd_typexception_ptr<T,exception_ptr>&, const unexception_ptrxpexception_ptrctexception_ptrd_typexception_ptr<T,exception_ptr>&);
+	texception_ptrmplatexception_ptr <class T, class exception_ptr>
+		constexception_ptrxpr bool opexception_ptrrator>(const unexception_ptrxpexception_ptrctexception_ptrd_typexception_ptr<T,exception_ptr>&, const unexception_ptrxpexception_ptrctexception_ptrd_typexception_ptr<T,exception_ptr>&);
+	texception_ptrmplatexception_ptr <class T, class exception_ptr>
+		constexception_ptrxpr bool opexception_ptrrator<=(const unexception_ptrxpexception_ptrctexception_ptrd_typexception_ptr<T,exception_ptr>&, const unexception_ptrxpexception_ptrctexception_ptrd_typexception_ptr<T,exception_ptr>&);
+	texception_ptrmplatexception_ptr <class T, class exception_ptr>
+		constexception_ptrxpr bool opexception_ptrrator>=(const unexception_ptrxpexception_ptrctexception_ptrd_typexception_ptr<T,exception_ptr>&, const unexception_ptrxpexception_ptrctexception_ptrd_typexception_ptr<T,exception_ptr>&);
+		
+
 }}}
 ```
 
@@ -1100,6 +1130,111 @@ constexpr unexpected_type<std::exception_ptr> make_unexpected_from_current_excep
 
 *Returns*: `unexpected_type<std::exception_ptr>(std::current_exception())`.
 
+**X.Y.6 Unexpected Relational operators [unexpected_type.relational_op]**
+
+```c++
+	template <class E>
+		constexpr bool operator==(const unexpected_type<E>& x, const unexpected_type<E>& y);
+```
+
+
+*Requires*: `E` shall meet the requirements of *EqualityComparable*. 
+
+
+*Returns*: `x.value() != y.value()`.
+
+*Remarks*: Specializations of this function template, for which `x.value() != y.value()` is a core constant expression, shall be constexpr functions.    
+        
+    
+```c++
+	template <class E>
+		constexpr bool operator!=(const unexpected_type<E>& x, const unexpected_type<E>& y);
+```
+*Returns*: `!(x == y)`.
+
+```c++
+	template <class E>
+		constexpr bool operator<(const unexpected_type<E>& x, const unexpected_type<E>& y);
+```
+
+*Requires*: `x.value() < y.value()`. 
+
+*Returns*: `x.value() < y.value()`. 
+
+*Remarks*: Specializations of this function template, for which `x.value() < y.value()` is a core constant expression, shall be constexpr functions.    
+    
+```c++
+	template <class E>
+		constexpr bool operator>(const unexpected_type<E>& x, const unexpected_type<E>& y);
+```
+
+*Returns*: `y < x`.
+
+
+```c++
+	template <class E>
+		constexpr bool operator<=(const unexpected_type<E>& x, const unexpected_type<E>& y);
+```
+
+*Returns*: `!(y < x)`.
+
+```c++
+	template <class E>
+		constexpr bool operator>=(const unexpected_type<E>& x, const unexpected_type<E>& y);
+```
+
+*Returns*: `!(x < y)`.
+
+
+**X.Y.7 Unexpected Relational operators [unexpected_type.relational_op]**
+
+```c++
+	template <class exception_ptr>
+		constexpr bool operator==(const unexpected_type<exception_ptr>& x, const unexpected_type<exception_ptr>& y);
+```
+
+
+*Returns*: `x.value() != y.value()`.
+
+*Remarks*: Specializations of this function template, for which `x.value() != y.value()` is a core constant expression, shall be constexpr functions.    
+        
+    
+```c++
+	template <class exception_ptr>
+		constexpr bool operator!=(const unexpected_type<exception_ptr>& x, const unexpected_type<exception_ptr>& y);
+```
+*Returns*: `!(x == y)`.
+
+```c++
+	template <class exception_ptr>
+		constexpr bool operator<(const unexpected_type<exception_ptr>& x, const unexpected_type<exception_ptr>& y);
+```
+
+*Returns*: `false`. 
+
+    
+```c++
+	template <class exception_ptr>
+		constexpr bool operator>(const unexpected_type<exception_ptr>& x, const unexpected_type<exception_ptr>& y);
+```
+
+*Returns*: `false`. 
+
+
+```c++
+	template <class exception_ptr>
+		constexpr bool operator<=(const unexpected_type<exception_ptr>& x, const unexpected_type<exception_ptr>& y);
+```
+
+*Returns*: `x == y`. 
+
+```c++
+	template <class exception_ptr>
+		constexpr bool operator>=(const unexpected_type<exception_ptr>& x, const unexpected_type<exception_ptr>& y);
+```
+
+*Returns*: `x == y`. 
+
 
 
 ***-------------------------------------------------------***
@@ -1109,32 +1244,34 @@ Insert a new section.
 
 **X.Z Expected objects [[expected]]**
 
-**X.Y.1 In general [expected.general]**
+**X.Z.1 In general [expected.general]**
 
 This subclause describes class template expected that represents expected objects. An `expected<T,E>` object is an object that contains the storage for another object and manages the lifetime of this contained object `T`, alternatively it could contain the storage for another unexpected object `E`. The contained object may not be initialized after the expected object has been initialized, and may not be destroyed before the expected object has been destroyed. The initialization state of the contained object is tracked by the expected object.
 
-**X.Y.7 Header `<experimental/expected>` synopsis [expected.synop]**
+**X.Z.2 Header `<experimental/expected>` synopsis [expected.synop]**
 
 ```c++
 namespace std {
 namespace experimental {
 inline namespace fundamentals_v3 {
-	// X.Z.3, expected for object types
+	// X.Z.4, expected for object types
 	template <class T, class E= exception_ptr>
 		class expected;
 	
-	// X.Z.4, Specialization for void.
+	// X.Z.5, Specialization for void.
 	template <class E>
 		class expected<void, E>;
 	
-	// X.Z.5, unexpect tag
-	struct unexpect_t{};
-	constexpr unexpect_t unexpect{};
+	// X.Z.6, unexpect tag
+	struct unexpect_t{
+	   unexpect_t() = delete;
+	};
+	constexpr unexpect_t unexpect{'implementation defined'};
 	
-	// X.Z.6, class bad_expected_access
+	// X.Z.7, class bad_expected_access
 	class bad_expected_access;
 	
-	// X.Z.7, Expected relational operators
+	// X.Z.8, Expected relational operators
 	template <class T, class E>
 		constexpr bool operator==(const expected<T,E>&, const expected<T,E>&);
 	template <class T, class E>
@@ -1148,7 +1285,7 @@ inline namespace fundamentals_v3 {
 	template <class T, class E>
 		constexpr bool operator>=(const expected<T,E>&, const expected<T,E>&);
 	
-	// X.Z.8, Comparison with T
+	// X.Z.9, Comparison with T
 	template <class T, class E> constexpr bool operator==(const expected<T,E>&, const T&);
 	template <class T, class E> constexpr bool operator==(const T&, const expected<T,E>&);
 	template <class T, class E> constexpr bool operator!=(const expected<T,E>&, const T&);
@@ -1162,7 +1299,7 @@ inline namespace fundamentals_v3 {
 	template <class T, class E> constexpr bool operator>=(const expected<T,E>&, const T&);
 	template <class T, class E> constexpr bool operator>=(const T&, const expected<T,E>&);
 
-	// X.Z.9, Comparison with unexpected_type<E>
+	// X.Z.10, Comparison with unexpected_type<E>
 	template <class T, class E> constexpr bool operator==(const expected<T,E>&, const unexpected_type<E>&);
 	template <class T, class E> constexpr bool operator==(const unexpected_type<E>&, const expected<T,E>&);
 	template <class T, class E> constexpr bool operator!=(const expected<T,E>&, const unexpected_type<E>&);
@@ -1176,10 +1313,10 @@ inline namespace fundamentals_v3 {
 	template <class T, class E> constexpr bool operator>=(const expected<T,E>&, const unexpected_type<E>&);
 	template <class T, class E> constexpr bool operator>=(const unexpected_type<E>&, const expected<T,E>&);
 
-	// X.Z.10, Specialized algorithms
+	// X.Z.11, Specialized algorithms
 	void swap(expected<T,E>&, expected<T,E>&) noexcept(see below);
 
-	// X.Z.11, Factories
+	// X.Z.12, Factories
 	template <class T> constexpr expected<decay_t<T>> make_expected(T&& v);
 	expected<void> make_expected();
 	template <class T>
@@ -1196,7 +1333,7 @@ inline namespace fundamentals_v3 {
 		constexpr expected<typename result_type<F>::type>
 	make_expected_from_call(F f);
 	
-	// X.Z.12, hash support
+	// X.Z.13, hash support
 	template <class T, class E> struct hash<expected<T,E>>;
 	template <class E> struct hash<expected<void,E>>;
 }}}
@@ -1309,7 +1446,7 @@ Members `has_value`, `val` and `err` are provided for exposition only. Implement
 
 `T` and `E` shall be an object type and shall satisfy the requirements of `Destructible`.
 
-**X.Y.9.1 Constructors [expected.object.ctor]**
+**X.Z.4.1 Constructors [expected.object.ctor]**
 
 ###########################################################################
 ```c++
@@ -1503,7 +1640,7 @@ If `E`’s constructor selected for the initialization is a constexpr constructo
 *Remarks*: This signature shall not participate in overload resolution unless
 `is_constructible<E, initializer_list<U>&, Args&&...>::value`.
 
-**X.Y.9.2 Destructor [expected.object.dtor]**
+**X.Z.4.2 Destructor [expected.object.dtor]**
 
 ###########################################################################
 ```c++
@@ -1515,7 +1652,7 @@ If `is_trivially_destructible<E>::value != true and ! (bool(*this)`, calls `err-
 
 *Remarks*: If `is_trivially_destructible<T>::value and is_trivially_destructible<E>::value` then this destructor shall be a trivial destructor.
 
-**X.Y.9.3 Assignment [expected.object.assign]**
+**X.2.4.3 Assignment [expected.object.assign]**
 
 ###########################################################################
 ```c++
@@ -1661,7 +1798,7 @@ Any exception thrown by the selected constructor of `T`.
 The function shall not participate in overload resolution unless:
 `is_constructible<T, initializer_list<U>&, Args&&...>::value`.
 
-**X.Y.9.4 Swap [expected.object.swap]**
+**X.Z.4.4 Swap [expected.object.swap]**
 
 ###########################################################################
 ```c++
@@ -1690,7 +1827,7 @@ is_nothrow_move_constructible<E>::value and noexcept(swap(declval<E&>(), declval
 The function shall not participate in overload resolution unless:
 LValues of type `T` shall be `Swappable`, `is_move_constructible<T>::value`, LValues of type `E` shall be `Swappable` and `is_move_constructible<T>::value`.
 
-**X.Y.9.5 Observers [expected.object.observe]**
+**X.2.4.5 Observers [expected.object.observe]**
 
 ###########################################################################
 ```c++
@@ -1926,7 +2063,7 @@ Any exception thrown by the selected constructor of `expected<T,E>`.
 The function shall not participate in overload resolution unless:
 `is_move_constructible<expected<T,E>>::value`.
 
-**X.Y.9.6 Factories [expected.object.factories]**
+**X.Z.4.6 Factories [expected.object.factories]**
 
 ###########################################################################
 ```c++
@@ -1980,19 +2117,7 @@ if `! bool(*this)` returns `unwrap(expected<decltype(func(val)), E>(funct(**this
 result of the call continuation function `fuct` possibly wrapped on a `expected<T,E>`, otherwise, returns
 `*this`.
 
-**X.Y.10 `expected` as a meta-fuction [expected.object.meta]**
-
-```c++
-template <class E>
-class expected<holder, E> 
-{
-public:
-	template <class T>
-	using apply = expected<T,E>;
-};
-```
-
-**X.Y.11 `expected` for `void` [expected.object.void]**
+**X.Z.6 `expected` for `void` [expected.object.void]**
 
 ```c++
 template <class E>
@@ -2054,14 +2179,14 @@ private:
 ```
 *TODO: Describe the functions*
 
-**X.Y.12 `unexpect` tag [expected.unexpect]**
+**X.Z.7 `unexpect` tag [expected.unexpect]**
 
 ```c++
 struct unexpect_t;
 constexpr unexpect_t unexpect;
 ```
 
-**X.Y.13 Template Class `bad_expected_access` [expected.bad_expected_access]**
+**X.Z.8 Template Class `bad_expected_access` [expected.bad_expected_access]**
 
 ```
 template <class E>
@@ -2095,19 +2220,170 @@ The stored error.
 *Remarks*:
 The first function shall be a constexpr function.
 
-**X.Y.14 Expected Relational operators [expected.relational_op]**
+**X.Z.8 Expected Relational operators [expected.relational_op]**
 
-*TODO: Describe the functions.*
+```c++
+	template <class T, class E>
+		constexpr bool operator==(const expected<T,E>& x, const expected<T,E>& y);
+```
 
-**X.Y.15 Comparison with `T` [expected.comparison_T]**
 
-*TODO: Describe the functions.*
+*Requires*: `T`and `unexpected_type<E>` shall meet the requirements of *EqualityComparable*. 
 
-**X.Y.16 Comparison with `unexpected_type<E>` [expected.comparison_unexpected_E]**
 
-*TODO: Describe the functions.*
+*Returns*: If `bool(x) != bool(y)`, `false`; otherwise if `bool(x) == false`, `x.get_unexpected() == y.get_unexpected()`; otherwise `*x == *y`.
 
-**X.Y.17 Specialized algorithms [expected.specalg]**
+*Remarks*: Specializations of this function template, for which `*x == *y` and `x.get_unexpected() == y.get_unexpected()` are core constant expression, shall be constexpr functions.    
+        
+    
+```c++
+	template <class T, class E>
+		constexpr bool operator!=(const expected<T,E>& x, const expected<T,E>& y);
+```
+*Returns*: `!(x == y)`.
+
+```c++
+	template <class T, class E>
+		constexpr bool operator<(const expected<T,E>& x, const expected<T,E>& y);
+```
+
+*Requires*: `*x < *y` shall be well-formed and its result shall be convertible to `bool`. 
+
+*Returns*: If `!y`, false; otherwise, if `!x`, `x.get_unexpected() < y.get_unexpected()`; otherwise `*x < *y`. 
+
+*Remarks*: Specializations of this function template, for which `*x < *y` and `x.get_unexpected() < y.get_unexpected()` are core constant expression, shall be constexpr functions.    
+    
+```c++
+	template <class T, class E>
+		constexpr bool operator>(const expected<T,E>& x, const expected<T,E>& y);
+```
+
+*Returns*: `y < x`.
+
+
+```c++
+	template <class T, class E>
+		constexpr bool operator<=(const expected<T,E>& x, const expected<T,E>& y);
+```
+
+*Returns*: `!(y < x)`.
+
+```c++
+	template <class T, class E>
+		constexpr bool operator>=(const expected<T,E>& x, const expected<T,E>& y);
+```
+
+*Returns*: `!(x < y)`.
+
+
+**X.Z.9 Comparison with `T` [expected.comparison_T]**
+
+```c++	
+	template <class T, class E> constexpr bool operator==(const expected<T,E>& x, const T& v);
+	template <class T, class E> constexpr bool operator==(const T& v, const expected<T,E>& x);
+```
+
+
+*Returns*: bool(x) ? *x == v : false.
+
+
+```c++
+	template <class T, class E> constexpr bool operator!=(const expected<T,E>& x, const T& v);
+	template <class T, class E> constexpr bool operator!=(const T& v, const expected<T,E>& x);
+```
+*Returns*: `!(x == v)`.
+
+
+```c++
+	template <class T, class E> constexpr bool operator<(const expected<T,E>& x, const T& v);
+```
+
+*Returns*: `bool(x) ? *x < v : true`.
+
+
+```c++
+	template <class T, class E> constexpr bool operator<(const T& v, const expected<T,E>& x);
+```
+
+*Returns*: `bool(x) ? v < *x : false`.
+
+
+```c++
+	template <class T, class E> constexpr bool operator<=(const expected<T,E>& x, const T& y);
+	template <class T, class E> constexpr bool operator<=(const T& x, const expected<T,E>& y);
+```
+
+*Returns*: `!(y < x)`.
+
+```c++
+	template <class T, class E> constexpr bool operator>(const expected<T,E>& x, const T& y);
+	template <class T, class E> constexpr bool operator>(const T& x, const expected<T,E>& y);
+```
+
+*Returns*: `y < x`.
+
+
+```c++
+	template <class T, class E> constexpr bool operator>=(const expected<T,E>&, const T&);
+	template <class T, class E> constexpr bool operator>=(const T&, const expected<T,E>&);
+
+```
+
+*Returns*: `!(x < y)`.
+
+**X.Z.10 Comparison with `unexpected_type<E>` [expected.comparison_unexpected_E]**
+
+```c++
+	template <class T, class E> constexpr bool operator==(const expected<T,E>& x, const unexpected_type<E>& v);
+	template <class T, class E> constexpr bool operator==(const unexpected_type<E>& v, const expected<T,E>& x);
+```
+
+*Returns*: `bool(x) ? false ? x.get_unexpected() == v`.
+
+
+```c++
+	template <class T, class E> constexpr bool operator!=(const expected<T,E>& x, const unexpected_type<E>& v);
+	template <class T, class E> constexpr bool operator!=(const unexpected_type<E>& v, const expected<T,E>& x);
+```
+
+*Returns*: `!(x == v)`.
+
+```c++
+	template <class T, class E> constexpr bool operator<(const expected<T,E>& x, const unexpected_type<E>& v);
+```
+
+*Returns*: `bool(x) ? false : x.get_unexpected() < v`.
+
+```c++
+	template <class T, class E> constexpr bool operator<(const unexpected_type<E>& v, const expected<T,E>& x);
+```
+
+*Returns*: `bool(x) ? true : v < x.get_unexpected()`.
+
+
+```c++
+	template <class T, class E> constexpr bool operator<=(const expected<T,E>& x, const unexpected_type<E>& y);
+	template <class T, class E> constexpr bool operator<=(const unexpected_type<E>& x, const expected<T,E>& y);
+```
+*Returns*: `!(y < x)`.
+
+
+```c++
+	template <class T, class E> constexpr bool operator>(const expected<T,E>& x, const unexpected_type<E>& y);
+	template <class T, class E> constexpr bool operator>(const unexpected_type<E>& x, const expected<T,E>& y);
+```
+*Returns*: `y < x`.
+
+```c++
+	template <class T, class E> constexpr bool operator>=(const expected<T,E>& x, const unexpected_type<E>& y);
+	template <class T, class E> constexpr bool operator>=(const unexpected_type<E>& x, const expected<T,E>& y);
+
+```
+
+*Returns*: `!(x < y)`.
+
+
+**X.Z.11 Specialized algorithms [expected.specalg]**
 
 ###########################################################################
 ```c++
@@ -2118,7 +2394,7 @@ void swap(expected<T,E>& x, expected<T,E>& y) noexcept(noexcept(x.swap(y)));
 *Effects*:
 calls `x.swap(y)`.
 
-**X.Y.18 Expected Factories [expected.factories]**
+**X.Z.12 Expected Factories [expected.factories]**
 
 ###########################################################################
 ```c++
@@ -2179,7 +2455,7 @@ catch (...)
 	return make_unexpected_from_current_exception();
 ```
 
-**X.Y.19 Hash support [expected.hash]**
+**X.Z.13 Hash support [expected.hash]**
 
 ###########################################################################
 ```c++
@@ -2197,6 +2473,19 @@ struct hash<expected<void, E>>;
 ```
 *Requires*:
 The template specialization `hash<E>`(if E is not `exception_ptr`)  shall meet the requirements of class template `hash` (Z.X.Y). The template specialization `hash<expected<void,E>>` shall meet the requirements of class template `hash`. For an object `e` of type `expected<void,E>`, if `bool(e)`, `hash<expected<void,E>>()(e)` shall evaluate to the hashing `true`; otherwise it evaluates to an unspecified value if E is `exception_ptr` or a combination of hashing `false` and `hash<E>()(e.error())`.
+
+**X.Z.14 `expected` as a meta-fuction [expected.object.meta]**
+
+```c++
+template <class E>
+class expected<holder, E> 
+{
+public:
+	template <class T>
+	using apply = expected<T,E>;
+};
+```
+
 	# Implementability
 
 This proposal can be implemented as pure library extension, without any compiler magic support, in C++14.
