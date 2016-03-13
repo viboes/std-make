@@ -401,6 +401,9 @@ As `boost::variant<T,unexpected_type<E>>`, `expected<T,E>` ensures that it is ne
 
 This implies that expected may be viewed precisely as a union of exactly its bounded types. This “never-empty” property insulates the user from the possibility of undefined `expected` content and the significant additional complexity-of-use attendant with such a possibility.
 
+In order to ensure this property the types 'T' and `E` must satisfy some requirements as described in [P0110R0]. Given the nature of the parameter `E`, that is, to transport an error, it is expected that `is_nothrow_copy_constructible<E>` or at least that `is_nothrow_move_constructible<E>`. 
+
+
 ## The default constructor
 
 Similar data structure includes `optional<T>`, `variant<T1,...,Tn>` and `future<T>`. We can compare how they are default constructed.
@@ -513,8 +516,7 @@ This pattern is used for all sort of pointers (smart or raw) and `optional`; it 
 
 We do not think that providing an implicit conversion to `T` would be a good choice. First, it would require different way of checking for the empty state; and second, such implicit conversion is not perfect and still requires other means of accessing the contained value if we want to call a member function on it.
 
-Using the indirection operator for a object that doesn’t contain a value is an undefined behavior. This
-behavior offers maximum runtime performance.
+Using the indirection operator for a object that doesn’t contain a value is an undefined behavior. This behavior offers maximum runtime performance.
 
 ### Function value
 
@@ -1659,15 +1661,42 @@ If `is_trivially_destructible<E>::value != true and ! (bool(*this)`, calls `err-
 expected<T,E>& operator=(const expected<T,E>& rhs);
 ```
 
+*Requires*: `is_nothrow_copy_constructible<E>::value && is_nothrow_move_constructible<E>::value`  is `true`
+
 *Effects*: 
 
-if `bool(*this) and bool(rhs)`, assigns `*rhs` to the contained value `val`, otherwise
+if `bool(*this) and bool(rhs)`, 
 
-if `bool(*this) and ! bool(rhs)`, destroys the contained value by calling `val->T::~T()` and initializes the contained value as if direct-non-list-initializing an object of type `E` with `rhs.error()`, otherwise
+* assigns `*rhs` to the contained value `val`, otherwise
 
-if `! (bool(*this) and ! bool(rhs)`, assigns `rhs.error()` to the contained value `err`, otherwise
+if `! (bool(*this) and ! bool(rhs)`, 
 
-if `! (bool(*this) and bool(rhs)`, destroys the contained value by calling err->E::~E() and initializes the contained value as if direct-non-list-initializing an object of type `E` with `rhs.error()`.
+* assigns `rhs.error()` to the contained value `err`, otherwise
+
+if `bool(*this) and ! bool(rhs)`, 
+
+* destroys the contained value by calling `val->T::~T()`,
+* initializes the contained value as if direct-non-list-initializing an object of type `E` with `rhs.error()`, otherwise `! (bool(*this) and bool(rhs)`
+
+if `is_nothrow_copy_constructible<T>::value`
+
+* destroys the contained value by calling `err->E::~E()`
+* initializes the contained value as if direct-non-list-initializing an object of type `T` with `*rhs`, otherwise
+
+if `is_nothrow_move_constructible<T>::value`
+
+* constructs a new `T tmp` on the stack from `*rhs`, 
+* destroys the contained value by calling `err->E::~E()`, 
+* initializes the contained value as if direct-non-list-initializing an object of type `T` with `tmp`, otherwise 
+
+if `is_nothrow_move_constructible<E>::value`
+
+* move constructs a new `E tmp` on the stack from `this.error()` (which can't throw as A is nothrow-move-constructible), 
+* destroys the contained value by calling `err->E::~E()`, 
+* initializes the contained value as if direct-non-list-initializing an object of type `T` with `*rhs`. Either, 
+
+    * The constructor didn't throw, so mark the expected as holding a T (which can't throw), or
+    * The constructor did throw, so move-construct the `E` from the stack `tmp` back into the expected storage  (which can't throw as `E` is nothrow-move-constructible), and rethrow the exception.
 
 *Returns*: `*this`.
 
@@ -1683,7 +1712,8 @@ If an exception is thrown during the call to `E`’s copy constructor, no effect
 
 If an exception is thrown during the call to `E`’s copy assignment, the state of its contained value is as defined by the exception safety guarantee of `E`’s copy assignment.
 
-*Remarks*: This signature shall not participate in overload resolution unless
+*Remarks*: *TODO reword this part*
+This signature shall not participate in overload resolution unless
 `is_copy_constructible<T>::value and
 is_copy_assignable<T>::value and
 is_copy_constructible<E>::value and
@@ -1693,6 +1723,8 @@ is_copy_assignable<E>::value`.
 ```c++
 expected<T,E>& operator=(expected<T,E>&& rhs) noexcept(/*see below*/);
 ```
+
+*TODO reword this operation*
 
 *Effects*: if `bool(*this)` and `rhs` is values, assigns `std::move(*rhs)` to the contained value `val`, otherwise if `bool(*this) and ! bool(rhs)`, destroys the contained value by calling `val->T::~T()` and initializes the contained value as if direct-non-list-initializing an object of type `E` with `rhs.error()`, otherwise if `! bool(*this) and ! bool(rhs)`, assigns `std::move(rhs.error())` to the contained value `err`, otherwise if `! bool(*this) and bool(rhs)`, destroys the contained value by calling `err->E::~E()` and initializes the contained value as if direct-non-list-initializing an object of type `E` with `rhs.error()`.
 
@@ -1722,6 +1754,8 @@ template <class U>
 expected<T,E>& operator=(U&& v);
 ```
 
+*TODO reword this operation*
+
 *Effects*: If `bool(*this)` assigns `std::forward<U>(v)` to the contained value; otherwise destroys the contained value by calling `err->E::~E()` and initializes the unexpected value as if direct-non-list-initializing object of type `T` with `std::forward<U>(v)`.
 
 *Returns*: `*this`.
@@ -1741,6 +1775,8 @@ is_assignable<T&, U>::value`.
 ```c++
 expected<T,E>& operator=(unexpected_type<E>&& e);
 ```
+
+*TODO reword this operation*
 
 *Effects*:
 If `! bool(*this)` assigns `std::forward<E>(e.value())` to the contained value; otherwise destroys the contained value by calling `val->T::~T()` and initializes the contained value as if direct-non-list-initializing object of type `E` with `std::forward<unexpected_type<E>>(e).value()`.
@@ -1762,6 +1798,8 @@ template <class... Args>
 void emplace(Args&&... args);
 ```
 
+*TODO reword this operation*
+
 *Effects*:
 if `bool(*this)`, assigns the contained value `val` as if constructing an object of type `T` with the arguments `std::forward<Args>(args)...`, otherwise destroys the contained value by calling `err->E::~E()` and initializes the contained value as if constructing an object of type `T` with the arguments `std::forward<Args>(args)...`.
 
@@ -1782,6 +1820,9 @@ This signature shall not participate in overload resolution unless
 ```c++
 template <class U, class... Args>
 void emplace(initializer_list<U> il, Args&&... args);
+
+*TODO reword this operation*
+
 ```
 *Effects*: if `bool(*this)`, assigns the contained value `val` as if constructing an object of type `T` with the arguments `il, std::forward<Args>(args)...`, otherwise destroys the contained value by calling `err->E::~E()` and initializes the contained value as if constructing an object of type `T` with the arguments `il, std::forward<Args>(args)...`.
 
@@ -1804,6 +1845,9 @@ The function shall not participate in overload resolution unless:
 ```c++
 void swap(expected<T,E>& rhs) noexcept(/*see below*/);
 ```
+
+*TODO reword this operation*
+
 
 *Effects*:
 if `bool(*this) and bool(rhs)`, calls `swap(val, rhs.val)`, otherwise
@@ -2532,6 +2576,8 @@ Pierre thanks the IRCAM and Carlos Agon who allowed him to work on this proposal
 [N4109]: http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n4109.pdf "Pierre talbot Vicente J. Botet Escriba. N4109, a proposal to add a utility class to represent expected monad (Revision 1), 2014."
 [N4233]: http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n4233.html "L. Crowl, C. Mysen. N4233, A Class for Status and Optional Value, 2014." 
 [N4564]: http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/n4564.pdf "N4564 - Working Draft, C++ Extensions for Library Fundamentals"[P0088R0]: http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/p0088r0.pdf "Variant: a type-safe union that is rarely invalid (v5)." 
+
+[P0110R0]: http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/p0110r0.html "Implementing the strong guarantee for variant<> assignment"
  
 [P0157R0]: http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/p0157r0.html "L. Crowl. P0157R0, Handling Disappointment in C++, 2015." 
 
@@ -2595,6 +2641,10 @@ Pierre thanks the IRCAM and Carlos Agon who allowed him to work on this proposal
 * [P0159R0] Artur Laksberg. P0159R0, Draft of Technical Specification for C++ Extensions for Concurrency, 2015. 
 
 	http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/p0159r0.html
+
+* [P0110R0] Implementing the strong guarantee for variant<> assignment
+
+    http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/p0110r0.html
 
 * [TBoost.Expected] Pierre Talbot and Vicente J. Botet Escriba. TBoost.Expected, 2014. 
 
