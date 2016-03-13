@@ -1182,15 +1182,16 @@ inline namespace fundamentals_v3 {
 	// X.Z.11, Factories
 	template <class T> constexpr expected<decay_t<T>> make_expected(T&& v);
 	expected<void> make_expected();
-	template <class E> expected<void, E> make_expected();
 	template <class T>
 		expected<T> make_expected_from_current_exception();
 	template <class T, class E>
-		constexpr expected<T> make_expected_from_exception(E e);
+		constexpr expected<T> make_expected_from_exception(E&& e);
 	template <class T>
 		constexpr expected<T> make_expected_from_exception(std::exception_ptr v);
 	template <class T, class E>
-		constexpr expected<T, decay_t<E>> make_expected_from_error(E v);
+		constexpr expected<T, decay_t<E>> make_expected_from_error(E&& e);
+	template <class T, class E, class U>
+		constexpr expected<T, E> make_expected_from_error(U&& u);
 	template <class F>
 		constexpr expected<typename result_type<F>::type>
 	make_expected_from_call(F f);
@@ -2128,14 +2129,6 @@ constexpr expected<typename decay<T>::type> make_expected(T&& v);
 *Returns*:
 `expected<typename decay<T>::type>(std::forward<T>(v))`.
 
-###########################################################################
-```c++
-template <class E>
-expected<void, E> make_expected();
-```
-
-*Returns*:
-`expected<void,E>(in_place)`.
 
 ###########################################################################
 ```c++
@@ -2148,11 +2141,20 @@ expected<T, exception_ptr> make_expected_from_exception(std::exception_ptr v);
 ###########################################################################
 ```c++
 template <class T, class E>
-constexpr expected<T, decay_t<E>> make_expected_from_error(E e);
+constexpr expected<T, decay_t<E>> make_expected_from_error(E&& e);
 ```
 
 *Returns*:
 `expected<T, decay_t<E>>(make_unexpected(e))`;
+
+###########################################################################
+```c++
+template <class T, class E, class U>
+constexpr expected<T, E> make_expected_from_error(U&& u);
+```
+
+*Returns*:
+`expected<T, E>(make_unexpected(E{forward<U>(u)}))`;
 
 ###########################################################################
 ```c++
