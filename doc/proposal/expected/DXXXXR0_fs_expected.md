@@ -35,7 +35,7 @@ This paper describes some alternatives to the design of the FileSystem TS [N4099
 # FileSystem TS adaptation alternatives
 
 
-If `std::experimental::expected` is adopted, it seems natural to make use of it in the standard library, and in particular in a new version of the FileSystem TS [N4099].  This section present some alternative design, but in no way this is intended as a real proposal. We can see this paper as an appendix to [N4099] as an study of application of `std::experimental::expected` to a standard library.
+If `std::experimental::expected` is adopted, it seems natural to make use of it in the standard library, and in particular in a new version of the FileSystem TS [N4099].  This section present some alternative design, but in no way this is intended as a real proposal. We can see this paper as an appendix to [N4099] as a study of application of `std::experimental::expected` to a standard library.
 
 
 The two major concerns of this study are 
@@ -78,11 +78,39 @@ void copy(const path& from, const path& to, error_code& ec) noexcept;
 void copy(const path& from, const path& to, copy_options options, error_code& ec) noexcept;
 ```
 
+Usage
+
+```c++
+//...
+error_code ec;
+copy(p1, p2, ec);
+if (! ec)
+    // success case ...
+} else {
+	// error case - make use of ec
+}
+
+```
+
+
 **Expected**
 
 ```c++
-expecteds<void,error_code> copy(const path& from, const path& to, 
+expected<void,error_code> copy(const path& from, const path& to, 
 									  copy_options options =  copy_options::none) noexcept;
+```
+
+Usage
+
+```c++
+//...
+auto e = copy(p1, p2);
+if (e)
+    // success case ...
+} else {
+	// error case - make use of e.error()
+}
+
 ```
 
 **Alternatively**
@@ -92,12 +120,46 @@ error_code copy(const path& from, const path& to,
 									  copy_options options =  copy_options::none) noexcept;
 ```
 
-Note that removing the `error_code` parameter allows to have a single function. The same could be achieved if instead of been the last parameter, the FS was decided to put in at fist parameter.
+```c++
+//...
+auto ec = copy(p1, p2);
+if (!ec)
+    // success case ...
+} else {
+	// error case - make use of ec
+}
+```
+
+Note that removing the `error_code` parameter allows to have a single function. The same could be achieved if instead of being the last parameter, the FS was decided to put in at fist parameter.
+
+
+**Another alternative**
+
+`error_code` has an explicit conversion to bool that reverse the sense of success. `expected<void,error_code>` reach to reverse the sense, but needs an additional call to `e.error()` to obtain the real error code.
+
+Maybe we could have an `result_code` that is like an `error_code`, but that reverses the explicit bool conversion.
+
+
+
+```c++
+result_code copy(const path& from, const path& to, 
+									  copy_options options =  copy_options::none) noexcept;
+```
+
+```c++
+//...
+auto rc = copy(p1, p2);
+if (rc)
+    // success case ...
+} else {
+	// error case - make use of rc
+}
+```
 
 
 ### Function returning a `bool`
 
-These functions returns already a status. When the result is false, it can be because an error occurred or because the condition is really false. This makes these kind of functions almost a tri-state function. makes is redundant with the error_code as the error_code is in reality a status, as we can check if it is ok. We could already make use of the result type to return the `error_code`. For coherency purposes we can also use `expected<void, error_code>`.
+These functions returns already a status. When the result is false, it can be because an error occurred or because the condition is really false. This makes these kind of functions almost tri-state functions. This makes it redundant with the `error_code` as the `error_code` is in reality a status, as we can check if it is ok. We could already make use of the result type to return the `error_code`. For coherency purposes we can also use `expected<void, error_code>`.
 
 
 **Current**
@@ -120,6 +182,8 @@ if ( equivalent(p1, p2, ec) ) {
 }
 
 ```
+
+The previous code presumes that when there is an error the function return false.
 
 **Expected**
 
@@ -159,11 +223,16 @@ Usage
 
 ```c++
 //...
-auto res = equivalent(p1, p2);
+auto sv = equivalent(p1, p2);
 if ( res.status() ) {
- // success case ...
-} else {
-	// make use of ex.error()
+ // error case ... make use of res.status()
+else if (sv.value()) 
+{
+    // equivalent case ...
+} 
+else 
+{
+    // not equivalent case ...
 }
 
 ```
@@ -189,7 +258,7 @@ Two approaches that depend on whether it is important or not to know the concret
 	* The result type can be `status_value<error_code, file_status>`.
 	* The result type can be a struct that group both `file_status_error` = `pair<file_status, error_code>`.
   
-Note that as the status overload that throws loss the error codes for `file_type::unknown` and `file_type::not_found`, the non-local interface transport less information. 
+Note that as the status overload that throws loss the error codes for `file_type::unknown` and `file_type::not_found`, the non-local interface transports less information. 
 
 **Current**
 
@@ -252,11 +321,12 @@ Usage
 //...
 auto efst = fs::status(p);
 if ( efst ) {
- // success case ...
+    // success case ...
+    // make use of *efst
 } else {
-	// do something 
-	// make use of efst.error()
-   throw filesystem_error("message", p, efst.error());
+    // do something 
+    // make use of efst.error()
+    throw filesystem_error("message", p, efst.error());
 }
 ```
 
@@ -460,7 +530,7 @@ There are several alternatives:
 * Make use of a suffix `_no_throw`.
 * Add an additional tag parameter to disambiguate (e.g. `no_throw`).
 * Use a nested namespace for the `expected` based functions
-* Make use of the template parameter `Error` to disambiguate both overloads.
+* Make use of a template parameter `Error` to disambiguate both overloads.
 * Replace the throw overload by a function returning `expected<T, file_system_error>`.
 
 ### Add a tag to disambiguate (e.g. `no_throw`)
@@ -482,6 +552,10 @@ The usage of the throwing function doesn't change. For the expected one
 	auto x = de.status(no_throw);
 ```
 
+**Liabilities**
+
+* This is a breaking for the non-throwing case.
+
 ### Make use of a suffix  (e.g. `_no_throw`)
 
 We can name the functions using a suffix to select the specific behavior. 
@@ -492,7 +566,7 @@ class directory_entry
 {
 public:
   file_status  status() const;
-  expected<file_status, error_code> status_no_throw(no_throw_t) const noexcept;
+  expected<file_status, error_code> status_no_throw() const noexcept;
   //...
 ```
 
@@ -501,6 +575,11 @@ The usage of the throwing function doesn't change. For the expected one
 ```c++
 	auto x = de.status_no_throw();
 ```
+
+**Liabilities**
+
+* ???
+
 
 ### Use a nested namespace 
 
@@ -524,7 +603,7 @@ namespace err {
 
 #### Classes 
 
-However, the member function cannot be nested in an additional namespace. We could duplicate the classes and have one that throws and the other that return expected.
+However, the member function cannot be nested in an additional namespace. We could duplicate the classes and have one that throws and the other that return `expected`.
 
 
 ```c++
@@ -598,7 +677,16 @@ namespace err {
 
 * The classes are duplicated
 
-### Make use of the template parameter `Error` to disambiguate both overloads. 
+### Make use of a template parameter `Error` to disambiguate both overloads
+
+The following `filesystem::result_type` trait could be used to define the result type of an operation depending on wether the the error is the exception `filesystem_error` or `error_code`
+
+```c++
+template <class T, class E>
+struct result_type { using type = T; };
+template <class T>
+struct result_type<T, error_code> { using type = expected<T, error_code>; };
+```
 
 
 ```c++
@@ -606,46 +694,95 @@ class directory_entry
 {
 public:
   template <class Error=filesystem_error>
-  file_status  status() const;
-  template <>	
-  file_status  status<filesystem_error>() const;
-  template <>	
-  expected<file_status, error_code> status<error_code>() const noexcept;
+    	requires Same<Error, error_code> or Same<Error, filesystem_error> 
+  result_type_t<file_status, Error>  status() const noexcept(Same<Error, error_code>::value);
   //...
 ```
 
-The usage of the throwing function doesn't change, but can be made more explicit. For the expected one
+The usage of the throwing function doesn't change, but can be made more explicit. 
+
+```c++
+	auto x = de.status(); // throw filesystem_error if a filesystem error detected
+	auto x = de.status<filesystem_error>(); // throw filesystem_error if a filesystem error detected
+	// success case
+```
+
+For the expected one
 
 ```c++
 	auto x = de.status<error_code>(); // return expected<file_status, error_code>	if (x) // success case
 ```
+
+The implementation could use tag dispatching to non-template functions.
+
+**Liabilities**
+
+* This is a breaking change when the user used pointer to member functions. 
+
+
+### Make use of a template parameter `ErrorPolicy` to disambiguate both overloads
+
+Instead of using a specific error we can use an error policy, `throw_t`/`no_throw_t`.
+The following `filesystem::result_type` trait could be used to define the result type of an operation depending on wether the the error is the exception `filesystem_error` or `error_code`
+
 ```c++
-	auto x = de.status<filesystem_error>(); // throw filesystem_error if a filesystem error detected
-	auto x = de.status(); // throw filesystem_error if a filesystem error detected
-	// success case
+template <class T, class E>
+struct result_type;
+template <class T>
+struct result_type<T, throw_t> { using type = T; };
+template <class T>
+struct result_type<T, no_throw_t> { using type = expected<T, error_code>; };
 ```
 
 
 ```c++
-template <class Error=filesystem_error>
 class directory_entry
 {
 public:
-  file_status  status() const;
+  template <class ErrorPolicy=throw_t>
+    	requires Same<ErrorPolicy, throw_t> or Same<ErrorPolicy, no_throw_t> 
+  result_type_t<file_status, ErrorPolicy>  status() const noexcept(Same<ErrorPolicy, no_throw_t>::value);
   //...
-};
-
-template <>
-class directory_entry<error_code>
-{
-public:
-  expected<file_status, error_code> status() const noexcept;
-  //...
-};
 ```
 
-This is not applicable to function template as we cannot partially specialize a function.
+The usage of the throwing function doesn't change, but can be made more explicit. 
 
+```c++
+	auto x = de.status(); // throw filesystem_error if a filesystem error detected
+	auto x = de.status<throw_t>(); // throw filesystem_error if a filesystem error detected
+	// success case
+```
+
+For the expected one
+
+```c++
+	auto x = de.status<no_throw_t>(); // return expected<file_status, error_code>	if (x) // success case
+```
+
+The implementation could use tag dispatching to non-template functions.
+
+
+**Advantages**
+
+* We can take the pointer member function `&status<throw_t>`
+
+Before
+
+```c++
+auto st1 = static_cast<file_status (directory_entry::*)() const>(&directory_entry::status);
+auto st2 = static_cast<file_status (directory_entry::*)(std::error_code) const>(&directory_entry::status);
+```
+
+After
+
+```c++
+auto st1 = &directory_entry::status<throw_t>;
+auto st2 = &directory_entry::status<no_throw_t>;
+``` 
+
+**Liabilities**
+
+* The function is now template and there is a minor breaking change. Alternatively we can use a new function name.
 
 ### Replace the throw overload by `expected<T, filesystem_error>` 
 
@@ -697,6 +834,20 @@ using directory_entry = err::directory_entry<filesystem_error>;
 
 ```
 
+
+**Liabilities**
+
+* This is a breaking change
+
+
+# Conclusions
+
+Any change will have as liability a breaking change respect to the current Filesystem TS.
+
+For new libraries, we should consider which cases are considered errors and which ones are status. 
+When the function can return  
+
+Adding an `ErrorPolicy` template parameter to each function seems to be the best option for the author.
 
 
 # Acknowledgements
