@@ -21,7 +21,8 @@
     </tr>
 </table>
 
-# Thread Constructor Attributes
+
+# Thread Constructor Attributes
 ===============================
 
 **Abstract**
@@ -82,7 +83,7 @@ Even for this simple attribute there could be portable issues as some platforms 
 
 This is the single attribute that is provided in a portable way. In order to set any other `thread` attribute at construction time the user needs to use non portable code.
 
-## Using a nativie_handle_type
+## Using a native_handle_type
 
 On Posix platforms the user will need to get the thread attributes native handle and use it for whatever attribute.
 
@@ -134,8 +135,11 @@ As the Posix based platforms have associated a `pthread_attribute_t` to the thre
 
 ## About `thread::attributes` non portable setters
 
-Users of platforms as Windows that don't have a native handle for the thread attributes, could need to set some attributes in a non-portable way. This paper let the implementation the possibility to add implementation defined functions to achieve this goal. 
-# Proposed wordingThe wording is relative to [P0159R0].
+Users of platforms as Windows that don't have a native handle for the thread attributes, could need to set some attributes in a non-portable way. This paper let the implementation the possibility to add implementation defined functions to achieve this goal.
+ 
+# Proposed wording
+
+The wording is relative to [P0159R0].
 
 ## Thread library
 
@@ -157,6 +161,8 @@ inline namespace concurrency_v3 {
     // add after thread construtor
     template <class F, class ...Args> 
     explicit thread(attributes cosnt& attr, F&& f, Args&&... args);
+    
+  };
 
 }}}
 
@@ -193,7 +199,7 @@ attributes() noexcept;
 
 *Effects*: Constructs a thread attributes instance with its default values.  A thread constructed with such a default `attributes` shall behave as if there was no `attributes` parameter.
 
-*Postconditions*: this-> get_stack_size() returns `0`. 
+*Postconditions*: `this-> get_stack_size()` returns `0`. 
 
 *Throws*: Nothing 
 
@@ -204,7 +210,7 @@ void set_stack_size(std::size_t size) noexcept;
 
 *Effects*: Stores the stack size to be used to create a thread. This is a hint that the implementation can choose a better size if to small or too big or not aligned to a page. `0` means the default. 
 
-*Postconditions*: this-> get_stack_size() returns the chosen stack size. 
+*Postconditions*: `this-> get_stack_size()` returns the chosen stack size. 
 
 *Throws*: Nothing. 
 
@@ -236,7 +242,7 @@ As before
 
 *Remarks*: The first overload constructor shall not participate in overload resolution if `decay_t<F>` is the same type as `std::thread` or `std::thread::attributes`.
 
-*Effects*: Constructs an object of type `thread`, taking in account the passed attributes. The first overload behaves a if a default attributes was passed. ....
+*Effects*: Constructs an object of type `thread`, taking in account the passed attributes. The first overload behaves as if a default attributes was passed. ....
 
  
 # Implementability
@@ -268,4 +274,4 @@ Thanks to all that commented this proposal helping me to improve globally the pa
 * [P0159R0] P0159 - Draft of Technical Specification for C++ Extensions for Concurrency
 
 	http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/p0159r0.html 
-
+
