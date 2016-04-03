@@ -125,7 +125,7 @@ std::thread th(attrs, find_the_question, 42);
 
 ## Making the stack size really a portable attribute
 
-As the stack size is given as a hint, there is no portability issues. In platforms where the the stack size can not be set, this hint is just ignored, and the the result of getting it would be the value '0', meaning the default stack size.
+As the stack size is given as a hint, there is no portability issues. In platforms where the the stack size can not be set, this hint is just ignored, and the result of getting it would be the value '0', meaning the default stack size.
 
 ## Using setters versus constructors
 
@@ -173,7 +173,7 @@ inline namespace concurrency_v3 {
 ```
 namespace std {
 namespace experimental {
-inline namespace fundamentals_v3 {
+inline namespace concurrency_v3 {
 
 class thread::attributes {
 public:
@@ -190,7 +190,7 @@ public:
 }}}
 ```
 
-Implementation are free to add other functions not specified in this document.
+Implementations are free to add other functions not specified in this document.
 
 
 ```c++
@@ -226,7 +226,7 @@ std::size_t get_stack_size() const noexcept;
 ```
 
 
-*Returns*: Returns an instance of `native_handle_type` that can be used with platform-specific APIs to manipulate the underlying thread attributes implementation. If no such instance exists, `native_handle()` and `native_handle_type` are not present and `BOOST_THREAD_DEFINES_THREAD_ATTRIBUTES_NATIVE_HANDLE` is not defined. 
+*Returns*: Returns an instance of `native_handle_type` that can be used with platform-specific APIs to manipulate the underlying thread attributes implementation. If no such instance exists, `native_handle()` and `native_handle_type` are not present. 
 
 *Throws*: Nothing. 
 
