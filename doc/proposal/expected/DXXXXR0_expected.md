@@ -21,7 +21,7 @@
     </tr>
     <tr>
         <td width="172" align="left" valign="top">Reply-to:</td>
-        <td width="435">Vicente J. Botet Escriba &lt;<a href="mailto:vicente.botet@wanadoo.fr">vicente.botet@wanadoo.fr</a>&gt;</td>
+        <td width="435">Vicente J. Botet Escriba &lt;<a href="mailto:vicente.botet@wanadoo.fr">vicente.botet@nokia.com</a>&gt;</td>
     </tr>
 </table>
 
@@ -758,9 +758,9 @@ The example section shows how these operations are important to `expected`. The 
 
 ### Functor `map`
 
-The operation `map` consider `expected` as a `Functor` and just apply a function on the contained value, if any. The types of the two overloads are presented using a functional notation and the `[]` represents a context in which the value `T` or `U` is contained. The current context is `expected<_t,E>` and thus `[T]` is equivalent to `expected<T,E>`.
+The operation `map` consider `expected` as a `Functor` and just apply a function on the contained value, if any. The types of the two overloads are presented using a functional notation and the `[]` represents a context in which the value `T` or `U` is contained. The current context is `expected<_t,E>` and thus `[T]` is equivalent to `expected<T,E>` for a specific `E`.
 
-* (T -> U) -> [U]
+    (T -> U) -> [U]
 
 Whatever the return type of the continuation, we observe that it is always wrapped into a context. The monadic bind do it differently.
 
@@ -774,7 +774,7 @@ Finally, the `bind` operation is similar to `map` but doesn’t wrap the value i
 
 The functional signature of bind can be described as follow:
 
-* (T -> [U]) -> [U]
+    (T -> [U]) -> [U]
 
 If a *do-notation* is introduced in C++, as proposed in section [Do-Notation], these operations can become a powerful abstraction, they have been proven very useful in Haskell. For example, a similar interface could be used with `optional`.
 
@@ -782,8 +782,8 @@ If a *do-notation* is introduced in C++, as proposed in section [Do-Notation], t
 
 The last operation has no direct counterpart in functional language and is inspired from [N3857] proposing some improvements to `std::future<T>`. The functional signature is as follow:
 
-* ([T] -> U) -> [U]
-* ([T] -> [U]) -> [U]
+    ([T] -> U) -> [U]
+    ([T] -> [U]) -> [U]
 
 It has a conditional wrapping strategy: it doesn’t wrap if the continuation already wraps it up.
 
