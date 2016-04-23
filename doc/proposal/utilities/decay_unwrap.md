@@ -17,7 +17,7 @@
     </tr>
     <tr>
         <td width="172" align="left" valign="top">Reply-to:</td>
-        <td width="435">Vicente J. Botet Escriba &lt;<a href="mailto:vicente.botet@wanadoo.fr">vicente.botet@wanadoo.fr</a>&gt;</td>
+        <td width="435">Vicente J. Botet Escrib&aacute; &lt;<a href="mailto:vicente.botet@wanadoo.fr">vicente.botet@nokia.com</a>&gt;</td>
     </tr>
 </table>
 
@@ -74,7 +74,7 @@ This trait can already be used in the following cases
  
 To the knowledge of the author `decay_unwrap` is used already in [HPX], and in [Boost.Thread] as `deduced_type`.
 
-The author plan to use it also in other factory proposals as the ongoing [MAKEF] [FUTURE_EMPLACE].
+The author plan to use it also in other factory proposals as the ongoing [MAKEF] and [FUTURE_EMPLACE].
 
 
 # Proposal
