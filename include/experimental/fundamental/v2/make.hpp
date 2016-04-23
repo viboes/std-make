@@ -44,17 +44,17 @@ inline namespace fundamental_v2
   }
 
   // make overload: requires a type constructor, deduce the underlying type
-  template <class TC, int = 0, int..., class ...X>
+  template <class TC, int = 0, int..., class ...Xs>
   constexpr typename enable_if<
-    meta::is_applicable_with<TC, meta::deduced_type_t<X>...>::value,
-    meta::apply<TC, meta::deduced_type_t<X>...>
+    meta::is_applicable_with<TC, meta::deduced_type_t<Xs>...>::value,
+    meta::apply<TC, meta::deduced_type_t<Xs>...>
   >::type
-  make(X&& ...x)
+  make(Xs&& ...xs)
   {
-    return make_custom(meta::id<meta::apply<TC, meta::deduced_type_t<X>...>>{}, std::forward<X>(x)...);
+    return make_custom(meta::id<meta::apply<TC, meta::deduced_type_t<Xs>...>>{}, std::forward<Xs>(xs)...);
   }
 
-  // make overload: requires a type with a specific underlying type, don't deduce the underlying type from X
+  // make overload: requires a type with a specific underlying type, don't deduce the underlying type from Xs
   template <class M, int = 0, int..., class ...Xs>
   constexpr typename enable_if<
     ! meta::is_applicable_with<M, meta::deduced_type_t<Xs>...>::value
@@ -66,11 +66,11 @@ inline namespace fundamental_v2
   }
 
   // make overload: requires a template class, deduce the underlying type
-  template <template <class ...> class M, int = 0, int..., class ...X>
-  constexpr M<meta::deduced_type_t<X>...>
-  make(X&& ...x)
+  template <template <class ...> class M, int = 0, int..., class ...Xs>
+  constexpr M<meta::deduced_type_t<Xs>...>
+  make(Xs&& ...xs)
   {
-    return make<meta::type_constructor_t<meta::template_class<M>>>(std::forward<X>(x)...);
+    return make<meta::type_constructor_t<meta::template_class<M>>>(std::forward<Xs>(xs)...);
   }
 }
 }
@@ -83,22 +83,24 @@ namespace meta
 {
 inline namespace v1
 {
-  // default customization point for constructor from X...
-  template <class M, class ...X>
+  // default customization point for constructor from Xs...
+  template <class M, class ...Xs>
   constexpr auto
-  make_custom(meta::id<M>, X&& ...x)
-  -> decltype(M(std::forward<X>(x)...))
+  make_custom(meta::id<M>, Xs&& ...xs)
+  -> decltype(M(std::forward<Xs>(xs)...))
+//  -> decltype(auto)
   {
-    return M(std::forward<X>(x)...);
+    return M(std::forward<Xs>(xs)...);
   }
 
-  // default customization point for constructor from X...
-  template <class T, class ...X>
+  // default customization point for constructor from Xs...
+  template <class T, class ...Xs>
   constexpr auto
-  make_custom(meta::id<T*>, X&& ...x)
-  -> decltype(new T(std::forward<X>(x)...))
+  make_custom(meta::id<T*>, Xs&& ...xs)
+  -> decltype(new T(std::forward<Xs>(xs)...))
+//  -> decltype(auto)
   {
-    return new T(std::forward<X>(x)...);
+    return new T(std::forward<Xs>(xs)...);
   }
 }
 }
