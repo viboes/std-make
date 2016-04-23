@@ -5,7 +5,7 @@
     </tr>
     <tr>
         <td width="172" align="left" valign="top">Date:</td>
-        <td width="435">2016-01-31</td>
+        <td width="435">2016-04-23</td>
     </tr>
     <tr>
         <td width="172" align="left" valign="top">Project:</td>
@@ -17,16 +17,16 @@
     </tr>
     <tr>
         <td width="172" align="left" valign="top">Reply-to:</td>
-        <td width="435">Vicente J. Botet Escriba &lt;<a href="mailto:vicente.botet@wanadoo.fr">vicente.botet@wanadoo.fr</a>&gt;</td>
+        <td width="435">Vicente J. Botet Escrib&aacute; &lt;<a href="mailto:vicente.botet@wanadoo.fr">vicente.botet@nokia.com</a>&gt;</td>
     </tr>
 </table>
 
-Adding Emplace Factories for `promise<T>/future<T>/exception_ptr`
+Adding Emplace functions for `promise<T>/future<T>`
 ===================================================
 
 **Abstract**
 
-This paper proposes the addition of emplace factories for `future<T>` as we have proposed for of `any` and `optional` in [P0032R1].
+This paper proposes the addition of emplace factories for `future<T>` and emplace functions for `promise<T>` as we have proposed for of `any` and `optional` in [P0032R2].
 
 # Table of Contents
 
@@ -43,11 +43,11 @@ This paper proposes the addition of emplace factories for `future<T>` as we have
 
 # Introduction
 
-This paper proposes the addition of emplace factories for `future<T>` as we have proposed for of `any` and `optional` in [P0032R1].
+This paper proposes the addition of emplace factories for `future<T>` and emplace functions for `promise<T>` as we have proposed for of `any` and `optional` in [P0032R2].
 
 # Motivation
 
-While we have added the `future<T>` factories `make_ready_future` and `make_exceptional_future` into [P0159R0], we don't have emplace factories as we have for `shared_ptr`and `unique_ptr` and we could have for `any` and `optional` if [P0032R1] is accepted.  
+While we have added the `future<T>` factories `make_ready_future` and `make_exceptional_future` into [P0159R0], we don't have emplace factories as we have for `shared_ptr`and `unique_ptr` and we could have for `any` and `optional` if [P0032R2] is accepted.  
 
 The C++ standard should be coherent for features that behave the same way on different types and complete, that is, don't miss features that could make the user code more efficient. 
 
@@ -59,16 +59,10 @@ We propose to:
 
 * Add `promise<T>::emplace(Args...)` member function that emplaces the value instead of setting it.
 
-* Add `promise<T>::emplace_exception<E>(Args...)`  member function that emplaces the exception `E` instead of setting it.
-
-* Add `exception_ptr` emplace factory `emplace_exception_ptr<E>(Args...)`/`make_exception_ptr<E>(Args...)` that emplaces any exception on an `exception_ptr` instead of moving it.
-
 * Add `future<T>` emplace factory `emplace_ready_future<T>(Args...)`/`make_ready_future<T>(Args...)`.
 
 * Add `future<T>` emplace factory `emplace_exceptional_future<T,E>(Args...)/make_exceptional_future<T,E>(Args...)`.
 
-
-## Emplace factory for exception_ptr
 
 ## Emplace assignment for promises
 
@@ -81,27 +75,26 @@ Before
 	  if (cnd)
 	    p.set_value(X(a, b, c));
 	  else 
-	    p.set_exception<MyException>(MyException(__FILE_, __LINE__));
-	    //p.set_exception(make_exception_ptr(MyException(__FILE_, __LINE__)));
+	    p.set_exception(make_exception_ptr(MyException(__FILE_, __LINE__)));
 	}
 ```
 
-Note that we need to repeat `X` and `MyException`.
+Note that we need to repeat `X`.
 
 With this proposal we can just emplace either the value or the exception.
 
 ```c++
 	void producer(promise<int>& p) {
 	  if (cnd) p.set_value(a, b, c);
-	  else p.set_exception<myException>(__FILE_, __LINE__);
+	  else p.set_exception(MyException(__FILE_, __LINE__));
 	}
 ```
 
-Note that not only the code can be more efficient,  it is also clearer and more robust as we don't repeat neither `X` neither `MyException`.
+Note that not only the code can be more efficient, it is also clearer and more robust as we don't repeat neither `X`..
 
 ## Emplace factory for futures
 
-Some future producer functions may know how to build the value at the point of construction and possibly the exception. However, when the value type is not available it must be constructed explicitly before making a ready future. The same applies for a possible exception that must be be built.
+Some future producer functions may know how to build the value at the point of construction and possibly the exception. However, when the value type is not available it must be constructed explicitly before making a ready future. The same applies for a possible exception that must be built.
 
 Before
 
@@ -116,14 +109,14 @@ Before
 	}
 ```
 
-The same reasoning than the previous section applies here. With this proposal we can just write less code and have more (as possible more efficient)
+The same reasoning than the previous section applies here. With this proposal we can just write less code and have more (as possible more efficient).
 
 ```c++
 future<int> futureProducer(bool cnd1, bool cnd2) {
 	  if (cnd1) 
 	    return make_ready_future<X>(a, b, c);
 	  if (cnd2) 
-	    return make_exceptional_future<X, MyException>(__FILE_, __LINE__);
+	    return make_exceptional_future<X>(MyException(__FILE_, __LINE__));
 	  else 
 	    return somethingElse();
 	}
@@ -144,11 +137,13 @@ The current standard and the TS provide already a lot of such emplace operations
 
 This proposal just extends the current future factories to emplace factories.
 
-Should we provide a future `in_place` constructor? For coherency purposes and in order to be generic, yes, we should. However we should also provide a constructor from a `T` which doesn't exists neither.
+Should we provide a future `in_place` constructor? For coherency purposes and in order to be generic, yes, we should. However we should also provide a constructor from a `T` which doesn't exists neither. This paper doesn't proposes this yet.
 
 ## Promise emplace assignments
 
 `std::experimental::optional` provides emplace assignments via `optional::emplace()` and it could provide emplace factory if [P0032R0] is accepted.
+
+We believe that `promise<T>` should provide and similar interface. However, a promise accepts to be set only once, and so the function name should be different for the authors.
 
 # Impact on the standard
 
@@ -159,27 +154,6 @@ These changes are entirely based on library extensions and do not require any la
 The wording is relative to [P0159R0].
 
 The current wording make use of `decay_unwrap_t` as proposed in [decay_unwrap], but if this is not accepted the wording can be changed without too much troubles.
-
-## Language support library
-
-
-**X.Y Header `<experimental/exception_ptr>` synopsis**
-
-```Replace the `make_exception_ptr` declaration in [support.exception] by```
-
-```c++
-namespace std {
-namespace experimental {
-inline namespace concurrency_v2 {
-
-template <class E>
-exception_ptr make_exception_ptr(E e) noexcept;
-template <class E, class ...Args>
-exception_ptr make_exception_ptr(Args&& ...args) noexcept;
-
-}}
-}
-```
 
 
 ## Thread library
@@ -205,14 +179,6 @@ future<T> make_ready_future(Args&& ...args) noexcept;
 }
 ```
 
-*Add the `make_exceptional_future` declaration in [header.future.synop]*
-
-```c++
-template <class T, class E, class ...Args>
-future<T> make_exceptional_future(Args&& ...args) noexcept;
-```
-
-
 **X.Y Class template `promise`**
 
 ```Add  [futures.promise] the following in the synopsis```
@@ -223,10 +189,6 @@ void promise::set_value(Args&& ...args);
 template <class U, class... Args>
 void promise::set_value(initializer_list<U> il, Args&&... args);
 
-template <class E, class ...Args>
-void set_exception(Args&& ...args);
-template <class E, class U, class... Args>
-void set_exception(initializer_list<U> il, Args&&... args);
 ```
 
 ```Add the following```
@@ -259,34 +221,6 @@ void promise::set_value(initializer_list<U> il, Args&&... args);
 
 ```[NDLR] Throws and Error conditions as before```
 
-###################################
-```c++
-template <class E, class ...Args>
-void set_exception(Args&& ...args);
-```
-
-*Requires*: `is_constructible<R, Args&&...>`
-
-*Effects*: atomically initializes the the exception pointer as if direct-non-list-initializing an object of type `R` with the arguments `forward<Args>(args)...)` in the shared state and makes that state ready.
-
-*Postconditions*: this contains an exception.
-
-```[NDLR] Throws and Error conditions as before```
-
-###################################
-```c++
-template <class E, class U, class... Args>
-void set_exception(initializer_list<U> il, Args&&... args);
-```
-
-*Requires*: `is_constructible<R, initializer_list<U>&, Args&&...>`
-
-*Effects*: atomically initializes the the exception pointer as if direct-non-list-initializing an object of type `R` with the arguments `il, forward<Args>(args)...)`in the shared state and makes that state ready.
-
-*Postconditions*: this contains an exception.
-
-```[NDLR] Throws and Error conditions as before```
-
 **Function template make_ready_future**
 
 ```[NDLR] Add to [futures.make_ready_future] the following```
@@ -307,31 +241,10 @@ future<T> make_ready_future(Args&& ...args) noexcept;
 
 *Postconditions*: The returned future contains a value.
 
-**Function template make_exceptional_future**
-
-Add to [futures.make_exceptional_future] the following
-
-###################################
-```c++
-template <class T>
-future<T> make_exceptional_future(exception_ptr excp);
-template <class T, class E>
-future<T> make_exceptional_future(E excp);
-template <class T, class E, class ...Args>
-future<T> make_exceptional_future(Args&& ...args);
-```
-
-*Effects*: The function creates a shared state immediately ready copying the `exception_ptr` with `excp` for the first overload, and emplacing  `excp` for the second and `E{args...}` for the third overloads. 
-
-*Returns*: A future associated with that shared state. 
-
-*Postconditions*: The returned future contains a value.
-
-
    
 # Implementability
 
-[Boost.Thread] contains an implementation of the future interface. However the `exception_ptr` emplace functions have not been implemented yet, and so `promise::set_exception<E>(a1, …, aN)` as it can not implemented ensuring a real emplace.
+[Boost.Thread] contains an implementation of the emplace value functions. 
 
 # Open Points
 
@@ -360,31 +273,22 @@ template <typename ...Args>
 void promise::set_value(Args&& as);
 ```
 
-However optional names this member function `emplace`. Should we add a new member `emplace` function or overload `set_value`?
+`optional` names this member function `emplace`. However, a promise accepts to be set only once, and so the function name should be different. Should we add a new member `emplace` function to `promise<T>` or overload `set_value`?
 
+# Future work
 
-## `promise::emplace_exception<E>` versus `promise<T>::set_exception<E>`
-
-The same applies to `promise<R>::set_exception` member function that could accept 
-
-```c++
-template < typename E, typename ...Args>
-void promise<R>::set_exception(Args&& ...as);
-```
-
-Alternatively we could name this function emplace_exception. What do we prefer?
-
+In addition to emplace value functions we could also have emplace exceptions functions. This would need to update also `exception_ptr` emplace factories. While this cases can perform better, the exceptional case need less optimizations.   
 
 # Acknowledgements 
 
-Thanks to ...
+Thanks to Jonathan Wakely for his suggestion to limit the proposal to the emplace value cases which should be more consensual.
 
 # References
 
 [N4480]: http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/n4480.html "N4480- Working Draft, C++ Extensions for Library Fundamentals"
 [P0032R0]: http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/p0032r0.pdf "P0032 - Homogeneous interface for variant, any and optional" 
 
-[P0032R1]: http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/p0032r1.pdf "P0032 - Homogeneous interface for variant, any and optional - Revision 1" 
+[P0032R2]: http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0032r2.pdf "P0032 - Homogeneous interface for variant, any and optional - Revision 1" 
 
 [P0159R0]: http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/p0159r0.html "P0159 - Draft of Technical Specification for C++ Extensions for Concurrency"
 
@@ -404,9 +308,9 @@ Thanks to ...
 
 	http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/p0032r0.pdf
 
-* [P0032R1] P0032 - Homogeneous interface for variant, any and optional - Revision 1
+* [P0032R2] P0032 - Homogeneous interface for variant, any and optional - Revision 1
 
-	http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/p0032r1.pdf
+	http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0032r2.pdf
 
 * [P0159R0] P0159 - Draft of Technical Specification for C++ Extensions for Concurrency
 
