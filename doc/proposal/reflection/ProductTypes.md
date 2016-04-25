@@ -7,7 +7,7 @@
     </tr>
     <tr>
         <td width="172" align="left" valign="top">Date:</td>
-        <td width="435">2016-04-23</td>
+        <td width="435">2016-04-25</td>
     </tr>
     <tr>
         <td width="172" align="left" valign="top">Project:</td>
@@ -178,45 +178,52 @@ auto get(PT&& pt) { return product_type_get(N, forward<PT>(pt)); }
 
 # Wording
 
-## Product types access
+## Product types terms
 
-### Product type macros
-**Defines the following macros as we define INVOKE**
+A type `E` is a *product type* if the following terms are well defined.
 
-#### PRODUCT\_TYPE\_SIZE(E)
+*product type size*
 
-If E is an array type with element type T, equal to the number of elements of E.
+* If E is an array type with element type T, equal to the number of elements of E.
+* Else , if the expression `e.product_type_size()` is a well-formed integral constant expression, equal to `e.product_type_size()`.
+* Else, if all of E's non-static data members and bit-fields shall be public direct members of E or of the same unambiguous public base class of E, E shall not have an anonymous union member, equal to the number of non-static data members of E. 
+* Else it is undefined.
 
-Otherwise, if the expression `e.product_type_size()` is a well-formed integral constant expression, equal to `e.product_type_size()`.
+*product type i <sup>th</sup>-element* 
 
-Otherwise, all of E's non-static data members and bit-fields shall be public direct members of E or of the same unambiguous public base class of E, E shall not have an anonymous union member, equal to the number of non-static data members of E. 
+* If *product type size* `E` is defined and `i < `*product type size* `E`.
+    * If `E` is an array type with element type `T`, equal to `e[i]`.
+    * else, if the expression `e.product_type_size()` is a well-formed integral constant expression, equal to the following: The unqualified-id `product_type_get` is looked up in the scope of `E` by class member access lookup (3.4.5 [basic.lookup.classref]), and if that finds at least one declaration, the value is `e.product_type_get<i-1>()`. Otherwise, the value is `product_type_get<i-1>(e)`, where `product_type_get` is looked up in the associated namespaces (3.4.2 [basic.lookup.argdep]). [ Note: Ordinary unqualified lookup (3.4.1 [basic.lookup.unqual]) is not performed. -- end note ].
+    * else, if all of `E`'s non-static data members and bit-fields shall be public direct members of `E` or of the same unambiguous public base class of `E`, `E` shall not have an anonymous union member, equal to  `e.mi` where `i`-th non-static data member of `E` in declaration order is designated by `mi`. 
+    * else it is undefined.
+* else it is undefined.
 
-Otherwise it is undefined.
-
-#### PRODUCT\_TYPE\_GET(i, e)
-
-If `PRODUCT_TYPE_SIZE(E)` is defined and  `i < PRODUCT_TYPE_SIZE(E)`.
-
-and if `E` is an array type with element type `T`, equal to `e[i]`.
-
-Otherwise, if the expression `e.product_type_size()` is a well-formed integral constant expression, equal to 
-
-The unqualified-id `product_type_get` is looked up in the scope of `E` by class member access lookup (3.4.5 [basic.lookup.classref]), and if that finds at least one declaration, the value is `e.product_type_get<i-1>()`. Otherwise, the value is `product_type_get<i-1>(e)`, where `product_type_get` is looked up in the associated namespaces (3.4.2 [basic.lookup.argdep]). [ Note: Ordinary unqualified lookup (3.4.1 [basic.lookup.unqual]) is not performed. -- end note ].
-
-Otherwise, all of `E`'s non-static data members and bit-fields shall be public direct members of `E` or of the same unambiguous public base class of `E`, `E` shall not have an anonymous union member, equal to 
-`e.mi` where `i`-th non-static data member of `E` in declaration order is designated by `mi`. 
-
-Otherwise it is undefined.
 
 If either one of the previous macros is undefined the other is undefined also.
 
 **Defines the following operators**
 
-### Product type objects
+*TBC*
 
-### Product type objects
 
-#### Product type synopsis
+**On the Structurd binding, 7.1.6.4 [dcl.spec.auto] paragraph 8 replace**
+
+If `E` is an array type with element type `T`, the number of elements in the identifier-list shall be equal to the number of elements of `E`. Each `v`<sub>`i`</sub> is the name of an lvalue that refers to the element `i-1` of the array and whose type is `T`; the referenced type is `T`. [ Note: The top-level cv-qualifiers of `T` are cv. -- end note ]
+
+Otherwise, if the expression `std::tuple_size<E>::value` is a well-formed integral constant expression, the number of elements in the identifier-list shall be equal to the value of that expression. The unqualified-id `get` is looked up in the scope of `E` by class member access lookup (3.4.5 [basic.lookup.classref]), and if that finds at least one declaration, the initializer is `e.get<i-1>()`. Otherwise, the initializer is `get<i-1>(e)`, where `get` is looked up in the associated namespaces (3.4.2 [basic.lookup.argdep]). [ Note: Ordinary unqualified lookup (3.4.1 [basic.lookup.unqual]) is not performed. -- end note ] In either case, `e` is an lvalue if the type of the entity `e` is an lvalue reference and an xvalue otherwise. Given the type `T`<sub>`i`</sub> designated by `std::tuple_element<i-1,E>::type`, each `v`<sub>`i`</sub> is a variable of type "reference to `T`<sub>`i`</sub>" initialized with the initializer, where the reference is an lvalue reference if the initializer is an lvalue and an rvalue reference otherwise; the referenced type is `T`<sub>`i`</sub>.
+
+Otherwise, all of `E`'s non-static data members and bit-fields shall be public direct members of `E` or of the same unambiguous public base class of `E`, `E` shall not have an anonymous union member, and the number of elements in the identifier-list shall be equal to the number of non-static data members of `E`. The `i`-th non-static data member of `E` in declaration order is designated by `m`<sub>`i`</sub>. Each `v`<sub>`i`</sub> is the name of an lvalue that refers to the member `m`<sub>`i`</sub> of `e` and whose type is cv `T`<sub>`i`</sub>, where `T`<sub>`i`</sub> is the declared type of that member; the referenced type is cv `T`<sub>`i`</sub>. The lvalue is a bit-field if that member is a bit-field.
+
+**with**
+
+The number of elements in the identifier-list shall be equal to *product type size of E*  .
+
+Each `v`<sub>`i`</sub> is the name of an lvalue that refers to *product type i<sup>th</sup>-element of e*
+
+
+## Library
+
+### Product type object
 
 In `<product_type>`
 
@@ -236,51 +243,30 @@ constexpr auto get(PT&& pt) { return product_type_get(N, forward<PT>(pt)); }
 
 #### `product_type::size`
 
-The `product_type_size` operator yields the number of elements of a product type represented by operand. The operand is either an expression, which is an unevaluated operand (Clause 5), or a parenthesized type-id. It is defined as if `PRODUCT_TYPE_SIZE(E)` where E is the decay type of the operand.
 
 ```c++
 template <class PT>
-constexpr size_t size() { return PRODUCT_TYPE_SIZE(PT); }
+static constexpr size_t size();
 ```
 
-*Effect* As if `return  PRODUCT_TYPE_SIZE(N, pt)`.
+*Effect*: As if return *product type size* `PT`.
 
-*Remark* This operation would not be defined if `PRODUCT_TYPE_SIZE(PT)` is undefined.
-
-
-
+*Remark*: This operation would not be defined if *product type size* `PT`. is undefined.
 
 #### `product_type::get`
 
-The `product_type_get ` operator gives access to the i<sup>th</sup> element of a product type as `PRODUCT_TYPE_GET(i, e)`.
 
 ```c++
 template <size_t N, class PT>
-constexpr auto get(PT&& pt) { return PRODUCT_TYPE_GET(N, pt); }
+constexpr auto get(PT&& pt);
 ```
 
-*Effect* As if `return  PRODUCT_TYPE_GET(N, pt)`.
+*Requires*: `N < size<PT>()`
 
-*Remark* This operation would not be defined if `PRODUCT_TYPE_GET(N, pt)` is undefined.
+*Effect*: As if return  *product type Nth-element* of `pt`.
 
+*Remark*: This operation would not be defined if *product type Nth-element* of `pt` is undefined.
 
-
-**On the Structurd binding, 7.1.6.4 [dcl.spec.auto] paragraph 8 replace**
-
-If `E` is an array type with element type `T`, the number of elements in the identifier-list shall be equal to the number of elements of `E`. Each `v`<sub>`i`</sub> is the name of an lvalue that refers to the element `i-1` of the array and whose type is `T`; the referenced type is `T`. [ Note: The top-level cv-qualifiers of `T` are cv. -- end note ]
-
-Otherwise, if the expression `std::tuple_size<E>::value` is a well-formed integral constant expression, the number of elements in the identifier-list shall be equal to the value of that expression. The unqualified-id `get` is looked up in the scope of `E` by class member access lookup (3.4.5 [basic.lookup.classref]), and if that finds at least one declaration, the initializer is `e.get<i-1>()`. Otherwise, the initializer is `get<i-1>(e)`, where `get` is looked up in the associated namespaces (3.4.2 [basic.lookup.argdep]). [ Note: Ordinary unqualified lookup (3.4.1 [basic.lookup.unqual]) is not performed. -- end note ] In either case, `e` is an lvalue if the type of the entity `e` is an lvalue reference and an xvalue otherwise. Given the type `T`<sub>`i`</sub> designated by `std::tuple_element<i-1,E>::type`, each `v`<sub>`i`</sub> is a variable of type "reference to `T`<sub>`i`</sub>" initialized with the initializer, where the reference is an lvalue reference if the initializer is an lvalue and an rvalue reference otherwise; the referenced type is `T`<sub>`i`</sub>.
-
-Otherwise, all of `E`'s non-static data members and bit-fields shall be public direct members of `E` or of the same unambiguous public base class of `E`, `E` shall not have an anonymous union member, and the number of elements in the identifier-list shall be equal to the number of non-static data members of `E`. The `i`-th non-static data member of `E` in declaration order is designated by `m`<sub>`i`</sub>. Each `v`<sub>`i`</sub> is the name of an lvalue that refers to the member `m`<sub>`i`</sub> of `e` and whose type is cv `T`<sub>`i`</sub>, where `T`<sub>`i`</sub> is the declared type of that member; the referenced type is cv `T`<sub>`i`</sub>. The lvalue is a bit-field if that member is a bit-field.
-
-**with**
-
-The number of elements in the identifier-list shall be equal to `PRODUCT_TYPE_SIZE(E)`.
-
-Each `v`<sub>`i`</sub> is the name of an lvalue that refers to `PRODUCT_TYPE_GET(i, e)`
-
-
-## Library
 
 
 
