@@ -29,7 +29,7 @@ Product types: about structure binding and tuple-like access
 
 # Abstract
 
-This paper prose to change the customization points of Structured binding to something more specific and related to product types: `product_type_size` and  `product_type_get` either as members or non-members found by ADL.
+This paper proposes to change the customization points of Structured binding to something more specific and related to product types: `product_type_size` and  `product_type_get` either as members or non-members found by ADL.
 
 In addition, it proposes to add some product type specific operators to get the size and the n<sup>th</sup> element as well as some specific traits and functions.
 
@@ -59,39 +59,42 @@ Adopting [P0144R1] as such would mean that
 
 Accepting the previous points would at least mean that we need to change the freestanding implementation requirements and that the *extended tuple-like* access is based on the Structure Binding statement instead of the ad-hoc *tuple-like* access, and that we cannot access the size or the n<sup>th</sup> element directly and independently.
 
-The author considers that this is an acceptable situation, but would prefer to see what the committee thinks of an alternative design.
+The authors consider that this is an acceptable situation, but would prefer to see what the committee thinks of an alternative design.
 
 ## Alternative design
 
 Not accepting any of the previous points would mean a change on the definition of *tuple-like* access.
 
+### Independence on library
+
 In order to overcome the library dependency we need to find a way to avoid the use of `std::tuple_size<T>`. We have 3 possibilities:
 
-* A non-member function `get_tuple_size` that must be found by ADL.
-* A member function `tuple_size`.
-* Use `tuple_get<N>(tpl)` as customization point and deduce the tuple size as N for which `tuple_get<I>(tpl)` is well defined for any I in 0..N(-1) and `tuple_get<N>(tpl)` is not defined.
+* A non-member function `product_type_size` that must be found by ADL.
+* A member function `product_type_size `.
+* Use `product_type_get<N>(tpl)` as customization point and deduce the tuple size as N for which `product_type_get<I>(tpl)` is well defined for any I in 0..N(-1) and `product_type_get<N>(tpl)` is not defined.
 
-### non-member function `get_tuple_size`
+#### non-member function `product_type_size`
 
-We could think of a non-member function `get_tuple_size` that must be found by ADL. However `get_tuple_size<T>()` couldn't be found by ADL. We need to add the type on as a parameter. 
+We could think of a non-member function `product_type_size` that must be found by ADL. However `product_type_size<T>()` couldn't be found by ADL. We need to add the type on as a parameter. 
 
-We could instead to look for `get_tuple_size(T)` but this would be restricted to copyable types.
-We could instead to look for `get_tuple_size(T const&)` but this would accept types inheriting from `T`.
-We could use a nullary function that returns a pointer to `T` and look for `get_tuple_size(T*(*)())`. This has the advantage that it doesn't accept derived types and works for any type.
+We could instead to look for `product_type_size(T)` but this would be restricted to copyable types.
+We could instead to look for `product_type_size(T const&)` but this would accept types inheriting from `T`.
+We could use a nullary function that returns a pointer to `T` and look for `product_type_size(T*(*)())`. This has the advantage that it doesn't accept derived types and works for any type.
 
-### member function `tuple_size`
+#### member function `product_type_size`
 
 This seems much simpler.
 
-### non-member function `tuple_get<I>(tmpl)`
+#### non-member function `product_type_get<I>(tpl)`
 
 This also seems much simpler, but determining the size could be expensive at compile time.
 
-### Summary
 
-To provide *extended tuple-like* access for all the types covered by [P0144R1] which support getting the size and the n<sup>th</sup> element, we need to define some kind of predefined operators `pt_size(T)`/`pt_get<N>(pt)` that could use the new *tuple-like* customization points.
+### Able to manage with bitfields
 
-### Parameter packs
+To provide *extended tuple-like* access for all the types covered by [P0144R1] which support getting the size and the n<sup>th</sup> element, we need to define some kind of predefined operators `pt_size(T)`/`pt_get<N>(pt)` that could use the new *product-type-like* customization points.
+
+#### Parameter packs
 
 We shouldn't forget parameter packs, that could be seen as being similar to product types. Parameter packs already have the `sizeof...(T)` operator. Some (see e.g. [P0311R0] and references therein) are proposing to have a way to explicitly access the n<sup>th</sup> element of a pack (a variety of possible syntaxes have been suggested). The authors believe that the same operators should apply to parameter packs and product types.
 
@@ -99,27 +102,25 @@ We shouldn't forget parameter packs, that could be seen as being similar to prod
 
 This paper proposes to define a new *product type* access, to cover the previous *extended tuple-like* access, on which [P0144R1] would be based. The user shall be able to customize his own types to see them as *product types* ([P0144R1] case 2).
 
-The *product type* access is based on two operators/macros: one `pt_size(T)/PRODUCT_TYPE_SIZE(T)` to get the size and the other `pt_get<N>(pt)/PRODUCT_TYPE_GET(N,pt)` to get the `N`<sup>th</sup> element of a product type instance `pt` of type `T`. The definition of these operators/macros is based on the wording of structured binding [P0217R1].
+The *product type* access is based on two operators: one `pt_size(T) to get the size and the other `pt_get<N>(pt) to get the `N`<sup>th</sup> element of a product type instance `pt` of type `T`. The definition of these operators is based on the wording of structured binding [P0217R1].
 
-The user should of course, be able to customize his *product* types, as she already is able to do it for *tuple-like* types, but now it should define the member operations `pt_size()` and `pt_get<N>()`.
+The user should of course, be able to customize his *product* types, as she already is able to do it for *tuple-like* types, but now it should define the member operations `product_type_size()` and `product_type_get<N>()`.
 
-The name of the operators/operation `pt_size` and `pt_get` are of course subject to bike-shedding.
+The name of the operators `pt_size` and `pt_get` are of course subject to bike-shedding.
 This paper proposes the following names for the operators and the customization operations:
 
 * `pt_size(PT)` = `product_type_size(PT)`
 * `pt_get<N>(pt)` = `product_type_get(N,pt)`
 
-
 Customization points are functions with the same name as the operators:
 
 * `PT::pt_size()` = `PT::product_type_size()`
-`pt.pt_get<N>()` = `pt.product_type_get<N>()`
-`pt.pt_get<N>()` = `product_type_get<N>(pt)`
+* `pt.pt_get<N>()` = `pt.product_type_get<N>()`
+* `pt.pt_get<N>()` = `product_type_get<N>(pt)`
 
 Note that `product_type_size` and `product_type_get` must therefore be contextual keywords.
 
 But what would be the result type of those operators? While we can consider `product_type_size` as a function and we could say that it returns an `unsigned int`, `product_type_get(N,pt)` wouldn't be a function (if we want to support bitfields), and so `decltype(product_type_get(N,pt))` wouldn't be defined if the N<sup>th</sup> element is a bitfield managed on [P0144R1] case 3. In all the other cases we can define it depending on the const-rvalue nature of `pt`.
-
 
 The following could be syntactic sugar for those operators but we don't proposes them yet, waiting to see what we do with parameter packs direct access and sum types.
 
@@ -129,6 +130,8 @@ The following could be syntactic sugar for those operators but we don't proposes
 ## Caveats
 
 `sizeof(T)`, `pt_size(T)` and `pt_get<N>(pt)` are not functions, and so they cannot be used in any algorithm expecting a function. Generic algorithms working on *product* types should take the type as a template parameter and possibly an integral constant for the indices.
+
+### Library interface
 
 However, an alternative is to define generic functions `std::product_type::size<T>()` and `std::product_type::get<I>(pt)`.
 
