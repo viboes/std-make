@@ -24,12 +24,12 @@
 </table>
 
 
-Product types: about structure binding and tuple-like access 
-============================================================
+Product types: about structured binding and tuple-like access
+=============================================================
 
 # Abstract
 
-This paper proposes to change the customization points of Structured binding to something more specific and related to product types: `product_type_size` and  `product_type_get` either as members or non-members found by ADL.
+This paper proposes to change the customization points of structured binding to something more specific and related to product types: `product_type_size` and  `product_type_get` either as members or non-members found by ADL.
 
 In addition, it proposes to add some product type specific operators to get the size and the n<sup>th</sup> element as well as some specific traits and functions.
 
@@ -40,24 +40,24 @@ The wording has been modified so that both structured binding and product type a
 
 ## Status-quo
 
-[P0144R1] proposes the ability to bind all the members of a *extended tuple-like* type at a time via the new structure binding statement which has some primitive matching for some specific cases and let the user customize their types using the case 2 with the current ad-hoc *tuple-like* interface.
+[P0144R2] proposes the ability to bind all the members of a *extended tuple-like* type at a time via the new structured binding statement which has some primitive matching for some specific cases and let the user customize their types using the case 2 with the current ad-hoc *tuple-like* interface.
 
-[P0144R1] case 1 takes care of c-array (wondering if we cannot define already a *tuple-like* access for them that can be found by ADL). 
+[P0144R2] case 1 takes care of c-array (wondering if we cannot define already a *tuple-like* access for them that can be found by ADL).
 
-[P0144R1] case 3 support structure binding to bitfields as it does for any other non-static public member. 
+[P0144R2] case 3 support structured binding to bitfields as it does for any other non-static public member.
 
-This means that with [P0144R1] we will be able to access the members of some *extended tuple-like* types that would not have a *tuple-like* access. [P0197R0] proposes the generation of the *tuple-like* access function for simple structs as the [P0144R1] does for simple structs (case 3 in [P0144R1]).  However we are unable to define the `get<N>(tl)` function to access bitfields. So we cannot have a *tuple-like* access for all the types supported by [P0217R1]. This is unfortunately asymmetric. We want to have structure binding, pattern matching and *tuple-like* access for the same types.
+This means that with [P0144R2] we will be able to access the members of some *extended tuple-like* types that would not have *tuple-like* access. [P0197R0] proposes the generation of the *tuple-like* access function for simple structs as [P0144R2] does for simple structs (case 3 in [P0144R2]).  However we are unable to define the `get<N>(tl)` function to access bitfields. So we cannot have *tuple-like* access for all the types supported by [P0217R1]. This is unfortunately asymmetric. We want to have structured binding, pattern matching and *tuple-like* access for the same types.
 
 This means that the *extended tuple-like* access cannot be limited to the current *tuple-like* customization points. We need something different.
 
 In addition, [P0217R1] makes the language dependent on the customization point `std::tuple_size<T>`, which is defined in the library file `<utility>`. This file is not part of the freestanding implementation. We should avoid this kind of dependency as much as possible.
 
-Adopting [P0144R1] as such would mean that
+Adopting [P0144R2] as such would mean that
 
 * we accept a dependency on the library file `<utility>`, and
-* we would be unable to have *tuple-like* access for all the types covered by [P0144R1].
+* we would be unable to have *tuple-like* access for all the types covered by [P0144R2].
 
-Accepting the previous points would at least mean that we need to change the freestanding implementation requirements and that the *extended tuple-like* access is based on the Structure Binding statement instead of the ad-hoc *tuple-like* access, and that we cannot access the size or the n<sup>th</sup> element directly and independently.
+Accepting the previous points would at least mean that we need to change the freestanding implementation requirements and that the *extended tuple-like* access is based on the structured binding statement instead of the ad-hoc *tuple-like* access, and that we cannot access the size or the n<sup>th</sup> element directly and independently.
 
 The authors consider that this is an acceptable situation, but would prefer to see what the committee thinks of an alternative design.
 
@@ -65,7 +65,7 @@ The authors consider that this is an acceptable situation, but would prefer to s
 
 Not accepting any of the previous points would mean a change on the definition of *tuple-like* access.
 
-### Independence on library
+### Independence from library
 
 In order to overcome the library dependency we need to find a way to avoid the use of `std::tuple_size<T>`. We have 3 possibilities:
 
@@ -77,8 +77,8 @@ In order to overcome the library dependency we need to find a way to avoid the u
 
 We could think of a non-member function `product_type_size` that must be found by ADL. However `product_type_size<T>()` couldn't be found by ADL. We need to add the type on as a parameter. 
 
-We could instead to look for `product_type_size(T)` but this would be restricted to copyable types.
-We could instead to look for `product_type_size(T const&)` but this would accept types inheriting from `T`.
+We could look for `product_type_size(T)` but this would be restricted to copyable types.
+We could look for `product_type_size(T const&)` but this would accept types inheriting from `T`.
 We could use a nullary function that returns a pointer to `T` and look for `product_type_size(T*(*)())`. This has the advantage that it doesn't accept derived types and works for any type.
 
 #### member function `product_type_size`
@@ -89,20 +89,19 @@ This seems much simpler.
 
 This also seems much simpler, but determining the size could be expensive at compile time.
 
+### Ability to work with bitfields
 
-### Able to manage with bitfields
+To provide *extended tuple-like* access for all the types covered by [P0144R2] which support getting the size and the n<sup>th</sup> element, we need to define some kind of predefined operators `pt_size(T)`/`pt_get<N>(pt)` that could use the new *product type* customization points. The use of operators, as opposed to pure library functions, is particularly required to support bitfield members.
 
-To provide *extended tuple-like* access for all the types covered by [P0144R1] which support getting the size and the n<sup>th</sup> element, we need to define some kind of predefined operators `pt_size(T)`/`pt_get<N>(pt)` that could use the new *product-type-like* customization points.
+### Parameter packs
 
-#### Parameter packs
-
-We shouldn't forget parameter packs, that could be seen as being similar to product types. Parameter packs already have the `sizeof...(T)` operator. Some (see e.g. [P0311R0] and references therein) are proposing to have a way to explicitly access the n<sup>th</sup> element of a pack (a variety of possible syntaxes have been suggested). The authors believe that the same operators should apply to parameter packs and product types.
+We shouldn't forget parameter packs, which could be seen as being similar to product types. Parameter packs already have the `sizeof...(T)` operator. Some (see e.g. [P0311R0] and references therein) are proposing to have a way to explicitly access the n<sup>th</sup> element of a pack (a variety of possible syntaxes have been suggested). The authors believe that the same operators should apply to parameter packs and product types.
 
 # Proposal
 
-This paper proposes to define a new *product type* access, to cover the previous *extended tuple-like* access, on which [P0144R1] would be based. The user shall be able to customize his own types to see them as *product types* ([P0144R1] case 2).
+This paper proposes to define a new *product type* access, to cover the previous *extended tuple-like* access, on which [P0144R2] would be based. The user shall be able to customize his own types to see them as *product types* ([P0144R2] case 2).
 
-The *product type* access is based on two operators: one `pt_size(T) to get the size and the other `pt_get<N>(pt) to get the `N`<sup>th</sup> element of a product type instance `pt` of type `T`. The definition of these operators is based on the wording of structured binding [P0217R1].
+The *product type* access is based on two operators: one `pt_size(T)` to get the size and the other `pt_get<N>(pt)` to get the `N`<sup>th</sup> element of a product type instance `pt` of type `T`. The definition of these operators is based on the wording of structured binding [P0217R1].
 
 The user should of course, be able to customize his *product* types, as she already is able to do it for *tuple-like* types, but now it should define the member operations `product_type_size()` and `product_type_get<N>()`.
 
@@ -110,7 +109,7 @@ The name of the operators `pt_size` and `pt_get` are of course subject to bike-s
 This paper proposes the following names for the operators and the customization operations:
 
 * `pt_size(PT)` = `product_type_size(PT)`
-* `pt_get<N>(pt)` = `product_type_get(N,pt)`
+* `pt_get<N>(pt)` = `product_type_get<N>(pt)`
 
 Customization points are functions with the same name as the operators:
 
@@ -120,7 +119,7 @@ Customization points are functions with the same name as the operators:
 
 Note that `product_type_size` and `product_type_get` must therefore be contextual keywords.
 
-But what would be the result type of those operators? While we can consider `product_type_size` as a function and we could say that it returns an `unsigned int`, `product_type_get(N,pt)` wouldn't be a function (if we want to support bitfields), and so `decltype(product_type_get(N,pt))` wouldn't be defined if the N<sup>th</sup> element is a bitfield managed on [P0144R1] case 3. In all the other cases we can define it depending on the const-rvalue nature of `pt`.
+But what would be the result type of those operators? While we can consider `product_type_size` as a function and we could say that it returns an `unsigned int`, `product_type_get<N>(pt)` wouldn't be a function (if we want to support bitfields), and so `decltype(product_type_get<N>(pt))` wouldn't be defined if the N<sup>th</sup> element is a bitfield managed on [P0144R2] case 3. In all the other cases we can define it depending on the const-rvalue nature of `pt`.
 
 The following could be syntactic sugar for those operators but we don't proposes them yet, waiting to see what we do with parameter packs direct access and sum types.
 
@@ -185,28 +184,26 @@ A type `E` is a *product type* if the following terms are well defined.
 *product type size*
 
 * If E is an array type with element type T, equal to the number of elements of E.
-* Else , if the expression `e.product_type_size()` is a well-formed integral constant expression, equal to `e.product_type_size()`.
+* Else, if the expression `e.product_type_size()` is a well-formed integral constant expression, equal to `e.product_type_size()`.
 * Else, if all of E's non-static data members and bit-fields shall be public direct members of E or of the same unambiguous public base class of E, E shall not have an anonymous union member, equal to the number of non-static data members of E. 
 * Else it is undefined.
 
 *product type i <sup>th</sup>-element* 
 
-* If *product type size* `E` is defined and `i < `*product type size* `E`.
+* If the *product type size* of `E` is defined and `i` is less than the *product type size* of `E`.
     * If `E` is an array type with element type `T`, equal to `e[i]`.
-    * else, if the expression `e.product_type_size()` is a well-formed integral constant expression, equal to the following: The unqualified-id `product_type_get` is looked up in the scope of `E` by class member access lookup (3.4.5 [basic.lookup.classref]), and if that finds at least one declaration, the value is `e.product_type_get<i-1>()`. Otherwise, the value is `product_type_get<i-1>(e)`, where `product_type_get` is looked up in the associated namespaces (3.4.2 [basic.lookup.argdep]). [ Note: Ordinary unqualified lookup (3.4.1 [basic.lookup.unqual]) is not performed. -- end note ].
+    * Else, if the expression `e.product_type_size()` is a well-formed integral constant expression, equal to the following: The unqualified-id `product_type_get` is looked up in the scope of `E` by class member access lookup (3.4.5 [basic.lookup.classref]), and if that finds at least one declaration, the value is `e.product_type_get<i-1>()`. Otherwise, the value is `product_type_get<i-1>(e)`, where `product_type_get` is looked up in the associated namespaces (3.4.2 [basic.lookup.argdep]). [ Note: Ordinary unqualified lookup (3.4.1 [basic.lookup.unqual]) is not performed. -- end note ].
     * else, if all of `E`'s non-static data members and bit-fields shall be public direct members of `E` or of the same unambiguous public base class of `E`, `E` shall not have an anonymous union member, equal to  `e.mi` where `i`-th non-static data member of `E` in declaration order is designated by `mi`. 
-    * else it is undefined.
-* else it is undefined.
+    * Else it is undefined.
+* Else it is undefined.
 
-
-If either one of the previous macros is undefined the other is undefined also.
 
 **Defines the following operators**
 
 *TBC*
 
 
-**On the Structurd binding, 7.1.6.4 [dcl.spec.auto] paragraph 8 replace**
+**In 7.1.6.4 [dcl.spec.auto] paragraph 8 of the Structured Binding proposal, replace**
 
 If `E` is an array type with element type `T`, the number of elements in the identifier-list shall be equal to the number of elements of `E`. Each `v`<sub>`i`</sub> is the name of an lvalue that refers to the element `i-1` of the array and whose type is `T`; the referenced type is `T`. [ Note: The top-level cv-qualifiers of `T` are cv. -- end note ]
 
@@ -216,9 +213,9 @@ Otherwise, all of `E`'s non-static data members and bit-fields shall be public d
 
 **with**
 
-The number of elements in the identifier-list shall be equal to *product type size of E*  .
+The number of elements in the identifier-list shall be equal to *product type size of `E`*.
 
-Each `v`<sub>`i`</sub> is the name of an lvalue that refers to *product type i<sup>th</sup>-element of e*
+Each `v`<sub>`i`</sub> is the name of an lvalue that refers to *product type `i`<sup>th</sup>-element of `e`*.
 
 
 ## Library
@@ -249,7 +246,7 @@ template <class PT>
 static constexpr size_t size();
 ```
 
-*Effect*: As if return *product type size* `PT`.
+*Effect*: As if `return` *product type size* `PT`.
 
 *Remark*: This operation would not be defined if *product type size* `PT`. is undefined.
 
@@ -263,7 +260,7 @@ constexpr auto get(PT&& pt);
 
 *Requires*: `N < size<PT>()`
 
-*Effect*: As if return  *product type Nth-element* of `pt`.
+*Effect*: As if `return` *product type Nth-element* of `pt`.
 
 *Remark*: This operation would not be defined if *product type Nth-element* of `pt` is undefined.
 
@@ -289,6 +286,7 @@ class tuple {
     constexpr auto product_type_get() const && { return get<I>(*this); };
 };
 ```
+
 ### std::array
 
 **Add the associated customization**
@@ -306,7 +304,6 @@ class array {
     constexpr auto product_type_get() && { return get<I>(*this); };
     template <size_t I>
     constexpr auto product_type_get() const && { return get<I>(*this); };
-    
 };
 ```
 
@@ -334,7 +331,7 @@ With [P0017R1] we have now that we can consider classes with non-virtual public 
 [P0197R0] considers the elements of the base class as elements of the *tuple-like* type.
 I would expect that all the aggregates can be seen as *tuple-like* types, so we need surely to consider this case in [P0217R1] and [P0197R0].
 
-We should see aggregate initialization and structure binding almost as inverse operations.
+We should see aggregate initialization and structured binding almost as inverse operations.
 
 This could already be the case for predefined *tuple-like* types which will have aggregate initialization. However user defined *tuple-like* types would need to define the corresponding constructor.
 
@@ -343,7 +340,7 @@ This could already be the case for predefined *tuple-like* types which will have
 
 Thanks to Jens Maurer, Matthew Woehlke and Tony Van Eerd for their comments in private discussion about structured binding and product types.
 
-Thanks to all those that have commented the idea of a tuple-like generation on the std-proposals ML better helping to identify the constraints, in particular to Nicol Bolas, Matthew Woehlke and T.C..
+Thanks to all those that have commented the idea of a tuple-like generation on the std-proposals ML better helping to identify the constraints, in particular to J. "Nicol Bolas" McKesson, Matthew Woehlke and Tim "T.C." Song.
 
 # References
 
@@ -377,6 +374,8 @@ Thanks to all those that have commented the idea of a tuple-like generation on t
 [P0197R0]: http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/p0197r0.pdf "Default Tuple-like Access"
 
 [P0217R1]: http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0217r1.pdf "Proposed wording for structured bindings"   
+
+[P0311R0]: http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0311r0.html
 
 [DSPM]: http://davidsankel.com/uncategorized/c-language-support-for-pattern-matching-and-variants "C++ Language Support for Pattern Matching and Variants"
 
@@ -427,9 +426,9 @@ Thanks to all those that have commented the idea of a tuple-like generation on t
 
     http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0091r1.html
 
-* [P0144R1] Structured Bindings
+* [P0144R2] Structured Bindings
 
-    http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/p0144r1.pdf
+    http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0144r2.pdf
 
 * [P0151R0] Proposal of Multi-Declarators
 
