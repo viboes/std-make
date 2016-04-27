@@ -57,9 +57,7 @@ Adopting [P0144R2] as such would mean that
 * we accept a dependency on the library file `<utility>`, and
 * we would be unable to have *tuple-like* access for all the types covered by [P0144R2].
 
-Accepting the previous points would at least mean that we need to change the freestanding implementation requirements and that the *extended tuple-like* access is based on the structured binding statement instead of the ad-hoc *tuple-like* access, and that we cannot access the size or the n<sup>th</sup> element directly and independently.
-
-The authors consider that this is an acceptable situation, but would prefer to see what the committee thinks of an alternative design.
+Accepting the previous points would at least mean that we need to change the freestanding implementation requirements and that the *extended tuple-like* access is based on the structured binding statement instead of the ad-hoc *tuple-like* access, and that we cannot access the size or the n<sup>th</sup> element directly and independently. While the authors feel that this may be a tenable direction, we would strongly prefer that the committee consider our proposed alternate design which would address these issues more cleanly.
 
 ## Alternative design
 
