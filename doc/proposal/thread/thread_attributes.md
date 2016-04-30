@@ -1,7 +1,7 @@
 <table border="0" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="607">
     <tr>
         <td width="172" align="left" valign="top">Document number:</td>
-        <td width="435"><span style="background-color: #FFFF00">DXXXXR0</span></td>
+        <td width="435"><span style="background-color: #FFFF00">D0320R0</span></td>
     </tr>
     <tr>
         <td width="172" align="left" valign="top">Date:</td>
@@ -17,7 +17,7 @@
     </tr>
     <tr>
         <td width="172" align="left" valign="top">Reply-to:</td>
-        <td width="435">Vicente J. Botet Escriba &lt;<a href="mailto:vicente.botet@wanadoo.fr">vicente.botet@wanadoo.fr</a>&gt;</td>
+        <td width="435">Vicente J. Botet Escrib&aacute; &lt;<a href="mailto:vicente.botet@wanadoo.fr">vicente.botet@nokia.com</a>&gt;</td>
     </tr>
 </table>
 
@@ -66,7 +66,7 @@ As each platform has its own specific thread construction attributes, it is not 
 
 This paper proposes then to 
 
-* add a `thread::attributes` class with a single portable stack size attribute, and possible  getter of  a `native_handle_type` when available on the platform.
+* add a `thread::attributes` class with a single portable stack size attribute, and possible getter of  a `native_handle_type` when available on the platform.
 * add `thread` constructors taking a `thread::attributes` parameter.
 
 ## How to set the stack size?
@@ -271,7 +271,11 @@ Thanks to all that commented this proposal helping me to improve globally the pa
 
 [P0159R0]: http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/p0159r0.html "P0159 - Draft of Technical Specification for C++ Extensions for Concurrency"
 
+[Boost.Thread]: http://www.boost.org/doc/libs/1_60_0/doc/html/thread.html
+
+
 * [P0159R0] P0159 - Draft of Technical Specification for C++ Extensions for Concurrency
 
 	http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/p0159r0.html 
 
+* [Boost.Thread] http://www.boost.org/doc/libs/1_60_0/doc/html/thread.html

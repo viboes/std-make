@@ -1,7 +1,7 @@
 <table border="0" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="607">
     <tr>
         <td width="172" align="left" valign="top">Document number:</td>
-        <td width="435"><span style="background-color: #FFFF00">DXXXX</span>=yy-nnnn</td>
+        <td width="435"><span style="background-color: #FFFF00">D0319R0</span>=yy-nnnn</td>
     </tr>
     <tr>
         <td width="172" align="left" valign="top">Date:</td>
@@ -153,7 +153,7 @@ These changes are entirely based on library extensions and do not require any la
 
 The wording is relative to [P0159R0].
 
-The current wording make use of `decay_unwrap_t` as proposed in [decay_unwrap], but if this is not accepted the wording can be changed without too much troubles.
+The current wording make use of `decay_unwrap_t` as proposed in [P0318R0], but if this is not accepted the wording can be changed without too much troubles.
 
 
 ## Thread library
@@ -294,11 +294,12 @@ Thanks to Jonathan Wakely for his suggestion to limit the proposal to the emplac
 
 [DXXXX]: https://github.com/viboes/std-make/blob/master/doc/proposal/factories/DXXXX_factories.md "C++ generic factory" 
 
+[P0318R0]: https://github.com/viboes/std-make/blob/master/doc/proposal/utilities/decay_unwrap.md "`decay_unwrap` and `unwrap_reference`"
+
 [make.impl]: https://github.com/viboes/std-make/blob/master/include/experimental/std_make_v1/make.hpp "C++ generic factory - Implementation" 
 
 [Boost.Thread]: http://www.boost.org/doc/libs/1_60_0/doc/html/thread.html
 
-[decay_unwrap]: https://github.com/viboes/std-make/blob/master/doc/proposal/utilities/decay_unwrap.md "`decay_unwrap` and `unwrap_reference`"
        
 
 * [N4480] N4480 - Working Draft, C++ Extensions for Library Fundamentals
@@ -316,6 +317,10 @@ Thanks to Jonathan Wakely for his suggestion to limit the proposal to the emplac
 
 	http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/p0159r0.html 
 	
+* [P0318R0] `decay_unwrap` and `unwrap_reference`
+ 
+    https://github.com/viboes/std-make/blob/master/doc/proposal/utilities/decay_unwrap.md  
+
 * [DXXXX] - C++ generic factory 
 
 	https://github.com/viboes/std-make/blob/master/doc/proposal/factories/DXXXX_factories.md
@@ -326,6 +331,3 @@ Thanks to Jonathan Wakely for his suggestion to limit the proposal to the emplac
 
 * [Boost.Thread] http://www.boost.org/doc/libs/1_60_0/doc/html/thread.html
 
-* [decay_unwrap] `decay_unwrap` and `unwrap_reference`
- 
-    https://github.com/viboes/std-make/blob/master/doc/proposal/utilities/decay_unwrap.md  

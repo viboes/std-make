@@ -1,7 +1,7 @@
 <table border="0" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="607">
     <tr>
         <td width="172" align="left" valign="top">Document number:</td>
-        <td width="435"><span style="background-color: #FFFF00">DXXXX</span>=yy-nnnn</td>
+        <td width="435"><span style="background-color: #FFFF00">D0318R0</span>=yy-nnnn</td>
     </tr>
     <tr>
         <td width="172" align="left" valign="top">Date:</td>
@@ -74,7 +74,7 @@ This trait can already be used in the following cases
  
 To the knowledge of the author `decay_unwrap` is used already in [HPX], and in [Boost.Thread] as `deduced_type`.
 
-The author plan to use it also in other factory proposals as the ongoing [MAKEF] and [FUTURE_EMPLACE].
+The author plan to use it also in other factory proposals as the ongoing [MAKEF] and [P0319R0].
 
 
 # Proposal
@@ -214,7 +214,7 @@ Thanks to Agustín Bergé K-ballo who show me that [HPX] uses these traits alre
 
 [make.impl]: https://github.com/viboes/std-make/blob/master/include/experimental/std_make_v1/make.hpp "C++ generic factory - Implementation" 
 
-[FUTURE_EMPLACE]: https://github.com/viboes/std-make/blob/master/doc/proposal/future/future_emplace.md "Adding Emplace Factories for promise<T>/future<T>/exception_ptr" 
+[P0319R0]: https://github.com/viboes/std-make/blob/master/doc/proposal/future/future_emplace.md "Adding Emplace Factories for promise<T>/future<T>" 
 
 
 [Boost.Thread]: http://www.boost.org/doc/libs/1_60_0/doc/html/thread.html
@@ -237,7 +237,7 @@ Thanks to Agustín Bergé K-ballo who show me that [HPX] uses these traits alre
 
 	https://github.com/viboes/std-make/blob/master/include/experimental/std_make_v1/make.hpp
 
-* [FUTURE_EMPLACE] Adding Emplace Factories for promise<T>/future<T>/exception_ptr
+* [P0319R0] Adding Emplace Factories for promise<T>/future<T>
 
     https://github.com/viboes/std-make/blob/master/doc/proposal/future/future_emplace.md  
 
