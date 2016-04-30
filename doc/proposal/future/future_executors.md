@@ -5,11 +5,15 @@
     </tr>
     <tr>
         <td width="172" align="left" valign="top">Date:</td>
-        <td width="435">2015-01-11</td>
+        <td width="435">2015-11-22</td>
     </tr>
     <tr>
         <td width="172" align="left" valign="top">Project:</td>
-        <td width="435">Programming Language C++, Library Evolution Working Group</td>
+        <td width="435">ISO/IEC JTC1 SC22 WG21 Programming Language C++</td>
+    </tr>
+    <tr>
+        <td width="172" align="left" valign="top">Audience:</td>
+        <td width="435">Library Evolution Working Group</td>
     </tr>
     <tr>
         <td width="172" align="left" valign="top">Reply-to:</td>
@@ -18,7 +22,7 @@
 </table>
 
 Adding Executor Aware Constructors for `promise<T>`
-====================================================================
+===================================================
 
 # Introduction
 
@@ -69,13 +73,18 @@ An alternative is to type-erase the `Executor` type on the shared state, so that
 
 ## Do we need to add an `Executor` parameter to `make_ready_future` and  `make_exceptional_future`
 
+# Proposed Wording
 
-# Technical Specification
+The wording is relative to [N4538] 
+ 
+Update **X.Y Header <experimental/future> synopsis adding**
 
-The wording is relative to [N4529] 
+# Implementability
 
-Update X.Y Header <experimental/future> synopsis adding
+This proposal can be implemented as pure library extension, without any compiler magic support, in C++14.
+An almost full reference implementation of this proposal can be found at [Boost.Thread].
 
+# Future work
    
 # Acknowledgements 
 
@@ -83,9 +92,14 @@ Thanks to Vladimir Prus who presented the use case on the Boost ML.
 
 # References
 
-## N4529 - Working Draft, C++ Extensions for Library Fundamentals, Version 2  
-http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/n4529.html
 
-## use_case 
+[N4538]: http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/n4538.pdf "Working Draft,  Technical Specification for C++ Extensions for Concurrency, Version 1"  
+
+
+* [N4538] - Working Draft,  Technical Specification for C++ Extensions for Concurrency, Version 1  
+ 
+	http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/n4538.pdf
+
+# use_case 
 
 
