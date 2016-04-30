@@ -7,7 +7,7 @@
     </tr>
     <tr>
         <td width="172" align="left" valign="top">Date:</td>
-        <td width="435">2016-04-25</td>
+        <td width="435">2016-04-30</td>
     </tr>
     <tr>
         <td width="172" align="left" valign="top">Project:</td>
@@ -29,11 +29,11 @@ Product types: about structured binding and tuple-like access
 
 # Abstract
 
-This paper proposes to change the customization points of structured binding to something more specific and related to product types: `product_type_size` and  `product_type_get` either as members or non-members found by ADL.
+This paper proposes to either add additional wording to Structured binding [P0217R1] to cover with the core language dependency on the library file `<utility>` or to change the customization points of Structured binding to something more specific and related to product types: `product_type_size` and  `product_type_get` either as members or non-members found by ADL so that we remove the dependency from the library file.
 
-In addition, it proposes to add some product type specific operators to get the size and the n<sup>th</sup> element as well as some specific traits and functions.
+In addition, it proposes a library interface for product types access, including getting the size and the n<sup>th</sup> element.
 
-The wording has been modified so that both structured binding and product type access wording doesn't repeat themselves.
+The wording has been modified so that both structured binding and the possible product type access wording doesn't repeat themselves. An alternative could be to preserve the structure of the current wording [P0217R1] and let the refactoring of the wording to a future product type access proposal.
 
 
 # Motivation
@@ -68,8 +68,8 @@ Not accepting any of the previous points would mean a change on the definition o
 In order to overcome the library dependency we need to find a way to avoid the use of `std::tuple_size<T>`. We have 3 possibilities:
 
 * A non-member function `product_type_size` that must be found by ADL.
-* A member function `product_type_size `.
-* Use `product_type_get<N>(tpl)` as customization point and deduce the tuple size as N for which `product_type_get<I>(tpl)` is well defined for any I in 0..N(-1) and `product_type_get<N>(tpl)` is not defined.
+* A member function `product_type_size`.
+* Use `product_type_get<N>(tpl)` as customization point and deduce the tuple size as `N` for which `product_type_get<I>(tpl)` is well defined for any `I` in `0..N(-1)` and `product_type_get<N>(tpl)` is not defined.
 
 #### non-member function `product_type_size`
 
@@ -81,60 +81,80 @@ We could use a nullary function that returns a pointer to `T` and look for `prod
 
 #### member function `product_type_size`
 
-This seems much simpler.
+This seems much simpler. However it prevents the customization of 3PP classes.
 
 #### non-member function `product_type_get<I>(tpl)`
 
 This also seems much simpler, but determining the size could be expensive at compile time.
 
+#### A combination of all the previous
+
+Let the user define member or non-member functions of `product_type_size` and `product_type_get`.
+
+We consider that the user has customized his class when 
+
+* either `PT::product_type_size()` or `product_type_size([]()->PT* {return nullptr})` and the result is `N` and `pt.product_type_get<I>()` or `product_type_get<I>(pt)` is well defined for all `I` in `0..(N-1)`,
+* either the member or non-member functions for `product_type_size` and the `pt.product_type_get<I>()` or `product_type_get<I>(pt)` is well defined for all `I` in `0..(N-1)` and `pt.product_type_get<N>()` or `product_type_get<N>(pt)` is not well defined,
+
 ### Ability to work with bitfields
 
-To provide *extended tuple-like* access for all the types covered by [P0144R2] which support getting the size and the n<sup>th</sup> element, we need to define some kind of predefined operators `pt_size(T)`/`pt_get<N>(pt)` that could use the new *product type* customization points. The use of operators, as opposed to pure library functions, is particularly required to support bitfield members.
+To provide *extended tuple-like* access for all the types covered by [P0144R2] which support getting the size and the n<sup>th</sup> element, we need to define some kind of predefined operators `pt_size(T)`/`pt_get(N, pt)` that could use the new *product type* customization points. The use of operators, as opposed to pure library functions, is particularly required to support bitfield members. 
 
-### Parameter packs
+A function interface could also be provided as soon as we have a `bitfield_ref` class.
+
+#### Parameter packs
 
 We shouldn't forget parameter packs, which could be seen as being similar to product types. Parameter packs already have the `sizeof...(T)` operator. Some (see e.g. [P0311R0] and references therein) are proposing to have a way to explicitly access the n<sup>th</sup> element of a pack (a variety of possible syntaxes have been suggested). The authors believe that the same operators should apply to parameter packs and product types.
 
-# Proposal
+## Proposal
 
-This paper proposes to define a new *product type* access, to cover the previous *extended tuple-like* access, on which [P0144R2] would be based. The user shall be able to customize his own types to see them as *product types* ([P0144R2] case 2).
+Taking into consideration these points, this paper proposes:
 
-The *product type* access is based on two operators: one `pt_size(T)` to get the size and the other `pt_get<N>(pt)` to get the `N`<sup>th</sup> element of a product type instance `pt` of type `T`. The definition of these operators is based on the wording of structured binding [P0217R1].
+* Two alternative proposals for the *product type* customization points for Structured binding.
+* A *product type* access library interface.
 
-The user should of course, be able to customize his *product* types, as she already is able to do it for *tuple-like* types, but now it should define the member operations `product_type_size()` and `product_type_get<N>()`.
+We don't proposes yet the *product type* operators `pt_size`and `pt_get` as we don't have a good proposal for the names.
 
-The name of the operators `pt_size` and `pt_get` are of course subject to bike-shedding.
-This paper proposes the following names for the operators and the customization operations:
+## Alternative proposal 1
 
-* `pt_size(PT)` = `product_type_size(PT)`
-* `pt_get<N>(pt)` = `product_type_get<N>(pt)`
+Let the core language depend on an additional library file and add this file to the freestanding implementation.
 
-Customization points are functions with the same name as the operators:
+Currently the traits `std::tuple_size` and `std::tuple_element` are defined in the `<utility>` file. In order to reduce the freestanding implementation constraints, we proposes to move these traits to a <tuple_like> file.
 
-* `PT::pt_size()` = `PT::product_type_size()`
-* `pt.pt_get<N>()` = `pt.product_type_get<N>()`
-* `pt.pt_get<N>()` = `product_type_get<N>(pt)`
+## Alternative proposal 2
 
-Note that `product_type_size` and `product_type_get` must therefore be contextual keywords.
+Change the customization points of Structured binding to something more specific and related to product types: `product_type_size` and  `product_type_get` either as members or non-members functions found by ADL so that we remove the dependency from the library file.
 
-But what would be the result type of those operators? While we can consider `product_type_size` as a function and we could say that it returns an `unsigned int`, `product_type_get<N>(pt)` wouldn't be a function (if we want to support bitfields), and so `decltype(product_type_get<N>(pt))` wouldn't be defined if the N<sup>th</sup> element is a bitfield managed on [P0144R2] case 3. In all the other cases we can define it depending on the const-rvalue nature of `pt`.
+
+## Future Product type operator proposal (Not yet)
+
+As it is too late to add this on C++17, you should read this section as the direction the authors would like to see in the future. 
+A future paper will propose to define a new *product type* access, to cover the previous *extended tuple-like* access, on which [P0144R2] would be based. The user shall be able to customize his own types to see them as *product types* ([P0144R2] case 2) following any of the previous alternative customization points.
+
+The *product type* access would be based on two operators: one `pt_size(T)` to get the size and the other `pt_get(N, pt)` to get the `N`<sup>th</sup> element of a *product type* instance `pt` of type `T`. The definition of these operators would be based on the wording of structured binding [P0217R1].
+
+The name of the operators `pt_size` and `pt_get` would be of course subject to bike-shedding.
+
+But what would be the result type of those operators? While we can consider `pt_size` as a function and we could say that it returns an `unsigned int`, `pt_get(N,pt)` wouldn't be a function (if we want to support bitfields), and so `decltype(pt_get(N,pt))` wouldn't be defined if the N<sup>th</sup> element is a bitfield managed on [P0144R2] case 3. In all the other cases we can define it depending on the const-rvalue nature of `pt`.
 
 The following could be syntactic sugar for those operators but we don't proposes them yet, waiting to see what we do with parameter packs direct access and sum types.
 
 * `pt_size(PT)` = `sizeof...(PT)`
-* `pt_get<N>(pt)` = `pt.[N]`
+* `pt_get(N, pt)` = `pt.[N]`
 
-## Caveats
+### Caveats
 
-`sizeof(T)`, `pt_size(T)` and `pt_get<N>(pt)` are not functions, and so they cannot be used in any algorithm expecting a function. Generic algorithms working on *product* types should take the type as a template parameter and possibly an integral constant for the indices.
+As `sizeof(T)`, `pt_size(T)` and `pt_get(N, pt)` wouldn't be functions, and so they cannot be used in any algorithm expecting a function. Generic algorithms working on *product* types should take the type as a template parameter and possibly an integral constant for the indices.
 
-### Library interface
+We need to find the name for those two operators.
 
-However, an alternative is to define generic functions `std::product_type::size<T>()` and `std::product_type::get<I>(pt)`.
+## Product type library proposal
+
+An alternative is to define generic functions `std::product_type::size<T>()` and `std::product_type::get<I>(pt)` using either some wording similar to the one in [P0217R1].
 
 We have two possibilities for `std::product_type::get`: either it supports bitfield elements and we need a `std::bitfield_ref` type, or it doesn't supports them.
 
-We believe that we should provide the `bitfield_ref` class in the future, but it seems it is too late to propose such a class for C++17.
+We believe that we should provide a `bitfield_ref` class in the future, but this is out of the scope of this paper.
 
 However, we could already define the functions that will work well expect for bitfields.
 
@@ -143,24 +163,28 @@ namespace std {
 namespace product_type {
 
 template <class PT>
-constexpr size_t size() { return product_type_size(PT); }
+constexpr size_t size() { return pt(PT); }
 
 template <size_t N, class PT>
-constexpr auto get(PT&& pt) { return product_type_get(N, forward<PT>(pt)); } // Wouldn't work for bitfields
+constexpr auto get(PT&& pt) { return pt_get(N, forward<PT>(pt)); } // Wouldn't work for bitfields
 
 }}
 ```
 
-This means that in C++17 we could work with product types using the operators, and that we wouldn't have a complete function interface until C++20. While this could be seen as a limitation, and it would be in some cases, a lot of algorithms can be defined using the operator interfaces without any limitation. Only some algorithms would need the function interface.
+If the committee considers that this interface has value for the C++17, this could means that in C++17 we could work with product types using these operations that would work for all the product types (except for bitfields), and that we wouldn't have a complete function interface until C++20. 
 
-Users could already define their own `bitfield_ref` class in C++17 and define its customization point for bitfields members if needed. However, the default implementation of the `pt_get` operator would never return a bitfield_reference. In order to define this function in C++20 we will need a compiler type trait `product_type_element_is_bitfield<N,PT>` that would say if the N<sup>th</sup> element is a bitfield or not.
+While this could be seen as a limitation, and it would be in some cases, we can already start to define a lot of algorithms.
+
+Users could already define their own `bitfield_ref` class in C++17 and define its customization point for bitfields members if needed. 
+
+In order to define this function in C++20 we will need an additional compiler type trait `product_type_element_is_bitfield<N,PT>` that would say if the N<sup>th</sup> element is a bitfield or not.
 
 ```c++
 namespace std {
 namespace product_type {
 
 template <class PT>
-size_t size() { return product_type_size(PT); }
+size_t size() { return pt_size(PT); }
 
 template <size_t N, class PT>
 // requires product_type_element_is_bitfield<N,PT>::value
@@ -168,12 +192,123 @@ bitfield_ref_t<PT, N> get(PT&& pt) { return bitfield_ref_t<PT, N>(pt); }
 
 template <size_t N, class PT>
 // requires ! product_type_element_is_bitfield<N,PT>::value
-auto get(PT&& pt) { return product_type_get(N, forward<PT>(pt)); }
+auto get(PT&& pt) { return pt_get(N, forward<PT>(pt)); }
 
 }}
 ```
 
-# Wording
+# Wording Alternative 1.1
+
+**Add a new `<utility>` file in 17.6.2.2 Headers [using.headers] Table 16**
+
+**Add the following to `[utility]` Header <utility> synopsis** 
+
+```c++
+namespace std {
+    template <class T> class tuple_size<const T>; 
+    template <class T> class tuple_size<volatile T>; 
+    template <class T> class tuple_size<const volatile T>;
+        template <size_t I, class T> class tuple_element<I, const T>; 
+    template <size_t I, class T> class tuple_element<I, volatile T>; 
+    template <size_t I, class T> class tuple_element<I, const volatile T>;    
+}
+```
+
+
+# Wording Alternative 1.2
+
+**Add a new `<tuple_like>` file in 17.6.1.2 Headers [headers] Table 14**
+
+**Add a section Tuple like Objects in 20**
+
+## 20.X Tuple like Objects
+
+Header <tuple_like> synopsis
+
+The header <tuple_like> defines the tuple-like traits.
+
+```c++
+namespace std {
+    template <class T> class tuple_size; // undefined
+    template <class T> class tuple_size<const T>; 
+    template <class T> class tuple_size<volatile T>; 
+    template <class T> class tuple_size<const volatile T>;
+        template <size_t I, class T> class tuple_element; // undefined
+    template <size_t I, class T> class tuple_element<I, const T>; 
+    template <size_t I, class T> class tuple_element<I, volatile T>; 
+    template <size_t I, class T> class tuple_element<I, const volatile T>;    
+}
+```
+
+```c++
+template <class T> struct tuple_size;
+```
+*Remarks*: All specializations of `tuple_size<T>` shall meet the *UnaryTypeTrait* requirements (20.10.1) with a *BaseCharacteristic* of `integral_constant<size_t, N>` for some `N`.
+
+
+```c++
+template <class T> class tuple_size<const T>;template <class T> class tuple_size<volatile T>;template <class T> class tuple_size<const volatile T>;
+```
+Let `TS` denote `tuple_size<T>` of the cv-unqualified type `T`. Then each of the three templates shall meet the `UnaryTypeTrait` requirements (20.10.1) with a `BaseCharacteristic` of  `integral_constant<size_t, TS::value>`In addition to being available via inclusion of the `<tuple_like>` header, the three templates are available when either of the headers `<array>` or `<utility>` or `tuple` are included.
+
+```c++
+    template <size_t I, class T> class tuple_element; // undefined
+```
+
+*Remarks*: `std::tuple_element<I,T>::type` shall be defined for all the `I` in `0..(std::tuple_size<T>::value-1)`.
+
+```c++
+template <size_t I, class T> class tuple_element<I, const T>;template <size_t I, class T> class tuple_element<I, volatile T>;template <size_t I, class T> class tuple_element<I, const volatile T>;
+```
+Let `TE` denote `tuple_element<I, T>` of the cv-unqualified type `T`. Then each of the three templates shall meet the `TransformationTrait` requirements (20.10.1) with a member typedef type that names the following type:
+* for the first specialization, `add_const_t<TE::type>`,* for the second specialization, `add_volatile_t<TE::type>`, and* for the third specialization, `add_cv_t<TE::type>`.
+In addition to being available via inclusion of the <tuple_like> header, the three templates are available when either of the headers <array> or <utility>  or <tuple> are included.
+
+
+**Extract the following from `[utility]` Header <utility> synopsis**
+
+
+```c++
+    template <class T> class tuple_size;    template <size_t I, class T> class tuple_element;
+```
+
+**Add the following to `[utility]` Header <utility> synopsis**
+
+```c++
+#include <tuple_like>
+```
+
+**Extract the following from `[tuple.general]` Header <utility> synopsis**
+
+
+```c++
+    template <class T> class tuple_size; // undefined
+    template <class T> class tuple_size<const T>; 
+    template <class T> class tuple_size<volatile T>; 
+    template <class T> class tuple_size<const volatile T>;
+        template <size_t I, class T> class tuple_element; // undefined
+    template <size_t I, class T> class tuple_element<I, const T>; 
+    template <size_t I, class T> class tuple_element<I, volatile T>; 
+    template <size_t I, class T> class tuple_element<I, const volatile T>;    
+```
+
+
+**Add the following to `[tuple.general]` Header <tuple> synopsis**
+
+```c++
+#include <tuple_like>
+```
+
+**Rename 20.4.2.5 Tuple helper classes as Tuple Tuple-like configuration.** 
+
+**Remove from 20.4.2.5 the definition for tuple_size and tuple_element 0 3,4, 5 and 6** 
+
+
+**Add a new `<tuple_like>` file in 17.6.2.2 Headers [using.headers] Table 16**
+
+# Wording Alternative 2
+
+**Add the following Product type section**
 
 ## Product types terms
 
@@ -196,11 +331,6 @@ A type `E` is a *product type* if the following terms are well defined.
 * Else it is undefined.
 
 
-**Defines the following operators**
-
-*TBC*
-
-
 **In 7.1.6.4 [dcl.spec.auto] paragraph 8 of the Structured Binding proposal, replace**
 
 If `E` is an array type with element type `T`, the number of elements in the identifier-list shall be equal to the number of elements of `E`. Each `v`<sub>`i`</sub> is the name of an lvalue that refers to the element `i-1` of the array and whose type is `T`; the referenced type is `T`. [ Note: The top-level cv-qualifiers of `T` are cv. -- end note ]
@@ -215,41 +345,85 @@ The number of elements in the identifier-list shall be equal to *product type si
 
 Each `v`<sub>`i`</sub> is the name of an lvalue that refers to *product type `i`<sup>th</sup>-element of `e`*.
 
+**Add the associated customization in `[tuple.tuple]`**
 
-## Library
+### Class template tuple
 
-### Product type object
 
-In `<product_type>`
+```c++
+    ...
+    constexpr size_t product_type_size() { return sizeof...(Ts); };
+    template <size_t I>
+    constexpr auto product_type_get();
+    template <size_t I>
+    constexpr auto product_type_get() const;
+    template <size_t I>
+    constexpr auto product_type_get() &&;
+    template <size_t I>
+    constexpr auto product_type_get() const &&;
+```
+
+### std::array
+
+```c++
+template <class T, size_t N>
+class array {
+    ...
+    constexpr size_t product_type_size() { return N; };
+    template <size_t I>
+    constexpr auto product_type_get();
+    template <size_t I>
+    constexpr auto product_type_get() const;
+    template <size_t I>
+    constexpr auto product_type_get() &&;
+    template <size_t I>
+    constexpr auto product_type_get() const &&;
+};
+```
+
+# Wording for *product* type access
+
+**Add a new `<product_type>` file in 17.6.1.2 Headers [headers] Table 14**
+
+**Add the following section**
+
+## Product type object
+
+### Product type synopsis
+
 
 ```c++
 namespace std {
 namespace product_type {
 
-template <class PT>
-constexpr size_t size() { return product_type_size(PT); }
+    template <class PT>
+    constexpr size_t size();
+    
+    template <class PT>
+    struct size;
 
-template <size_t N, class PT>
-constexpr auto get(PT&& pt) { return product_type_get(N, forward<PT>(pt)); } 
+    template <size_t I, class PT>
+    struct element;
+
+    template <size_t N, class PT>
+    constexpr auto get(PT&& pt);
 
 }}
 ```
 
-
-#### `product_type::size`
+### Template Function `product_type::size`
 
 
 ```c++
 template <class PT>
-static constexpr size_t size();
+constexpr size_t size();
 ```
 
 *Effect*: As if `return` *product type size* `PT`.
 
 *Remark*: This operation would not be defined if *product type size* `PT`. is undefined.
 
-#### `product_type::get`
-
+### Template Function `product_type::get`
 
 ```c++
 template <size_t N, class PT>
@@ -262,48 +436,9 @@ constexpr auto get(PT&& pt);
 
 *Remark*: This operation would not be defined if *product type Nth-element* of `pt` is undefined.
 
+**Adapt the definition of tuple_cat in[tuple.creation] to take care of product type**
 
-
-
-### std::tuple
-
-**Add the associated customization**
-
-```c++
-template <class ...Ts>
-class tuple {
-    ...
-    constexpr size_t product_type_size() { return sizeof...(Ts); };
-    template <size_t I>
-    constexpr auto product_type_get() { return get<I>(*this); };
-    template <size_t I>
-    constexpr auto product_type_get() const { return get<I>(*this); };
-    template <size_t I>
-    constexpr auto product_type_get() && { return get<I>(*this); };
-    template <size_t I>
-    constexpr auto product_type_get() const && { return get<I>(*this); };
-};
-```
-
-### std::array
-
-**Add the associated customization**
-
-```c++
-template <class T, size_t N>
-class array {
-    ...
-    constexpr size_t product_type_size() { return N; };
-    template <size_t I>
-    constexpr auto product_type_get() { return get<I>(*this); };
-    template <size_t I>
-    constexpr auto product_type_get() const { return get<I>(*this); };
-    template <size_t I>
-    constexpr auto product_type_get() && { return get<I>(*this); };
-    template <size_t I>
-    constexpr auto product_type_get() const && { return get<I>(*this); };
-};
-```
+## Product type object
 
 # Implementability
 
@@ -313,15 +448,16 @@ There is no implementation as of the date of this paper.
 
 The authors would like to have an answer to the following points if there is any interest at all in this proposal:
 
-* Do we want the customization points for `PRODUCT_TYPE_SIZE` to be `PT::product_type_size()`?
-* Do we want the customization points for `PRODUCT_TYPE_GET` to be `pt.product_type_get<i>()`/`product_type_size<I>(pt)`?
-* Do we want the `PRODUCT_TYPE_SIZE`/`PRODUCT_TYPE_GET` macros?
-* Do we want the `product_type_size`/`product_type_get` operators?
+* Do we want the core language depend on the file library?
+* If yes, do we prefer to move to a `<tuple_like>` file?
+* If not, 
+* Do we want the proposed customization points?
+* Do we want customization points for *product type* size to be optional?
+* Do we want the `pt_size`/`pt_get` operators?
 * Do we want the `std::product_type::size`/`std::product_type::get` functions?
+* Do we want the `std::product_type::size`/`std::product_type::element` traits?
 
 # Future work
-
-## Allow product type function access to bitfield references
 
 ## Extend the default definition to aggregates
 
@@ -332,6 +468,8 @@ I would expect that all the aggregates can be seen as *tuple-like* types, so we 
 We should see aggregate initialization and structured binding almost as inverse operations.
 
 This could already be the case for predefined *tuple-like* types which will have aggregate initialization. However user defined *tuple-like* types would need to define the corresponding constructor.
+
+## Add `bitfield_ref`class and allow product type function access to bitfield fields
 
 
 # Acknowledgments
