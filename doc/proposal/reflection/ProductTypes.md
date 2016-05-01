@@ -24,12 +24,14 @@
 </table>
 
 
-Product types
-=============
+Product types access
+====================
 
 # Abstract
 
-This paper proposes a library interface for product types access, including getting the size and the n<sup>th</sup> element for the same kind of types covered by Structured binding [SBR].
+This paper proposes a library interface to access the same types covered by Structured binding [SBR]. This proposal name them *product types* The interface includes getting the number of elements, access to the n<sup>th</sup> element and the type of the n<sup>th</sup> element.
+
+The wording depends on the wording of [SBR].
 
 
 # Table of Contents
@@ -50,31 +52,35 @@ This paper proposes a library interface for product types access, including gett
 
 Defining *tuple-like* access `tuple_size`, `tuple_element` and `get<I>/get<T>` for simple classes is -- as for comparison operators ([N4475]) -- tedious, repetitive, slightly error-prone, and easily automated.
 
-This paper proposes a library interface for product types access, including getting the size and the n<sup>th</sup> element for the same kind of types covered by Structured binding [SBR].
+This paper proposes a library interface to access the same types covered by Structured binding [SBR]. This proposal name them *product types* The interface includes getting the number of elements, access to the n<sup>th</sup> element and the type of the n<sup>th</sup> element.
 
 The wording of Structured binding has been modified so that both structured binding and the possible product type access wording doesn't repeat themselves. 
 
 # Motivation
 
-Algorithms such as `std::tuple_cat` and `std::experimental::apply` work as well with tuple-like types. There are many more of them; a lot of the homogeneous container algorithm are applicable to heterogeneous containers and functions, see [Boost.Fusion] and [Boost.Hana]. Some examples of such algorithms are  `fold`, `accumulate`, `for_each` `any_of`,  `all_of`, `none_of`, `find`, `count`, `filter`, `transform`, `replace`, `join`, `zip`, `flatten`.
+## Status-quo
 
-Besides `std::pair`, `std::tuple` and `std::array`, aggregates in particular are good candidates to be considered as tuple-like types. However defining the tuple-like access functions is tedious, repetitive, slightly error-prone, and easily automated.
+Besides `std::pair`, `std::tuple` and `std::array`, aggregates in particular are good candidates to be considered as *tuple-like* types. However defining the *tuple-like* access functions is tedious, repetitive, slightly error-prone, and easily automated.
 
 Some libraries, in particular [Boost.Fusion] and [Boost.Hana] provide some macros to generate the needed reflection instantiations. Once this reflection is available for a type, the user can use the struct in  algorithms working with heterogeneous sequences. Very often, when macros are used for something, it is hiding a language feature.
 
+Algorithms such as `std::tuple_cat` and `std::experimental::apply` that work well with *tuple-like* types, should work also for *extended tuple-like*. There are many more of them; a lot of the homogeneous container algorithm are applicable to heterogeneous containers and functions, see [Boost.Fusion] and [Boost.Hana]. Some examples of such algorithms are  `fold`, `accumulate`, `for_each` `any_of`,  `all_of`, `none_of`, `find`, `count`, `filter`, `transform`, `replace`, `join`, `zip`, `flatten`.
+
 [P0144R2]/[P0217R1]/[SBR] proposes the ability to bind all the members of a *tuple-like* type at a time via the new structured binding statement. [P0197R0] proposes the generation of the *tuple-like* access function for simple structs as the [P0144R2] does for simple structs (case 3 in [P0144R2]).
  
-The wording in [P0217R1]/[SBR], allows to do structure binding for arrays and allow bitfields as members in case 3. But bitfields cannot be managed by the current tuple-like access function `get<I>(t)` without returning a bitfields reference wrapper, so [P0197R0] doesn't provides a *tuple-like* access for all the types supported by [P0217R1]. This is unfortunately asymmetric. We want to have structure binding, pattern matching and *extended tuple-like* access for the same types.
+The wording in [P0217R1]/[SBR], allows to do structure binding for arrays and allow bitfields as members in case 3. But bitfields cannot be managed by the current *tuple-like* access function `get<I>(t)` without returning a bitfields reference wrapper, so [P0197R0] doesn't provides a *tuple-like* access for all the types supported by [P0217R1]. 
 
-This means that the *extended tuple-like* access cannot be limited to the current customization points. 
-[P0197R0] proposes to generate the *tuple-like* access customization points for the case 3 in [P0217R1].
-The case 1 of c-arrays can be defined as well.
+The wording in [P0217R1]/[SBR] support C-arrays, but we are unable to find a `get<I>(arr)`overload on arrays that is found by ADL.
+ 
+This is unfortunately asymmetric. We want to have structure binding, pattern matching and *extended tuple-like* access for the same types.
+
+This means that the *extended tuple-like* access cannot be limited to *tuple-like* access. 
 
 ### Ability to work with bitfields
 
-To provide *extended tuple-like* access for all the types covered by [P0144R2] which support getting the size and the n<sup>th</sup> element, we need to define some kind of predefined operators `pt_size(T)`/`pt_get(N, pt)` that could use the new *product type* customization points. The use of operators, as opposed to pure library functions, is particularly required to support bitfield members. 
+To provide *extended tuple-like* access for all the types covered by [P0144R2] which support getting the size and the n<sup>th</sup> element, we would need to define some kind of predefined operators `pt_size(T)`/`pt_get(N, pt)` that could use the new *product type* customization points. The use of operators, as opposed to pure library functions, is particularly required to support bitfield members. 
 
-A function interface could also be provided as soon as we have a `bitfield_ref` class.
+The authors don't know how to define a function interface that could manage with bitfield references could also be provided as soon as we have a `bitfield_ref` class.
 
 #### Parameter packs
 
