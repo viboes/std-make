@@ -311,6 +311,10 @@ Thanks to all those that have commented the idea of a tuple-like generation on t
 [DSPM]: http://davidsankel.com/uncategorized/c-language-support-for-pattern-matching-and-variants "C++ Language Support for Pattern Matching and Variants"
 
 [SBR]: https://github.com/viboes/std-make/blob/master/doc/proposal/reflection/StructuredBindingRedesign.md "Structured binding: alternative design for customization points"  
+
+[PT_impl]: https://github.com/viboes/std-make/blob/master/doc/proposal/reflection/product_type.cpp  " Product types access emmulation."
+
+    
     
 
 * [Boost.Fusion] Boost.Fusion 2.2 library
@@ -388,4 +392,4 @@ Thanks to all those that have commented the idea of a tuple-like generation on t
 
 * [PT_impl] Product types
 
-    https://github.com/viboes/std-make/blob/master/doc/proposal/reflection/StructuredBindingRedesign.md 
+    https://github.com/viboes/std-make/blob/master/doc/proposal/reflection/product_type.cpp 
