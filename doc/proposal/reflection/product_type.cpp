@@ -15,32 +15,31 @@ namespace std {
 
 namespace product_type {
 
-template<typename T>
-struct has_product_type_size
-{
-    struct yes{ char a[1]; };
-    struct no { char a[2]; };
+namespace detail {
+    template<typename T>
+    struct has_product_type_size
+    {
+        struct yes{ char a[1]; };
+        struct no { char a[2]; };
 
-    //template<typename U, E (U::*)() const> struct SFINAE {};
-    template<typename U>
-        static constexpr yes test(decltype(product_type_size(&detail::type<U>)) *);
-    template<typename U>
-        static constexpr no test(...);
-    static constexpr bool value = sizeof(test<T>(0)) == sizeof(yes);
-};
+        template<typename U>
+            static constexpr yes test(decltype(product_type_size(&std::detail::type<U>)) *);
+        template<typename U>
+            static constexpr no test(...);
+        static constexpr bool value = sizeof(test<T>(0)) == sizeof(yes);
+    };
 
-template<typename T>
-struct has_product_type_size_static_member
-{
-    struct yes{ char a[1]; };
-    struct no { char a[2]; };
+    template<typename T>
+    struct has_product_type_size_static_member
+    {
+        struct yes{ char a[1]; };
+        struct no { char a[2]; };
 
-    //template<typename U, E (U::*)() const> struct SFINAE {};
-    template<typename U> static yes test(decltype(U::product_type_size())*);
-    template<typename U> static no test(...);
-    static const bool value = sizeof(test<T>(nullptr)) == sizeof(yes);
-};
-
+        template<typename U> static yes test(decltype(U::product_type_size())*);
+        template<typename U> static no test(...);
+        static const bool value = sizeof(test<T>(nullptr)) == sizeof(yes);
+    };
+}
     template <class PT, class Enabler = void>
     struct size;
 
@@ -50,12 +49,12 @@ struct has_product_type_size_static_member
 
     // customization for types defining product_type_size(T*(*)())
     template <class PT>
-    struct size<PT, typename std::enable_if<has_product_type_size<PT>::value>::type>
-        : size_t_constant< product_type_size(&detail::type<PT>)>
+    struct size<PT, typename std::enable_if<detail::has_product_type_size<PT>::value>::type>
+        : size_t_constant< product_type_size(&std::detail::type<PT>)>
     {};
     // customization for types defining PT::product_type_size()
     template <class PT>
-    struct size<PT, typename std::enable_if<has_product_type_size_static_member<PT>::value>::type>
+    struct size<PT, typename std::enable_if<detail::has_product_type_size_static_member<PT>::value>::type>
         : size_t_constant<PT::product_type_size()>
     {};
 
@@ -173,7 +172,7 @@ int main() {
         using T = std::pair<int,int>;
         T p = {0,1};
         static_assert(std::is_same<std::type<T>, decltype(&std::detail::type<T>)>::value, "Hrr");
-        static_assert(std::product_type::has_product_type_size<T>::value, "Hrr");
+        static_assert(std::product_type::detail::has_product_type_size<T>::value, "Hrr");
         std::cout << std::product_type::size<T>::value << "\n";
         std::cout << std::product_type::get<0>(p) << "\n";
         std::cout << std::product_type::get<1>(p) << "\n";
