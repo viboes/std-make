@@ -1,17 +1,31 @@
-// <product_type>
-#include <type_traits>
-#include <utility>
-
+// <__type>
+// this can be used by other files other than product_type and utility.
 namespace std {
-    template <size_t N>
-    using size_t_constant = integral_constant<size_t, N>;
+
+    // helper for users to avoid to type PT* (*)() while overloading product_type_size.
+    template <class T>
+    using type = T* (*)();
 
     namespace detail {
-        template <class PT>
-        PT* type() {return nullptr;}
+        // an instance of std::type<T>
+        template <class T>
+        T* type() {return nullptr;}
     }
-    template <class PT>
-    using type = PT* (*)();
+}
+
+// <product_type>
+#include <type_traits>
+#include <utility> // std::forward/std::move
+// There is a cycle here product_type -> utility -> product_type
+// the cycle can be broken if std::forward/std::move are moved to files <__forward_utility> and <__move_utility>
+//#include <__forward_utility>
+//#include <__move_utility>
+//#include <__type>
+
+namespace std {
+
+    template <size_t N>
+    using size_t_constant = integral_constant<size_t, N>;
 
 namespace product_type {
 namespace detail {
@@ -142,8 +156,14 @@ namespace detail {
 
 
 }
+}
 
-    // customization for pair
+
+// customization for pair to be added in <utility>
+#include <utility>
+//#include <product_type>
+
+namespace std {
     template <class T1, class T2>
     constexpr size_t product_type_size(type<pair<T1,T2>>) { return 2; };
 
@@ -156,7 +176,6 @@ namespace detail {
     constexpr T1 const& product_type_get(size_t_constant<0>, pair<T1,T2> const& x) { return x.first; };
     template <class T1, class T2>
     constexpr T2 const& product_type_get(size_t_constant<1>, pair<T1,T2> const& x) { return x.second; };
-
 }
 
 
