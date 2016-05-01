@@ -97,6 +97,16 @@ namespace detail {
     {
         return product_type_get(size_t_constant<N>{},pt);
     }
+#if 0
+    template <size_t N, class PT>
+    constexpr auto get(PT & pt) -> decltype(product_type_get<N>(pt))
+    {
+        return product_type_get<N>(pt);
+    }
+    // prog.cc:102:45: error: 'product_type_get' was not declared in this scope
+    //          constexpr auto get(PT & pt) -> decltype(product_type_get<N>(pt))
+    //                                                  ^~~~~~~~~~~~~~~~
+#endif
     template <size_t N, class PT>
     constexpr auto get(PT & pt) -> decltype(product_type_get(size_t_constant<N>{},pt))
     {
@@ -133,9 +143,7 @@ namespace detail {
 
 }
 
-        // customization for pair
-    //template <class T1, class T2>
-    //constexpr size_t product_type_size(type< pair<T1,T2> >) { return 2; };
+    // customization for pair
     template <class T1, class T2>
     constexpr size_t product_type_size(type<pair<T1,T2>>) { return 2; };
 
