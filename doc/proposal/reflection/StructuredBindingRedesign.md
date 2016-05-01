@@ -24,12 +24,18 @@
 </table>
 
 
-Structured binding: alternative design for customization points
-========================================================
+Structured binding: customization points issues
+===============================================
 
 # Abstract
 
-This paper proposes to either add additional wording to Structured binding [P0217R1] to cover with the core language dependency on the library file `<utility>` or to change the customization points of Structured binding to something more specific and related to product types: `product_type_size` and  `product_type_get` either as members or non-members found by ADL so that we remove the dependency from the library file.
+This paper proposes two alternative approaches to cover with two possible issue on Structured binding [P0217R1] wording: [P0217R1] adds an additional dependency of the core language on the library file `<utility>` and that, to the authors knowledge, the user is unable to customize completely bitfields members.  
+
+The first approach is to add additional wording to Structured binding [P0217R1] to cover with the core language dependency on the library file `<utility>`. 
+
+The second one consists in changing the customization points of Structured binding to something more specific and related to product types: `product_type_size` and  `product_type_get`. These functions would be either members or non-members found by ADL so that we remove the dependency from the library file.
+
+It is weird that Structured binding provides access to types that can not be customized by the user.
 
 
 1. [Introduction](#introduction)
@@ -46,38 +52,48 @@ This paper proposes to either add additional wording to Structured binding [P021
 
 # Introduction
 
-This paper proposes to either add additional wording to Structured binding [P0217R1] to cover with the core language dependency on the library file `<utility>` or to change the customization points of Structured binding to something more specific and related to product types: `product_type_size` and  `product_type_get` either as members or non-members found by ADL so that we remove the dependency from the library file.
+This paper proposes two alternative approaches to cover with two possible issue on Structured binding [P0217R1] wording: [P0217R1] adds an additional dependency of the core language on the library file `<utility>` and that, to the authors knowledge, the user is unable to customize completely bitfields members.  
+
+The first approach is to add additional wording to Structured binding [P0217R1] to cover with the core language dependency on the library file `<utility>`. 
+
+The second one consists in changing the customization points of Structured binding to something more specific and related to product types: `product_type_size` and  `product_type_get`. These functions would be either members or non-members found by ADL so that we remove the dependency from the library file.
 
 The wording has been modified so that both structured binding and the possible product type access [PT]  wording doesn't repeat themselves. An alternative could be to preserve the structure of the current wording [P0217R1] and let the refactoring of the wording to a future product type access proposal [PT].
 
 # Motivation
 
-## Almost Status-quo
+There are two issues.
 
-[P0144R2] proposes the ability to bind all the members of a *extended tuple-like* type at a time via the new structured binding statement which has some primitive matching for some specific cases and let the user customize their types using the case 2 with the current ad-hoc *tuple-like* interface.
+## Dependent on library
 
-[P0144R2] case 1 takes care of c-array (wondering if we cannot define already a *tuple-like* access for them that can be found by ADL).
+[P0217R1] makes the language dependent on the customization point `std::tuple_size<T>`, which is defined in the library file `<utility>`. This file is not part of the freestanding implementation. We should avoid this kind of dependency as much as possible.
 
-[P0144R2] case 3 support structured binding to bitfields as it does for any other non-static public member.
+Suppose we want to do a customized the following class
 
-This means that with [P0144R2] we will be able to access the members of some *extended tuple-like* types that would not have *tuple-like* access. [P0197R0] proposes the generation of the *tuple-like* access function for simple structs as [P0144R2] does for simple structs (case 3 in [P0144R2]).  However we are unable to define the `get<N>(tl)` function to access bitfields. So we cannot have *tuple-like* access for all the types supported by [P0217R1]. This is unfortunately asymmetric. We want to have structured binding, pattern matching and *tuple-like* access for the same types.
+```c++
+class S { 
+    int x, y; 
+public:
+    // ...    
+};
+```
 
-This means that the *extended tuple-like* access cannot be limited to the current *tuple-like* customization points. We need something different.
+[P0217R1] says you must specialize `std::tuple_size<S>` and `std::tuple_element<i,E>` for your own `get()` to work.
 
-In addition, [P0217R1] makes the language dependent on the customization point `std::tuple_size<T>`, which is defined in the library file `<utility>`. This file is not part of the freestanding implementation. We should avoid this kind of dependency as much as possible.
+Fine so far, except that you can only specialize a template if you've seen the declaration of the primary template.  Users can't declare the primary template themselves (it's in namespace std), so they
+need to include the correct header, which happens to be `<utility>`.
 
-Adopting [P0144R2] as such would mean that
+However, `<utility>` is not required to be available in a freestanding implementation (see 17.6.1.3 table 16).
 
-* we accept a dependency on the library file `<utility>`, and
-* we would be unable to have *tuple-like* access for all the types covered by [P0144R2].
+Net result: You can't (portably) use structured bindings with customized `get()` in a freestanding implementation. 
 
-Accepting the previous points would at least mean that we need to change the freestanding implementation requirements and that the *extended tuple-like* access is based on the structured binding statement instead of the ad-hoc *tuple-like* access, and that we cannot access the size or the n<sup>th</sup> element directly and independently. While the authors feel that this may be a tenable direction, we would strongly prefer that the committee consider our proposed alternate design which would address these issues more cleanly.
+Adopting [P0144R2] would at least mean that we need to change the freestanding implementation requirements. While the authors feel that this may be a tenable direction (and provide wording to fix this), we would strongly prefer that the committee considers our proposed alternate design which would address these issues more cleanly.
 
-## Alternative design
+### Alternative customization approach
 
-Not accepting any of the previous points would mean a change on the definition of *tuple-like* access.
+Changing the customization point would mean a change on the definition of *tuple-like* access or more precisely that Structured binding is not based on *tuple-like* access.
 
-### Independence from library
+#### Independence from library
 
 In order to overcome the library dependency we need to find a way to avoid the use of `std::tuple_size<T>`. We have 3 possibilities:
 
@@ -85,7 +101,7 @@ In order to overcome the library dependency we need to find a way to avoid the u
 * A member function `product_type_size`.
 * Use `product_type_get<N>(tpl)` as customization point and deduce the tuple size as `N` for which `product_type_get<I>(tpl)` is well defined for any `I` in `0..N(-1)` and `product_type_get<N>(tpl)` is not defined.
 
-#### non-member function `product_type_size`
+##### non-member function `product_type_size`
 
 We could think of a non-member function `product_type_size` that must be found by ADL. However `product_type_size<T>()` couldn't be found by ADL. We need to add the type on as a parameter. 
 
@@ -93,15 +109,15 @@ We could look for `product_type_size(T)` but this would be restricted to copyabl
 We could look for `product_type_size(T const&)` but this would accept types inheriting from `T`.
 We could use a nullary function that returns a pointer to `T` and look for `product_type_size(T*(*)())`. This has the advantage that it doesn't accept derived types and works for any type.
 
-#### member function `product_type_size`
+##### member function `product_type_size`
 
 This seems much simpler. However it prevents the customization of 3PP classes.
 
-#### non-member function `product_type_get<I>(tpl)`
+##### non-member function `product_type_get<I>(tpl)`
 
 This also seems much simpler, but determining the size could be expensive at compile time.
 
-#### A combination of all the previous
+##### A combination of all the previous
 
 Let the user define member or non-member functions of `product_type_size` and `product_type_get`.
 
@@ -110,31 +126,125 @@ We consider that the user has customized his class when
 * either `PT::product_type_size()` or `product_type_size([]()->PT* {return nullptr})` and the result is `N` and `pt.product_type_get<I>()` or `product_type_get<I>(pt)` is well defined for all `I` in `0..(N-1)`,
 * either the member or non-member functions for `product_type_size` and the `pt.product_type_get<I>()` or `product_type_get<I>(pt)` is well defined for all `I` in `0..(N-1)` and `pt.product_type_get<N>()` or `product_type_get<N>(pt)` is not well defined,
 
-### Ability to work with bitfields
+## Ability to work with bitfields only partially
 
-To provide *extended tuple-like* access for all the types covered by [P0144R2] which support getting the size and the n<sup>th</sup> element, we need to define some kind of predefined operators `pt_size(T)`/`pt_get(N, pt)` that could use the new *product type* customization points. The use of operators, as opposed to pure library functions, is particularly required to support bitfield members. 
+[P0217R1] wording make use of `std::tuple_element` to define the type of the elements of the lvalues. 
 
-A function interface could also be provided as soon as we have a `bitfield_ref` class.
+> Given the type `Ti` designated by `std::tuple_element<i-1,E>::type`, each `vi` is a variable of type "reference to `Ti`" initialized with the initializer, where the reference is an lvalue reference if the initializer is an lvalue and an rvalue reference otherwise; the referenced type is `Ti`. 
 
-#### Parameter packs
+This works well as far as the type returned by `get<I,e>` is a reference to `std::tuple_element_t<I,E>`.
 
-We shouldn't forget parameter packs, which could be seen as being similar to product types. Parameter packs already have the `sizeof...(T)` operator. Some (see e.g. [P0311R0] and references therein) are proposing to have a way to explicitly access the n<sup>th</sup> element of a pack (a variety of possible syntaxes have been suggested). The authors believe that the same operators should apply to parameter packs and product types.
+However, when a user that wants to customize a class with bitfields members would need to define `std::tuple_element` for this bitfield member is some `bitfield_ref` class. However, we this is not the   real type of the member. This would mean that the the function `get`should return a reference to this `bitfield_ref`, but the `bitfield_ref` returned by get can not be reference as it should be an rvalue.. 
+
+Wondering if instead of using a reference to `std::tuple_element<I,e>` the type should be the type returned by `get<I>(pt)`.
+
+```c++
+template <size_t I, class X>
+class bitfield_ref;
+
+struct X3 {
+  unsigned i:2;
+  int j:5;
+  int k;
+public:
+
+};
+
+template <>
+class bitfield_ref<0,X3> {
+  X3& x;
+public:
+  bitfield_ref(X3& x) : x(x) {}
+  operator unsigned() const { return x.i; }
+  bitfield_ref& operator=(int v)
+  {
+    x.i = v;
+    return *this;
+  }
+};
+template <>
+class bitfield_ref<1,X3> {
+  X3& x;
+public:
+  bitfield_ref(X3& x) : x(x) {}
+  operator int() const { return x.j; }
+  bitfield_ref& operator=(int v)
+  {
+    x.j = v;
+    return *this;
+  }
+};
+// Something similar for const& and &&, but without assignment
+// ...
+namespace std {
+  template <>
+  class tuple_size<X3> : integral_constant<size_t, 3> {};
+  template <>
+  class tuple_element<0,X3> { public: using type = bitfield_ref<0, const X3>; };
+  template <>
+  class tuple_element<1,X3> { public: using type = bitfield_ref<1, const X3>; };
+  template <>
+  class tuple_element<2,X3> { public: using type = int; };
+}
+bitfield_ref<0, X3> get_element(std::integral_constant<size_t, 0>, X3 & x) {
+  return bitfield_ref<0, X3>(x);
+}
+bitfield_ref<1, X3> get_element(std::integral_constant<size_t, 1>, X3 & x) {
+  return bitfield_ref<1, X3>(x);
+}
+int& get_element(std::integral_constant<size_t, 2>, X3 & x) {
+  return x.k;
+}
+// Something similar for const& and &&
+// ...
+
+```
+
+Given
+
+```c++
+    X3 x {0,1,2};
+```
+
+the following couldn't compile for a bitfield member
+
+```c++
+      auto &xi = get<0>(x);
+```
+
+while the following compiles for a non bitfield member
+
+```c++
+      auto &xk = get<2>(x);
+```
+
+
 
 # Proposal
 
-Taking into consideration these points, this paper proposes two alternative proposals for the *product type* customization points for Structured binding.
+Taking into consideration these points, this paper proposes two alternative proposals for each one of the points. 
+
+We name *product type* the types covered by Structured binding.
 
 [PT] is an extension paper to this proposal that includes *product type* access library interface.
 
-## Alternative proposal 1
+## Alternative proposal 1.1
 
 Let the core language depend on an additional library file and add this file to the freestanding implementation.
 
-Currently the traits `std::tuple_size` and `std::tuple_element` are defined in the `<utility>` file. In order to reduce the freestanding implementation constraints, we proposes to move these traits to a <tuple_like> file.
+Currently the traits `std::tuple_size` and `std::tuple_element` are defined in the `<utility>` file. In order to reduce the freestanding implementation constraints, we proposes to move these traits to a `<tuple_like>` file.
 
-## Alternative proposal 2
+## Alternative proposal 1.2
 
 Change the customization points of Structured binding to something more specific and related to product types: `product_type_size` and  `product_type_get` either as members or non-members functions found by ADL so that we remove the dependency from the library file.
+
+## Alternative proposal 2.1
+
+Status quo: Let Structured binding be able to manage with bitfield members in case 3 even if the user is unable to customize them and that we will be unable to define a function interface to access [PT] all types supported by Structured binding. 
+
+## Alternative proposal 2.2
+
+Don't support bitfield members in any case.
 
 # Design Rationale
 
@@ -148,10 +258,54 @@ There are not too much classes providing a *tuple-like* access on the standard a
 
 ## What do we gain by changing the current customization point?
 
+We don't increase the dependency of the core language on the library.
+
 The current *tuple-like* access `tuple_size`/`tuple_element`/`get` has a customization point `get` that is used also for other types that don't provide a *tuple-like* access. There is no real problem as the other customization points are more specific.
 
 Adopting the *product type* customization  points `product_type_size`/`product_type_get`  are more explicit and in line with *product type* access [PT]. 
 
+## What do we loss if Structured binding is not able to bind to bitfield members?
+
+There is not too much we loss. The user can always nest the bitfields on a nested structure and use the bitfield access.
+
+Instead of
+
+```c++
+class X3 {
+  unsigned i:2;
+  int j:5;
+  int k;
+  // friend declarations as needed
+public:
+  ...
+};
+```
+
+the user can define 
+
+```c++
+class X3 {
+public:
+  struct IJ {
+    unsigned i:2;
+    int j:5;
+  };
+private: 
+  IJ ij;
+  int k;
+  // friend declarations as needed
+public:
+  ...
+};
+```
+
+## What do we gain if Structured binding don't support bitfield members?
+
+We can not take the address of a bitfield, have a pointer to bitfield member function, we don't know how to return references to bitfield members, ...
+
+Don't supporting them make it possible to have a uniform interface. We would be able to name the exact type for any element and have access to the element via a reference to the member data. 
+
+If a uniform solution is found later on that support bitfields references we could always update the proposal in a backward compatible way.
 
 # Wording 
 
@@ -409,7 +563,7 @@ Thanks to all those that have commented the idea of a tuple-like generation on t
 
 [DSPM]: http://davidsankel.com/uncategorized/c-language-support-for-pattern-matching-and-variants "C++ Language Support for Pattern Matching and Variants"
 
-[PT]: https://github.com/viboes/std-make/blob/master/doc/proposal/reflection/ProductTypes.md "Product types"
+[PT]: https://github.com/viboes/std-make/blob/master/doc/proposal/reflection/ProductTypes.md "Product types access"
 
      
 
@@ -484,6 +638,6 @@ Thanks to all those that have commented the idea of a tuple-like generation on t
 
     http://davidsankel.com/uncategorized/c-language-support-for-pattern-matching-and-variants 
 
-* [PT] Product types
+* [PT] Product types access
 
     https://github.com/viboes/std-make/blob/master/doc/proposal/reflection/ProductTypes.md 
