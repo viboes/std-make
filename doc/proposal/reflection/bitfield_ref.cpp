@@ -54,8 +54,9 @@ public:
   operator int() const { return x.j; }
 };
 
+#if 0
 template <>
-class bitfield_ref<0,X3&&> {
+class bitfield_ref<0, X3&&> {
   X3 &&x;
 public:
   bitfield_ref(X3 && x) : x(std::move(x)) {}
@@ -69,6 +70,23 @@ public:
   bitfield_ref(X3 && x) : x(std::move(x)) {}
   operator int() const { return x.j; }
 };
+#else
+template <>
+class bitfield_ref<0, X3&&> {
+  unsigned v;
+public:
+  bitfield_ref(X3 && x) : v(x.i) {}
+  operator unsigned() const { return v; }
+};
+
+template <>
+class bitfield_ref<1, X3&&> {
+  int v;
+public:
+  bitfield_ref(X3 && x) : v(x.j) {}
+  operator int() const { return v; }
+};
+#endif
 
 namespace std {
   template <>
@@ -142,7 +160,7 @@ int main()
     }
     {
       auto xi = get<0>(make_X3());
-      static_assert(std::is_same<decltype(xi), bitfield_ref<0, X3&&>>::value, "Hrr");
+      static_assert(std::is_same<decltype(xi), bitfield_ref<0, X3 &&>>::value, "Hrr");
       std::cout << xi << std::endl;
     }
 #if 0
