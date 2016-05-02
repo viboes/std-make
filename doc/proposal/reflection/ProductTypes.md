@@ -296,31 +296,76 @@ struct element { 
 
 **Adapt the definition of `std::tuple_cat` in [tuple.creation] to take care of product type**
 
+*Replace `Tuples` by `PTs`, `tpls` by `pts`, `tuple` by `product type`, get by `product_type::get` and `tuple_size` by `product_type::size`*. 
+
+
+```c++
+template <class... PTs>constexpr tuple<CTypes...> tuple_cat(PTs&&... pts);
+```
+
 ### Constructor from a product type with the same number of elements as the tuple
 
-Similar to the constructor from `pair`.
+```c++
+template <class PT> EXPLICIT constexpr pair(PT&& u); 
+```
+Let where `Ui` is `product_type::element<i, PT>::type`.
+
+*Effects*: For all `i`, the constructor initializes the `i`th element of `*this` with `std::forward<Ui>(product_type::get<i>(u))`.*Remarks*: This function shall not participate in overload resolution unless `PT` is a product type with the same number elements than this tuple and `is_constructible<Ti, Ui&&>::value` is true for all `i`. The constructor is explicit if and only if `is_convertible<Ui&&, Ti>::value` is false for at least one `i`.
+
+```c++
+template <class PT>  tuple& operator=(const PT& u);
+```*Remarks¨: *Remarks*: This function shall not participate in overload resolution unless `PT` is a product type with the same number elements than this tuple and`is_assignable<Ti&, const Ui&>::value` is true for all `i`.
+*Effects*: Assigns each element `std::forward<Ui>(product_type::get<i>(u))` of `u` to the corresponding element of *this. 
+
+*Returns*: `*this`
 
 ### `std::apply`
 
 **Adapt the definition of `std::apply` in [xxx] to take care of product type**
 
+*Replace `Tuple` by `PT`, `t` by `pt`, `tuple` by `product type`, get by `product_type::get` and `tuple_size` by `product_type::size`*. 
+
+```c++
+template <class F, class PT>
+constexpr decltype(auto) apply(F&& f, PT&& t);
+```
+
 ## `std::pair 
 
 ### piecewise constructor
 
-The following constructor could also be generalized to *product types*
+**Replace**
 
 ```c++
 template <class... Args1, class... Args2>    pair(piecewise_construct_t,        tuple<Args1...> first_args, tuple<Args2...> second_args);
 ```
 
+**by**
+
 ```c++
 template <class PT1, class PT2>    pair(piecewise_construct_t, PT1 first_args, PT2 second_args);
 ```
 
+
 ### Constructor and assignment from a product type with two elements
 
-Similar to the `tuple` constructor from `pair`.
+```c++
+template <class PT> EXPLICIT constexpr pair(PT&& u); 
+```
+
+Let where `Ui` is `product_type::element<i, PT>::type`.
+
+*Effects*: For all `i`, the constructor initializes the `i`th element of `*this` with `std::forward<Ui>(product_type::get<i>(u)).*Remarks*: This function shall not participate in overload resolution unless `PT` is a product type with 2 elements and `is_constructible<Ti, Ui&&>::value` is true for all `i`  The constructor is explicit if and only if `is_convertible<Ui&&, Ti>::value` is false for at least one `i`.
+
+```c++
+template <class PT>  tuple& operator=(const PT& u);
+```Let where `Ui` is `product_type::element<i, PT>::type`.
+*Effects*: Assigns each element `product_type::get<i>(u)` of `u` to the corresponding element of `*this`. 
+
+*Returns*: `*this`
+
+*Remarks*: This function shall not participate in overload resolution unless `PT` is a product type with 2 elements and`is_assignable<Ti&, const Ui&>::value` is true for all `i`.
+
              
 # Implementability
 
@@ -340,6 +385,33 @@ The authors would like to have an answer to the following points if there is any
 # Future work
 
 ## Add `bitfield_ref` class and allow product type function access to bitfield fields
+
+## Add other algorithms in namespace `product_type`
+
+### front
+
+### back
+
+
+### is_empty
+
+### lexicographical_compare
+
+## Add other algorithms in namespace `product_type`
+
+These algorithms needs the `make<TC>(args...)` to work.
+
+### drop_front -> tuple
+
+### drop_back -> tuple
+
+### group
+
+### insert
+
+###
+
+
 
 # Acknowledgments
 
