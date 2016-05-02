@@ -5,7 +5,7 @@
     </tr>
     <tr>
         <td width="172" align="left" valign="top">Date:</td>
-        <td width="435">2016-03-05</td>
+        <td width="435">2016-05-02</td>
     </tr>
     <tr>
         <td width="172" align="left" valign="top">Project:</td>
@@ -17,7 +17,7 @@
     </tr>
     <tr>
         <td width="172" align="left" valign="top">Reply-to:</td>
-        <td width="435">Vicente J. Botet Escriba &lt;<a href="mailto:vicente.botet@wanadoo.fr">vicente.botet@wanadoo.fr</a>&gt;</td>
+        <td width="435">Vicente J. Botet Escrib&aacute; &lt;<a href="mailto:vicente.botet@wanadoo.fr">vicente.botet@nokia.com</a>&gt;</td>
     </tr>
 </table>
 
@@ -45,9 +45,9 @@ Experimental generic factories library for C++.
 
 # Introduction
 
-This paper presents a proposal for two generic factories `make<TC>(v)` that allows to make generic algorithms that need to create an instance of a wrapped class `TC` from their underlying types and `none<TC>()` that creates an instance meaning the not-a-value associated to a type constructor.
+This paper presents a proposal for a generic factories `make<TC>(v)` that allows to make generic algorithms that need to create an instance of a wrapped class `TC` from their underlying types.
 
-[P0091R0] proposes extending template parameter deduction for functions to constructors of template classes. If this proposal is accepted, it would be clear that this proposal will lost most of its added value but not all.
+[P0091R0] extends template parameter deduction for functions to constructors of template classes. With this feature, it would seam clear that this proposal lost most of its added value but this is not the case.
 
 # Motivation and scope
 
@@ -75,7 +75,7 @@ unique_ptr<T> f() {
     T a,
     ...
     return make_unique(a);
-    //return unique_ptr(a); // this should be correct if [P0091R0] is accepted?
+    //return unique_ptr(a); // this should be correct with [P0091R0]
 }
 ```
 
@@ -87,7 +87,7 @@ shared_ptr<T> f() {
     T a,
     ...
     return make_shared(a);
-    //return shared_ptr(a); // this should be correct if P0091R0 is accepted?
+    //return shared_ptr(a); // this should be correct with [P0091R0]
 }
 ```
 
@@ -100,7 +100,7 @@ TC<T> f() {
     T a,
     ...
     return make<TC>(a);
-    //return TC(a); // This should not work even if [P0091R0] is accepted
+    //return TC(a); // This should not work even with [P0091R0] 
 }
 ```
 
@@ -121,8 +121,11 @@ int v=0;
 auto x1 = make<shared_ptr>(v);
 auto x2 = make<unique_ptr>(v);
 auto x3 = make<optional>(v);
+auto x4v = make<future>();
 auto x4 = make<future>(v);
+auto x5v = make<shared_future>();
 auto x5 = make<shared_future>(v);
+auto x6v = make<expected>();
 auto x6 = make<expected>(v);
 auto x7 = make<pair>(v, v);
 auto x8 = make<tuple>(v, v, 1u);
@@ -140,13 +143,13 @@ or use the class name to build to support in place construction
 ```c++
 auto x1 = make<shared_ptr<A>>(v, v);
 auto x2 = make<unique_ptr<A>>(v, v);
-auto x3 = make<optional<A>>();
-auto x4 = make<future<A>>(v);
+auto x3 = make<optional<A>>(v,v);
+auto x4 = make<future<A>>(v,v);
 auto x5 = make<shared_future<A>>(v, v);
 auto x6 = make<expected<A>>(v, v);
 ```
 
-Note, if [P0091R0] is accepted, the following will be already possible
+Note, with [P0091R0], the following is already possible
 
 ```c++
 int v=0;
@@ -180,7 +183,7 @@ template <class TC>
   apply<TC, int> safe_divide(int i, int j)
 {
   if (j == 0)
-    return none<TC>();
+    return {};
   else
     return make<TC>(i / j);
 }
@@ -191,16 +194,10 @@ We can use this function with different type constructor as
 ```c++
 auto x = safe_divide<optional<_t>>(1, 0);
 ```
-
-or
-**todo: expected don't works for none :(**
-```c++
-auto x = safe_divide<expected<_t>>(1, 0);
-```
-
   
 ## Emplace factory
 
+**TBC**
 
 ## How to define a class that wouldn't need customization? 
 
@@ -226,7 +223,7 @@ namespace boost {
   future<void> make_custom(meta::id<future<void>>) 
   { 
     return make_ready_future(); 
-    }
+  }
   template <class T, class ...Args>
   future<T> make_custom(meta::id<future<T>>, Args&& ...args)
   { 
@@ -371,7 +368,7 @@ namespace boost
 
 This proposal takes advantage of overloading the `make_custom` functions adding the tag `id<T>`.
 
-We have named the customization points `make_custom` to make more evident that these are customization points.
+We have named the customization point `make_custom` to make more evident that these are customization point.
 
 Alternatively, we could use a trait
 
@@ -427,7 +424,7 @@ struct make_traits<future<T>>
 }}}
 ```
 
-## Why to have default customization points?
+## Why a default customization point?
 
 The first factory `make` uses default constructor to build a `C<void>`. 
 
@@ -485,7 +482,7 @@ where
   };
 ```
 
-The main problem defining function objects is that we cannot have the same class with different template parameters. The `maker` class template has a template class parameter. We need an additional class that takes a type conctructor or a type.
+The main problem defining function objects is that we cannot have the same class with different template parameters. The `maker` class template has a template class parameter. We need an additional class that takes a type constructor or a type.
 
 ```c++
   template <template <class> class T>
@@ -514,10 +511,15 @@ Now we can define a `maker` factory for high-order make functions as follows
 
 ```c++
 template <class T>
+// requires is_type_constructor<T>()==false
 maker_t<T> maker() { return maker_t<T>{}; }
 
-template <template <class ...> class TC>
+template <class TC>
+// requires is_type_constructor<TC>()==false
 maker_tc<TC> maker() { return maker_tc<TC>{}; }
+
+template <template <class ...> class TC>
+maker_tmpl<TC> maker() { return maker_tmpl<TC>{}; }
 
 ```
 
@@ -532,14 +534,14 @@ std::transform(xs.begin(), xs.end(), std::back_inserter(ys), maker<Something>())
 
 # Impact on the standard
 
-These changes are entirely based on library extensions and do not require any language features beyond what is available in C++ 14. 
+These changes are entirely based on library extensions and do not require any language features beyond what is available in C++14. 
 
 
 # Proposed wording
 
 The proposed changes are expressed as edits to [N4564] the Working Draft - C++ Extensions for Library Fundamentals V2.
 
-The current wording make use of `decay_unwrap_t` as proposed in [decay_unwrap], but if this is not accepted the wording can be changed without too much troubles.
+The current wording make use of `decay_unwrap_t` as proposed in [P0318R0], but if this is not accepted the wording can be changed without too much troubles.
 
 
 ## General utilities library
@@ -572,12 +574,6 @@ namespace meta
     struct id { using type = T; };
 }
 
-  template <template <class ...> class TC>
-  constexpr auto none();
-
-  template <class TC>
-  constexpr auto none();
-
   // make() overload
   template <template <class ...> class M>
     M<void> make();
@@ -588,7 +584,7 @@ namespace meta
   
   // make overload: requires a template class parameter, deduce the underlying type
   template <template <class ...> class TC, class ...Xs>
-    TC<decay_unwrap<X>> make(Xs&& ...xs);
+    TC<decay_unwrap<Xs>...> make(Xs&& ...xs);
 
   // make overload: requires a type constructor, deduce the underlying types
   template <class TC, class ...Xs>
@@ -600,17 +596,26 @@ namespace meta
     M make(Xs&& ...xs);
     
     
+  template <class TC>
+  struct maker_tc;
+  
   template <template <class> class T>
-  struct maker_tc;  
+  struct maker_tmpl;  
  
   template <class T>
   struct maker_t;
   
+  // requires a type constructor
+  template <class TC>
+    maker_tc<TC> maker();
+    
+  // requires T is not a type constructor
   template <class T>
     maker_t<T> maker();
 
   template <template <class ...> class TC>
-    maker_tc<TC> maker();
+    maker_tmpl<TC> maker();
+
     
 
 namespace meta
@@ -656,7 +661,7 @@ template <template <class ...> class M, class ...Xs>
   M<decay_unwrap<Xs>...> make(Xs&& ...xs);
 ```
 
-*Effects:* Forwards to the customization point `make` with a template constructor 
+*Effects:* Forwards to the customization point `make_custom` with a template constructor 
 `meta::id<M<decay_unwrap<Xs>...>>`. As if
 
 ```c++
@@ -673,7 +678,7 @@ template <template <class ...> class M, class ...Xs>
 
 *Requires:* `TC` is a type constructor.
 
-*Effects:* Forwards to the customization point `make` with a template constructor 
+*Effects:* Forwards to the customization point `make_custom` with a template constructor 
 `meta::id<meta::apply<TC, decay_unwrap<Xs>>>`. As if
 
 ```c++
@@ -690,7 +695,7 @@ template <class M, class ...Xs>
 
 *Requires:* `M` is not a type constructor.
 
-*Effects:* Forwards to the customization point `make` with a template constructor 
+*Effects:* Forwards to the customization point `make_custom` with a template constructor 
 `meta::id<M>`. As if
 
 ```c++
@@ -825,8 +830,6 @@ The authors would like to have an answer to the following points if there is at 
 
 * Is there an interest on the `make` functions?
 
-* Is there an interest on the `none` functions?
-
 * Should the customization be done with overloading or with traits?
 
     The current proposal uses overloading as customization point. 
@@ -840,7 +843,7 @@ The authors would like to have an answer to the following points if there is at 
 
 * Should the high-order function factory `maker` be part of the proposal?
 
-* Should the function factories `make` and `none` be function objects?
+* Should the function factories `make` be function objects?
 
     [N4381] proposes to use function objects as customized points, so that ADL is not involved.
 
@@ -856,9 +859,9 @@ The authors would like to have an answer to the following points if there is at 
 
     If yes, should them be part of a separated proposal?
 
-    There is much more on meta-programming utilities as show on the Meta library.
+    There is much more on meta-programming utilities as show on the [Meta] library.
 
-* Should the customization of the standard classes `pair`, `tuple`,`optional`, `future`, `unique_ptr`, `shared_ptr` be part of this proposal?
+* Should the customization of the standard classes `pair`, `tuple`, `optional`, `future`, `unique_ptr`, `shared_ptr` be part of this proposal? Are there others standard types to customize?
 
 
 # Acknowledgements 
@@ -874,9 +877,11 @@ Thanks to Mike Spertus for its [P0091R0] proposal that would even help to avoid 
 
 [N4480]: http://open-std.org/JTC1/SC22/WG21/docs/papers/2015/n4480.html "Programming Languages — C++ Extensions for Library Fundamentals"
 
-[N4015]: http://www.open-std.org/JTC1/SC22/WG21/docs/papers/2014/n4015.pdf "A proposal to add a utility class to represent expected monad"
-
 [P0091R0]: http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/p0091r0.html "Template parameter deduction for constructors (Rev. 3)"
+
+[P0318R0]: http://www.open-std.org/JTC1/SC22/WG21/docs/papers/2016/p0318r0.pdf "`decay_unwrap` and `unwrap_reference`"
+
+[P0323R0]: http://www.open-std.org/JTC1/SC22/WG21/docs/papers/2016/p0323r0.pdf "A proposal to add a utility class to represent expected monad (Revision 2)"
 
 [Range-V3]: https://github.com/ericniebler/range-v3
 
@@ -888,9 +893,6 @@ Thanks to Mike Spertus for its [P0091R0] proposal that would even help to avoid 
 
 [Fit]: https://github.com/pfultz2/Fit
 
-[decay_unwrap]: https://github.com/viboes/std-make/blob/master/doc/proposal/utilities/decay_unwrap.md "`decay_unwrap` and `unwrap_reference`"
-
-
 
 * [N4381] - Suggested Design for Customization Points
 
@@ -900,14 +902,17 @@ Thanks to Mike Spertus for its [P0091R0] proposal that would even help to avoid 
 
     http://open-std.org/JTC1/SC22/WG21/docs/papers/2015/n4480.html
 
-* [N4015] - A proposal to add a utility class to represent expected monad
-
-    http://www.open-std.org/JTC1/SC22/WG21/docs/papers/2014/n4015.pdf
-
-
 * [P0091R0] - Template parameter deduction for constructors (Rev. 3)
 
     http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/p0091r0.html
+
+* [P0318R0] `decay_unwrap` and `unwrap_reference`
+ 
+    http://www.open-std.org/JTC1/SC22/WG21/docs/papers/2016/p0318r0.pdf
+
+* [P0323R0] - A proposal to add a utility class to represent expected monad (Revision 2)
+
+    http://www.open-std.org/JTC1/SC22/WG21/docs/papers/2016/p0323r0.pdf
 
 * [Range-V3]
 
@@ -929,9 +934,6 @@ Thanks to Mike Spertus for its [P0091R0] proposal that would even help to avoid 
 
     https://github.com/pfultz2/Fit
 
-* [decay_unwrap] `decay_unwrap` and `unwrap_reference`
- 
-    https://github.com/viboes/std-make/blob/master/doc/proposal/utilities/decay_unwrap.md  
 
 
 # Appendix - Helper Classes
