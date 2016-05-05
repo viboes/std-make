@@ -7,7 +7,7 @@ namespace std {
     using type = T* (*)();
 
     namespace detail {
-        // an instance of std::type<T>
+        // the address of this function is an instance of std::type<T>
         template <class T>
         T* type() {return nullptr;}
     }
@@ -176,13 +176,61 @@ namespace std {
     constexpr T1 const& product_type_get(size_t_constant<0>, pair<T1,T2> const& x) { return x.first; };
     template <class T1, class T2>
     constexpr T2 const& product_type_get(size_t_constant<1>, pair<T1,T2> const& x) { return x.second; };
+
+    // This should be a pair constructor from a Product type with 2 elements pairwise convertible
+    template <class T1, class T2, class PT>
+        constexpr pair<T1, T2> to_pair(PT&& pt)
+    {
+            return pair<T1,T2>(product_type::get<0>(forward<PT>(pt)), product_type::get<1>(forward<PT>(pt)));
+    }
+
 }
 
+// <tuple>
+#include <tuple>
+
+namespace std {
+
+    template <class ...Ts>
+    constexpr size_t product_type_size(type<tuple<Ts...>>) { return sizeof...(Ts); };
+
+    template <size_t I, class ...Ts>
+    constexpr auto product_type_get(size_t_constant<I>, tuple<Ts...> & x) { return get<I>(x); };
+    template <size_t I, class ...Ts>
+    constexpr auto product_type_get(size_t_constant<I>, tuple<Ts...> const& x) { return get<I>(x); };
+    template <size_t I, class ...Ts>
+    constexpr auto product_type_get(size_t_constant<I>, tuple<Ts...> && x) { return get<I>(move(x)); };
+
+namespace product_type {
+
+    //template <class... CTypes>
+    //    constexpr tuple<CTypes...> cat(PTs&&... pts);
+
+}
+namespace detail {
+
+    // This should be a tuple constructor from a Product type
+    template <class ...CTypes, size_t ...Is, class PT>
+        constexpr tuple<CTypes...> to_tuple_helper(PT&& pt, std::index_sequence<Is...>)
+    {
+            return tuple<CTypes...>(product_type::get<Is>(forward<PT>(pt))...);
+    }
+}
+    template <class ...CTypes, class PT>
+        constexpr tuple<CTypes...> to_tuple(PT&& pt)
+    {
+            return detail::to_tuple_helper<CTypes...>(forward<PT>(pt),
+                                    std::make_index_sequence<
+                                        product_type::size<std::decay_t<PT> >{}
+                                    >{}
+                                   );
+    }
+
+}
 
 // main
 #include <iostream>
 #include <cassert>
-
 
 int main() {
     {
@@ -260,6 +308,14 @@ int main() {
         static_assert(0 == std::product_type::get<0>(arr), "Hrr");
         assert(3 == std::product_type::size<decltype(arr)>::value);
         assert(0 == std::product_type::get<0>(arr));
+    }
+    {
+        using T = std::pair<int,int>;
+        T p = {0,1};
+        auto x = std::to_tuple<int,int>(p);
+        assert(2 == std::product_type::size<decltype(x)>::value);
+        assert(0 == std::product_type::get<0>(x));
+        assert(1 == std::product_type::get<1>(x));
     }
 
 }
