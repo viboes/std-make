@@ -310,9 +310,16 @@ int main() {
         assert(0 == std::product_type::get<0>(arr));
     }
     {
-        using T = std::pair<int,int>;
+        using T = std::pair<int,short>;
         T p = {0,1};
-        auto x = std::to_tuple<int,int>(p);
+        auto x = std::to_tuple<int,short>(p);
+        assert(2 == std::product_type::size<decltype(x)>::value);
+        assert(0 == std::product_type::get<0>(x));
+        assert(1 == std::product_type::get<1>(x));
+    }
+    {
+        constexpr int arr[] = {0,1};
+        auto x = std::to_pair<int,int>(arr);
         assert(2 == std::product_type::size<decltype(x)>::value);
         assert(0 == std::product_type::get<0>(x));
         assert(1 == std::product_type::get<1>(x));
