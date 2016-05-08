@@ -33,6 +33,8 @@ This paper proposes a library interface to access the same types covered by Stru
 
 The wording depends on the wording of [SBR].
 
+In addition, some of the algorithms that work for *tuple-like* access are adapted to work with *product types*. 
+
 # Table of Contents
 
 1. [Introduction](#introduction)
@@ -55,7 +57,7 @@ Defining *tuple-like* access `tuple_size`, `tuple_element` and `get<I>/get<T>` f
 
 [P0197R0] proposed the generation of the *tuple-like* access function for simple structs as the [P0144R2] does for simple structs (case 3 in [P0144R2]).
 
-We are unable to define a *tuple-like* access interface for c-arrays, as the get<I>(arr) can not be found by ADL.
+We are unable to define a *tuple-like* access interface for C-arrays, as the `get<I>(arr)` cannot be found by ADL.
 
 This paper proposes a library interface to access the same types covered by Structured binding [SBR], *product types*.  The interface includes getting the number of elements, access to the n<sup>th</sup> element and the type of the n<sup>th</sup> element. Tuis interface don't use ADL.
 
@@ -314,7 +316,7 @@ Let where `Ui` is `product_type::element<i, PT>::type`.
 
 ```c++
 template <class PT>  tuple& operator=(const PT& u);
-```*Remarks¨: *Remarks*: This function shall not participate in overload resolution unless `PT` is a product type with the same number elements than this tuple and`is_assignable<Ti&, const Ui&>::value` is true for all `i`.
+```*Remarks¨: *Remarks*: This function shall not participate in overload resolution unless `PT` is a product type with the same number elements than this tuple and `is_assignable<Ti&, const Ui&>::value` is true for all `i`.
 *Effects*: Assigns each element `std::forward<Ui>(product_type::get<i>(u))` of `u` to the corresponding element of *this. 
 
 *Returns*: `*this`
@@ -386,30 +388,52 @@ The authors would like to have an answer to the following points if there is any
 
 ## Add `bitfield_ref` class and allow product type function access to bitfield fields
 
-## Add other algorithms in namespace `product_type`
+## Add other algorithms in namespace `???`
 
 ### front
 
+`PT(T) -> T`
+
 ### back
 
+`PT(T) -> T`
 
 ### is_empty
 
+`PT(T) -> bool`
+
 ### lexicographical_compare
 
-## Add other algorithms in namespace `product_type`
+## Add other algorithms in namespace `???`
 
-These algorithms needs the `make<TC>(args...)` to work.
+The following algorithms needs the `make<TC>(args...)` to work [factories].
+If the first product type argument is *TypeConstructible* from the `CTypes` then return an instance of it, else construct a `std::tuple`. 
 
-### drop_front -> tuple
+### cat
 
-### drop_back -> tuple
+`TCPT(T)... -> TCPT(T)`
+`PT(T)... -> tuple(T)`
+
+### drop_front
+
+`TCPT(T) -> TCPT(T)`
+`PT(T) -> tuple(T)`
+
+### drop_back
+
+`TCPT(T) -> TCPT(T)`
+`PT(T) -> tuple(T)`
 
 ### group
 
+`TCPT(T) -> TCPT(TCPT(T))`
+`PT(T) -> tuple(tuple(T))`
+
 ### insert
 
-###
+`TCPT(T) x unsigned x T -> TCPT(T)`
+
+### ...
 
 
 

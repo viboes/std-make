@@ -3,7 +3,7 @@
 <table border="0" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="607">
     <tr>
         <td width="172" align="left" valign="top">Document number:</td>
-        <td width="435"><span style="background-color: #FFFF00">D0XXXR0</span></td>
+        <td width="435"><span style="background-color: #FFFF00">D0326R0</span></td>
     </tr>
     <tr>
         <td width="172" align="left" valign="top">Date:</td>
@@ -29,13 +29,11 @@ Structured binding: customization points issues
 
 # Abstract
 
-This paper proposes two alternative approaches to cover with two possible issue on Structured binding [P0217R1] wording: [P0217R1] adds an additional dependency of the core language on the library file `<utility>` and that, to the authors knowledge, the user is unable to customize completely bitfields members.  
+This paper proposes two alternative approaches to cover with two possible issue on Structured binding [P0217R1] wording: it adds an additional dependency of the core language on the library file `<utility>` and that, to the authors knowledge, the user is unable to customize completely bitfields members.  
 
-The first approach is to add additional wording to Structured binding [P0217R1] to cover with the core language dependency on the library file `<utility>`. 
+The first approach is to add additional wording to Structured binding [P0217R1] to cover with the core language dependency on the library file `<utility>`. The second one consists in changing the customization points of Structured binding to something more specific and related to product types: `product_type_size` and  `product_type_get`. These functions would be either members or non-members found by ADL so that we remove the dependency from the library file.
 
-The second one consists in changing the customization points of Structured binding to something more specific and related to product types: `product_type_size` and  `product_type_get`. These functions would be either members or non-members found by ADL so that we remove the dependency from the library file.
-
-It is weird that Structured binding provides access to types that can not be customized by the user.
+It is weird that Structured binding provides access to types that can not be customized by the user and that can not be accessed using functions.
 
 
 1. [Introduction](#introduction)
@@ -428,9 +426,9 @@ A type `E` is a *product type* if the following terms are well defined.
 
 *product type size*
 
-* If E is an array type with element type T, equal to the number of elements of E.
+* If `E` is an array type with element type `T`, equal to the number of elements of `E`.
 * Else, if the expression `e.product_type_size()` is a well-formed integral constant expression, equal to `e.product_type_size()`.
-* Else, if all of E's non-static data members and bit-fields shall be public direct members of E or of the same unambiguous public base class of E, E shall not have an anonymous union member, equal to the number of non-static data members of E. 
+* Else, if all of `E`'s non-static data members and bit-fields shall be public direct members of `E` or of the same unambiguous public base class of `E`, `E` shall not have an anonymous union member, equal to the number of non-static data members of `E`. 
 * Else it is undefined.
 
 *product type i <sup>th</sup>-element* 
