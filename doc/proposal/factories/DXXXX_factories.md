@@ -5,7 +5,7 @@
     </tr>
     <tr>
         <td width="172" align="left" valign="top">Date:</td>
-        <td width="435">2016-05-02</td>
+        <td width="435">2016-05-08</td>
     </tr>
     <tr>
         <td width="172" align="left" valign="top">Project:</td>
@@ -29,7 +29,9 @@ C++ generic factories
 
 **Abstract**
 
-Experimental generic factories library for C++. 
+This paper presents a proposal for a generic factory `make<TC>(args...)` that allows to make generic algorithms that need to create an instance of a wrapped class `TC` from the underlying types.
+
+[P0091R0] extends template parameter deduction for functions to constructors of template classes. With this feature, it would seam clear that this proposal lost most of its added value but this is not the case.
 
 # Table of Contents
 
@@ -45,13 +47,15 @@ Experimental generic factories library for C++.
 
 # Introduction
 
-This paper presents a proposal for a generic factories `make<TC>(v)` that allows to make generic algorithms that need to create an instance of a wrapped class `TC` from their underlying types.
+This paper presents a proposal for a family of generic factories `make<TC>(args...)` that create an instance of a wrapping class from a *type constructor* and his underlying types as well as emplace factories `make<T>(args...)` that creates an instance of a wrapping class by emplace constructing the underlying type from the provided arguments. 
 
-[P0091R0] extends template parameter deduction for functions to constructors of template classes. With this feature, it would seam clear that this proposal lost most of its added value but this is not the case.
+[P0091R0] extends template parameter deduction for functions to constructors of template classes. With this feature, it would seam that this proposal has lost most of its added value but this is not the case, as [P0091R0] is a feature for the user that cannot be used in generic code.
 
 # Motivation and scope
 
-All these types, `shared_ptr<T>`, `unique_ptr<T,D>`, `optional<T>`, `expected<T,E>` and `future<T>`, have in common that all of them have an underlying type `T'.
+## Possible valued types
+
+All these types, `shared_ptr<T>`, `unique_ptr<T,D>`, `optional<T>`, `expected<T,E>` (see [P0323R0]) and `future<T>`, have in common that all of them have an underlying type `T`.
 
 There are two kind of factories: 
 
@@ -104,18 +108,98 @@ TC<T> f() {
 }
 ```
 
-In addition, we have factories for the product types such as `pair` and `tuple`
+Another generic example: *PossiblyValued* types define 
+
+```c++
+template <class Callable, class PossiblyValued>
+// requires PossiblyValued<FT> and TypeConstructible<FT>
+auto functor_map f(Callable&& c, PossiblyValued && f) 
+    -> rebind_t<PossiblyValued, decltype(c(declval<value_type_t<PossiblyValued>>()))>
+{
+    using namespace possibly_valued;
+    using namespace type_constructible;
+    
+    if (has_value(forward<PossiblyValued>(pv)))
+        // This should not work even with [P0091R0] 
+        return make<type_constructor_t<PossiblyValued>>(c(value(forward<PossiblyValued>(pv)))); 
+    else 
+        return none<type_constructor_t<PossiblyValued>>(); 
+}
+```
+
+## *Product types*
+
+In addition, we have factories for the *product types* such as `pair` and `tuple`
 
  * ```make_pair```
  * ```make_tuple```
 
+## Comparaison
+
+<table border="0" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="607">
+    <tr>
+        <td align="left" valign="top"> WITHOUT proposal </td>
+        <td align="left" valign="top"> WITH proposal </td>
+    </tr>
+    <tr>
+        <td align="left" valign="top"><pre class='brush: cpp'>
+int v=0;
+auto x1  = make_shared&lt;int>(v);
+auto x2  = make_unique&lt;int>(v);
+auto x3  = make_optional(v);
+auto x4v = make_ready_future();
+auto x4  = make_ready_future(v);
+auto x5v = make_ready_future().share();
+auto x5  = make_ready_future(v).share();
+auto x6v = make_expected();
+auto x6  = make_expected(v);
+auto x7  = make_pair(v, v);
+auto x8  = make_tuple(v, v, 1u);
+
+future&lt;int&> x4r = make_ready_future(std::ref(v));
+
+auto x1  = make_shared&lt;A>(v, v);
+auto x2  = make_unique&lt;A>(v, v);
+auto x3  = make_optional&lt;A>(v,v);
+auto x4  = make_ready_future&lt;A>(v,v);
+auto x5  = make<shared_future<A>>(v, v);
+auto x6  = make_expected&lt;A>(v, v);
+
+        </b></td>
+        <td align="left" valign="top"><pre class='brush: cpp'>
+int v=0;
+auto x1  = make&lt;shared_ptr>(v);
+auto x2  = make&lt;unique_ptr>(v);
+auto x3  = make&lt;optional>(v);
+auto x4v = make&lt;future>();
+auto x4  = make&lt;future>(v);
+auto x5v = make&lt;shared_future>();
+auto x5  = make&lt;shared_future>(v);
+auto x6v = make&lt;expected>();
+auto x6  = make&lt;expected>(v);
+auto x7  = make&lt;pair>(v, v);
+auto x8  = make&lt;tuple>(v, v, 1u);
+
+future&lt;int&> x4r = make&lt;future>(std::ref(v));
+
+auto x1  = make&lt;shared_ptr&lt;A>>(v, v);
+auto x2  = make&lt;unique_ptr&lt;A>>(v, v);
+auto x3  = make&lt;optional&lt;A>>(v,v);
+auto x4  = make&lt;future&lt;A>>(v,v);
+auto x5  = make&lt;shared_future&lt;A>>(v, v);
+auto x6  = make&lt;expected&lt;A>>(v, v);
+
+        </b></td>
+    </tr>   
+
+</table>
 
 We can use the class template name as a type constructor
 
 ```c++
 vector<int> vi1 = { 0, 1, 1, 2, 3, 5, 8 };
 vector<int> vi2;
-copy_n(vi1, 3, make<back_insert_iterator>(vi2));
+copy_n(vi1, 3, maker<back_insert_iterator>(vi2));
 
 int v=0;
 auto x1 = make<shared_ptr>(v);
@@ -247,7 +331,7 @@ namespace boost
 }
 ```
 
-When the class has two parameter and the underlying type is the first template parameter, as it is the case for `expected`, 
+When the class has two parameters and the underlying type is the first template parameter, as it is the case for `expected`, 
 
 ```c++
 namespace boost
@@ -260,7 +344,7 @@ namespace boost
 }
 ```
 
-If the second template depends on the first one as it is the case of `unique_ptr<T, D>`, the rebind of the second parameter must be done explicitly. 
+If the second template depends on the first one as it is the case of `unique_ptr<T, D>`, the rebinding of the second parameter must be done explicitly. 
 
 ```c++
 namespace boost
@@ -426,11 +510,11 @@ struct make_traits<future<T>>
 
 ## Why a default customization point?
 
-The first factory `make` uses default constructor to build a `C<void>`. 
+The first `make` factory  uses default constructor to build a `C<void>`. 
 
-The second factory `make` uses conversion constructor from the underlying type(s). 
+The second `make` factory uses conversion constructor from the underlying type(s). 
 
-The third factory `make` is used to be able to do emplace construction given the specific 
+The third `make` factory is used to be able to do emplace construction given the specific 
 type.
 
 ## `reference_wrapper<T>` overload to deduce `T&`
@@ -440,7 +524,7 @@ the type deduced for the underlying type is `T&`.
 
 ## Product types factories
 
-This proposal takes into account also product type factories (as `std::pair` or `std::tuple`). 
+This proposal takes into account also *product type* factories (as `std::pair` or `std::tuple`). 
 
 ```c++
   // make product factory overload: Deduce the resulting `Us` 
@@ -482,32 +566,44 @@ where
   };
 ```
 
-The main problem defining function objects is that we cannot have the same class with different template parameters. The `maker` class template has a template class parameter. We need an additional class that takes a type constructor or a type.
+The main problem defining function objects is that we cannot have the same class with different template parameters. The previous `maker` class template has a template class parameter. We need an additional class that takes a type constructor or a type.
 
 ```c++
-  template <template <class> class T>
+  template <template <class> class Tmpl>
+  struct maker_tmpl {
+    template <typename ...X>
+    constexpr auto
+    operator()(X&& ...x) const
+    {
+        return make<Tmpl>(forward<X>(x)...);
+    }     
+  };
+
+  template <class TC>
+  // requires  TC is a type constructor
   struct maker_tc {
     template <typename ...Args>
     constexpr auto
     operator()(Args&& ...args) const
     {
-        return make<T>(forward<Args>(args)...);
+        return make<TC>(forward<Args>(args)...);
     }     
   };  
  
   template <class T>
+  // requires  T is not a type constructor
   struct maker_t
   {
     template <class ...Args>
     constexpr auto 
-    operator()(Args&& ...args) const -> decltype(auto)
+    operator()(Args&& ...args) const 
     {
       return make<T>(std::forward<Args>(args)...);
     }
   };
 ```
 
-Now we can define a `maker` factory for high-order make functions as follows
+Now we can define a `maker` factory for high-order `make` functions as follows
 
 ```c++
 template <class T>
@@ -531,6 +627,7 @@ std::vector<Something<X>> ys;
 std::transform(xs.begin(), xs.end(), std::back_inserter(ys), maker<Something>());
 ```
 
+Note the use of `()` instead of `{}`
 
 # Impact on the standard
 
