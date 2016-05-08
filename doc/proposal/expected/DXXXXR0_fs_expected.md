@@ -8,10 +8,6 @@
         <td width="435">2016-03-12</td>
     </tr>
     <tr>
-        <td width="172" align="left" valign="top">Revises:</td>
-        <td width="435">N4109/N4015</td>
-    </tr>
-    <tr>
         <td width="172" align="left" valign="top">Project:</td>
         <td width="435">ISO/IEC JTC1 SC22 WG21 Programming Language C++</td>
     </tr>
@@ -29,13 +25,13 @@
 =============================================================
  
 
-This paper describes some alternatives to the design of the FileSystem TS [N4099] making use of the proposed `std::experimental::expected` [N4109] or `std::experimental::status_value` [N4233].
+This paper describes some alternatives to the design of the FileSystem TS [N4099] making use of the proposed `std::experimental::expected` [P0323R0] or `std::experimental::status_value` [P0262R0].
 
 
 # FileSystem TS adaptation alternatives
 
 
-If `std::experimental::expected` is adopted, it seems natural to make use of it in the standard library, and in particular in a new version of the FileSystem TS [N4099].  This section present some alternative design, but in no way this is intended as a real proposal. We can see this paper as an appendix to [N4099] as a study of application of `std::experimental::expected` to a standard library.
+If `std::experimental::expected` is adopted, it seems natural to make use of it in the standard library, and in particular in a new version of the FileSystem TS [N4099].  This section present some alternative design, but in no way this is intended as a real proposal. We can see this paper as an appendix to [P0323R0] as a study of application of `std::experimental::expected` to a standard library.
 
 
 The two major concerns of this study are 
@@ -159,7 +155,7 @@ if (rc)
 
 ### Function returning a `bool`
 
-These functions returns already a status. When the result is false, it can be because an error occurred or because the condition is really false. This makes these kind of functions almost tri-state functions. This makes it redundant with the `error_code` as the `error_code` is in reality a status, as we can check if it is ok. We could already make use of the result type to return the `error_code`. For coherency purposes we can also use `expected<void, error_code>`.
+These functions returns already a status. When the result is `false`, it can be because an error occurred or because the condition is really false. This makes these kind of functions almost tri-state functions. This makes them redundant with the `error_code` as the `error_code` is in reality a status, as we can check if it is ok. We could already make use of the result type to return the `error_code`. For coherency purposes we can also use `expected<void, error_code>`.
 
 
 **Current**
@@ -183,7 +179,7 @@ if ( equivalent(p1, p2, ec) ) {
 
 ```
 
-The previous code presumes that when there is an error the function return false.
+The previous code presumes that when there is an error the function return `false`.
 
 **Expected**
 
@@ -240,11 +236,11 @@ else
 
 ### Function returning a `file_status`
 
-Functions returning the `file_status` are a specific and a more complex case as these functions return already a status. The wording do a mapping from the `error_code`s to the `file_status::file_type` and   consider that only some `error_code`s represent an error and associate it to `file_type::none`. Only when the status is `file_type::none` the `error_code` is really significant. 
+Functions returning the `file_status` are a specific and a more complex case as these functions return already a status. The wording do a mapping from the `error_code`s to the `file_status::file_type` and   considers that only some `error_code`s represent an error and associate it to `file_type::none`. Only when the status is `file_type::none` the `error_code` is really significant. 
 
 `expected<T, Error>` is designed to help working with error cases. 
 
-It would be interesting in separating what is the file status information from what is the file status error. 
+It would be interesting to separate what is the file status information from what is the file status error. 
 
 Two approaches that depend on whether it is important or not to know the concrete reasons error codes that mapped to `file_type::unknown`, `file_type::not_found`.
 
@@ -372,7 +368,7 @@ if ( fs::status_known(efst.value()) ) {
 }
 ```
 
-### Refactoring `file_status` and `expected` using sum types and pattern matching
+### Refactoring `file_status` and `expected` using *sum types* and pattern matching
 
 `file_status` has two attributes of type `file_type` and `perms`. The `file_type` is the one that contains at the same level file type information and file status information.
 
@@ -395,7 +391,7 @@ template <class T, class E>
 using expected = success(T) | failure(E) {};
 ```
 
-`expected<_,EC>` is an Error Monad. 
+`expected<_,EC>` is an *Error Monad*. 
 
 
 Then we could also use pattern matching to get
@@ -471,7 +467,7 @@ if (x) {
 ```
 
 
-### Constuctors
+### Constructors
 
 While there is no problem doing this replacement, we cannot return `expected<T, error_code>` from a constructor. We need to introduce factories instead.
 
@@ -853,28 +849,30 @@ Adding an `ErrorPolicy` template parameter to each function seems to be the best
 # Acknowledgements
 
 # References
-[N4109]: http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n4109.pdf "Pierre talbot Vicente J. Botet Escriba. N4109, a proposal to add a utility class to represent expected monad (Revision 1), 2014."
-[N4233]: http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n4233.html "L. Crowl, C. Mysen. N4233, A Class for Status and Optional Value, 2014." 
  
-[P0157R0]: http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/p0157r0.html "L. Crowl. P0157R0, Handling Disappointment in C++, 2015." 
-
 [N4099]: http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n4099.html "Beman Dawes, N4099 - Working Draft, Technical Specification — File System"
 
+[P0157R0]: http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/p0157r0.html "L. Crowl. P0157R0, Handling Disappointment in C++." 
+
+[P0262R0]: http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n4233.html "L. Crowl, C. Mysen., A Class for Status and Optional Value, 2014." 
+
+[P0323R0]: https://github.com/viboes/std-make/blob/master/doc/proposal/expected/p0323r0.md "Vicente J. Botet Escriba, A proposal to add a utility class to represent expected monad (Revision 2)"
 
 * [N4099] Beman Dawes, N4099 - Working Draft, Technical Specification — File System
 
 	http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n4099.html
 
-* [N4109] Pierre talbot Vicente J. Botet Escriba. N4109, a proposal to add a utility class to represent expected monad (Revision 1), 2014. 
-
-	http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n4109.pdf
-
-* [N4233] L. Crowl, C. Mysen. N4233, A Class for Status and Optional Value, 2014. 
-
-	http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n4233.html
 	
 * [P0157R0] L. Crowl. P0157R0, Handling Disappointment in C++, 2015. 
 
 	http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/p0157r0.html
+
+* [P0262R0] L. Crowl, C. Mysen. N4233, A Class for Status and Optional Value, 2014. 
+
+	http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0262r0.html
+
+* [P0323R0] Vicente J. Botet Escriba. A proposal to add a utility class to represent expected monad (Revision 2). 
+
+	http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n4109.pdf
 
 
