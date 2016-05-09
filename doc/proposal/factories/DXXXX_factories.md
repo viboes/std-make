@@ -264,7 +264,7 @@ auto x2 = make<unique_ptr<_t, MyDeleter>>(v);
 
 ```c++
 template <class TC>
-  apply<TC, int> safe_divide(int i, int j)
+  invoke<TC, int> safe_divide(int i, int j)
 {
   if (j == 0)
     return {};
@@ -326,7 +326,7 @@ namespace boost
 {
   struct future_tc {
     template <class T>
-    using apply = future<T>;
+    using invoke = future<T>;
   };
 }
 ```
@@ -339,7 +339,7 @@ namespace boost
   template <class E>
   struct expected_tc<E> {
     template <class T>
-    using apply = expected<T, E>;
+    using invoke = expected<T, E>;
   };
 }
 ```
@@ -365,14 +365,14 @@ namespace boost
     struct default_delete<experimental::_t> 
   {
     template<class T>
-    using apply = default_delete<T>;
+    using invoke = default_delete<T>;
   };
     
   template <class D>
     struct unique_ptr<experimental::_t, D>
   {
     template<class T>
-    using apply = unique_ptr<T, detail::rebind_t<D, T>>;
+    using invoke = unique_ptr<T, detail::rebind_t<D, T>>;
   };
 }
 ```
@@ -387,20 +387,55 @@ Defining these type constructors is cumbersome. This task can be simplified with
   
 namespace meta
 {
-  // identity meta-function
-  template<class T>
+  // eval a type-trait expression
+  template <class T>
+    using eval = typename T::type;
+    
+  // invoke a type constructor TC to the type parameters Xs
+  template<class TC, class... Xs>
+    using invoke = typename TC::template invoke<Xs...>;
+    
+    
+  // identity trait
+  template <class T>
     struct id
     {
       using type = T;
     };
+  template <class T>
+    using id_t = eval<id, T>;
+    
+  // constant meta-function that returns always its argument T
+  template <class T>
+    struct always
+    {
+        template <class...>
+        using invoke = T;
+    };
 
   // lift a class template to a type constructor
-  template <template <class ...> class TC, class... Args>
-    struct lift;
+  template <template <class ...> class TC>
+    struct quote
+    {
+        template <class... Xs>
+        using invoke = TC<Xs...>;
+    };
 
-  // reverse lift a class template to a type constructor
+  // lift a class template to a type constructor binding the arguments first
   template <template <class ...> class TC, class... Args>
-    struct reverse_lift;
+    struct bind_front
+    {
+        template <class... Xs>
+        using invoke = TC<Args..., Xs...>;
+    };
+
+  // reverse lift a class template to a type constructor binding the arguments last
+  template <template <class ...> class TC, class... Args>
+    struct bind_back
+    {
+        template <class... Xs>
+        using invoke = TC<Xs..., Argss...>;
+    };
     
   template <class M, class ...U>
   struct rebind : id<typename M::template rebind<U...>> {};
@@ -419,14 +454,14 @@ The previous type constructors could be rewritten using these helper classes as 
 ```c++
 namespace boost
 {
-  template <> struct future<_t> : std::experimental::meta::lift<future> {};
+  template <> struct future<_t> : std::experimental::meta::quote<future> {};
 }
 ```
 
 ```c++
 namespace boost
 {
-  template <class E> struct expected<_t, E> : std::experimental::meta::reverse_lift<expected, E> {};
+  template <class E> struct expected<_t, E> : std::experimental::meta::bind_back<expected, E> {};
 }
 ```
 
@@ -435,13 +470,13 @@ namespace boost
 {
   
   template <>
-    struct default_delete<_t> : std::experimental::meta::lift<default_delete> {};
+    struct default_delete<_t> : std::experimental::meta::quote<default_delete> {};
     
   template <class D>
     struct unique_ptr<_t, D>
   {
     template<class T>
-    using apply = unique_ptr<T, std::experimental::meta::rebind_t<D, T>>;
+    using invoke = unique_ptr<T, std::experimental::meta::rebind_t<D, T>>;
   };
 }
 ```
@@ -532,7 +567,7 @@ This proposal takes into account also *product type* factories (as `std::pair` o
     TC<decay_unwrap_t<Xs>...> make(Xs&& ...xs);
   // make product factory overload: Deduce the resulting `Us` 
   template <class TC, class ...Xs>
-    apply<TC, decay_unwrap_t<Xs>...> make(Xs&& ...xs);
+    invoke<TC, decay_unwrap_t<Xs>...> make(Xs&& ...xs);
 ```
 
 ```c++
@@ -662,9 +697,9 @@ inline namespace fundamental_v3
 {
 namespace meta
 {
-  // apply a type constuctor TC to the type parameters Xs
+  // invoke a type constructor TC to the type parameters Xs
   template<class TC, class... Xs>
-    using apply = typename TC::template apply<Xs...>;
+    using invoke = typename TC::template invoke<Xs...>;
     
   // identity meta-function
   template <class T>
@@ -677,7 +712,7 @@ namespace meta
   
   // requires a type constructor
   template <class TC>
-    meta::apply<TC, void> make();
+    meta::invoke<TC, void> make();
   
   // make overload: requires a template class parameter, deduce the underlying type
   template <template <class ...> class TC, class ...Xs>
@@ -685,10 +720,12 @@ namespace meta
 
   // make overload: requires a type constructor, deduce the underlying types
   template <class TC, class ...Xs>
-    meta::apply<TC, decay_unwrap<Xs>...> make(Xs&& ...xs);
+    meta::invoke<TC, decay_unwrap<Xs>...> make(Xs&& ...xs);
     
   // make overload: don't deduce the underlying types, 
   // don't deduce the underlying type from Xs
+  // requires M is not a type constructor
+
   template <class M, class ...Xs>
     M make(Xs&& ...xs);
     
@@ -770,16 +807,16 @@ template <template <class ...> class M, class ...Xs>
 ###########################################################################
 ```c++
   template <class TC, class ...Xs>
-    meta::apply<TC, decay_unwrap<Xs>...> make(Xs&& ...xs);
+    meta::invoke<TC, decay_unwrap<Xs>...> make(Xs&& ...xs);
 ```
 
 *Requires:* `TC` is a type constructor.
 
 *Effects:* Forwards to the customization point `make_custom` with a template constructor 
-`meta::id<meta::apply<TC, decay_unwrap<Xs>>>`. As if
+`meta::id<meta::invoke<TC, decay_unwrap<Xs>>>`. As if
 
 ```c++
-    return make_custom(meta::id<meta::apply<TC, decay_unwrap<Xs>>>{}, std::forward<Xs>(xs));
+    return make_custom(meta::id<meta::invoke<TC, decay_unwrap<Xs>>>{}, std::forward<Xs>(xs));
 ```
 
 **X.Y.7 type + non deduced underlying type**
@@ -853,17 +890,17 @@ namespace std {
 
   // customization point for template
   // (needed because std::experimental::future doesn't has a conversion constructor)
-  template <class DX, class X>
-    future<DX> make_custom(experimental::meta::id<future<DX>>, X&& x);
+  template <class DX, class ...Xs>
+    future<DX> make_custom(experimental::meta::id<future<DX>>, Xs&& ...xs);
 
   // customization point for template 
   // (needed because std::experimental::shared_future doesn't has a default constructor)
   shared_future<void> make_custom(experimental::meta::id<shared_future<void>>);
 
   // customization point for template 
-  // (needed because std::experimental::shared_future<X> doesn't has a constructor from X)
-  template <class DX, class X>
-    shared_future<DX> make_custom(experimental::meta::id<shared_future<DX>>, X&& x);
+  // (needed because std::experimental::shared_future<X> doesn't has a constructor from Xs...)
+  template <class DX, class ...Xs>
+    shared_future<DX> make_custom(experimental::meta::id<shared_future<DX>>, Xs&& ...xs);
      
   // Holder specializations
   template <>
@@ -886,7 +923,7 @@ namespace std {
   // customization point for template 
   // (needed because std::unique_ptr doesn't has a conversion constructor)
   template <class DX, class ...Xs>
-    unique_ptr<DX> make_custom(experimental::meta::id<unique_ptr<DX>>, Xs&& xs);
+    unique_ptr<DX> make_custom(experimental::meta::id<unique_ptr<DX>>, Xs&& ...xs);
 
   // Holder customization
   template <class D>
@@ -906,7 +943,7 @@ namespace std {
   // customization point for template 
   // (needed because std::shared_ptr doesn't has a conversion constructor)
   template <class DX, class ...Xs>
-  shared_ptr<DX> make_custom(experimental::meta::id<shared_ptr<DX>>, Xs&& xs...);
+  shared_ptr<DX> make_custom(experimental::meta::id<shared_ptr<DX>>, Xs&& ...xs);
 
   // Holder customization
   template <>
@@ -936,7 +973,7 @@ The authors would like to have an answer to the following points if there is at 
 
     * should the customization function names be suffixed e.g. with  `_custom`?
 
-* Should the namespace `meta` be used for the meta programming utilities `apply` and `id`?
+* Should the namespace `meta` be used for the meta programming utilities `invoke` and `id`?
 
 * Should the high-order function factory `maker` be part of the proposal?
 
@@ -952,7 +989,7 @@ The authors would like to have an answer to the following points if there is at 
 
     While not need absolutely, it helps to define friendly the type constructors.
 
-* Is there an interest on the helper meta-functions `id`, `lift`, `lift_reverse` and `rebind`?
+* Is there an interest on the helper meta-functions `id`, `quote`, `bind_front`, `bind_back` and `rebind`?
 
     If yes, should them be part of a separated proposal?
 
@@ -1036,7 +1073,7 @@ Thanks to Mike Spertus for its [P0091R0] proposal that would even help to avoid 
 # Appendix - Helper Classes
 
 In the original proposal there were some helper classes as 
-`lift`, `reverse_lift`, `_t` and `id`  that are not mandatory for this proposal. 
+`quote`, `bind_front`, `bind_back``_t` and `id`  that are not mandatory for this proposal. 
 If the committee has interest, a specific proposal can be written. 
 
 ```c++
@@ -1051,22 +1088,6 @@ inline namespace fundamental_v3
   
 namespace meta
 {
-  // lift a class template to a type constructor
-  template <template <class ...> class TC, class... Args>
-    struct lift;
-
-  // reverse lift a class template to a type constructor
-  template <template <class ...> class TC, class... Args>
-    struct reverse_lift;
-
-  template <class M, class ...U>
-  struct rebind : id<typename M::template rebind<U...>> {};
-
-  template <template<class ...> class TC, class ...Ts, class ...Us>
-  struct rebind<TC<Ts...>, Us...> : id<TC<Us...>> {};
-
-  template <class M, class ...Us>
-  using rebind_t = typename rebind<M, Us...>::type;
 
 }}}}
 ```
