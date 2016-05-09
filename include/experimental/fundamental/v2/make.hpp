@@ -11,7 +11,7 @@
 #include <type_traits>
 #include <experimental/meta/v1/types.hpp>
 #include <experimental/meta/v1/id.hpp>
-#include <experimental/meta/v1/is_applicable_with.hpp>
+#include <experimental/meta/v1/is_invokable.hpp>
 #include <experimental/meta/v1/type_constructor.hpp>
 #include <experimental/meta/v1/deduced_type.hpp>
 
@@ -27,12 +27,12 @@ inline namespace fundamental_v2
   template <class TC, int = 0, int...>
   constexpr
   typename enable_if<
-      meta::is_applicable_with<TC, void>::value,
-      meta::apply<TC, void>
+      meta::is_invokable<TC, void>::value,
+      meta::invoke<TC, void>
   >::type
   make()
   {
-    return make_custom(meta::id<meta::apply<TC, void>>{});
+    return make_custom(meta::id<meta::invoke<TC, void>>{});
   }
 
   template <template <class> class M>
@@ -46,18 +46,18 @@ inline namespace fundamental_v2
   // make overload: requires a type constructor, deduce the underlying type
   template <class TC, int = 0, int..., class ...Xs>
   constexpr typename enable_if<
-    meta::is_applicable_with<TC, meta::deduced_type_t<Xs>...>::value,
-    meta::apply<TC, meta::deduced_type_t<Xs>...>
+    meta::is_invokable<TC, meta::deduced_type_t<Xs>...>::value,
+    meta::invoke<TC, meta::deduced_type_t<Xs>...>
   >::type
   make(Xs&& ...xs)
   {
-    return make_custom(meta::id<meta::apply<TC, meta::deduced_type_t<Xs>...>>{}, std::forward<Xs>(xs)...);
+    return make_custom(meta::id<meta::invoke<TC, meta::deduced_type_t<Xs>...>>{}, std::forward<Xs>(xs)...);
   }
 
   // make overload: requires a type with a specific underlying type, don't deduce the underlying type from Xs
   template <class M, int = 0, int..., class ...Xs>
   constexpr typename enable_if<
-    ! meta::is_applicable_with<M, meta::deduced_type_t<Xs>...>::value
+    ! meta::is_invokable<M, meta::deduced_type_t<Xs>...>::value
     , M
   >::type
   make(Xs&& ...xs)

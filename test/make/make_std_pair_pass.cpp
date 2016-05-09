@@ -1,4 +1,4 @@
-// Copyright (C) 2015 Vicente J. Botet Escriba
+// Copyright (C) 2015-2016 Vicente J. Botet Escriba
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -34,7 +34,7 @@ namespace std {
     struct impl<experimental::meta::types<T>> : experimental::meta::id<T>{};
   public:
     template <class ...Ts>
-    using apply = experimental::meta::eval<impl<experimental::meta::types<Ts...>>>;
+    using invoke = experimental::meta::eval<impl<experimental::meta::types<Ts...>>>;
   };
 
   namespace experimental
@@ -54,7 +54,7 @@ namespace std {
 int main()
 {
   namespace stde = std::experimental;
-  static_assert(stde::meta::is_applicable_with<std::pair<stde::_t,stde::_t>, int>::value, "ERROR");
+  static_assert(stde::meta::is_invokable<std::pair<stde::_t,stde::_t>, int>::value, "ERROR");
   {
     int v=0;
     std::pair<int, int> x = stde::make<std::pair>(v, v);

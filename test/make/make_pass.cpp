@@ -48,7 +48,7 @@ struct A<void>
 
 // Holder specialization
 template <>
-struct A<std::experimental::_t> : std::experimental::meta::lift<A> {};
+struct A<std::experimental::_t> : std::experimental::meta::quote<A> {};
 
 namespace std
 {
@@ -174,7 +174,7 @@ int main()
   }
   {
     int v=0;
-    A<int> x = stde::make<stde::meta::lift<A>>(v);
+    A<int> x = stde::make<stde::meta::quote<A>>(v);
     BOOST_TEST(x.v == 0);
   }
   {

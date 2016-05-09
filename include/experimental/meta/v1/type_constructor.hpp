@@ -11,7 +11,7 @@
 
 #include <experimental/meta/v1/id.hpp>
 #include <experimental/meta/v1/eval.hpp>
-#include <experimental/meta/v1/lift.hpp>
+#include <experimental/meta/v1/quote.hpp>
 #include <experimental/meta/v1/void_.hpp>
 #include <experimental/meta/v1/template_class.hpp>
 #include <experimental/fundamental/v2/holder.hpp>
@@ -21,7 +21,7 @@
 namespace std
 {
   template <>
-  struct add_pointer<experimental::_t> : experimental::meta::lift<add_pointer> {};
+  struct add_pointer<experimental::_t> : experimental::meta::quote<add_pointer> {};
 
 namespace experimental
 {

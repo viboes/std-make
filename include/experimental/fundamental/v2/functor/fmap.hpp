@@ -9,7 +9,7 @@
 
 #include <experimental/fundamental/v2/functor/functor_tag.hpp>
 #include <experimental/fundamental/v2/concept_map.hpp>
-#include <experimental/meta/v1/apply.hpp>
+#include <experimental/meta/v1/invoke.hpp>
 #include <experimental/meta/v1/type_constructor.hpp>
 #include <experimental/meta/v1/value_type.hpp>
 #include <experimental/meta/v1/result_type.hpp>
@@ -25,7 +25,7 @@ inline namespace fundamental_v2
   //  requires Function<F, ValueType<M>...>
   // && Same<meta::TypeConstructor<M>, meta::TypeConstructor<M>>...
   auto fmap(F&& f, const M& m, const Ms& ...ms)
-    //-> meta::apply<meta::TypeConstructor<M>, meta::ResultType<F, meta::ValueType<M>...>>
+    //-> meta::invoke<meta::TypeConstructor<M>, meta::ResultType<F, meta::ValueType<M>...>>
     -> decltype(fmap_custom(concept_tag_t<functor, M>{}, forward<F>(f), m, ms...))
   {
     return fmap_custom(concept_tag_t<functor, M>{}, forward<F>(f), m, ms...);
@@ -35,7 +35,7 @@ inline namespace fundamental_v2
 //  //  requires Function<F, ValueType<M>...>
 //  // && Same<meta::TypeConstructor<M>, meta::TypeConstructor<M>>...
 //  auto fmap(F&& f, M&& m, Ms&& ...ms)
-//    // -> meta::apply<meta::TypeConstructor<M>, meta::ResultType<F, meta::ValueType<M>...>>
+//    // -> meta::invoke<meta::TypeConstructor<M>, meta::ResultType<F, meta::ValueType<M>...>>
 //    -> decltype(concept_instance_t<functor, decay_t<M>>::fmap_impl(forward<F>(f), forward<M>(m), forward<Ms>(ms)...))
 //  {
 //    return concept_instance_t<functor, decay_t<M>>::fmap_impl(forward<F>(f), forward<M>(m), forward<Ms>(ms)...);
@@ -45,7 +45,7 @@ inline namespace fundamental_v2
   //  requires Function<F, ValueType<M>...>
   // && Same<meta::TypeConstructor<M>, meta::TypeConstructor<M>>...
   auto fmap(F&& f, const M& m, const Ms& ...ms)
-    // -> meta::apply<meta::TypeConstructor<M>, meta::ResultType<F, meta::ValueType<M>...>>
+    // -> meta::invoke<meta::TypeConstructor<M>, meta::ResultType<F, meta::ValueType<M>...>>
     -> decltype(concept_instance_t<functor, M>::fmap_impl(forward<F>(f), m, ms...))
   {
     return concept_instance_t<functor, M>::fmap_impl(forward<F>(f), m, ms...);

@@ -29,12 +29,12 @@ inline namespace fundamental_v2
   //  requires PossibleValued<PV>
   //  && Function<F, ValueType<PV>>
   auto fmap_custom(possible_value, F&& f, const PV& pv, const PVs& ...pvs)
-    -> meta::apply<meta::TypeConstructor<PV>, meta::ResultType<F, meta::ValueType<PV>, meta::ValueType<PVs>...>>
+    -> meta::invoke<meta::TypeConstructor<PV>, meta::ResultType<F, meta::ValueType<PV>, meta::ValueType<PVs>...>>
   {
     if (have_value(pv, pvs...))
       return make<meta::TypeConstructor<PV>>(f(value(pv), value(pvs)...));
     else
-      return none(pv);
+      return not_a_value(pv);
   }
 
 }

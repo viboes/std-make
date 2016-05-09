@@ -11,6 +11,7 @@
 
 #include <experimental/meta/v1/id.hpp>
 #include <experimental/meta/v1/eval.hpp>
+#include <experimental/meta/v1/defer.hpp>
 
 namespace std
 {
@@ -26,7 +27,7 @@ inline namespace v1
   struct quote
   {
     template <typename... Ts>
-    using apply = eval<defer<TC, Ts... >>;
+    using invoke = eval<defer<TC, Ts... >>;
   };
 
 }

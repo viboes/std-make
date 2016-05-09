@@ -1,4 +1,4 @@
-// Copyright (C) 2014-2015 Vicente J. Botet Escriba
+// Copyright (C) 2014-2016 Vicente J. Botet Escriba
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -35,7 +35,7 @@ namespace std {
 
     // Holder specialization
     template <>
-    struct optional<_t>  : meta::lift<optional> {};
+    struct optional<_t>  : meta::quote<optional> {};
 
     template <class T>
     struct possible_value::tag<optional<T>> : meta::id<pointer_like> {};
@@ -85,7 +85,7 @@ std::experimental::optional<double> inverse(double x) {
 int main()
 {
   namespace stde = std::experimental;
-  static_assert(stde::meta::is_applicable_with<stde::optional<stde::_t>, int>::value, "ERROR");
+  static_assert(stde::meta::is_invokable<stde::optional<stde::_t>, int>::value, "ERROR");
   static_assert(std::is_same<stde::meta::value_type_t<stde::optional<int&>>, int&>::value, "ERROR");
 
   {

@@ -10,7 +10,7 @@
 #define JASEL_META_V1_VOID_HPP
 
 #include <experimental/meta/v1/always.hpp>
-#include <experimental/meta/v1/apply.hpp>
+#include <experimental/meta/v1/invoke.hpp>
 
 namespace std
 {
@@ -23,7 +23,7 @@ inline namespace v1
   /// \brief An alias for `void`.
   template<typename...Ts>
   //using void_ = void;
-  using void_ = apply<always<void>, Ts...>;
+  using void_ = invoke<always<void>, Ts...>;
 
 }
 }

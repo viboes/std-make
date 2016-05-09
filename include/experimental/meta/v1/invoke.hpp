@@ -1,13 +1,13 @@
 //////////////////////////////////////////////////////////////////////////////
 //
-// (C) Copyright Vicente J. Botet Escriba 2014.
+// (C) Copyright Vicente J. Botet Escriba 2014,2016.
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file // LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef JASEL_META_V1_APPLY_HPP
-#define JASEL_META_V1_APPLY_HPP
+#ifndef JASEL_META_V1_INVOKE_HPP
+#define JASEL_META_V1_INVOKE_HPP
 
 namespace std
 {
@@ -19,12 +19,12 @@ inline namespace v1
 {
   /// applies a meta-function \p TC to the arguments \p Args
   ///
-  /// apply<type_constructor_t<M>, value_type_t<M>> == M
-  /// value_type_t<apply<TC, T>> == T
-  /// type_constructor_t<apply<TC, T>> == TC
+  /// invoke<type_constructor_t<M>, value_type_t<M>> == M
+  /// value_type_t<invoke<TC, T>> == T
+  /// type_constructor_t<invoke<TC, T>> == TC
 
   template<class TC, class... Args>
-  using apply = typename TC::template apply<Args...>;
+  using invoke = typename TC::template invoke<Args...>;
 
 }
 }

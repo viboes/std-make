@@ -10,10 +10,10 @@
 #include <experimental/meta/v1/defer.hpp>
 #include <experimental/meta/v1/eval.hpp>
 #include <experimental/meta/v1/id.hpp>
-#include <experimental/meta/v1/lift.hpp>
 #include <experimental/meta/v1/quote.hpp>
 #include <experimental/meta/v1/rebind.hpp>
-#include <experimental/meta/v1/reverse_lift.hpp>
+#include <experimental/meta/v1/bind_front.hpp>
+#include <experimental/meta/v1/bind_back.hpp>
 #include <experimental/meta/v1/type_constructor.hpp>
 
 #endif // header

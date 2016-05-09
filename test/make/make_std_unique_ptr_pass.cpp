@@ -1,4 +1,4 @@
-// Copyright (C) 2014-2015 Vicente J. Botet Escriba
+// Copyright (C) 2014-2016 Vicente J. Botet Escriba
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -62,11 +62,11 @@ namespace std {
   struct unique_ptr<experimental::_t, D>
   {
       template <class ...T>
-      using apply = unique_ptr<T..., experimental::meta::eval<experimental::meta::rebind<D, T...>>>;
+      using invoke = unique_ptr<T..., experimental::meta::eval<experimental::meta::rebind<D, T...>>>;
   };
 
 //  template <>
-//  struct default_delete<experimental::_t> : experimental::meta::lift<default_delete> {};
+//  struct default_delete<experimental::_t> : experimental::meta::quote<default_delete> {};
 
   namespace experimental
   {

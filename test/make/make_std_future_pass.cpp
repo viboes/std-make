@@ -1,4 +1,4 @@
-// Copyright (C) 2014-2015 Vicente J. Botet Escriba
+// Copyright (C) 2014-2016 Vicente J. Botet Escriba
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -78,13 +78,13 @@ namespace std {
 
   // Holder customization
   template <>
-  struct future<experimental::_t> : experimental::meta::lift<future> {};
+  struct future<experimental::_t> : experimental::meta::quote<future> {};
 
   template <>
   struct future<experimental::_t&>
   {
     template<class ...T>
-    using apply = future<T& ...>;
+    using invoke = future<T& ...>;
   };
 
   namespace experimental

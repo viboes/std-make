@@ -18,6 +18,7 @@
 #include <experimental/fundamental/v2/monoid.hpp>
 #include <experimental/fundamental/v2/possible_valued.hpp>
 #include <experimental/meta/v1/type_constructor.hpp>
+#include <experimental/fundamental/v2/none.hpp>
 
 namespace std
 {
@@ -41,7 +42,7 @@ inline namespace fundamental_v2
     if (has_value(x) && has_value(y))
       return make<PV>(monoid_op(value(x), value(y)));
     else
-      return none(x);
+      return not_a_value(x);
   }
 
 }

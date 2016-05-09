@@ -1,4 +1,4 @@
-// Copyright (C) 2014-2015 Vicente J. Botet Escriba
+// Copyright (C) 2014-2016 Vicente J. Botet Escriba
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -31,7 +31,7 @@ namespace boost {
   // Holder specialization
   template <>
   struct optional<std::experimental::_t>
-  : std::experimental::meta::lift<optional> {};
+  : std::experimental::meta::quote<optional> {};
 
 }
 
@@ -107,7 +107,7 @@ int main()
 {
 
   namespace stde = std::experimental;
-  static_assert(stde::meta::is_applicable_with<boost::optional<stde::_t>, int>::value, "ERROR");
+  static_assert(stde::meta::is_invokable<boost::optional<stde::_t>, int>::value, "ERROR");
   static_assert(stde::meta::has_value_type_member<const boost::optional<int>>::value, "ERROR");
   static_assert(! stde::meta::has_element_type_member<const boost::optional<int>>::value, "ERROR");
   static_assert(!std::is_array<boost::optional<int> >::value, "ERROR");

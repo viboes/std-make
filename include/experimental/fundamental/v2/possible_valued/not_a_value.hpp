@@ -4,8 +4,8 @@
 //
 // Copyright (C) 2015 Vicente J. Botet Escriba
 
-#ifndef JASEL_FUNDAMENTAL_V2_POSSIBLEVALUED_NONE_HPP
-#define JASEL_FUNDAMENTAL_V2_POSSIBLEVALUED_NONE_HPP
+#ifndef JASEL_FUNDAMENTAL_V2_POSSIBLEVALUED_NOT_A_VALUE_HPP
+#define JASEL_FUNDAMENTAL_V2_POSSIBLEVALUED_NOT_A_VALUE_HPP
 
 #include <experimental/fundamental/v2/possible_valued/possible_value_tag.hpp>
 #include <experimental/fundamental/v2/concept_map.hpp>
@@ -22,21 +22,21 @@ inline namespace fundamental_v2
    * @Requires ! has_value(m)
    */
   template <class M>
-  auto none(M const& m) ->
-    decltype(none_custom(concept_tag_t<possible_value, M>{}, m))
+  auto not_a_value(M const& m) ->
+    decltype(not_a_value_custom(concept_tag_t<possible_value, M>{}, m))
   {
-    return none_custom(concept_tag_t<possible_value, M>{}, m);
+    return not_a_value_custom(concept_tag_t<possible_value, M>{}, m);
   }
 
   template <class M>
-  auto none(M const& m) ->
-    decltype(concept_instance_t<possible_value, M>::none_impl(m))
+  auto not_a_value(M const& m) ->
+    decltype(concept_instance_t<possible_value, M>::not_a_value_impl(m))
   {
-    return concept_instance_t<possible_value, M>::none_impl(m);
+    return concept_instance_t<possible_value, M>::not_a_value_impl(m);
   }
 
   template <class T>
-  nullptr_t none(const T*) {
+  nullptr_t not_a_value(const T*) {
     return nullptr;
   }
 }

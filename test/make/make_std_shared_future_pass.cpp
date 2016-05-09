@@ -1,4 +1,4 @@
-// Copyright (C) 2014-2015 Vicente J. Botet Escriba
+// Copyright (C) 2014-2016 Vicente J. Botet Escriba
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -31,13 +31,13 @@ namespace std {
 
   // Holder specialization
   template <>
-  struct shared_future<experimental::_t> : experimental::meta::lift<shared_future> {};
+  struct shared_future<experimental::_t> : experimental::meta::quote<shared_future> {};
 
   template <>
   struct shared_future<experimental::_t&>
   {
     template<class ...T>
-    using apply = shared_future<T& ...>;
+    using invoke = shared_future<T& ...>;
   };
 
   namespace experimental

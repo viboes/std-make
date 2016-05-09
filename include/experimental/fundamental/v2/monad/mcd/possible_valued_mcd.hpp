@@ -34,7 +34,7 @@ inline namespace fundamental_v2
     if (has_value(pv))
       return f(value(pv));
     else
-      return none(pv);
+      return not_a_value(pv);
   }
 
 }
