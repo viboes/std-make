@@ -5,7 +5,7 @@
     </tr>
     <tr>
         <td width="172" align="left" valign="top">Date:</td>
-        <td width="435">2016-05-08</td>
+        <td width="435">2016-05-11</td>
     </tr>
     <tr>
         <td width="172" align="left" valign="top">Project:</td>
@@ -860,7 +860,7 @@ namespace experimental {
 
   // Holder specialization
   template <>
-  struct optional<_t>;
+  struct optional<_t>: meta::quote<optional> {};
 
 }
 }
@@ -874,7 +874,7 @@ namespace experimental {
 
   // Holder specialization
   template <class E>
-  struct expected<_t, E>;
+  struct expected<_t, E>: meta::bind_back<expected, E> {};
 }
 }
 ```
@@ -885,30 +885,34 @@ namespace experimental {
 namespace std {
 
   // customization point for template 
-  // (needed because std::experimental::future doesn't has a default constructor)
-  future<void> make_custom(experimental::meta::id<future<void>>);
+  future<void> make_custom(experimental::meta::id<future<void>>) {
+    return make_ready_future();
+  }
 
   // customization point for template
-  // (needed because std::experimental::future doesn't has a conversion constructor)
   template <class DX, class ...Xs>
-    future<DX> make_custom(experimental::meta::id<future<DX>>, Xs&& ...xs);
+    future<DX> make_custom(experimental::meta::id<future<DX>>, Xs&& ...xs) {
+    return make_ready_future<DX>(forward<Xs>(xs)...);
+  }
 
   // customization point for template 
-  // (needed because std::experimental::shared_future doesn't has a default constructor)
-  shared_future<void> make_custom(experimental::meta::id<shared_future<void>>);
+  shared_future<void> make_custom(experimental::meta::id<shared_future<void>>)  {
+    return make_ready_future().share();
+  }
 
   // customization point for template 
-  // (needed because std::experimental::shared_future<X> doesn't has a constructor from Xs...)
   template <class DX, class ...Xs>
-    shared_future<DX> make_custom(experimental::meta::id<shared_future<DX>>, Xs&& ...xs);
+    shared_future<DX> make_custom(experimental::meta::id<shared_future<DX>>, Xs&& ...xs)  {
+    return make_ready_future<DX>(forward<Xs>(xs)...).share();
+  }
      
   // Holder specializations
   template <>
-    struct future<experimental::_t>;
+    struct future<experimental::_t> : experimental::meta::quote<future> {};;
   template <>
     struct future<experimental::_t&>;
   template <>
-    struct shared_future<experimental::_t>;
+    struct shared_future<experimental::_t> : experimental::meta::quote<shared_future> {};;
   template <>
     struct shared_future<experimental::_t&>;   
 }
@@ -921,16 +925,17 @@ namespace std {
 namespace std {
 
   // customization point for template 
-  // (needed because std::unique_ptr doesn't has a conversion constructor)
   template <class DX, class ...Xs>
-    unique_ptr<DX> make_custom(experimental::meta::id<unique_ptr<DX>>, Xs&& ...xs);
+    unique_ptr<DX> make_custom(experimental::meta::id<unique_ptr<DX>>, Xs&& ...xs) {
+    return make_unique<T>(forward<Xs>(xs)...);
+  }
 
   // Holder customization
   template <class D>
-  struct unique_ptr<experimental::_t, D>;
-
-  template <>
-  struct default_delete<experimental::_t>;
+  struct unique_ptr<experimental::_t, D> {
+      template <class ...T>
+      using invoke = unique_ptr<T..., experimental::meta::eval<experimental::meta::rebind<D, T...>>>;
+  };
 
 }
 ```
@@ -941,16 +946,54 @@ namespace std {
 namespace std {
 
   // customization point for template 
-  // (needed because std::shared_ptr doesn't has a conversion constructor)
   template <class DX, class ...Xs>
-  shared_ptr<DX> make_custom(experimental::meta::id<shared_ptr<DX>>, Xs&& ...xs);
+  shared_ptr<DX> make_custom(experimental::meta::id<shared_ptr<DX>>, Xs&& ...xs) {
+    return make_shared<DX>(forward<Xs>(xs)...);
+  }
 
   // Holder customization
   template <>
-  struct shared_ptr<experimental::_t>;
+  struct shared_ptr<experimental::_t> : experimental::meta::quote<shared_ptr> {};
   
 }
 ```
+
+
+## `pair`
+
+
+```c++
+namespace std {
+
+
+  // Holder customization
+  template <>
+  struct pair<experimental::_t, experimental::_t>
+  {
+    template <class ...Ts>
+    using invoke = pair<Ts...>;
+  };
+  
+}
+```
+
+## `tuple`
+
+```c++
+namespace std {
+
+  // customization point for template 
+  template <class DX, class ...Xs>
+  shared_ptr<DX> make_custom(experimental::meta::id<shared_ptr<DX>>, Xs&& ...xs) {
+    return make_shared<DX>(forward<Xs>(xs)...);
+  }
+
+  // Holder customization
+  template <>
+  struct tuple<experimental::_t> : experimental::meta::quote<tuple>  {  };  
+}
+```
+
 
 # Implementability
 
