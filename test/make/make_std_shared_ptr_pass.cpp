@@ -23,8 +23,7 @@ namespace std {
 
   // Holder customization
   template <>
-  struct shared_ptr<experimental::_t>
-  : public experimental::meta::quote<shared_ptr>  {  };
+  struct shared_ptr<experimental::_t> : experimental::meta::quote<shared_ptr> {};
 
   namespace experimental
   {

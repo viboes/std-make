@@ -24,17 +24,8 @@ namespace std {
   template <>
   struct pair<experimental::_t, experimental::_t>
   {
-  private:
-    template <class Types>
-    struct impl;
-    template <class T, class U>
-    struct impl<experimental::meta::types<T, U>> : experimental::meta::id<pair<T, U>>{};
-    // this specialization is needed to avoid instantiation of pair<T>
-    template <class T>
-    struct impl<experimental::meta::types<T>> : experimental::meta::id<T>{};
-  public:
     template <class ...Ts>
-    using invoke = experimental::meta::eval<impl<experimental::meta::types<Ts...>>>;
+    using invoke = pair<Ts...>;
   };
 
   namespace experimental
@@ -54,7 +45,7 @@ namespace std {
 int main()
 {
   namespace stde = std::experimental;
-  static_assert(stde::meta::is_invokable<std::pair<stde::_t,stde::_t>, int>::value, "ERROR");
+  static_assert(stde::meta::is_invokable<std::pair<stde::_t,stde::_t>, int, short>::value, "ERROR");
   {
     int v=0;
     std::pair<int, int> x = stde::make<std::pair>(v, v);

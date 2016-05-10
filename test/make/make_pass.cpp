@@ -200,17 +200,11 @@ int main()
   {
     std::vector<int> xs;
     std::vector<A<int> > ys;
-    std::transform(xs.begin(), xs.end(), std::back_inserter(ys), stde::maker_tc<A>{});
-  }
-  {
-    std::vector<int> xs;
-    std::vector<A<int> > ys;
     std::transform(xs.begin(), xs.end(), std::back_inserter(ys), stde::maker<A>());
   }
   {
     std::vector<int> xs;
     std::vector<A<int> > ys;
-    //std::transform(xs.begin(), xs.end(), std::back_inserter(ys), stde::maker_mfc<A<stde::_t>>{});
     std::transform(xs.begin(), xs.end(), std::back_inserter(ys), stde::maker<A<stde::_t>>());
   }
   {

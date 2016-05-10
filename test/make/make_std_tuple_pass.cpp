@@ -24,8 +24,7 @@ namespace std {
 
   // Holder customization
   template <>
-  struct tuple<experimental::_t>
-  : public experimental::meta::quote<tuple>  {  };
+  struct tuple<experimental::_t> : experimental::meta::quote<tuple> {};
 
   namespace experimental
   {
