@@ -12,7 +12,7 @@
 #include <experimental/fundamental/v2/type_constructor.hpp>
 #include <experimental/meta/v1/invoke.hpp>
 #include <experimental/fundamental/v2/value_type.hpp>
-#include <experimental/meta/v1/result_type.hpp>
+#include <experimental/fundamental/v2/result_type.hpp>
 
 namespace std
 {
