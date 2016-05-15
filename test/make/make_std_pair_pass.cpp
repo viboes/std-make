@@ -37,7 +37,7 @@ namespace std {
       struct type_constructor<pair<T1,T2>> : id<pair<_t, _t>> {};
 
       template <>
-      struct type_constructor<template_class<pair>> : id<pair<_t, _t>> {};
+      struct type_constructor<quote<pair>> : id<pair<_t, _t>> {};
     }
   }
 }

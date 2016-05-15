@@ -27,9 +27,9 @@ inline namespace fundamental_v2
 
   template <template <class ...> class TC>
   constexpr auto none()
-  ->  decltype(none<meta::type_constructor_t<meta::template_class<TC>>>())
+  ->  decltype(none<meta::type_constructor_t<meta::quote<TC>>>())
   {
-    return none<meta::type_constructor_t<meta::template_class<TC>>>();
+    return none<meta::type_constructor_t<meta::quote<TC>>>();
   }
 
 }

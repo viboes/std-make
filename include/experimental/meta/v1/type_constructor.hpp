@@ -13,7 +13,7 @@
 #include <experimental/meta/v1/eval.hpp>
 #include <experimental/meta/v1/quote.hpp>
 #include <experimental/meta/v1/void_.hpp>
-#include <experimental/meta/v1/template_class.hpp>
+#include <experimental/meta/v1/quote.hpp>
 #include <experimental/fundamental/v2/holder.hpp>
 
 #include <type_traits> //add_pointer
@@ -77,12 +77,12 @@ inline namespace v1
 #if 0
 // fixme this doesn't compile
   template <template <class...> class TC >
-  struct type_constructor<meta::template_class<TC>>
+  struct type_constructor<meta::quote<TC>>
     : detail::type_constructor_if_valid_type_constructor_tc_t<TC,
         detail::valid_type_constructor_tc_t<TC>> {};
 #else
   template <template <class...> class TC >
-  struct type_constructor<meta::template_class<TC>> : type_constructor<TC<_t> > {};
+  struct type_constructor<meta::quote<TC>> : type_constructor<TC<_t> > {};
 #endif
 
 //  // Default implementation make use of a nested type type_constructor
