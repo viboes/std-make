@@ -108,10 +108,10 @@ int main()
 
   namespace stde = std::experimental;
   static_assert(stde::meta::is_invokable<boost::optional<stde::_t>, int>::value, "ERROR");
-  static_assert(stde::meta::has_value_type_member<const boost::optional<int>>::value, "ERROR");
-  static_assert(! stde::meta::has_element_type_member<const boost::optional<int>>::value, "ERROR");
+  static_assert(stde::has_value_type_member<const boost::optional<int>>::value, "ERROR");
+  static_assert(! stde::has_element_type_member<const boost::optional<int>>::value, "ERROR");
   static_assert(!std::is_array<boost::optional<int> >::value, "ERROR");
-  static_assert(std::is_same<stde::meta::value_type_t<boost::optional<int>>, int>::value, "ERROR");
+  static_assert(std::is_same<stde::value_type_t<boost::optional<int>>, int>::value, "ERROR");
   static_assert(std::is_same<stde::concept_tag_t<stde::applicative, boost::optional<int>>, stde::possible_value>::value, "ERROR");
   static_assert(std::is_same<stde::concept_tag_t<stde::monoid, stde::product<int>>, stde::meta::id<stde::product<int>>>::value, "ERROR");
 

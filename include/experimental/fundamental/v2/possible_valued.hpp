@@ -27,7 +27,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////
 
 #include <experimental/fundamental/v2/type_constructor.hpp>
-#include <experimental/meta/v1/value_type.hpp>
+#include <experimental/fundamental/v2/value_type.hpp>
 #include <experimental/meta/v1/none_type.hpp>
 
 #include <experimental/fundamental/v2/make.hpp>

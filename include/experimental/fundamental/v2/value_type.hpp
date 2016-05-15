@@ -18,29 +18,26 @@ namespace std
 {
 namespace experimental
 {
-namespace meta
+inline namespace fundamental_v2
 {
-inline namespace v1
-{
-
   template< class, class = void >
   struct has_value_type_member : false_type { };
   template< class T >
-  struct has_value_type_member<T, void_<typename T::value_type>> : true_type { };
+  struct has_value_type_member<T, meta::void_<typename T::value_type>> : true_type { };
 
   template< class, class = void >
   struct has_element_type_member : false_type { };
   template< class T >
-  struct has_element_type_member<T, void_<typename T::element_type>> : true_type { };
+  struct has_element_type_member<T, meta::void_<typename T::element_type>> : true_type { };
 
   template<class T, class = void>
   struct value_type;
 
   // value_type getter meta-function
   template <class T>
-  using value_type_t = eval<value_type<T>>;
+  using value_type_t = meta::eval<value_type<T>>;
   template <class T>
-  using ValueType = eval<value_type<T>>;
+  using ValueType = meta::eval<value_type<T>>;
 
   template <class T >
   struct value_type<T*> : enable_if<is_object<T>::value, remove_cv_t<T>>  {};
@@ -59,9 +56,9 @@ inline namespace v1
     template <class T>
     struct value_type<T, true, false, false>: value_type_t<decay_t<T>> {};
     template <class T >
-    struct value_type<T, false, true, false>: id<typename T::value_type> {};
+    struct value_type<T, false, true, false>: meta::id<typename T::value_type> {};
     template <class T >
-    struct value_type<T, false, false, true>: id<typename T::element_type> {};
+    struct value_type<T, false, false, true>: meta::id<typename T::element_type> {};
 
   }
   template <class T >
@@ -81,7 +78,6 @@ inline namespace v1
 //    : enable_if<is_object<typename T::element_type>::value, typename T::element_type> { };
 
 
-}
 }
 }
 }

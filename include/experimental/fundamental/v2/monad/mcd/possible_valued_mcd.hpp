@@ -29,7 +29,7 @@ inline namespace fundamental_v2
   //  requires PossibleValued<PV>
   //  && Same<TypeConstructor<ResultType<F, ValueType<PV>>>, TypeConstructor<PV>>
   auto mbind_custom(possible_value, const PV& pv, F&& f)
-    -> meta::ResultType<F, meta::ValueType<PV>>
+    -> meta::ResultType<F, ValueType<PV>>
   {
     if (has_value(pv))
       return f(value(pv));

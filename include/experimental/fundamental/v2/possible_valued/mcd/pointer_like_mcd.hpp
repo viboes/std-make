@@ -33,13 +33,13 @@ inline namespace fundamental_v2
   }
 
   template <class M>
-  meta::value_type_t<M>&
+  value_type_t<M>&
   value_custom(pointer_like, M& ptr)
   {
     return *ptr;
   }
   template <class M>
-  meta::value_type_t<M> const&
+  value_type_t<M> const&
   value_custom(pointer_like, M const& ptr)
   {
     return *ptr;

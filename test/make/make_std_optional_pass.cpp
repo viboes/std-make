@@ -50,11 +50,11 @@ namespace std {
     template <class T>
     struct type_constructor<optional<T>> : meta::id<optional<_t>> {};
 
+    template <class T>
+    struct value_type<optional<T>> : meta::id<T> { };
+
     namespace meta
     {
-      template <class T>
-      struct value_type<optional<T>> : meta::id<T> { };
-
       template <class T>
       struct none_type<optional<T>> : meta::id<nullopt_t> { };
     }
@@ -85,7 +85,7 @@ int main()
 {
   namespace stde = std::experimental;
   static_assert(stde::meta::is_invokable<stde::optional<stde::_t>, int>::value, "ERROR");
-  static_assert(std::is_same<stde::meta::value_type_t<stde::optional<int&>>, int&>::value, "ERROR");
+  static_assert(std::is_same<stde::value_type_t<stde::optional<int&>>, int&>::value, "ERROR");
 
   {
     stde::optional<int> x = stde::none<stde::optional>();
