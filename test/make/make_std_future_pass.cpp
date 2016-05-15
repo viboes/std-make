@@ -63,18 +63,18 @@ namespace std {
 
   }
 
-  // customization point for template (needed because std::future doesn't has a default constructor)
-  future<void> make_custom(experimental::meta::id<future<void>>)
-  {
-    return make_ready_future();
-  }
+//  // customization point for template (needed because std::future doesn't has a default constructor)
+//  future<void> make_custom(experimental::meta::id<future<void>>)
+//  {
+//    return make_ready_future();
+//  }
 
-  // customization point for template (needed because std::future doesn't has a conversion constructor)
-  template <class DX, class ...Xs>
-  future<DX> make_custom(experimental::meta::id<future<DX>>, Xs&& ...xs)
-  {
-    return make_ready_future<DX>(forward<Xs>(xs)...);
-  }
+//  // customization point for template (needed because std::future doesn't has a conversion constructor)
+//  template <class DX, class ...Xs>
+//  future<DX> make_custom(experimental::meta::id<future<DX>>, Xs&& ...xs)
+//  {
+//    return make_ready_future<DX>(forward<Xs>(xs)...);
+//  }
 
   // Holder customization
   template <>
@@ -94,6 +94,26 @@ namespace std {
       struct type_constructor<future<T>> : meta::id<future<_t>> {};
       template <class T>
       struct type_constructor<future<T&>> : meta::id<future<_t&>> {};
+
+      template <class T>
+      struct factory_traits<future<T>> {
+
+        template <class ...Xs>
+        static //constexpr
+        future<T> make(Xs&& ...xs)
+        {
+          return make_ready_future<T>(forward<Xs>(xs)...);
+        }
+      };
+      template <>
+      struct factory_traits<future<void>> {
+
+        static //constexpr
+        future<void> make()
+        {
+          return make_ready_future();
+        }
+      };
   }
 
 }
@@ -119,7 +139,7 @@ int main()
   std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
   {
     std::future<void> x = stde::make<std::future>();
-    x.get();
+    //fixme x.get();
   }
   std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
   {

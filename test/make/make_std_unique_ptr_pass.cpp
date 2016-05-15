@@ -50,12 +50,12 @@ namespace std {
   template <class D>
   nullptr_t none_custom(experimental::meta::id<unique_ptr<experimental::_t, D>>) { return nullptr; }
 
-  // customization point for template (needed because std::unique_ptr doesn't has a conversion constructor)
-  template <class T, class ...Xs>
-  unique_ptr<T> make_custom(experimental::meta::id<unique_ptr<T>>, Xs&& ...xs)
-  {
-    return make_unique<T>(forward<Xs>(xs)...);
-  }
+//  // customization point for template (needed because std::unique_ptr doesn't has a conversion constructor)
+//  template <class T, class ...Xs>
+//  unique_ptr<T> make_custom(experimental::meta::id<unique_ptr<T>>, Xs&& ...xs)
+//  {
+//    return make_unique<T>(forward<Xs>(xs)...);
+//  }
 
   // Holder customization
   template <class D>
@@ -78,6 +78,17 @@ namespace std {
 
     template <class T, class D>
     struct none_type<unique_ptr<T,D>> : meta::id<nullptr_t> { };
+
+    template <class T, class D>
+    struct factory_traits<unique_ptr<T, D>> {
+
+      template <class ...Xs>
+      static //constexpr
+      unique_ptr<T, D> make(Xs&& ...xs)
+      {
+        return make_unique<T>(forward<Xs>(xs)...);
+      }
+    };
   }
 
 }

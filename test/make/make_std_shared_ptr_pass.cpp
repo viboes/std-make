@@ -33,16 +33,27 @@ namespace std {
 
     template <class T>
     struct none_type<shared_ptr<T>> : meta::id<nullptr_t> { };
+
+    template <class T>
+    struct factory_traits<shared_ptr<T>> {
+
+      template <class ...Xs>
+      static //constexpr
+      shared_ptr<T> make(Xs&& ...xs)
+      {
+        return make_shared<T>(forward<Xs>(xs)...);
+      }
+    };
   }
 
   nullptr_t none_custom(experimental::meta::id<shared_ptr<experimental::_t>>) { return nullptr; }
 
-  // customization point for template (needed because std::shared_ptr doesn't has a conversion constructor)
-  template <class DX, class ...Xs>
-  shared_ptr<DX> make_custom(experimental::meta::id<shared_ptr<DX>>, Xs&& ...xs)
-  {
-    return make_shared<DX>(forward<Xs>(xs)...);
-  }
+//  // customization point for template (needed because std::shared_ptr doesn't has a conversion constructor)
+//  template <class DX, class ...Xs>
+//  shared_ptr<DX> make_custom(experimental::meta::id<shared_ptr<DX>>, Xs&& ...xs)
+//  {
+//    return make_shared<DX>(forward<Xs>(xs)...);
+//  }
 
 }
 

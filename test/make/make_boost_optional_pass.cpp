@@ -62,6 +62,20 @@ namespace std
 
     template <class T>
     struct none_type<boost::optional<T>> : meta::id<boost::none_t> { };
+
+    template <class T>
+    struct factory_traits<boost::optional<T>> : factory_traits_cons<boost::optional<T>> {
+      using factory_traits_cons<boost::optional<T>>::make;
+
+      template <class ...Xs>
+      static constexpr
+      boost::optional<T> make(std::experimental::in_place_t, Xs&& ...xs)
+      {
+        boost::optional<T> res;
+        res.emplace(std::forward<Xs>(xs)...);
+        return std::move(res);
+      }
+    };
   }
 }
 
@@ -69,14 +83,14 @@ namespace boost {
 
   none_t none_custom(std::experimental::meta::id<optional<std::experimental::_t>>) { return boost::none; }
 
-  // customization point for template (needed because boost::optional doesn't has experimental::in_place_t constructor)
-  template <class X, class ...Args>
-  optional<X> make_custom(std::experimental::meta::id<optional<X>>, std::experimental::in_place_t, Args&& ...args)
-  {
-    optional<X> res;
-    res.emplace(std::forward<Args>(args)...);
-    return std::move(res);
-  }
+//  // customization point for template (needed because boost::optional doesn't has experimental::in_place_t constructor)
+//  template <class X, class ...Args>
+//  optional<X> make_custom(std::experimental::meta::id<optional<X>>, std::experimental::in_place_t, Args&& ...args)
+//  {
+//    optional<X> res;
+//    res.emplace(std::forward<Args>(args)...);
+//    return std::move(res);
+//  }
 }
 
 struct A

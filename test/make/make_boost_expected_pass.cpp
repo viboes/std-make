@@ -25,12 +25,12 @@ int main()
 
 namespace boost {
 
-  // customization point for template (needed because boost::expected doesn't has experimental::in_place_t constructor)
-  template <class X, class E, class ...Args>
-  expected<X, E> make_custom(std::experimental::meta::id<expected<X, E>>, std::experimental::in_place_t, Args&& ...args)
-  {
-    return expected<X, E>(boost::in_place_t{}, std::forward<Args>(args)...);
-  }
+//  // customization point for template (needed because boost::expected doesn't has experimental::in_place_t constructor)
+//  template <class X, class E, class ...Args>
+//  expected<X, E> make_custom(std::experimental::meta::id<expected<X, E>>, std::experimental::in_place_t, Args&& ...args)
+//  {
+//    return expected<X, E>(boost::in_place_t{}, std::forward<Args>(args)...);
+//  }
 
   // Holder specialization
   template <class E>
@@ -42,6 +42,19 @@ namespace std
 {
   namespace experimental
   {
+
+    template <class T, class E>
+    struct factory_traits<boost::expected<T,E>> : factory_traits_cons<boost::expected<T,E>> {
+      using factory_traits_cons<boost::expected<T,E>>::make;
+
+      template <class ...Xs>
+      static constexpr
+      boost::expected<T,E> make(std::experimental::in_place_t, Xs&& ...xs)
+      {
+        return boost::expected<T, E>(boost::in_place_t{}, std::forward<Xs>(xs)...);
+      }
+    };
+
     // type_constructor customization
     template <class T, class E>
     struct type_constructor<boost::expected<T, E>> : meta::id<boost::expected<_t, E>> {};

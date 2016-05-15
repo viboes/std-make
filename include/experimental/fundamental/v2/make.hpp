@@ -19,66 +19,6 @@ namespace std
 {
 namespace experimental
 {
-inline namespace fundamental_v2
-{
-
-  // make() overload
-
-  template <class TC, int = 0, int...>
-  constexpr
-  typename enable_if<
-      meta::is_invokable<TC, void>::value,
-      meta::invoke<TC, void>
-  >::type
-  make()
-  {
-    return make_custom(meta::id<meta::invoke<TC, void>>{});
-  }
-
-  template <template <class> class M>
-  constexpr M<void> make()
-  {
-    //return make_custom(meta::id<M<void>>{});
-    return make<type_constructor_t<meta::quote<M>>>();
-
-  }
-
-  // make overload: requires a type constructor, deduce the underlying type
-  template <class TC, int = 0, int..., class ...Xs>
-  constexpr typename enable_if<
-    meta::is_invokable<TC, meta::deduced_type_t<Xs>...>::value,
-    meta::invoke<TC, meta::deduced_type_t<Xs>...>
-  >::type
-  make(Xs&& ...xs)
-  {
-    return make_custom(meta::id<meta::invoke<TC, meta::deduced_type_t<Xs>...>>{}, std::forward<Xs>(xs)...);
-  }
-
-  // make overload: requires a type with a specific underlying type, don't deduce the underlying type from Xs
-  template <class M, int = 0, int..., class ...Xs>
-  constexpr typename enable_if<
-    ! meta::is_invokable<M, meta::deduced_type_t<Xs>...>::value
-    , M
-  >::type
-  make(Xs&& ...xs)
-  {
-    return make_custom(meta::id<M>{}, std::forward<Xs>(xs)...);
-  }
-
-  // make overload: requires a template class, deduce the underlying type
-  template <template <class ...> class M, int = 0, int..., class ...Xs>
-  constexpr M<meta::deduced_type_t<Xs>...>
-  make(Xs&& ...xs)
-  {
-    return make<type_constructor_t<meta::quote<M>>>(std::forward<Xs>(xs)...);
-  }
-}
-}
-}
-namespace std
-{
-namespace experimental
-{
 namespace meta
 {
 inline namespace v1
@@ -104,7 +44,83 @@ inline namespace v1
   }
 }
 }
+inline namespace fundamental_v2
+{
+  template <class T>
+  struct factory_traits {
+    template <class ...Xs>
+    static constexpr
+    auto make(Xs&& ...xs)
+    -> decltype(make_custom(meta::id<T>{}, std::forward<Xs>(xs)...))
+    {
+      return make_custom(meta::id<T>{}, std::forward<Xs>(xs)...);
+    }
+  };
+
+
+  template <class T>
+  struct factory_traits_cons {
+    template <class ...Xs>
+    static constexpr
+    auto make(Xs&& ...xs)
+    -> decltype(T(std::forward<Xs>(xs)...))
+    {
+      return T(std::forward<Xs>(xs)...);
+    }
+  };
+
+  // make() overload
+
+  template <class TC, int = 0, int...>
+  constexpr
+  typename enable_if<
+      meta::is_invokable<TC, void>::value,
+      meta::invoke<TC, void>
+  >::type
+  make()
+  {
+    return make_custom(meta::id<meta::invoke<TC, void>>{});
+  }
+
+  template <template <class> class M>
+  constexpr M<void> make()
+  {
+    return make<type_constructor_t<meta::quote<M>>>();
+  }
+
+  // make overload: requires a type constructor, deduce the underlying type
+  template <class TC, int = 0, int..., class ...Xs>
+  constexpr typename enable_if<
+    meta::is_invokable<TC, meta::deduced_type_t<Xs>...>::value,
+    meta::invoke<TC, meta::deduced_type_t<Xs>...>
+  >::type
+  make(Xs&& ...xs)
+  {
+    return factory_traits<meta::invoke<TC, meta::deduced_type_t<Xs>...>>::make(std::forward<Xs>(xs)...);
+
+  }
+
+  // make overload: requires a type with a specific underlying type, don't deduce the underlying type from Xs
+  template <class M, int = 0, int..., class ...Xs>
+  constexpr typename enable_if<
+    ! meta::is_invokable<M, meta::deduced_type_t<Xs>...>::value
+    , M
+  >::type
+  make(Xs&& ...xs)
+  {
+    return factory_traits<M>::make(std::forward<Xs>(xs)...);
+  }
+
+  // make overload: requires a template class, deduce the underlying type
+  template <template <class ...> class M, int = 0, int..., class ...Xs>
+  constexpr M<meta::deduced_type_t<Xs>...>
+  make(Xs&& ...xs)
+  {
+    return make<type_constructor_t<meta::quote<M>>>(std::forward<Xs>(xs)...);
+  }
 }
 }
+}
+
 
 #endif // header

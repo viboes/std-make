@@ -20,14 +20,14 @@
 
 namespace std {
 
-  // customization point for template (needed because std::shared_future<X> doesn't has a constructor from X)
-  template <class T, class ...Xs>
-  shared_future<T> make_custom(experimental::meta::id<shared_future<T>>, Xs&& ...xs)
-  {
-    promise<T> p;
-    p.set_value(T(forward<Xs>(xs)...));
-    return p.get_future().share();
-  }
+//  // customization point for template (needed because std::shared_future<X> doesn't has a constructor from X)
+//  template <class T, class ...Xs>
+//  shared_future<T> make_custom(experimental::meta::id<shared_future<T>>, Xs&& ...xs)
+//  {
+//    promise<T> p;
+//    p.set_value(T(forward<Xs>(xs)...));
+//    return p.get_future().share();
+//  }
 
   // Holder specialization
   template <>
@@ -47,6 +47,30 @@ namespace std {
     struct type_constructor<shared_future<T>> : meta::id<shared_future<_t>> {};
     template <class T>
     struct type_constructor<shared_future<T&>> : meta::id<shared_future<_t&>> {};
+
+    template <class T>
+    struct factory_traits<shared_future<T>> {
+
+      template <class ...Xs>
+      static //constexpr
+      shared_future<T> make(Xs&& ...xs)
+      {
+        promise<T> p;
+        p.set_value(T(forward<Xs>(xs)...));
+        return p.get_future().share();
+      }
+    };
+    template <>
+    struct factory_traits<shared_future<void>> {
+
+      static //constexpr
+      shared_future<void> make()
+      {
+        promise<void> p;
+        p.set_value();
+        return p.get_future().share();
+      }
+    };
   }
 }
 
