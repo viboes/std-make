@@ -9,16 +9,6 @@
 #ifndef JASEL_FUNDAMENTAL_V2_MONAD_HPP
 #define JASEL_FUNDAMENTAL_V2_MONAD_HPP
 
-///////////////////////////////////////////////////////////////////////////////////////
-///
-/// A type M is model of a Monad if it is a model of Applicative and
-///
-///   bind(const M &, F&&) -> ResultType<F, ValueType<M>>
-///
-///////////////////////////////////////////////////////////////////////////////////////
-
-#include <experimental/fundamental/v2/functor.hpp>
-#include <experimental/fundamental/v2/monad/monad_tag.hpp>
-#include <experimental/fundamental/v2/monad/mbind.hpp>
+#include <experimental/fundamental/v2/monad/monad.hpp>
 
 #endif // header

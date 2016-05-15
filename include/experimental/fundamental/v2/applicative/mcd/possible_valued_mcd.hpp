@@ -15,8 +15,8 @@
 ///
 ///////////////////////////////////////////////////////////////////////////////////////
 
-#include <experimental/fundamental/v2/applicative.hpp>
-#include <experimental/fundamental/v2/functor.hpp>
+#include <experimental/fundamental/v2/applicative/applicative.hpp>
+#include <experimental/fundamental/v2/functor/functor.hpp>
 #include <experimental/fundamental/v2/possible_valued.hpp>
 
 namespace std
