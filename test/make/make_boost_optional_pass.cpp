@@ -64,8 +64,8 @@ namespace std
     struct none_type<boost::optional<T>> : meta::id<boost::none_t> { };
 
     template <class T>
-    struct factory_traits<boost::optional<T>> : factory_traits_cons<boost::optional<T>> {
-      using factory_traits_cons<boost::optional<T>>::make;
+    struct factory_traits<boost::optional<T>> : factory_traits_default<boost::optional<T>> {
+      using factory_traits_default<boost::optional<T>>::make;
 
       template <class ...Xs>
       static constexpr

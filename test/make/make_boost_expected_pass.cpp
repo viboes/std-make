@@ -44,8 +44,8 @@ namespace std
   {
 
     template <class T, class E>
-    struct factory_traits<boost::expected<T,E>> : factory_traits_cons<boost::expected<T,E>> {
-      using factory_traits_cons<boost::expected<T,E>>::make;
+    struct factory_traits<boost::expected<T,E>> : factory_traits_default<boost::expected<T,E>> {
+      using factory_traits_default<boost::expected<T,E>>::make;
 
       template <class ...Xs>
       static constexpr

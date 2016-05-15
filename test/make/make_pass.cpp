@@ -60,9 +60,6 @@ namespace std
     {
     };
 
-    template <class T>
-    struct factory_traits<A<T>> : factory_traits_cons<A<T>> {};
-
   }
 }
 

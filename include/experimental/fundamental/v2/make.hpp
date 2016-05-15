@@ -47,7 +47,18 @@ inline namespace v1
 inline namespace fundamental_v2
 {
   template <class T>
-  struct factory_traits;
+  struct factory_traits_default {
+    template <class ...Xs>
+    static constexpr
+    auto make(Xs&& ...xs)
+    -> decltype(T(std::forward<Xs>(xs)...))
+    {
+      return T(std::forward<Xs>(xs)...);
+    }
+  };
+
+  template <class T>
+  struct factory_traits : factory_traits_default<T> {};
 //  {
 //    template <class ...Xs>
 //    static constexpr

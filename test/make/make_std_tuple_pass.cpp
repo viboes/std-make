@@ -32,9 +32,6 @@ namespace std {
     template <class ...Ts>
     struct type_constructor<tuple<Ts...>> : meta::id<tuple<_t>> {};
 
-    template <class ...Ts>
-    struct factory_traits<tuple<Ts...>> : factory_traits_cons<tuple<Ts...>> {};
-
   }
 }
 
