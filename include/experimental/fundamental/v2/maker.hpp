@@ -17,20 +17,20 @@ namespace experimental
 inline namespace fundamental_v2
 {
 
-//  template <class MFC>
-//  struct maker_mfc
-//  {
-//    template <class ...Xs>
-//    constexpr auto
-//    operator()(Xs&& ...xs) const
-//    -> decltype(make<MFC>(std::forward<Xs>(xs)...))
-//    {
-//      return make<MFC>(std::forward<Xs>(xs)...);
-//    }
-//  };
+  template <class TC>
+  struct maker_tc
+  {
+    template <class ...Xs>
+    constexpr auto
+    operator()(Xs&& ...xs) const
+    -> decltype(make<TC>(std::forward<Xs>(xs)...))
+    {
+      return make<TC>(std::forward<Xs>(xs)...);
+    }
+  };
 
   template <template <class ...> class TC>
-  struct maker_tc
+  struct maker_tmpl
   {
     template <class ...Xs>
     constexpr auto
@@ -54,13 +54,19 @@ inline namespace fundamental_v2
   };
 
   template <class T>
-  maker_t<T> maker() { return maker_t<T>{}; }
+  typename enable_if<
+      ! is_type_constructor<T>::value
+      , maker_t<T>
+    >::type maker() { return maker_t<T>{}; }
+
+  template <class TC>
+  typename enable_if<
+      is_type_constructor<TC>::value
+      , maker_tc<TC>
+    >::type maker() { return maker_tc<TC>{}; }
 
   template <template <class ...> class TC>
-  maker_tc<TC> maker() { return maker_tc<TC>{}; }
-
-//  template <template <class ...> class TC>
-//  using maker = maker_tc<TC>;
+  maker_tmpl<TC> maker() { return maker_tmpl<TC>{}; }
 
 }
 }
