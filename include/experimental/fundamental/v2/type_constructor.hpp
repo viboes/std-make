@@ -41,6 +41,18 @@ inline namespace fundamental_v2
   using TypeConstructor = meta::eval<type_constructor<M>>;
 
   namespace detail {
+    template <class TC, class = void>
+    struct is_type_constructor : false_type {};
+    template <class TC>
+    struct is_type_constructor<TC, meta::void_< meta::quote<TC::template invoke> > >
+      : true_type {};
+  }
+
+  /// trait stating if a metafunction \p TC is applicable with the argument \p U
+  template <class TC>
+  struct is_type_constructor : detail::is_type_constructor<TC> {};
+
+  namespace detail {
     template< class, class = void >
     struct has_type_constructor_member : false_type { };
     template< class T >
