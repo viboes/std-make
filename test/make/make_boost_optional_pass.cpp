@@ -60,11 +60,8 @@ namespace std
     template <class T>
     struct type_constructor<boost::optional<T>> : meta::id<boost::optional<_t>> {};
 
-    namespace meta
-    {
-      template <class T>
-      struct none_type<boost::optional<T>> : id<boost::none_t> { };
-    }
+    template <class T>
+    struct none_type<boost::optional<T>> : meta::id<boost::none_t> { };
   }
 }
 

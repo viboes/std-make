@@ -31,11 +31,8 @@ namespace std {
     template <class T>
     struct type_constructor<shared_ptr<T>> : meta::id<shared_ptr<_t>> {};
 
-    namespace meta
-    {
-      template <class T>
-      struct none_type<shared_ptr<T>> : id<nullptr_t> { };
-    }
+    template <class T>
+    struct none_type<shared_ptr<T>> : meta::id<nullptr_t> { };
   }
 
   nullptr_t none_custom(experimental::meta::id<shared_ptr<experimental::_t>>) { return nullptr; }

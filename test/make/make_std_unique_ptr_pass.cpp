@@ -76,11 +76,8 @@ namespace std {
 //      template <class T>
 //      struct type_constructor<default_delete<T>> : id<default_delete<_t>> {};
 
-    namespace meta
-    {
-      template <class T, class D>
-      struct none_type<unique_ptr<T,D>> : id<nullptr_t> { };
-    }
+    template <class T, class D>
+    struct none_type<unique_ptr<T,D>> : meta::id<nullptr_t> { };
   }
 
 }

@@ -53,11 +53,8 @@ namespace std {
     template <class T>
     struct value_type<optional<T>> : meta::id<T> { };
 
-    namespace meta
-    {
-      template <class T>
-      struct none_type<optional<T>> : meta::id<nullopt_t> { };
-    }
+    template <class T>
+    struct none_type<optional<T>> : meta::id<nullopt_t> { };
 
     nullopt_t none_custom(meta::id<optional<_t>>) { return nullopt; }
 
