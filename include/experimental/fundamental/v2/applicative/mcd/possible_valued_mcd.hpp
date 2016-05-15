@@ -29,9 +29,9 @@ inline namespace fundamental_v2
   template <class F, class PV>
   //  requires PossibleValued<F> && PossibleValued<PV>
   //  && Function<ValueType<F>, ValueType<PV>>
-  //  && Same<meta::TypeConstructor<F>, meta::TypeConstructor<PV>>
+  //  && Same<TypeConstructor<F>, TypeConstructor<PV>>
   auto ap_custom(possible_value, F const& f, const PV& pv)
-    -> meta::invoke<meta::TypeConstructor<PV>, meta::ResultType<meta::ValueType<F>, meta::ValueType<PV>>>
+    -> meta::invoke<TypeConstructor<PV>, meta::ResultType<meta::ValueType<F>, meta::ValueType<PV>>>
   {
     if (has_value(f))
       return fmap(value(f), pv);

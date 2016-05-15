@@ -9,8 +9,8 @@
 
 #include <experimental/fundamental/v2/applicative/applicative_tag.hpp>
 #include <experimental/fundamental/v2/concept_map.hpp>
+#include <experimental/fundamental/v2/type_constructor.hpp>
 #include <experimental/meta/v1/invoke.hpp>
-#include <experimental/meta/v1/type_constructor.hpp>
 #include <experimental/meta/v1/value_type.hpp>
 #include <experimental/meta/v1/result_type.hpp>
 
@@ -23,9 +23,9 @@ inline namespace fundamental_v2
 
   template <class F, class M>
   //  requires Function<ValueType<F>, ValueType<M>>
-  //  && Same<meta::TypeConstructor<F>, meta::TypeConstructor<M>>
+  //  && Same<TypeConstructor<F>, TypeConstructor<M>>
   auto ap(F const& f, const M& m)
-    //-> meta::invoke<meta::TypeConstructor<M>, meta::ResultType<ValueType<F>, meta::ValueType<M>>>
+    //-> meta::invoke<TypeConstructor<M>, meta::ResultType<ValueType<F>, meta::ValueType<M>>>
     -> decltype(ap_custom(concept_tag_t<applicative, M>{}, f, m))
   {
     return ap_custom(concept_tag_t<applicative, M>{}, f, m);
@@ -33,9 +33,9 @@ inline namespace fundamental_v2
 
   template <class F, class M>
   //  requires Function<ValueType<F>, ValueType<M>>
-  //  && Same<meta::TypeConstructor<F>, meta::TypeConstructor<M>>
+  //  && Same<TypeConstructor<F>, TypeConstructor<M>>
   auto ap(F const& f, const M& m)
-    //-> meta::invoke<meta::TypeConstructor<M>, meta::ResultType<ValueType<F>, meta::ValueType<M>>>
+    //-> meta::invoke<TypeConstructor<M>, meta::ResultType<ValueType<F>, meta::ValueType<M>>>
     -> decltype(concept_instance_t<applicative, M>::ap_impl(f, m))
   {
     return concept_instance_t<applicative, M>::ap_impl(f, m);

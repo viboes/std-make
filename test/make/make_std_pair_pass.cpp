@@ -30,15 +30,12 @@ namespace std {
 
   namespace experimental
   {
-    namespace meta
-    {
-      // type_constructor customization
-      template <class T1, class T2>
-      struct type_constructor<pair<T1,T2>> : id<pair<_t, _t>> {};
+    // type_constructor customization
+    template <class T1, class T2>
+    struct type_constructor<pair<T1,T2>> : meta::id<pair<_t, _t>> {};
 
-      template <>
-      struct type_constructor<quote<pair>> : id<pair<_t, _t>> {};
-    }
+    template <>
+    struct type_constructor<meta::quote<pair>> : meta::id<pair<_t, _t>> {};
   }
 }
 

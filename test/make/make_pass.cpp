@@ -54,14 +54,11 @@ namespace std
 {
   namespace experimental
   {
-    namespace meta
+    // type_constructor customization
+    template <class T>
+    struct type_constructor<A<T>> : meta::id<A<_t>>
     {
-      // type_constructor customization
-      template <class T>
-      struct type_constructor<A<T>> : id<A<_t>>
-      {
-      };
-    }
+    };
   }
 }
 

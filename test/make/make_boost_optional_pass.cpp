@@ -56,12 +56,12 @@ namespace std
     template <class T>
     struct monad::tag<boost::optional<T>> : meta::id<possible_value> {};
 
+    // type_constructor customization
+    template <class T>
+    struct type_constructor<boost::optional<T>> : meta::id<boost::optional<_t>> {};
+
     namespace meta
     {
-      // type_constructor customization
-      template <class T>
-      struct type_constructor<boost::optional<T>> : id<boost::optional<_t>> {};
-
       template <class T>
       struct none_type<boost::optional<T>> : id<boost::none_t> { };
     }

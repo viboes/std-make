@@ -42,14 +42,11 @@ namespace std {
 
   namespace experimental
   {
-    namespace meta
-    {
-      // type_constructor customization
-      template <class T>
-      struct type_constructor<shared_future<T>> : id<shared_future<_t>> {};
-      template <class T>
-      struct type_constructor<shared_future<T&>> : id<shared_future<_t&>> {};
-    }
+    // type_constructor customization
+    template <class T>
+    struct type_constructor<shared_future<T>> : meta::id<shared_future<_t>> {};
+    template <class T>
+    struct type_constructor<shared_future<T&>> : meta::id<shared_future<_t&>> {};
   }
 }
 

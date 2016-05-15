@@ -9,7 +9,7 @@
 
 #include <experimental/fundamental/v2/holder.hpp>
 #include <experimental/meta/v1/id.hpp>
-#include <experimental/meta/v1/type_constructor.hpp>
+#include <experimental/fundamental/v2/type_constructor.hpp>
 #include <experimental/meta/v1/none_type.hpp>
 
 namespace std
@@ -27,9 +27,9 @@ inline namespace fundamental_v2
 
   template <template <class ...> class TC>
   constexpr auto none()
-  ->  decltype(none<meta::type_constructor_t<meta::quote<TC>>>())
+  ->  decltype(none<type_constructor_t<meta::quote<TC>>>())
   {
-    return none<meta::type_constructor_t<meta::quote<TC>>>();
+    return none<type_constructor_t<meta::quote<TC>>>();
   }
 
 }

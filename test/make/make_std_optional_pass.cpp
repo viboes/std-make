@@ -46,18 +46,17 @@ namespace std {
     template <class T>
     struct monad::tag<optional<T>> : meta::id<possible_value> {};
 
+    // type_constructor customization
+    template <class T>
+    struct type_constructor<optional<T>> : meta::id<optional<_t>> {};
+
     namespace meta
     {
-      // type_constructor customization
       template <class T>
-      struct type_constructor<optional<T>> : id<optional<_t>> {};
+      struct value_type<optional<T>> : meta::id<T> { };
 
       template <class T>
-      struct value_type<optional<T>> : id<T> { };
-
-      template <class T>
-      struct none_type<optional<T>> : id<nullopt_t> { };
-
+      struct none_type<optional<T>> : meta::id<nullopt_t> { };
     }
 
     nullopt_t none_custom(meta::id<optional<_t>>) { return nullopt; }

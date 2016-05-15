@@ -12,7 +12,7 @@
 #include <experimental/meta/v1/types.hpp>
 #include <experimental/meta/v1/id.hpp>
 #include <experimental/meta/v1/is_invokable.hpp>
-#include <experimental/meta/v1/type_constructor.hpp>
+#include <experimental/fundamental/v2/type_constructor.hpp>
 #include <experimental/meta/v1/deduced_type.hpp>
 
 namespace std
@@ -39,7 +39,7 @@ inline namespace fundamental_v2
   constexpr M<void> make()
   {
     //return make_custom(meta::id<M<void>>{});
-    return make<meta::type_constructor_t<meta::quote<M>>>();
+    return make<type_constructor_t<meta::quote<M>>>();
 
   }
 
@@ -70,7 +70,7 @@ inline namespace fundamental_v2
   constexpr M<meta::deduced_type_t<Xs>...>
   make(Xs&& ...xs)
   {
-    return make<meta::type_constructor_t<meta::quote<M>>>(std::forward<Xs>(xs)...);
+    return make<type_constructor_t<meta::quote<M>>>(std::forward<Xs>(xs)...);
   }
 }
 }

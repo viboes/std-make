@@ -42,15 +42,12 @@ namespace std
 {
   namespace experimental
   {
-    namespace meta
-    {
-      // type_constructor customization
-      template <class T, class E>
-      struct type_constructor<boost::expected<T, E>> : id<boost::expected<_t, E>> {};
+    // type_constructor customization
+    template <class T, class E>
+    struct type_constructor<boost::expected<T, E>> : meta::id<boost::expected<_t, E>> {};
   //    // value_type customization
   //    template <class T, class E>
   //    struct value_type<boost::expected<T, E>> : id<T> {};
-    }
   }
 }
 

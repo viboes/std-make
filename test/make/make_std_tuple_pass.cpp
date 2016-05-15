@@ -28,12 +28,9 @@ namespace std {
 
   namespace experimental
   {
-    namespace meta
-    {
-      // type_constructor customization
-      template <class ...Ts>
-      struct type_constructor<tuple<Ts...>> : id<tuple<_t>> {};
-    }
+    // type_constructor customization
+    template <class ...Ts>
+    struct type_constructor<tuple<Ts...>> : meta::id<tuple<_t>> {};
   }
 }
 

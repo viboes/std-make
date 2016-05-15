@@ -14,6 +14,5 @@
 #include <experimental/meta/v1/rebind.hpp>
 #include <experimental/meta/v1/bind_front.hpp>
 #include <experimental/meta/v1/bind_back.hpp>
-#include <experimental/meta/v1/type_constructor.hpp>
 
 #endif // header
