@@ -23,37 +23,49 @@ namespace meta
 {
 inline namespace v1
 {
-  // default customization point for constructor from Xs...
-  template <class M, class ...Xs>
-  constexpr auto
-  make_custom(meta::id<M>, Xs&& ...xs)
-  -> decltype(M(std::forward<Xs>(xs)...))
-//  -> decltype(auto)
-  {
-    return M(std::forward<Xs>(xs)...);
-  }
+//  // default customization point for constructor from Xs...
+//  template <class M, class ...Xs>
+//  constexpr auto
+//  make_custom(meta::id<M>, Xs&& ...xs)
+//  -> decltype(M(std::forward<Xs>(xs)...))
+////  -> decltype(auto)
+//  {
+//    return M(std::forward<Xs>(xs)...);
+//  }
 
-  // default customization point for constructor from Xs...
-  template <class T, class ...Xs>
-  constexpr auto
-  make_custom(meta::id<T*>, Xs&& ...xs)
-  -> decltype(new T(std::forward<Xs>(xs)...))
-//  -> decltype(auto)
-  {
-    return new T(std::forward<Xs>(xs)...);
-  }
+//  // default customization point for constructor from Xs...
+//  template <class T, class ...Xs>
+//  constexpr auto
+//  make_custom(meta::id<T*>, Xs&& ...xs)
+//  -> decltype(new T(std::forward<Xs>(xs)...))
+////  -> decltype(auto)
+//  {
+//    return new T(std::forward<Xs>(xs)...);
+//  }
 }
 }
 inline namespace fundamental_v2
 {
   template <class T>
-  struct factory_traits {
+  struct factory_traits;
+//  {
+//    template <class ...Xs>
+//    static constexpr
+//    auto make(Xs&& ...xs)
+//    -> decltype(make_custom(meta::id<T>{}, std::forward<Xs>(xs)...))
+//    {
+//      return make_custom(meta::id<T>{}, std::forward<Xs>(xs)...);
+//    }
+//  };
+  template <class T>
+  struct factory_traits<T*>
+  {
     template <class ...Xs>
     static constexpr
     auto make(Xs&& ...xs)
-    -> decltype(make_custom(meta::id<T>{}, std::forward<Xs>(xs)...))
+    -> decltype(new T(std::forward<Xs>(xs)...))
     {
-      return make_custom(meta::id<T>{}, std::forward<Xs>(xs)...);
+      return new T(std::forward<Xs>(xs)...);
     }
   };
 
@@ -79,7 +91,7 @@ inline namespace fundamental_v2
   >::type
   make()
   {
-    return make_custom(meta::id<meta::invoke<TC, void>>{});
+    return factory_traits<meta::invoke<TC, void>>::make();
   }
 
   template <template <class> class M>

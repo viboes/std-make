@@ -59,6 +59,10 @@ namespace std
     struct type_constructor<A<T>> : meta::id<A<_t>>
     {
     };
+
+    template <class T>
+    struct factory_traits<A<T>> : factory_traits_cons<A<T>> {};
+
   }
 }
 

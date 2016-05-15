@@ -54,6 +54,9 @@ namespace std {
     struct value_type<optional<T>> : meta::id<T> { };
 
     template <class T>
+    struct factory_traits<optional<T>> : factory_traits_cons<optional<T>> {};
+
+    template <class T>
     struct none_type<optional<T>> : meta::id<nullopt_t> { };
 
     nullopt_t none_custom(meta::id<optional<_t>>) { return nullopt; }

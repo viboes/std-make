@@ -36,6 +36,9 @@ namespace std {
 
     template <>
     struct type_constructor<meta::quote<pair>> : meta::id<pair<_t, _t>> {};
+
+    template <class T, class U>
+    struct factory_traits<pair<T,U>> : factory_traits_cons<pair<T,U>> {};
   }
 }
 
