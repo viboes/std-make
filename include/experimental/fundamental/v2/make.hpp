@@ -96,7 +96,7 @@ inline namespace fundamental_v2
   template <class TC, int = 0, int...>
   constexpr
   typename enable_if<
-      meta::is_invokable<TC, void>::value,
+      meta::is_invokable_with<TC, void>::value,
       meta::invoke<TC, void>
   >::type make()
   {
@@ -112,7 +112,7 @@ inline namespace fundamental_v2
   // make overload: requires a type constructor, deduce the underlying type
   template <class TC, int = 0, int..., class ...Xs>
   constexpr typename enable_if<
-    meta::is_invokable<TC, meta::deduced_type_t<Xs>...>::value,
+    meta::is_invokable_with<TC, meta::deduced_type_t<Xs>...>::value,
     meta::invoke<TC, meta::deduced_type_t<Xs>...>
   >::type
   make(Xs&& ...xs)
@@ -124,7 +124,7 @@ inline namespace fundamental_v2
   // make overload: requires a type with a specific underlying type, don't deduce the underlying type from Xs
   template <class M, int = 0, int..., class ...Xs>
   constexpr typename enable_if<
-    ! meta::is_invokable<M, meta::deduced_type_t<Xs>...>::value
+    ! meta::is_invokable_with<M, meta::deduced_type_t<Xs>...>::value
     , M
   >::type
   make(Xs&& ...xs)
