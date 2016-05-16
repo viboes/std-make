@@ -11,7 +11,6 @@
 #include <type_traits>
 //#include <experimental/meta/v1/id.hpp>
 #include <experimental/meta/v1/is_invokable.hpp>
-#include <experimental/fundamental/v2/type_constructor.hpp>
 #include <experimental/meta/v1/deduced_type.hpp>
 
 namespace std
@@ -58,15 +57,7 @@ inline namespace fundamental_v2
 
   template <class T>
   struct factory_traits : factory_traits_default<T> {};
-//  {
-//    template <class ...Xs>
-//    static constexpr
-//    auto make(Xs&& ...xs)
-//    -> decltype(make_custom(meta::id<T>{}, std::forward<Xs>(xs)...))
-//    {
-//      return make_custom(meta::id<T>{}, std::forward<Xs>(xs)...);
-//    }
-//  };
+
   template <class T>
   struct factory_traits<T*>
   {
@@ -79,20 +70,7 @@ inline namespace fundamental_v2
     }
   };
 
-
-  template <class T>
-  struct factory_traits_cons {
-    template <class ...Xs>
-    static constexpr
-    auto make(Xs&& ...xs)
-    -> decltype(T(std::forward<Xs>(xs)...))
-    {
-      return T(std::forward<Xs>(xs)...);
-    }
-  };
-
   // make() overload
-
   template <class TC, int = 0, int...>
   constexpr
   typename enable_if<
