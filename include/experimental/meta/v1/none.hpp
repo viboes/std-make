@@ -18,7 +18,7 @@ namespace meta
 inline namespace v1
 {
     struct none_t    {};
-    constexpr none_t none =    {};
+    //constexpr none_t none =    {};
 }
 }
 }

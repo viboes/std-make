@@ -56,7 +56,13 @@ namespace std {
     template <class T>
     struct none_type<optional<T>> : meta::id<nullopt_t> { };
 
-    nullopt_t none_custom(meta::id<optional<_t>>) { return nullopt; }
+    template <class T>
+    struct nullable_traits<optional<T>> {
+      static constexpr
+      nullopt_t none() { return nullopt; }
+    };
+
+    //nullopt_t none_custom(meta::id<optional<_t>>) { return nullopt; }
 
   }
 }

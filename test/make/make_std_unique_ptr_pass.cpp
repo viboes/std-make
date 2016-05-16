@@ -47,8 +47,8 @@ namespace std {
   }
 #endif
 
-  template <class D>
-  nullptr_t none_custom(experimental::meta::id<unique_ptr<experimental::_t, D>>) { return nullptr; }
+  //template <class D>
+  //nullptr_t none_custom(experimental::meta::id<unique_ptr<experimental::_t, D>>) { return nullptr; }
 
 //  // customization point for template (needed because std::unique_ptr doesn't has a conversion constructor)
 //  template <class T, class ...Xs>
@@ -88,6 +88,11 @@ namespace std {
       {
         return make_unique<T>(forward<Xs>(xs)...);
       }
+    };
+    template <class T, class D>
+    struct nullable_traits<unique_ptr<T, D>> {
+      static constexpr
+      nullptr_t none() { return nullptr; }
     };
   }
 

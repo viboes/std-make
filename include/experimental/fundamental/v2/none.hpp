@@ -18,11 +18,32 @@ namespace experimental
 {
 inline namespace fundamental_v2
 {
+  template <class T>
+  struct nullable_traits;
+
+  template <class T>
+  struct nullable_traits<T*>
+  {
+    static constexpr
+    nullptr_t none() { return nullptr; }
+  };
+
+  struct none_t {};
+  constexpr bool operator==(none_t, none_t) { return true; }
+  constexpr bool operator!=(none_t, none_t) { return false; }
+  constexpr bool operator<(none_t, none_t) { return false; }
+  constexpr bool operator<=(none_t, none_t) { return true; }
+  constexpr bool operator>(none_t, none_t) { return false; }
+  constexpr bool operator>=(none_t, none_t) { return true; }
+
+  constexpr none_t none() { return none_t{}; }
+
   template <class TC>
   constexpr auto none()
-    -> decltype(none_custom(meta::id<TC>{}))
+    -> decltype(nullable_traits<TC>::none())
   {
-    return none_custom(meta::id<TC>{});
+    //return none_custom(meta::id<TC>{});
+    return nullable_traits<TC>::none();
   }
 
   template <template <class ...> class TC>
@@ -37,7 +58,7 @@ namespace meta
 {
 inline namespace v1
 {
-  nullptr_t none_custom(id<add_pointer<_t>>) { return nullptr; }
+  //nullptr_t none_custom(id<add_pointer<_t>>) { return nullptr; }
 }
 }
 
