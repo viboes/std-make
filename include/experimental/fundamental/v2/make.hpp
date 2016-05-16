@@ -9,8 +9,7 @@
 
 #include <utility>
 #include <type_traits>
-#include <experimental/meta/v1/types.hpp>
-#include <experimental/meta/v1/id.hpp>
+//#include <experimental/meta/v1/id.hpp>
 #include <experimental/meta/v1/is_invokable.hpp>
 #include <experimental/fundamental/v2/type_constructor.hpp>
 #include <experimental/meta/v1/deduced_type.hpp>
@@ -99,8 +98,7 @@ inline namespace fundamental_v2
   typename enable_if<
       meta::is_invokable<TC, void>::value,
       meta::invoke<TC, void>
-  >::type
-  make()
+  >::type make()
   {
     return factory_traits<meta::invoke<TC, void>>::make();
   }
@@ -108,7 +106,7 @@ inline namespace fundamental_v2
   template <template <class> class M>
   constexpr M<void> make()
   {
-    return make<type_constructor_t<meta::quote<M>>>();
+    return factory_traits<M<void>>::make();
   }
 
   // make overload: requires a type constructor, deduce the underlying type
@@ -139,7 +137,7 @@ inline namespace fundamental_v2
   constexpr M<meta::deduced_type_t<Xs>...>
   make(Xs&& ...xs)
   {
-    return make<type_constructor_t<meta::quote<M>>>(std::forward<Xs>(xs)...);
+    return factory_traits<M<meta::deduced_type_t<Xs>...>>::make(std::forward<Xs>(xs)...);
   }
 }
 }
