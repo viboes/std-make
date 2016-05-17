@@ -33,10 +33,10 @@ inline namespace v1
   };
 
   template <typename F0, typename... Fs>
-  struct compose<F, Fs...>
+  struct compose<F0, Fs...>
   {
       template <typename... Ts>
-      using invoke = invoke<F, invoke<compose<Fs...>, Ts...>>;
+      using invoke = invoke<F0, invoke<compose<Fs...>, Ts...>>;
   };
 }
 }
