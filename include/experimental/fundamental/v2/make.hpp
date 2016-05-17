@@ -11,7 +11,7 @@
 #include <type_traits>
 //#include <experimental/meta/v1/id.hpp>
 #include <experimental/meta/v1/is_callable.hpp>
-#include <experimental/meta/v1/deduced_type.hpp>
+#include <experimental/meta/v1/decay_unwrap.hpp>
 
 namespace std
 {
@@ -90,19 +90,19 @@ inline namespace fundamental_v2
   // make overload: requires a type constructor, deduce the underlying type
   template <class TC, int = 0, int..., class ...Xs>
   constexpr typename enable_if<
-    meta::is_callable<TC(meta::deduced_type_t<Xs>...)>::value,
-    meta::invoke<TC, meta::deduced_type_t<Xs>...>
+    meta::is_callable<TC(meta::decay_unwrap_t<Xs>...)>::value,
+    meta::invoke<TC, meta::decay_unwrap_t<Xs>...>
   >::type
   make(Xs&& ...xs)
   {
-    return factory_traits<meta::invoke<TC, meta::deduced_type_t<Xs>...>>::make(std::forward<Xs>(xs)...);
+    return factory_traits<meta::invoke<TC, meta::decay_unwrap_t<Xs>...>>::make(std::forward<Xs>(xs)...);
 
   }
 
   // make overload: requires a type with a specific underlying type, don't deduce the underlying type from Xs
   template <class M, int = 0, int..., class ...Xs>
   constexpr typename enable_if<
-    ! meta::is_callable<M(meta::deduced_type_t<Xs>...)>::value
+    ! meta::is_callable<M(meta::decay_unwrap_t<Xs>...)>::value
     , M
   >::type
   make(Xs&& ...xs)
@@ -112,10 +112,10 @@ inline namespace fundamental_v2
 
   // make overload: requires a template class, deduce the underlying type
   template <template <class ...> class M, int = 0, int..., class ...Xs>
-  constexpr M<meta::deduced_type_t<Xs>...>
+  constexpr M<meta::decay_unwrap_t<Xs>...>
   make(Xs&& ...xs)
   {
-    return factory_traits<M<meta::deduced_type_t<Xs>...>>::make(std::forward<Xs>(xs)...);
+    return factory_traits<M<meta::decay_unwrap_t<Xs>...>>::make(std::forward<Xs>(xs)...);
   }
 }
 }

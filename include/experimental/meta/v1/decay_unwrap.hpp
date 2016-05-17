@@ -6,8 +6,8 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef JASEL_META_V1_DEDUCED_TYPE_HPP
-#define JASEL_META_V1_DEDUCED_TYPE_HPP
+#ifndef JASEL_META_V1_DECAY_UNWRAP_HPP
+#define JASEL_META_V1_DECAY_UNWRAP_HPP
 
 #include <experimental/meta/v1/id.hpp>
 #include <experimental/meta/v1/eval.hpp>
@@ -24,17 +24,17 @@ inline namespace v1
 {
   namespace detail {
     template <class T>
-    struct deduced_type_impl : id<T> {};
+    struct decay_unwrap_impl : id<T> {};
 
     template <class T>
-    struct deduced_type_impl<reference_wrapper<T>> : id<T&> {};
+    struct decay_unwrap_impl<reference_wrapper<T>> : id<T&> {};
   }
 
   template <class T>
-  struct deduced_type : detail::deduced_type_impl<eval<decay<T>>> {};
+  struct decay_unwrap : detail::decay_unwrap_impl<eval<decay<T>>> {};
 
   template <class T>
-  using deduced_type_t = eval<deduced_type<T>>;
+  using decay_unwrap_t = eval<decay_unwrap<T>>;
 
 }
 }

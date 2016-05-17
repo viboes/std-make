@@ -29,9 +29,9 @@ namespace std {
   }
 
   template <int = 0, int..., class T>
-    future<experimental::meta::deduced_type_t<T>> make_ready_future(T&& x)
+    future<experimental::meta::decay_unwrap_t<T>> make_ready_future(T&& x)
   {
-    promise<experimental::meta::deduced_type_t<T>> p;
+    promise<experimental::meta::decay_unwrap_t<T>> p;
     p.set_value(forward<T>(x));
     return p.get_future();
   }

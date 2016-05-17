@@ -6,8 +6,8 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef JASEL_META_V1_IS_INVOKABLE_HPP
-#define JASEL_META_V1_IS_INVOKABLE_HPP
+#ifndef JASEL_META_V1_IS_CALLABLE_HPP
+#define JASEL_META_V1_IS_CALLABLE_HPP
 
 #include <experimental/meta/v1/void_.hpp>
 #include <experimental/meta/v1/invoke.hpp>
