@@ -23,7 +23,7 @@ inline namespace fundamental_v2
 
   template <class F, class M, class ...Ms>
   //  requires Function<F, ValueType<M>...>
-  // && Same<TypeConstructor<M>, TypeConstructor<M>>...
+  // && Same<TypeConstructor<M>, TypeConstructor<Ms>>...
   auto fmap(F&& f, const M& m, const Ms& ...ms)
     //-> meta::invoke<TypeConstructor<M>, meta::ResultType<F, ValueType<M>...>>
     -> decltype(fmap_custom(concept_tag_t<functor, M>{}, forward<F>(f), m, ms...))

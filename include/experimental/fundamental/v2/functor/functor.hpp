@@ -13,10 +13,6 @@
 ///
 /// A type M is model of a Functor if
 ///
-///   std::experimental::TypeConstructor<M>
-///   std::experimental::ValueType<M>
-///
-///   make<TypeConstructor<M>>(const ValueType<PV>& v) -> PV
 ///   map(const M &, class F) -> Apply<TypeConstructor<M>, ResultType<F, ValueType<M>>>
 ///
 ///////////////////////////////////////////////////////////////////////////////////////
