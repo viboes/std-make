@@ -12,6 +12,8 @@
 #include <experimental/fundamental/v2/type_constructor.hpp>
 #include <experimental/fundamental/v2/none_type.hpp>
 
+#include <utility>
+
 namespace std
 {
 namespace experimental
@@ -35,6 +37,42 @@ inline namespace fundamental_v2
   constexpr bool operator<=(none_t, none_t) { return true; }
   constexpr bool operator>(none_t, none_t) { return false; }
   constexpr bool operator>=(none_t, none_t) { return true; }
+
+  template <class T>
+  struct is_nullable : false_type {};
+
+  template < class C, typename enable_if<is_nullable<C>::value, int>::type=0 >
+  bool operator==(none_t, C const& x) { return ! x.has_value(); }
+  template < class C, typename enable_if<is_nullable<C>::value, int>::type=0  >
+  bool operator==(C const& x, none_t) { return ! x.has_value(); }
+
+  template < class C, typename enable_if<is_nullable<C>::value, int>::type=0  >
+  bool operator!=(none_t, C const& x) { return x.has_value(); }
+  template < class C, typename enable_if<is_nullable<C>::value, int>::type=0  >
+  bool operator!=(C const& x, none_t) { return x.has_value(); }
+
+  template <class T>
+  struct is_strict_weakly_ordered_nullable : false_type {};
+
+  template < class C, typename enable_if<is_strict_weakly_ordered_nullable<C>::value, int>::type=0  >
+  bool operator<(none_t, C const& x) { return x.has_value(); }
+  template < class C, typename enable_if<is_strict_weakly_ordered_nullable<C>::value, int>::type=0 >
+  bool operator<(C const& x, none_t) { return false; }
+
+  template < class C, typename enable_if<is_strict_weakly_ordered_nullable<C>::value, int>::type=0 >
+  bool operator<=(none_t, C const& x) { return true; }
+  template < class C, typename enable_if<is_strict_weakly_ordered_nullable<C>::value, int>::type=0 >
+  bool operator<=(C const& x, none_t) { return ! x.has_value(); }
+
+  template < class C, typename enable_if<is_strict_weakly_ordered_nullable<C>::value, int>::type=0 >
+  bool operator>(none_t, C const& x) { return false; }
+  template < class C, typename enable_if<is_strict_weakly_ordered_nullable<C>::value, int>::type=0 >
+  bool operator>(C const& x, none_t) { return x.has_value(); }
+
+  template < class C, typename enable_if<is_strict_weakly_ordered_nullable<C>::value, int>::type=0  >
+  bool operator>=(none_t, C const& x) { return ! x.has_value(); }
+  template < class C, typename enable_if<is_strict_weakly_ordered_nullable<C>::value, int>::type=0  >
+  bool operator>=(C const& x, none_t) { return true; }
 
   constexpr none_t none() { return none_t{}; }
 
