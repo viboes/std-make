@@ -43,7 +43,8 @@ namespace std {
 int main()
 {
   namespace stde = std::experimental;
-  static_assert(stde::meta::is_invokable_with<std::pair<stde::_t,stde::_t>, int, short>::value, "ERROR");
+  static_assert(stde::meta::is_callable<std::pair<stde::_t,stde::_t>(int, short)>::value, "ERROR");
+  static_assert(stde::meta::is_callable<std::pair<stde::_t,stde::_t>(int, short), std::pair<int, short>>::value, "ERROR");
   {
     int v=0;
     std::pair<int, int> x = stde::make<std::pair>(v, v);

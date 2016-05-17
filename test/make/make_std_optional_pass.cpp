@@ -87,7 +87,7 @@ std::experimental::optional<double> inverse(double x) {
 int main()
 {
   namespace stde = std::experimental;
-  static_assert(stde::meta::is_invokable_with<stde::optional<stde::_t>, int>::value, "ERROR");
+  static_assert(stde::meta::is_callable<stde::optional<stde::_t>(int)>::value, "ERROR");
   static_assert(std::is_same<stde::value_type_t<stde::optional<int&>>, int&>::value, "ERROR");
 
   {

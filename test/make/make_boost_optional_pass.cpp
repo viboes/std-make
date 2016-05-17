@@ -123,7 +123,7 @@ int main()
 {
 
   namespace stde = std::experimental;
-  static_assert(stde::meta::is_invokable_with<boost::optional<stde::_t>, int>::value, "ERROR");
+  static_assert(stde::meta::is_callable<boost::optional<stde::_t>(int)>::value, "ERROR");
   static_assert(stde::has_value_type_member<const boost::optional<int>>::value, "ERROR");
   static_assert(! stde::has_element_type_member<const boost::optional<int>>::value, "ERROR");
   static_assert(!std::is_array<boost::optional<int> >::value, "ERROR");

@@ -10,7 +10,7 @@
 #define JASEL_META_V1_IS_INVOKABLE_HPP
 
 #include <experimental/meta/v1/void_.hpp>
-#include <experimental/meta/v1/eval.hpp>
+#include <experimental/meta/v1/invoke.hpp>
 #include <type_traits> //false_type
 
 namespace std
@@ -22,11 +22,14 @@ namespace meta
 inline namespace v1
 {
   namespace detail {
-    template <class TC, class List, class = void>
-    struct is_invokable_with : false_type {};
-    template <class TC, class ...U>
-    struct is_invokable_with<TC, types<U...>, void_<typename TC::template invoke<U...>>>
-      : true_type {};
+    template <class Sig, class R, class = void>
+    struct is_callable : false_type {};
+    template <class Fn, class ...U>
+    struct is_callable<Fn(U...), void, void_<typename Fn::template invoke<U...>>>
+    : true_type {};
+    template <class Fn, class ...U, class R>
+    struct is_callable<Fn(U...), R, void_<typename Fn::template invoke<U...>>>
+    : is_convertible<invoke<Fn, U...>, R> {  };
 
     template <class TC, class = void>
     struct is_invokable : false_type {};
@@ -37,11 +40,14 @@ inline namespace v1
   }
 
   /// trait stating if a metafunction \p TC is applicable with the argument \p U
-  template <class TC, class ...U >
-  struct is_invokable_with : eval<detail::is_invokable_with<TC, types<U...>>> {};
+  template <class Sig, class R = void >
+  struct is_callable; // not defined
+
+  template <class Fn, class ...U, class R >
+  struct is_callable<Fn(U...), R> : detail::is_callable<Fn(U...), R> {};
 
   template <class TC>
-  struct is_invokable : eval<detail::is_invokable<TC>> {};
+  struct is_invokable : detail::is_invokable<TC> {};
 
 }
 }

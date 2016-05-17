@@ -72,7 +72,7 @@ struct A
 int main()
 {
   namespace stde = std::experimental;
-  static_assert(stde::meta::is_invokable_with<std::shared_ptr<stde::_t>, int>::value, "ERROR");
+  static_assert(stde::meta::is_callable<std::shared_ptr<stde::_t>(int)>::value, "ERROR");
 
   {
     std::shared_ptr<int> x = stde::none<std::shared_ptr>();
