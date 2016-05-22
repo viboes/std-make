@@ -23,8 +23,8 @@
     </tr>
 </table>
 
-High-Order template meta-programming functions
-==============================================
+Meta-programming High-Order functions
+=====================================
 
 **Abstract**
 
@@ -46,6 +46,10 @@ Some of these utilities are used in the interface of [P0338R0] and [P0196R1] and
 
 # Introduction
 
+This paper presents a proposal for some high-order template meta-programming functions based on some common patterns used in libraries as [Meta] and [Boost.MPL].
+
+Some of these utilities are used in the interface of [P0338R0] and [P0196R1] and other have been used in their respective implementations.
+
 
 # Motivation and scope
 
@@ -53,25 +57,29 @@ C++ has already class templates and template alias that can be seen as meta-prog
 
 The C++ standard library has also type traits that add an additional level of indirection via the nested type alias `type`.
 
-As any high-order function library we should be able to pass meta-programming function as parameters and return new high-order function. While the first is possible with class templates, we are unable to return them, we need an artifice, nest a class template `invoke` as the result of the returned class.
+As any high-order function library we should be able to pass meta-programming function as parameters and return meta-programming functions. While the first is possible with class templates, we are unable to return them, we need an artifice, nest a class template `invoke` as the result of the returned class.
 
 [TinyMeta] contains a good description of why high order function is as useful in meta-programming as it is in functional programs, at the end meta-programming is a functional language. [Boost.MPL] calls these high-order meta-programming functions *Metafunction Classes*. [Meta] call them *Callable*. The C++ standard defines also *Callable* in function of `std::invoke`, so we will use here *Meta-Callable*.
 
 One of the uses of *Meta-Callabless* as type constructors as any *Meta-Callabless* return in some way a type. We call the also type-constructors.
 
-[Boost.Hana] takes a different direction. Instead of using meta-programming techniques, it uses usual C++14 constexpr functions and use a trick `type_c<T>` to pass types to these functions. It needs also the use of `decltype` to get the resulting type and then unwrap it, `decltype(t)::type`. The authors would like to see a concrete proposal using this alternative direction but prefer the author's [Boost.Hana] do it.
+[Boost.Hana] takes a different direction. Instead of using meta-programming techniques, it uses usual C++14 constexpr functions and use a trick `type_c<T>` to pass types to these functions. It needs also the use of `decltype` to get the resulting type and then unwrap it, `decltype(t)::type`. The authors would like to see a concrete proposal using this alternative direction but prefer the Hana's author to do it.
 
 [P0196R1] and [P0338R0] depends on this proposal.
 
 # Proposal
 
-## Traits helpers
+## Type-Traits helpers
 
 ### `meta::id`
 
 Results always its parameter. This is useful to convert a type into a type trait.
 
 [Meta] provides the same. 
+
+[Boost.MPL] call this `mpl::identity`.
+
+[Boost.Hana] has an `hana::id` constexpr function.
 
 ### `meta::eval`
 
@@ -86,7 +94,7 @@ A *Meta-Callable* is a class that has a nested template alias `invoke`.
 
 [Meta] provides the same. 
 
-[Boost.MPL] It defines *MetaFunctionsClass* as something similar and requiring a nested `apply` template class instead of of nested `invoke` template alias. 
+[Boost.MPL] It defines *MetaFunctionsClass* as something similar and requiring a nested `apply` type trait instead of of nested `invoke` template alias. 
 
 [Boost.Hana] It defines *MetaFunctions* as something similar but adapted to the run-time function and  instead of requiring `invoke` it requires a nested `apply` [Boost.Hana-Metafunction]
 
@@ -107,20 +115,35 @@ it is preferable to have a template alias that do that `invoke<TC, Xs...>`
 
 Results always its `invoke` parameter.
 
-[Meta] calls it `meta::id<T>`.
+[Meta] not supported to the author knowledge.
 
 [Boost.MPL] call this `mpl::identity`.
 
 [Boost.Hana] calls the equivalent function `hana::id`.
+
+#### `meta::always`
+
+Results always its `template` parameter. Is the constant *Meta-Callable*.
+
+[Meta] calls it `meta::id<T>`.
+
+[Boost.MPL] call this `mpl::always`.
+
+[Boost.Hana] calls the equivalent function `hana::always`.
 
 #### `meta::compose`
 
 Composes several *Meta-Callabless*.
 
 [Meta] provides the same. 
+
+[Boost.MPL] not supported to the author knowledge.
+
 [Boost.Hana] calls the equivalent constexpr run-time function `hana::compose`.
 
 ### partial application
+
+The following functions bind some parameters for later invocation.
 
 * `meta::bind_front`
 * `meta::bind_back`
@@ -153,9 +176,13 @@ Other helper meta-functions are useful to transform a class template or a type t
 
 Checks if the result of invoking the class `T` with the arguments `Args...` is convertible to `R`.
 
-[Meta] provides a similar trait `meta::is_callable` that don't has the check for the result type. 
-
 This trait follows the syntax and semantics of `std::is_callable`.
+
+[Meta] not supported to the author knowledge.
+
+[Boost.MPL] not supported to the author knowledge.
+
+[Boost.Hana] not supported to the author knowledge.
 
 #### `meta::is_type_constructor`
 
@@ -315,31 +342,6 @@ inline namespace fundamental_v3
 namespace meta
 {
 
- 
-  // Type list
-  template <class ...Ts>
-    struct list {};
-
-namespace product_type
-{
-
-  template <class TL, class I>
-    struct at;
-  template <class TL, size_t I>
-    using at_c = at<TL, size_constant<I>> ;
-  template <class ...Ts, class I>
-    struct at<list<Ts...>, I>;
-  template <class TL, class I>
-    using at_t = eval<at<TL, I>>;   
-    
-  template< class TL>
-    struct size;
-  template< class ...Ts>
-    struct size<list<Ts...>>;
-  template <class TL>
-    using size_v = size<TL>::value;
-    
-}
 
   // Type alias for T::type
   template <class T>
@@ -455,13 +457,6 @@ namespace product_type
   template <class T>
   using type_constructor_t = eval<type_constructor<T>>;
 
-  // Arguments trait
-  template <class T>
-  struct arg_types;
-  template <class T>
-  using arg_types_t = eval<arg_types<T>> ;
-
-
 }
 }
 }
@@ -485,7 +480,7 @@ Always `T`.
 
 **Preconditions**
 
-`T` shall be a complete type, (possibly cv-qualified) void, or an array of unknown bound.
+`T` shall be a complete type.
 
 
 **Template**
@@ -501,7 +496,7 @@ If `TC::template invoke` is well formed then true else false.
 
 **Preconditions**
 
-`TC` shall be a complete type, (possibly cv-qualified) void, or an array of unknown bound.
+`TC` shall be a complete type.
 
 **Template**
 
@@ -514,11 +509,14 @@ struct is_callable<TC<Xs>, R>;
 
 **Condition**
 
-If `TC::template invoke<Xs...>` is well formed then true else false.
+- If `TC::template invoke<Xs...>` is well formed then 
+    - if `R` is void `std::true_type` 
+    - else `std::is_convertible<meta::invoke_t<Xs...>, R>`    
+- else `std::false_type`.
 
 **Preconditions**
 
-`TC` and all types in the parameter pack `Xs` shall be a complete types, (possibly cv-qualified) void, or an array of unknown bound.
+`TC` and all types in the parameter pack `Xs` shall be a complete types.
 
 **Template**
 
@@ -569,46 +567,11 @@ If `T::type_constructor` is well formed then `id<TC::type_constructor>`.
 
 **Preconditions**
 
-`T` shall be a complete types, possibly cv-qualified.
+`T` shall be a complete types.
 
 **Remarks**
 
 This template can be specialized by the user.
-
-**Template**
-
-```c++
-  template <class T>
-  struct arg_types;
-```
-
-**Condition**
-
-If `T::arg_types` is well formed then `id<TC::arg_types`.
-
-**Preconditions**
-
-`T` shall be a complete types, possibly cv-qualified.
-
-**Remarks**
-
-This template can be specialized by the user.
-
-**X.Y.2 Header <experimental/type_traits> synopsis**
-
-```c++
-namespace std
-{
-namespace experimental
-{
-inline namespace fundamental_v3
-{
-
-}
-}
-}
-
-```
 
 
 # Example of customizations
@@ -765,7 +728,7 @@ namespace meta {
 
 This proposal can be implemented as pure library extension, without any compiler magic support, in C++14.
 
-There is an implementation at `https://github.com/viboes/std-make/include/experimental/meta`.
+There is an implementation at `https://github.com/viboes/std-make/include/experimental/meta.hpp`.
 
 # Open points
 
@@ -778,6 +741,7 @@ The authors would like to have an answer to the following points if there is at 
 * Is there an interest on `is_callable`?
 * Is there an interest on `is_type_constructor`?
 * Is there an interest on placeholder type `_t`?
+* Should the type constructors for  `pair`, `tuple`, `optional`, `future`, `unique_ptr`, `shared_ptr` be part of this proposal?  As specializations using the placeholder `_t` or with a suffix `_tc`?
 * Is there an interest on `id`, `eval`?
 * Is there an interest on `identity`?
 * Is there an interest on `compose`?
@@ -786,7 +750,6 @@ The authors would like to have an answer to the following points if there is at 
 * Is there an interest on `rebind`?
 * If yes, should `rebind` define a nested type alias `type` or a nested type alias `other` as allocators does?
 * Is there an interest on `type_constructor`?
-* Should the type constructors for  `pair`, `tuple`, `optional`, `future`, `unique_ptr`, `shared_ptr` be part of this proposal? 
 
 # Future work
 
