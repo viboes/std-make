@@ -62,7 +62,7 @@ inline namespace fundamental_v2
   struct factory_traits<T*>
   {
     template <class ...Xs>
-    static constexpr
+    static
     auto make(Xs&& ...xs)
     -> decltype(new T(std::forward<Xs>(xs)...))
     {
