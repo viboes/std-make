@@ -17,10 +17,10 @@ namespace meta
 {
 inline namespace v1
 {
-  template <typename T>
     struct identity
     {
-      using type = T;
+      template <class T>
+      using invoke = T;
     };
 
 }
