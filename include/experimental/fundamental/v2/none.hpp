@@ -30,7 +30,10 @@ inline namespace fundamental_v2
     nullptr_t none() { return nullptr; }
   };
 
-  struct none_t {};
+  struct none_t {
+    //struct init{};
+    //constexpr explicit none_t(init){};
+  };
   constexpr bool operator==(none_t, none_t) { return true; }
   constexpr bool operator!=(none_t, none_t) { return false; }
   constexpr bool operator<(none_t, none_t) { return false; }
@@ -74,13 +77,13 @@ inline namespace fundamental_v2
   template < class C, typename enable_if<is_strict_weakly_ordered_nullable<C>::value, int>::type=0  >
   bool operator>=(C const& x, none_t) { return true; }
 
+  //constexpr none_t none() { return none_t{none_t::init{}}; }
   constexpr none_t none() { return none_t{}; }
 
   template <class TC>
   constexpr auto none()
     -> decltype(nullable_traits<TC>::none())
   {
-    //return none_custom(meta::id<TC>{});
     return nullable_traits<TC>::none();
   }
 
