@@ -15,25 +15,9 @@
 
 #include <experimental/make.hpp>
 #include <experimental/meta.hpp>
-#include <tuple>
+#include <experimental/tuple.hpp>
 #include <boost/detail/lightweight_test.hpp>
 
-namespace std {
-
-// There is no way to have a variadic type constructor so we opt for a type constructor with a single type holder
-
-  // Holder customization
-  template <>
-  struct tuple<experimental::_t> : experimental::meta::quote<tuple> {};
-
-  namespace experimental
-  {
-    // type_constructor customization
-    template <class ...Ts>
-    struct type_constructor<tuple<Ts...>> : meta::id<tuple<_t>> {};
-
-  }
-}
 
 int main()
 {

@@ -15,30 +15,9 @@
 
 #include <experimental/make.hpp>
 #include <experimental/meta.hpp>
-#include <utility>
+#include <experimental/utility.hpp>
 #include <boost/detail/lightweight_test.hpp>
 
-namespace std {
-
-  // Holder customization
-  template <>
-  struct pair<experimental::_t, experimental::_t>
-  {
-    template <class ...Ts>
-    using invoke = pair<Ts...>;
-  };
-
-  namespace experimental
-  {
-    // type_constructor customization
-    template <class T1, class T2>
-    struct type_constructor<pair<T1,T2>> : meta::id<pair<_t, _t>> {};
-
-    template <>
-    struct type_constructor<meta::quote<pair>> : meta::id<pair<_t, _t>> {};
-
-  }
-}
 
 int main()
 {

@@ -20,52 +20,9 @@ int main()
 #else
 
 #define JASEL_STD_EXPERIMENTAL_FACTORIES_USE_OPTIONAL
-#include <experimental/make.hpp>
-#include <experimental/meta.hpp>
-#include <optional.hpp>
-#include <experimental/fundamental/v2/possible_valued/mcd/pointer_like_mcd.hpp>
-#include <experimental/fundamental/v2/functor/mcd/possible_valued_mcd.hpp>
-#include <experimental/fundamental/v2/monad/mcd/possible_valued_mcd.hpp>
+#include <experimental/optional.hpp>
 
 #include <boost/detail/lightweight_test.hpp>
-
-namespace std {
-  namespace experimental {
-
-
-    // Holder specialization
-    template <>
-    struct optional<_t>  : meta::quote<optional> {};
-
-    template <class T>
-    struct possible_value::tag<optional<T>> : meta::id<pointer_like> {};
-
-    template <class T>
-    struct functor::tag<optional<T>> : meta::id<possible_value> {};
-
-    template <class T>
-    struct monad::tag<optional<T>> : meta::id<possible_value> {};
-
-    // type_constructor customization
-    template <class T>
-    struct type_constructor<optional<T>> : meta::id<optional<_t>> {};
-
-    template <class T>
-    struct value_type<optional<T>> : meta::id<T> { };
-
-    template <class T>
-    struct none_type<optional<T>> : meta::id<nullopt_t> { };
-
-    template <class T>
-    struct nullable_traits<optional<T>> {
-      static constexpr
-      nullopt_t none() { return nullopt; }
-    };
-
-    //nullopt_t none_custom(meta::id<optional<_t>>) { return nullopt; }
-
-  }
-}
 
 struct A
 {
@@ -90,6 +47,42 @@ int main()
   static_assert(stde::meta::is_callable<stde::optional<stde::_t>(int)>::value, "ERROR");
   static_assert(std::is_same<stde::value_type_t<stde::optional<int&>>, int&>::value, "ERROR");
 
+  {
+    auto n = stde::none_t{};
+    stde::optional<int> x(n);
+    BOOST_TEST(! x);
+    BOOST_TEST(! has_value(x));
+  }
+  {
+    stde::optional<stde::optional<int>> x { stde::none() };
+    BOOST_TEST(! x);
+    BOOST_TEST(! has_value(x));
+  }
+  {
+    stde::optional<stde::optional<int>> x { { stde::none() } };
+    BOOST_TEST(! x);
+    BOOST_TEST(! has_value(x));
+  }
+#if defined __clang__
+  {
+    stde::optional<stde::optional<int>> x { { stde::nullopt } };
+    BOOST_TEST( ! x);
+    BOOST_TEST( ! has_value(x));
+  }
+#endif
+  {
+    stde::optional<stde::optional<int>> x { stde::none<stde::optional>() };
+    BOOST_TEST(! x);
+    BOOST_TEST(! has_value(x));
+  }
+
+#if defined __clang__
+  {
+    stde::optional<stde::optional<int>> x { { stde::none<stde::optional>() } };
+    BOOST_TEST( ! x);
+    BOOST_TEST( ! has_value(x));
+  }
+#endif
   {
     stde::optional<int> x = stde::none<stde::optional>();
     BOOST_TEST(! x);

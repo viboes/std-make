@@ -15,51 +15,8 @@
 
 #include <experimental/make.hpp>
 #include <experimental/meta.hpp>
-#include <memory>
+#include <experimental/memory.hpp>
 #include <boost/detail/lightweight_test.hpp>
-
-namespace std {
-
-
-  // Holder customization
-  template <>
-  struct shared_ptr<experimental::_t> : experimental::meta::quote<shared_ptr> {};
-
-  namespace experimental
-  {
-    // type_constructor customization
-    template <class T>
-    struct type_constructor<shared_ptr<T>> : meta::id<shared_ptr<_t>> {};
-
-    template <class T>
-    struct none_type<shared_ptr<T>> : meta::id<nullptr_t> { };
-
-    template <class T>
-    struct factory_traits<shared_ptr<T>> {
-
-      template <class ...Xs>
-      static //constexpr
-      shared_ptr<T> make(Xs&& ...xs)
-      {
-        return make_shared<T>(forward<Xs>(xs)...);
-      }
-    };
-    template <class T>
-    struct nullable_traits<shared_ptr<T>> {
-      static constexpr
-      nullptr_t none() { return nullptr; }
-    };
-  }
-  //nullptr_t none_custom(experimental::meta::id<shared_ptr<experimental::_t>>) { return nullptr; }
-
-//  // customization point for template (needed because std::shared_ptr doesn't has a conversion constructor)
-//  template <class DX, class ...Xs>
-//  shared_ptr<DX> make_custom(experimental::meta::id<shared_ptr<DX>>, Xs&& ...xs)
-//  {
-//    return make_shared<DX>(forward<Xs>(xs)...);
-//  }
-
-}
 
 struct A
 {

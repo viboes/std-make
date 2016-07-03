@@ -15,108 +15,10 @@
 
 #include <experimental/make.hpp>
 #include <experimental/meta.hpp>
-#include <future>
+#include <experimental/future.hpp>
+
 #include <boost/detail/lightweight_test.hpp>
 #include <iostream>
-
-namespace std {
-
-  future<void> make_ready_future()
-  {
-    promise<void> p;
-    p.set_value();
-    return p.get_future();
-  }
-
-  template <int = 0, int..., class T>
-    future<experimental::meta::decay_unwrap_t<T>> make_ready_future(T&& x)
-  {
-    promise<experimental::meta::decay_unwrap_t<T>> p;
-    p.set_value(forward<T>(x));
-    return p.get_future();
-  }
-
-  // explicit overloads
-  template <class T>
-    future<T> make_ready_future(remove_reference_t<T> const& x)
-  {
-    promise<T> p;
-    p.set_value(x);
-    return p.get_future();
-  }
-
-  template <class T>
-    future<T> make_ready_future(remove_reference_t<T>&& x)
-  {
-    promise<T> p;
-    p.set_value(forward<remove_reference_t<T>>(x));
-    return p.get_future();
-  }
-
-  // variadic overload
-  template <class T, class ...Args>
-    future<T> make_ready_future(Args&&... args)
-  {
-    promise<T> p;
-    p.set_value(T(forward<Args>(args)...));
-    return p.get_future();
-
-  }
-
-//  // customization point for template (needed because std::future doesn't has a default constructor)
-//  future<void> make_custom(experimental::meta::id<future<void>>)
-//  {
-//    return make_ready_future();
-//  }
-
-//  // customization point for template (needed because std::future doesn't has a conversion constructor)
-//  template <class DX, class ...Xs>
-//  future<DX> make_custom(experimental::meta::id<future<DX>>, Xs&& ...xs)
-//  {
-//    return make_ready_future<DX>(forward<Xs>(xs)...);
-//  }
-
-  // Holder customization
-  template <>
-  struct future<experimental::_t> : experimental::meta::quote<future> {};
-
-  template <>
-  struct future<experimental::_t&>
-  {
-    template<class ...T>
-    using invoke = future<T& ...>;
-  };
-
-  namespace experimental
-  {
-      // type_constructor customization
-      template <class T>
-      struct type_constructor<future<T>> : meta::id<future<_t>> {};
-      template <class T>
-      struct type_constructor<future<T&>> : meta::id<future<_t&>> {};
-
-      template <class T>
-      struct factory_traits<future<T>> {
-
-        template <class ...Xs>
-        static //constexpr
-        future<T> make(Xs&& ...xs)
-        {
-          return make_ready_future<T>(forward<Xs>(xs)...);
-        }
-      };
-      template <>
-      struct factory_traits<future<void>> {
-
-        static //constexpr
-        future<void> make()
-        {
-          return make_ready_future();
-        }
-      };
-  }
-
-}
 
 struct A
 {
@@ -131,7 +33,7 @@ int main()
   namespace stde = std::experimental;
   std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
   {
-    std::future<void> x = std::make_ready_future();
+    std::future<void> x = stde::make_ready_future();
     std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
     x.get();
     std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
@@ -144,7 +46,7 @@ int main()
   std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
   {
     int v=0;
-    std::future<int> x = std::make_ready_future(v);
+    std::future<int> x = stde::make_ready_future(v);
     BOOST_TEST(x.get() == 0);
   }
   std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
@@ -156,7 +58,7 @@ int main()
   std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
   {
     int v=0;
-    std::future<int> x = std::make_ready_future<int>(v);
+    std::future<int> x = stde::make_ready_future<int>(v);
     BOOST_TEST(x.get() == 0);
   }
   std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
@@ -168,7 +70,7 @@ int main()
   std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
   {
     int v=1;
-    std::future<A> x = std::make_ready_future<A>(v,v);
+    std::future<A> x = stde::make_ready_future<A>(v,v);
     BOOST_TEST(x.get().v == 2);
   }
   std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
@@ -179,7 +81,7 @@ int main()
   }
   std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
   {
-    std::future<int> x = std::make_ready_future<int>();
+    std::future<int> x = stde::make_ready_future<int>();
     BOOST_TEST_EQ(x.get(),  0);
   }
   std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
@@ -190,13 +92,13 @@ int main()
   std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
   {
     int v=0;
-    std::future<int&> x = std::make_ready_future<int&>(v);
+    std::future<int&> x = stde::make_ready_future<int&>(v);
     BOOST_TEST(&x.get() == &v);
   }
   std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
   {
     int v=0;
-    std::future<int&> x = std::make_ready_future(std::ref(v));
+    std::future<int&> x = stde::make_ready_future(std::ref(v));
     BOOST_TEST(&x.get() == &v);
   }
   std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
