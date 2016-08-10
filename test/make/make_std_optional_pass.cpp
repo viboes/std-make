@@ -44,6 +44,7 @@ std::experimental::optional<double> inverse(double x) {
 int main()
 {
   namespace stde = std::experimental;
+  static_assert(stde::is_nullable<stde::optional<int>>::value, "ERROR");
   static_assert(stde::meta::is_callable<stde::optional<stde::_t>(int)>::value, "ERROR");
   static_assert(std::is_same<stde::value_type_t<stde::optional<int&>>, int&>::value, "ERROR");
 
@@ -52,6 +53,7 @@ int main()
     stde::optional<int> x(n);
     BOOST_TEST(! x);
     BOOST_TEST(! has_value(x));
+    BOOST_TEST(x == stde::none());
   }
   {
     stde::optional<stde::optional<int>> x { stde::none() };
@@ -102,6 +104,8 @@ int main()
     BOOST_TEST(value(x) == 1);
     stde::optional<int> y = stde::fmap(twice, x);
     BOOST_TEST(stde::value(y) == 2);
+    BOOST_TEST(x != stde::none());
+
   }
   {
     int v=0;

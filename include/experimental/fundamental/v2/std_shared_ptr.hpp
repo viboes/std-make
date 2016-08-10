@@ -41,10 +41,7 @@ inline namespace fundamental_v2
     }
   };
   template <class T>
-  struct nullable_traits<shared_ptr<T>> {
-    static constexpr
-    nullptr_t none() { return nullptr; }
-  };
+  struct nullable_traits<shared_ptr<T>> : nullable_traits_pointer_like {};
 }
 }
 }

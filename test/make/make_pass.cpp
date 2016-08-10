@@ -14,6 +14,7 @@
 
 
 #include <experimental/make.hpp>
+#include <experimental/nullable.hpp>
 #include <experimental/meta.hpp>
 #include <experimental/fundamental/v2/in_place.hpp>
 
@@ -209,6 +210,11 @@ int main()
     std::vector<int> xs;
     std::vector<A<long> > ys;
     std::transform(xs.begin(), xs.end(), std::back_inserter(ys), stde::maker<A<long>>());
+  }
+  {
+    int * x = nullptr;
+    BOOST_TEST(! stde::has_value(x));
+    BOOST_TEST(x == stde::none());
   }
   return ::boost::report_errors();
 }

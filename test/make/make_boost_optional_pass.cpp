@@ -78,8 +78,18 @@ namespace std
     };
     template <class T>
     struct nullable_traits<boost::optional<T>> {
+
+      template <class U>
+      struct none_type : meta::id<boost::none_t> { };
+
       static //constexpr
       boost::none_t none() { return boost::none; }
+
+      template <class U>
+      static constexpr
+      bool has_value(boost::optional<U> const& x) noexcept { return bool(x); }
+
+
     };
   }
 }

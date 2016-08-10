@@ -47,9 +47,16 @@ inline namespace fundamental_v2
   struct none_type<optional<T>> : meta::id<nullopt_t> { };
 
   template <class T>
-  struct nullable_traits<optional<T>> {
+  struct nullable_traits<optional<T>> : std::true_type {
+    template <class U>
+    struct none_type : meta::id<nullopt_t> { };
+
     static constexpr
     nullopt_t none() { return nullopt; }
+
+    template <class U>
+    static constexpr
+    bool has_value(optional<U> const& x) noexcept { return bool(x); }
   };
 
 }

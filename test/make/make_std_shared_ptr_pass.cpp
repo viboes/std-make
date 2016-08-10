@@ -29,6 +29,7 @@ struct A
 int main()
 {
   namespace stde = std::experimental;
+  static_assert(stde::is_nullable<std::shared_ptr<int>>::value, "ERROR");
   static_assert(stde::meta::is_callable<std::shared_ptr<stde::_t>(int)>::value, "ERROR");
 
   {

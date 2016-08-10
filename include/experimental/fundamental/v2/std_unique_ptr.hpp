@@ -79,11 +79,7 @@ inline namespace fundamental_v2
   };
 
   template <class T, class D>
-  struct nullable_traits<unique_ptr<T, D>>
-  {
-    static constexpr
-    nullptr_t none() { return nullptr; }
-  };
+  struct nullable_traits<unique_ptr<T, D>> : nullable_traits_pointer_like {};
 }
 }
 }
