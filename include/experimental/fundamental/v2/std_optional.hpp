@@ -59,6 +59,9 @@ inline namespace fundamental_v2
     bool has_value(optional<U> const& x) noexcept { return bool(x); }
   };
 
+  template <class T>
+  struct is_nullable<optional<T>> : true_type {};
+
 }
 }
 }

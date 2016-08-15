@@ -80,6 +80,10 @@ inline namespace fundamental_v2
 
   template <class T, class D>
   struct nullable_traits<unique_ptr<T, D>> : nullable_traits_pointer_like {};
+
+  template <class T, class D>
+  struct is_nullable<unique_ptr<T, D>> : true_type {};
+
 }
 }
 }

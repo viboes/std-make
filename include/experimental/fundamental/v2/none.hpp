@@ -12,6 +12,7 @@
 #include <experimental/fundamental/v2/type_constructor.hpp>
 #include <experimental/fundamental/v2/none_type.hpp>
 #include <experimental/meta.hpp>
+#include <experimental/fundamental/v2/config.hpp>
 
 #include <utility>
 
@@ -38,8 +39,8 @@ inline namespace fundamental_v2
 
   };
 
-  template <class T>
-  struct nullable_traits<T*> : nullable_traits_pointer_like {};
+  template <>
+  struct nullable_traits<add_pointer<_t>> : nullable_traits_pointer_like {};
 
 
 
@@ -48,62 +49,65 @@ inline namespace fundamental_v2
 
   struct none_t {
     explicit none_t() = default;
+    template <class T>
+    operator T*() const noexcept { return nullptr; }
   };
-  constexpr bool operator==(none_t, none_t) { return true; }
-  constexpr bool operator!=(none_t, none_t) { return false; }
-  constexpr bool operator<(none_t, none_t) { return false; }
-  constexpr bool operator<=(none_t, none_t) { return true; }
-  constexpr bool operator>(none_t, none_t) { return false; }
-  constexpr bool operator>=(none_t, none_t) { return true; }
+  constexpr bool operator==(none_t, none_t) noexcept { return true; }
+  constexpr bool operator!=(none_t, none_t) noexcept { return false; }
+  constexpr bool operator<(none_t, none_t) noexcept { return false; }
+  constexpr bool operator<=(none_t, none_t) noexcept { return true; }
+  constexpr bool operator>(none_t, none_t) noexcept { return false; }
+  constexpr bool operator>=(none_t, none_t) noexcept { return true; }
 
   template <class T>
   struct none_type : nullable_traits<type_constructor_t<T>>::template none_type<T> { };
 
   constexpr
-  none_t none() { return none_t{}; }
+  none_t none() noexcept { return none_t{}; }
 
   template <class TC>
   constexpr
   auto none()
-    -> decltype(nullable_traits<TC>::none())
-  {
-    return nullable_traits<TC>::none();
-  }
+    JASEL_DECLTYPE_RETURN_NOEXCEPT (
+      nullable_traits<TC>::none()
+    )
 
   template <template <class ...> class TC>
   constexpr
   auto none()
-  ->  decltype(none<type_constructor_t<meta::quote<TC>>>())
-  {
-    return none<type_constructor_t<meta::quote<TC>>>();
-  }
+    JASEL_DECLTYPE_RETURN_NOEXCEPT (
+      none<type_constructor_t<meta::quote<TC>>>()
+    )
 
   template <class T>
   constexpr
   auto has_value(T const& x)
-    -> decltype(nullable_traits<type_constructor_t<T>>::has_value(x))
-  {
-    return nullable_traits<type_constructor_t<T>>::has_value(x);
-  }
+    JASEL_DECLTYPE_RETURN_NOEXCEPT (
+      nullable_traits<type_constructor_t<T>>::has_value(x)
+    )
 
   template <class T>
   constexpr
-  bool has_value(T* ptr) {
+  bool has_value(T* ptr) noexcept {
     return ptr != nullptr;
   }
 
   template <class M>
   auto have_value(M const& v)
-    -> decltype(nullable::has_value(v))
-  {
-    return nullable::has_value(v) ;
-  }
+    JASEL_DECLTYPE_RETURN_NOEXCEPT (
+      nullable::has_value(v)
+    )
+
   template <class M1, class M2, class ...Ms>
   auto have_value(M1 const& v1, M2 const& v2, Ms const& ...vs)
     //-> decltype(has_value(v1) && have_value(v2, vs...))
+    noexcept(noexcept(nullable::has_value(v1)))
     -> decltype(nullable::has_value(v1))
+
   {
     return nullable::has_value(v1) && have_value(v2, vs...);
+    //return nullable::has_value(v1) &&
+    //    nullable::has_value(v2) && (nullable::has_value(vs) && ...);
   }
 
   }
@@ -113,8 +117,18 @@ inline namespace fundamental_v2
   using nullable::has_value;
   using nullable::have_value;
 
+// todo Make this SFINAE friendly so that it is false if type_constructor_t<T> is not defined
+// alternatively define type_constructor_t<T> by default to always<T>.
+//
+//  template <class T>
+//  struct is_nullable : nullable_traits<type_constructor_t<T>> {};
+
   template <class T>
-  struct is_nullable : nullable_traits<type_constructor_t<T>> {};
+  struct is_nullable : false_type {};
+
+  template <class T>
+  struct is_nullable<T*> : true_type {};
+
   template <class T>
   struct is_strict_weakly_ordered_nullable : false_type {};
 

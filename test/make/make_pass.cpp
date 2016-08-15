@@ -211,8 +211,15 @@ int main()
     std::vector<A<long> > ys;
     std::transform(xs.begin(), xs.end(), std::back_inserter(ys), stde::maker<A<long>>());
   }
+  static_assert(stde::is_nullable<int*>::value, "ERROR");
+  static_assert(stde::nullable_traits<stde::type_constructor_t<int*>>::value, "ERROR");
   {
     int * x = nullptr;
+    BOOST_TEST(! stde::has_value(x));
+    BOOST_TEST(x == stde::none());
+  }
+  {
+    int * x = stde::none();
     BOOST_TEST(! stde::has_value(x));
     BOOST_TEST(x == stde::none());
   }
