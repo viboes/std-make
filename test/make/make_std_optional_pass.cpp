@@ -24,6 +24,8 @@ int main()
 
 #include <boost/detail/lightweight_test.hpp>
 
+std::experimental::nullopt_t null() { return std::experimental::nullopt;}
+
 struct A
 {
   int v;
@@ -62,11 +64,36 @@ int main()
     BOOST_TEST(! has_value(x));
   }
   {
+    stde::optional<stde::optional<int>> x { stde::optional<int>(stde::none()) };
+    BOOST_TEST(x);
+    BOOST_TEST(has_value(x));
+  }
+
+# if !defined __clang__ && defined __GNUC__ // NOTE: GNUC is also defined for Clang
+#   if (__GNUC__ < 6)
+  {
     stde::optional<stde::optional<int>> x { { stde::none() } };
     BOOST_TEST(! x);
     BOOST_TEST(! has_value(x));
   }
+#endif
+#endif
+
 #if defined __clang__
+  {
+    stde::optional<stde::optional<int>> x { { stde::none() } };
+    BOOST_TEST(! x);
+    BOOST_TEST(! has_value(x));
+  }
+#endif
+
+
+#if defined __clang__
+  {
+    stde::optional<stde::optional<int>> x { { null() } };
+    BOOST_TEST( ! x);
+    BOOST_TEST( ! has_value(x));
+  }
   {
     stde::optional<stde::optional<int>> x { { stde::nullopt } };
     BOOST_TEST( ! x);
