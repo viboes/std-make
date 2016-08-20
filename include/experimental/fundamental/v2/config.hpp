@@ -16,10 +16,10 @@
 #include <boost/config.hpp>
 
 
-#if __cplusplus > 201402L
-#define JASE_CXX14_CONSTEXPR_NO_CONST BOOST_CONSTEXPR
+#if __cplusplus >= 201402L
+#define JASE_MUTABLE_CONSTEXPR BOOST_CONSTEXPR
 #else
-#define JASE_CXX14_CONSTEXPR_NO_CONST
+#define JASE_MUTABLE_CONSTEXPR
 #endif
 
 #define JASEL_DECLTYPE_RETURN_NOEXCEPT(...)               \
