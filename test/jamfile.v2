@@ -84,6 +84,11 @@ test-suite signature
       [ run make/signature_pass.cpp  ]
     ;
 
+test-suite callable_wrapper
+    : 
+      [ run callable_wrapper/ex_pass.cpp  ]
+    ;
+
 explicit fix ;
 test-suite fix
     : 
