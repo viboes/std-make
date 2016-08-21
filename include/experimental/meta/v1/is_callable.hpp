@@ -11,6 +11,7 @@
 
 #include <experimental/meta/v1/void_.hpp>
 #include <experimental/meta/v1/invoke.hpp>
+#include <experimental/meta/v1/quote.hpp>
 #include <type_traits> //false_type
 
 namespace std

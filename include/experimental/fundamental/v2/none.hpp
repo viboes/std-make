@@ -9,8 +9,6 @@
 
 #include <experimental/fundamental/v2/holder.hpp>
 #include <experimental/meta/v1/id.hpp>
-#include <experimental/fundamental/v2/type_constructor.hpp>
-#include <experimental/fundamental/v2/none_type.hpp>
 #include <experimental/meta.hpp>
 #include <experimental/fundamental/v2/config.hpp>
 
@@ -60,7 +58,7 @@ inline namespace fundamental_v2
   constexpr bool operator>=(none_t, none_t) noexcept { return true; }
 
   template <class T>
-  struct none_type : nullable_traits<type_constructor_t<T>>::template none_type<T> { };
+  struct none_type : nullable_traits<T>::template none_type<T> { };
 
   constexpr
   none_t none() noexcept { return none_t{}; }
@@ -76,14 +74,15 @@ inline namespace fundamental_v2
   constexpr
   auto none()
     JASEL_DECLTYPE_RETURN_NOEXCEPT (
-      none<type_constructor_t<meta::quote<TC>>>()
+        //none<type_constructor_t<meta::quote<TC>>>()
+        none< TC<_t> >()
     )
 
   template <class T>
   constexpr
   auto has_value(T const& x)
     JASEL_DECLTYPE_RETURN_NOEXCEPT (
-      nullable_traits<type_constructor_t<T>>::has_value(x)
+      nullable_traits<T>::has_value(x)
     )
 
   template <class T>
@@ -117,14 +116,8 @@ inline namespace fundamental_v2
   using nullable::has_value;
   using nullable::have_value;
 
-// todo Make this SFINAE friendly so that it is false if type_constructor_t<T> is not defined
-// alternatively define type_constructor_t<T> by default to always<T>.
-//
-//  template <class T>
-//  struct is_nullable : nullable_traits<type_constructor_t<T>> {};
-
   template <class T>
-  struct is_nullable : false_type {};
+  struct is_nullable : nullable_traits<T> {};
 
   template <class T>
   struct is_nullable<T*> : true_type {};

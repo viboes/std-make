@@ -43,9 +43,6 @@ inline namespace fundamental_v2
   template <class T>
   struct nullable_traits<shared_ptr<T>> : nullable_traits_pointer_like {};
 
-  template <class T>
-  struct is_nullable<shared_ptr<T>> : true_type {};
-
 }
 }
 }

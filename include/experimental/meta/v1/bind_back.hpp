@@ -11,6 +11,7 @@
 
 #include <experimental/meta/v1/id.hpp>
 #include <experimental/meta/v1/eval.hpp>
+#include <experimental/meta/v1/defer.hpp>
 
 namespace std
 {
