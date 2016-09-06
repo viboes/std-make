@@ -89,6 +89,14 @@ test-suite callable_wrapper
       [ run callable_wrapper/ex_pass.cpp  ]
     ;
 
+test-suite product_type
+    : 
+      [ run product_type/c_array_pass.cpp  ]
+      [ run product_type/std_pair_pass.cpp  ]
+      [ run product_type/std_tuple_pass.cpp  ]
+      [ run product_type/std_array_pass.cpp  ]
+    ;
+
 explicit fix ;
 test-suite fix
     : 

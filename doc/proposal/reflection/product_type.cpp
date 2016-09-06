@@ -28,20 +28,37 @@ namespace std {
     using size_t_constant = integral_constant<size_t, N>;
 
 namespace product_type {
+  template <size_t N, class PT>
+      void product_type_get(PT const& pt);
+  template <class PT>
+      size_t product_type_size(PT const& pt);
 namespace detail {
 
-    template<typename T>
-    struct has_product_type_size
-    {
-        struct yes{ char a[1]; };
-        struct no { char a[2]; };
+  template<typename T>
+  struct has_product_type_size
+  {
+      struct yes{ char a[1]; };
+      struct no { char a[2]; };
 
-        template<typename U>
-            static constexpr yes test(decltype(product_type_size(&std::detail::type<U>)) *);
-        template<typename U>
-            static constexpr no test(...);
-        static constexpr bool value = sizeof(test<T>(0)) == sizeof(yes);
-    };
+      template<typename U>
+          static constexpr yes test(decltype(product_type_size(&std::detail::type<U>)) *);
+      template<typename U>
+          static constexpr no test(...);
+      static constexpr bool value = sizeof(test<T>(0)) == sizeof(yes);
+  };
+
+  template<typename T>
+  struct has_product_type_size2
+  {
+      struct yes{ char a[1]; };
+      struct no { char a[2]; };
+
+      template<typename U>
+          static constexpr yes test(decltype(product_type_size<U>()) *);
+      template<typename U>
+          static constexpr no test(...);
+      static constexpr bool value = sizeof(test<T>(0)) == sizeof(yes);
+  };
 
     template<typename T>
     struct has_product_type_size_static_member
@@ -81,6 +98,11 @@ namespace detail {
         : size_t_constant< product_type_size(&std::detail::type<PT>)>
     {};
 
+    template <class PT>
+    struct size<PT, typename std::enable_if<detail::has_product_type_size2<PT>::value>::type>
+        : size_t_constant< product_type_size<PT>()>
+    {};
+
     template <size_t I, class PT>
     struct element;
     template <size_t I, class T> struct element<I, const T> : element<I, T> {};
@@ -111,7 +133,7 @@ namespace detail {
     {
         return product_type_get(size_t_constant<N>{},pt);
     }
-#if 0
+#if 1
     template <size_t N, class PT>
     constexpr auto get(PT & pt) -> decltype(product_type_get<N>(pt))
     {
