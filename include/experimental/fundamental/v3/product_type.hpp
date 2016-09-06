@@ -11,16 +11,17 @@
 
 ///////////////////////////////////////////////////////////////////////////////////////
 ///
-/// A type constructor PT is a model of a ProductType if
+/// A type PT is a model of a ProductType if given a variables pt of type PT
 ///
 ///   product_type::size<PT>::value
 ///   product_type::element<I,PT>::type
 ///   product_type::get<I>(pt)
 ///
-///   not_a_value<TC>() -> NotAValueType_t<TC>
-///   none<TC>() -> NotAValueType_t<TC>
+/// The definition of these traits/functions depend on whether P0327 is adopted by the standard and
+/// can be implemented only by the compiler, as it does for Range-based for loops.
 ///
-///
+/// What follows is just an emulation for the cases 1 (c-arrays) and 2 (tuple-like types).
+/// The case 3 can be implemented only by the compiler.
 ///////////////////////////////////////////////////////////////////////////////////////
 
 #include <cstddef>
@@ -126,10 +127,6 @@ namespace detail
   struct product_type_traits<T (&)[N]> : product_type_traits<T [N]> {};
 
   namespace product_type {
-    // The definition of these traits/functions depend on Structured binding wording and can be implemented only by the compiler,
-    // as it does for Range-based for loops.
-    // What follows is just an emulation for the cases 1 (c-arrays) and 2 (tuple-like types).
-
     template <class PT>
     struct size : product_type_traits<PT>::size {};
     template <class T> struct size<const T> : size<T> {};
