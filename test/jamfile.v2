@@ -97,6 +97,11 @@ test-suite product_type
       [ run product_type/std_array_pass.cpp  ]
     ;
 
+test-suite swappable
+    : 
+      [ run swappable/swap_c_array_pass.cpp  ]
+    ;
+
 explicit fix ;
 test-suite fix
     : 

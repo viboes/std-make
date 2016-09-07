@@ -26,6 +26,11 @@
     noexcept(noexcept(decltype(__VA_ARGS__)(__VA_ARGS__))) ->   \
     decltype(__VA_ARGS__)                                       \
     { return (__VA_ARGS__); }                                   \
+
+#define JASEL_NOEXCEPT_RETURN(...)               \
+    noexcept(noexcept(decltype(__VA_ARGS__)(__VA_ARGS__)))    \
+    { return (__VA_ARGS__); }                                   \
+
 /**/
 
 #endif // BOOST_ENUMS_CONFIG_HPP
