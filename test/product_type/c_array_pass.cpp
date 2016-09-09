@@ -9,6 +9,8 @@
 
 #include <boost/detail/lightweight_test.hpp>
 
+int f(int,int,int) { return 0; }
+
 int main()
 {
   namespace stde = std::experimental;
@@ -40,6 +42,11 @@ int main()
       BOOST_TEST(0 == stde::product_type::get<0>(arr));
       BOOST_TEST(1 == stde::product_type::get<1>(arr));
       BOOST_TEST(2 == stde::product_type::get<2>(arr));
+  }
+  {
+      int arr[] = {0,1,2};
+      BOOST_TEST(0 == stde::product_type::apply(f, arr));
+
   }
   return ::boost::report_errors();
 }
