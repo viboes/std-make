@@ -46,7 +46,6 @@ int main()
   {
       int arr[] = {0,1,2};
       BOOST_TEST(0 == stde::product_type::apply(f, arr));
-
   }
   return ::boost::report_errors();
 }
