@@ -80,13 +80,28 @@ namespace detail
   };
   template <size_t I, size_t N, class T>
   struct has_tuple_like_get_access<I, T [N]> : false_type {};
+
+  template <typename T, typename  Indexes>
+  struct has_tuple_like_element_get_access_aux;
+  template <typename T, size_t ...N>
+  struct has_tuple_like_element_get_access_aux<T, index_sequence<N...>> : integral_constant<bool,
+    (has_tuple_like_element_access<N, T>::value && ...)
+    &&
+    (has_tuple_like_get_access<N, T>::value && ...)
+    > {};
+
+  template <typename T>
+  struct has_tuple_like_element_get_access:
+      has_tuple_like_element_get_access_aux<T, make_index_sequence<tuple_size<T>::value>>
+  {};
+
 }
 
   template <typename T>
   struct has_tuple_like_access : integral_constant<bool,
     detail::has_tuple_like_size_access<T>::value &&
-    detail::has_tuple_like_element_access<0, T>::value &&
-    detail::has_tuple_like_get_access<0, T>::value> {};
+    detail::has_tuple_like_element_get_access<T>::value
+    > {};
 
   template <size_t N, class T>
   struct has_tuple_like_access<T [N]> : false_type {};
