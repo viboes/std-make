@@ -9,9 +9,9 @@
 #ifndef JASEL_FUNDAMENTAL_V3_PRODUCT_TYPE_APPLY_HPP
 #define JASEL_FUNDAMENTAL_V3_PRODUCT_TYPE_APPLY_HPP
 
+#include <experimental/fundamental/v3/product_type.hpp>
 #include <utility>
 #include <functional>
-#include <experimental/product_type.hpp>
 
 namespace std
 {
@@ -25,9 +25,9 @@ namespace product_type
   namespace detail {
 
     template <class F, class ProductType, std::size_t... I>
-    constexpr decltype(auto) apply_impl( F&& f, ProductType&& t, index_sequence<I...> )
+    constexpr decltype(auto) apply_impl( F&& f, ProductType&& pt, index_sequence<I...> )
     {
-      return invoke(std::forward<F>(f), product_type::get<I>(forward<ProductType>(t))...);
+      return invoke(std::forward<F>(f), product_type::get<I>(forward<ProductType>(pt))...);
     }
 
   } // namespace detail
@@ -38,11 +38,11 @@ namespace product_type
    * @par f Callable object to be invoked
    * @par pt tuple whose elements to be used as arguments to f
    *
-   * @Note This function should't participate in overload resolution until
+   * @pre
    * - DF is a model of Callable<product_type::element_t<I, DProductType>... > and
    * - DProductType is a model of ProductType.
    *
-   * where DF and DProductType are respectively the decay of F and ProductType
+   * where DF and DProductType are respectively the decay of F and ProductType removing cv and reference.
    */
 
   template <class F, class ProductType>
