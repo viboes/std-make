@@ -54,5 +54,18 @@ int main()
     const T arr  = { {0,1,2} };
     BOOST_TEST(0 == stde::product_type::apply(f, arr));
   }
+  {
+      using T = std::array<int,3>;
+      const T arr  = { {0,1,2} };
+      BOOST_TEST(std::make_tuple(0,1,2) == stde::product_type::to_tuple(arr));
+  }
+  {
+    using T = std::array<int,2>;
+    const T p  = { {0,1} };
+    using U = std::array<int,2>;
+    const U q  = { {2,3} };
+    BOOST_TEST(std::make_tuple(0,1,2,3) == stde::product_type::cat(p, q));
+  }
+
   return ::boost::report_errors();
 }

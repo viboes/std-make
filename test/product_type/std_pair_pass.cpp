@@ -49,5 +49,17 @@ int main()
     const T p = {0,1};
     BOOST_TEST(0 == stde::product_type::apply(f, p));
   }
+  {
+    using T = std::pair<int,int>;
+    const T p = {0,1};
+    BOOST_TEST(std::make_tuple(0,1) == stde::product_type::to_tuple(p));
+  }
+  {
+    using T = std::pair<int,int>;
+    const T p = {0,1};
+    using U = std::pair<int,int>;
+    const U q = {2,3};
+    BOOST_TEST(std::make_tuple(0,1,2,3) == stde::product_type::cat(p, q));
+  }
   return ::boost::report_errors();
 }
