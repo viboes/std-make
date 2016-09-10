@@ -68,7 +68,7 @@ namespace detail
   namespace get_adl {
     using std::get;
     template <size_t N, class T>
-    decltype(auto) xget(T&& t) noexcept
+    auto xget(T&& t) noexcept -> decltype( get<N>(forward<T>(t)) )
     {
       return get<N>(forward<T>(t));
     }
@@ -97,17 +97,19 @@ namespace detail
     (has_tuple_like_get_access<N, T>::value && ...)
     > {};
 
-  template <typename T>
+  template <typename T, bool B>
   struct has_tuple_like_element_get_access:
       has_tuple_like_element_get_access_aux<T, make_index_sequence<tuple_size<T>::value>>
   {};
+  template <typename T>
+  struct has_tuple_like_element_get_access<T, false>: false_type {};
 
 }
 
   template <typename T>
   struct has_tuple_like_access : integral_constant<bool,
     detail::has_tuple_like_size_access<T>::value &&
-    detail::has_tuple_like_element_get_access<T>::value
+    detail::has_tuple_like_element_get_access<T, detail::has_tuple_like_size_access<T>::value>::value
     > {};
 
   template <size_t N, class T>
@@ -116,7 +118,7 @@ namespace detail
   struct has_tuple_like_access<T (&)[N]> : false_type {};
 
   template <class PT, typename = void>
-  struct product_type_traits;
+  struct product_type_traits {};
 
   struct product_type_tag{};
 
@@ -180,13 +182,8 @@ namespace detail
   }
 
   // fixme redefine it as we did for has_tuple_like_access
-#if 0
   template <typename T>
   struct is_product_type : is_base_of<product_type_tag, product_type_traits<T>> {};
-#else
-  template <typename T>
-    struct is_product_type  : false_type {};
-#endif
   template <typename T>
   struct is_product_type<const T> : is_product_type<T> {};
   template <typename T>

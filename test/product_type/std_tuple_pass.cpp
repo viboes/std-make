@@ -10,18 +10,6 @@
 
 #include <boost/detail/lightweight_test.hpp>
 
-// fixme
-#if 1
-namespace std {
-namespace experimental {
-inline namespace fundamental_v3 {
-
-  template <typename ...Ts>
-  struct is_product_type<std::tuple<Ts...>>  : true_type {};
-
-}}}
-#endif
-
 int f(int,int) { return 0; }
 
 int main()

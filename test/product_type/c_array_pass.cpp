@@ -17,6 +17,7 @@ int main()
   namespace stde = std::experimental;
   {
       int arr[] = {0,1,2};
+      static_assert(! stde::has_tuple_like_access<int>::value, "Hrr");
       static_assert(! stde::has_tuple_like_access<decltype(arr)>::value, "Hrr");
 
       static_assert(3 == stde::product_type::size<decltype(arr)>::value, "Hrr");

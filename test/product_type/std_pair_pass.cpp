@@ -11,17 +11,6 @@
 
 int f(int,int) { return 0; }
 
-// fixme
-#if 1
-namespace std {
-namespace experimental {
-inline namespace fundamental_v3 {
-
-  template <typename T, typename U>
-  struct is_product_type<std::pair<T,U>> : true_type {};
-
-}}}
-#endif
 int main()
 {
   namespace stde = std::experimental;

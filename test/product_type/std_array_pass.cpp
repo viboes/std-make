@@ -12,17 +12,6 @@
 
 int f(int,int,int) { return 0; }
 
-// fixme
-#if 1
-namespace std {
-namespace experimental {
-inline namespace fundamental_v3 {
-
-  template <typename T, size_t N>
-  struct is_product_type<std::array<T,N>>  : true_type {};
-
-}}}
-#endif
 int main()
 {
   namespace stde = std::experimental;
