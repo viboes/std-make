@@ -11,15 +11,31 @@
 
 int f(int,int) { return 0; }
 
+// fixme
+#if 1
+namespace std {
+namespace experimental {
+inline namespace fundamental_v3 {
+
+  template <typename T, typename U>
+  struct is_product_type<std::pair<T,U>> : true_type {};
+
+}}}
+#endif
 int main()
 {
   namespace stde = std::experimental;
 
   {
+
       using T = std::pair<int,int>;
+      T p = {0,1};
+
+      static_assert(stde::detail::has_tuple_like_size_access<T>::value, "Hrr");
+      static_assert(stde::detail::has_tuple_like_element_access<0,T>::value, "Hrr");
+      static_assert(stde::detail::has_tuple_like_get_access<0,T>::value, "Hrr");
       static_assert(stde::has_tuple_like_access<T>::value, "Hrr");
 
-      T p = {0,1};
       static_assert(2 == stde::product_type::size<T>::value, "Hrr");
       static_assert(std::is_same<int, std::tuple_element_t<0,decltype(p)>>::value, "Hrr");
       static_assert(std::is_same<int, stde::product_type::element_t<0,decltype(p)>>::value, "Hrr");
@@ -62,6 +78,17 @@ int main()
     using U = std::pair<int,int>;
     const U q = {2,3};
     BOOST_TEST(std::make_tuple(0,1,2,3) == stde::product_type::cat(p, q));
+  }
+  {
+    using T = std::pair<int,int>;
+    T p  = {0,1};
+    using U = std::pair<int,int>;
+    U q  = {2,3};
+    stde::swappable::swap(p,q);
+    BOOST_TEST(0 == stde::product_type::get<0>(q));
+    BOOST_TEST(1 == stde::product_type::get<1>(q));
+    BOOST_TEST(2 == stde::product_type::get<0>(p));
+    BOOST_TEST(3 == stde::product_type::get<1>(p));
   }
   return ::boost::report_errors();
 }

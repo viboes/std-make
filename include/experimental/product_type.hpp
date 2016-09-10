@@ -11,5 +11,6 @@
 #include <experimental/fundamental/v3/product_type/apply.hpp>
 #include <experimental/fundamental/v3/product_type/cat.hpp>
 #include <experimental/fundamental/v3/product_type/to_tuple.hpp>
+#include <experimental/fundamental/v3/product_type/swap.hpp>
 
 #endif // header

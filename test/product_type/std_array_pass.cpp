@@ -12,6 +12,17 @@
 
 int f(int,int,int) { return 0; }
 
+// fixme
+#if 1
+namespace std {
+namespace experimental {
+inline namespace fundamental_v3 {
+
+  template <typename T, size_t N>
+  struct is_product_type<std::array<T,N>>  : true_type {};
+
+}}}
+#endif
 int main()
 {
   namespace stde = std::experimental;
@@ -30,6 +41,7 @@ int main()
       static_assert(std::is_same<int, stde::product_type::element_t<0,decltype(p)>>::value, "Hrr");
       static_assert(std::is_same<int, stde::product_type::element_t<1,decltype(p)>>::value, "Hrr");
       //static_assert(std::is_same<int, stde::product_type::element_t<3,decltype(p)>>::value, "Hrr"); // COMPILE FAIL AS REQUIRED
+      static_assert(std::is_same<int&, decltype(stde::product_type::get<0>(p))>::value, "Hrr");
       BOOST_TEST(3 == stde::product_type::size<T>::value);
       BOOST_TEST(0 == stde::product_type::get<0>(p));
       BOOST_TEST(1 == stde::product_type::get<1>(p));
@@ -67,6 +79,16 @@ int main()
     const U q  = { {2,3} };
     BOOST_TEST(std::make_tuple(0,1,2,3) == stde::product_type::cat(p, q));
   }
-
+  {
+    using T = std::array<int,2>;
+    T p  = { {0,1} };
+    using U = std::array<int,2>;
+    U q  = { {2,3} };
+    stde::swappable::swap(p,q);
+    BOOST_TEST(0 == stde::product_type::get<0>(q));
+    BOOST_TEST(1 == stde::product_type::get<1>(q));
+    BOOST_TEST(2 == stde::product_type::get<0>(p));
+    BOOST_TEST(3 == stde::product_type::get<1>(p));
+  }
   return ::boost::report_errors();
 }

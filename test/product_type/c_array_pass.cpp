@@ -9,6 +9,7 @@
 
 #include <boost/detail/lightweight_test.hpp>
 
+
 int f(int,int,int) { return 0; }
 
 int main()
@@ -51,6 +52,20 @@ int main()
   {
       int arr[] = {0,1,2};
       BOOST_TEST(std::make_tuple(0,1,2) == stde::product_type::to_tuple(arr));
+  }
+  {
+    int p[] = {0,1};
+    int q[] = {2,3};
+    BOOST_TEST(std::make_tuple(0,1,2,3) == stde::product_type::cat(p, q));
+  }
+  {
+    int p[] = {0,1};
+    int q[] = {2,3};
+    stde::swappable::swap(p,q);
+    BOOST_TEST(0 == q[0]);
+    BOOST_TEST(1 == q[1]);
+    BOOST_TEST(2 == p[0]);
+    BOOST_TEST(3 == p[1]);
   }
   return ::boost::report_errors();
 }

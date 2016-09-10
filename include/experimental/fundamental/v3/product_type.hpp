@@ -68,7 +68,8 @@ namespace detail
   namespace get_adl {
     using std::get;
     template <size_t N, class T>
-    auto xget(T&& t) {
+    decltype(auto) xget(T&& t) noexcept
+    {
       return get<N>(forward<T>(t));
     }
   }
@@ -79,7 +80,7 @@ namespace detail
       struct no { char a[2]; };
 
       template <size_t I, typename U>
-          static yes test(decltype(detail::get_adl::xget<I>(declval<U>()))*);
+          static yes test(remove_reference_t<decltype(detail::get_adl::xget<I>(declval<U>()))>*);
       template <size_t I, typename U>
           static no test(...);
       static constexpr bool value = sizeof(test<N,T>(nullptr)) == sizeof(yes);
@@ -177,8 +178,15 @@ namespace detail
     }
 
   }
+
+  // fixme redefine it as we did for has_tuple_like_access
+#if 0
   template <typename T>
   struct is_product_type : is_base_of<product_type_tag, product_type_traits<T>> {};
+#else
+  template <typename T>
+    struct is_product_type  : false_type {};
+#endif
   template <typename T>
   struct is_product_type<const T> : is_product_type<T> {};
   template <typename T>
@@ -187,6 +195,11 @@ namespace detail
   struct is_product_type<const volatile T> : is_product_type<T> {};
   template <typename T>
   constexpr bool is_product_type_v = is_product_type<T>::value ;
+
+  template <typename T, size_t N>
+  struct is_product_type<T[N]> : true_type {};
+  template <typename T, size_t N>
+  struct is_product_type<T(&)[N]> : true_type {};
 
 }}
 }
