@@ -22,6 +22,7 @@ int main()
 
       static_assert(std::is_same<int, stde::product_type::element_t<0,decltype(arr)>>::value, "Hrr");
       //static_assert(std::is_same<int, stde::product_type::element_t<3,decltype(arr)>>::value, "Hrr");// COMPILE FAIL AS REQUIRED
+      static_assert(stde::is_product_type_v<decltype(arr)>, "Hrr");
 
       BOOST_TEST(3 == stde::product_type::size<decltype(arr)>::value);
       BOOST_TEST(0 == stde::product_type::get<0>(arr));

@@ -117,10 +117,12 @@ namespace detail
   template <class PT, typename = void>
   struct product_type_traits;
 
+  struct product_type_tag{};
+
   // Forward to customized class using tuple-like access
   template <class PT>
   struct product_type_traits
-  <  PT, enable_if_t< has_tuple_like_access<PT>::value>  >
+  <  PT, enable_if_t< has_tuple_like_access<PT>::value >  > : product_type_tag
   {
     using size = tuple_size<PT>;
 
@@ -136,7 +138,8 @@ namespace detail
 
   // customization for C-arrays
   template <class T, size_t N>
-  struct product_type_traits<T [N]> {
+  struct product_type_traits<T [N]> : product_type_tag
+  {
     using size = integral_constant<size_t, N>;
     template <size_t I>
     struct element { using type = T; };
@@ -173,8 +176,17 @@ namespace detail
         return product_type_traits<remove_cvr_t<PT>>::template get<I>(forward<PT>(pt));
     }
 
-
   }
+  template <typename T>
+  struct is_product_type : is_base_of<product_type_tag, product_type_traits<T>> {};
+  template <typename T>
+  struct is_product_type<const T> : is_product_type<T> {};
+  template <typename T>
+  struct is_product_type<volatile T> : is_product_type<T> {};
+  template <typename T>
+  struct is_product_type<const volatile T> : is_product_type<T> {};
+  template <typename T>
+  constexpr bool is_product_type_v = is_product_type<T>::value ;
 
 }}
 }

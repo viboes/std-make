@@ -45,7 +45,10 @@ namespace product_type
    * where DF and DProductType are respectively the decay of F and ProductType removing cv and reference.
    */
 
-  template <class F, class ProductType>
+  template <class F, class ProductType
+  // todo add constraint on F
+  , typename = enable_if_t< is_product_type_v<remove_cvr_t<ProductType>> >
+  >
   constexpr decltype(auto) apply(F&& f, ProductType&& pt)
   {
       return detail::apply_impl(forward<F>(f), forward<ProductType>(pt),

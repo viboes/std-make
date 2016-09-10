@@ -40,7 +40,9 @@ namespace product_type
    * @pre The parameter must be a model of ProductType
    */
 
-  template <class ProductType>
+  template <class ProductType
+  , typename = enable_if_t< is_product_type_v<remove_cvr_t<ProductType>>  >
+  >
   constexpr decltype(auto) to_tuple(ProductType&& pt)
   {
       return detail::to_tuple_impl(forward<ProductType>(pt),
