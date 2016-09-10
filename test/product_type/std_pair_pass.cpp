@@ -11,6 +11,12 @@
 
 int f(int,int) { return 0; }
 
+struct X {
+  int i;
+  int j;
+  X(int i, int j) : i(i), j(j) {}
+};
+
 int main()
 {
   namespace stde = std::experimental;
@@ -78,6 +84,13 @@ int main()
     BOOST_TEST(1 == stde::product_type::get<1>(q));
     BOOST_TEST(2 == stde::product_type::get<0>(p));
     BOOST_TEST(3 == stde::product_type::get<1>(p));
+  }
+  {
+    using T = std::pair<int,int>;
+    T p  = {0,1};
+    auto x = stde::product_type::make_from_product_type<X>(p);
+    BOOST_TEST(0 == x.i);
+    BOOST_TEST(1 == x.j);
   }
   return ::boost::report_errors();
 }
