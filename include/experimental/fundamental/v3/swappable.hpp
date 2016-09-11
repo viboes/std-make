@@ -76,6 +76,7 @@ namespace adl_swappable {
   template <class T> void swap(T&, T&) = delete;
   template <class T, std::size_t N> void swap(T(&)[N], T(&)[N]) = delete;
 #endif
+
   template <class T, class U, typename = void>
     struct is_adl_swappable
       : false_type {};
@@ -88,12 +89,10 @@ namespace adl_swappable {
 
   struct fn {
     template <class T, class U>
-      static constexpr auto apply(T&& x, U&& y)
-          noexcept(noexcept(swap(x,y))) ->
-          decltype(swap(x,y))
-      {
-        return swap(x,y);
-      }
+      static constexpr auto apply(T&& t, U&& u)
+        JASEL_DECLTYPE_RETURN_NOEXCEPT(
+          swap(std::forward<T>(t), std::forward<U>(u))
+        )
   };
 }
 
@@ -115,7 +114,7 @@ namespace swappable {
     constexpr bool is_trait_swappable_v = is_trait_swappable<T,U>::value;
 
 
-  // overload for adl swappables
+  // overload for adl swappables: for backward compatibility
   template <class T, class U>
     constexpr enable_if_t <
       is_adl_swappable_v<T,U>
@@ -125,18 +124,18 @@ namespace swappable {
         adl_swappable::fn::template apply(std::forward<T>(t), std::forward<U>(u))
     )
 
-  // overload for swappable by trait
+  // overload for swappable by trait: extension
   template <class T, class U>
     constexpr enable_if_t<
          ! is_adl_swappable_v<T,U>
       &&   is_trait_swappable_v<T,U>
     >
-    swap(T& x, U& y)
+    swap(T&& x, U&& y)
       JASEL_NOEXCEPT_RETURN(
-          traits<T, U>::swap(x,y)
+          traits<remove_cv_t<remove_reference_t<T>>, remove_cv_t<remove_reference_t<U>>>::swap(forward<T>(x),forward<U>(y))
        )
 
-  // overload for move swappable
+  // overload for move swappable: std
   template <class T>
     constexpr enable_if_t<
          ! is_adl_swappable_v<T>
@@ -145,12 +144,11 @@ namespace swappable {
       &&   is_move_assignable<T>::value
     >
     swap(T& x, T& y)
-      noexcept(noexcept(
-          (y = ::std::exchange(x, ::std::move(y)))
-      ))
-      { y = ::std::exchange(x, ::std::move(y)); }
+      JASEL_NOEXCEPT_RETURN(
+          (void)(y = ::std::exchange(x, ::std::move(y)))
+      )
 
-  // overload for c-arrays of swappables
+  // overload for c-arrays of swappables: std
   template <class T, std::size_t N>
     constexpr enable_if_t<
          ! is_adl_swappable_v<T (&)[N]>
@@ -176,11 +174,7 @@ namespace swap_detail {
   template <class T, class U>
     struct is_swappable<T, U,
       meta::when<meta::is_valid<
-#if defined __clang
-      decltype(swappable::swap((T&)declval<T>(), (U&)declval<U>()))
-#else
-      decltype(swappable::swap((T&&)(declval<T>()), (U&&)(declval<U>())))
-#endif
+        decltype(swappable::swap((T&&)(declval<T>()), (U&&)(declval<U>())))
       >>
     >: true_type {};
 
