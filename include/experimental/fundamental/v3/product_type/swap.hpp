@@ -23,7 +23,7 @@ inline  namespace fundamental_v3
   /**
    */
 
-  template <typename PT>
+  template <class PT>
   struct swappable_traits<PT, PT, meta::when<
     is_product_type_v<PT>
   >>

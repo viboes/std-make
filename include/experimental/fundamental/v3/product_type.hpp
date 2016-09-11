@@ -38,25 +38,25 @@ inline namespace fundamental_v3
 {
 namespace detail
 {
-  template <typename T>
+  template <class T>
   struct has_tuple_like_size_access
   {
       struct yes{ char a[1]; };
       struct no { char a[2]; };
 
-      template<typename U> static yes test(decltype(std::tuple_size<U>::value)*);
-      template<typename U> static no test(...);
+      template<class U> static yes test(decltype(std::tuple_size<U>::value)*);
+      template<class U> static no test(...);
       static const bool value = sizeof(test<T>(nullptr)) == sizeof(yes);
   };
 
-  template <size_t N, typename T>
+  template <size_t N, class T>
   struct has_tuple_like_element_access
   {
       struct yes{ char a[1]; };
       struct no { char a[2]; };
 
-      template <size_t I, typename U> static yes test(typename std::tuple_element<I,U>::type*);
-      template <size_t I, typename U> static no test(...);
+      template <size_t I, class U> static yes test(typename std::tuple_element<I,U>::type*);
+      template <size_t I, class U> static no test(...);
       static const bool value = sizeof(test<N, T>(nullptr)) == sizeof(yes);
   };
   namespace get_adl {
@@ -67,40 +67,40 @@ namespace detail
       return get<N>(forward<T>(t));
     }
   }
-  template<size_t N, typename T>
+  template<size_t N, class T>
   struct has_tuple_like_get_access
   {
       struct yes{ char a[1]; };
       struct no { char a[2]; };
 
-      template <size_t I, typename U>
+      template <size_t I, class U>
           static yes test(remove_reference_t<decltype(detail::get_adl::xget<I>(declval<U>()))>*);
-      template <size_t I, typename U>
+      template <size_t I, class U>
           static no test(...);
       static constexpr bool value = sizeof(test<N,T>(nullptr)) == sizeof(yes);
   };
   template <size_t I, size_t N, class T>
   struct has_tuple_like_get_access<I, T [N]> : false_type {};
 
-  template <typename T, typename  Indexes>
+  template <class T, class  Indexes>
   struct has_tuple_like_element_get_access_aux;
-  template <typename T, size_t ...N>
+  template <class T, size_t ...N>
   struct has_tuple_like_element_get_access_aux<T, index_sequence<N...>> : integral_constant<bool,
     (has_tuple_like_element_access<N, T>::value && ...)
     &&
     (has_tuple_like_get_access<N, T>::value && ...)
     > {};
 
-  template <typename T, bool B>
+  template <class T, bool B>
   struct has_tuple_like_element_get_access:
       has_tuple_like_element_get_access_aux<T, make_index_sequence<tuple_size<T>::value>>
   {};
-  template <typename T>
+  template <class T>
   struct has_tuple_like_element_get_access<T, false>: false_type {};
 
 }
 
-  template <typename T>
+  template <class T>
   struct has_tuple_like_access : integral_constant<bool,
     detail::has_tuple_like_size_access<T>::value &&
     detail::has_tuple_like_element_get_access<T, detail::has_tuple_like_size_access<T>::value>::value
@@ -111,11 +111,11 @@ namespace detail
   template <size_t N, class T>
   struct has_tuple_like_access<T (&)[N]> : false_type {};
 
-  template <class PT, typename Enabler=void>
+  template <class PT, class Enabler=void>
   struct product_type_traits : product_type_traits<PT, meta::when<true>> {};
 
   // Default failing specialization
-  template <typename PT, bool condition>
+  template <class  PT, bool condition>
   struct product_type_traits<PT, meta::when<condition>>
   {
       template <class T>
@@ -135,7 +135,7 @@ namespace detail
     template <size_t I>
     using element = tuple_element<I, PT>;
 
-    template <size_t I, class PT2, typename= std::enable_if_t< I < size::value > >
+    template <size_t I, class PT2, class= std::enable_if_t< I < size::value > >
       static constexpr decltype(auto) get(PT2&& pt) noexcept
       {
         return detail::get_adl::xget<I>(forward<PT2>(pt));
@@ -150,7 +150,7 @@ namespace detail
     template <size_t I>
     struct element { using type = T; };
 
-    template <size_t I, class U, size_t M, typename= std::enable_if_t< I<N >>
+    template <size_t I, class U, size_t M, class= std::enable_if_t< I<N >>
         static constexpr U& get(U (&arr)[M]) noexcept { return arr[I]; }
   };
   template <class T, size_t N>
@@ -165,7 +165,7 @@ namespace detail
     template <class PT>
     constexpr size_t size_v = size<PT>::value;
 
-    template <size_t I, class PT, typename= std::enable_if_t< I<size_v<PT> >>
+    template <size_t I, class PT, class= std::enable_if_t< I<size_v<PT> >>
     struct element : product_type_traits<PT>::template element<I> {};
     template <size_t I, class PT>
     using element_t = typename element<I,PT>::type;
@@ -175,7 +175,7 @@ namespace detail
 
 
     template <size_t I, class PT
-      , typename= std::enable_if_t< I < size_v<remove_cv_t<remove_reference_t<PT>>> >
+      , class= std::enable_if_t< I < size_v<remove_cv_t<remove_reference_t<PT>>> >
     >
     constexpr decltype(auto) get(PT && pt) noexcept
     {
@@ -185,20 +185,20 @@ namespace detail
   }
 
   // fixme redefine it as we did for has_tuple_like_access
-  template <typename T>
+  template <class T>
   struct is_product_type : is_base_of<product_type_tag, product_type_traits<T>> {};
-  template <typename T>
+  template <class T>
   struct is_product_type<const T> : is_product_type<T> {};
-  template <typename T>
+  template <class T>
   struct is_product_type<volatile T> : is_product_type<T> {};
-  template <typename T>
+  template <class T>
   struct is_product_type<const volatile T> : is_product_type<T> {};
-  template <typename T>
+  template <class T>
   constexpr bool is_product_type_v = is_product_type<T>::value ;
 
-  template <typename T, size_t N>
+  template <class T, size_t N>
   struct is_product_type<T[N]> : true_type {};
-  template <typename T, size_t N>
+  template <class T, size_t N>
   struct is_product_type<T(&)[N]> : true_type {};
 
 }}
