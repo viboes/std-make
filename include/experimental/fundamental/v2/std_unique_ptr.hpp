@@ -57,8 +57,8 @@ namespace std
 
 namespace experimental
 {
-inline namespace fundamental_v2
-{
+//inline namespace fundamental_v2
+//{
 
   // type_constructor customization
   template <class T, class D>
@@ -81,7 +81,7 @@ inline namespace fundamental_v2
   template <class T, class D>
   struct nullable_traits<unique_ptr<T, D>> : nullable_traits_pointer_like {};
 
-}
+//}
 }
 }
 

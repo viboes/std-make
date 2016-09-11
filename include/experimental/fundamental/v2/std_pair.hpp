@@ -24,8 +24,8 @@ namespace std
 namespace experimental
 {
 
-inline namespace fundamental_v2
-{
+//inline namespace fundamental_v2
+//{
   // type_constructor customization
   template <class T1, class T2>
   struct type_constructor<pair<T1,T2>> : meta::id<pair<_t, _t>> {};
@@ -33,7 +33,7 @@ inline namespace fundamental_v2
   template <>
   struct type_constructor<meta::quote<pair>> : meta::id<pair<_t, _t>> {};
 
-}
+//}
 }
 }
 

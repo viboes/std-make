@@ -22,12 +22,12 @@ namespace std
 namespace experimental
 {
 
-inline namespace fundamental_v2
-{
+//inline namespace fundamental_v2
+//{
   // type_constructor customization
   template <class ...Ts>
   struct type_constructor<tuple<Ts...>> : meta::id<tuple<_t>> {};
-}
+//}
 }
 }
 

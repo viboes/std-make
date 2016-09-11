@@ -25,8 +25,8 @@ namespace experimental
   template <>
   struct optional<_t>  : meta::quote<optional> {};
 
-inline namespace fundamental_v2
-{
+//inline namespace fundamental_v2
+  //{
   template <class T>
   struct possible_value::tag<optional<T>> : meta::id<pointer_like> {};
 
@@ -59,7 +59,7 @@ inline namespace fundamental_v2
     bool has_value(optional<U> const& x) noexcept { return bool(x); }
   };
 
-}
+//}
 }
 }
 
