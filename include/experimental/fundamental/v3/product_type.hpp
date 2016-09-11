@@ -35,13 +35,6 @@ namespace experimental
 {
 inline namespace fundamental_v3
 {
-  template <class T>
-  struct remove_cvr {
-    using type = remove_cv_t<remove_reference_t<T>>;
-  };
-  template <class T>
-  using remove_cvr_t = typename remove_cvr<T>::type;
-
 namespace detail
 {
   template <typename T>
@@ -172,11 +165,11 @@ namespace detail
 
 
     template <size_t I, class PT
-      , typename= std::enable_if_t< I < size_v<remove_cvr_t<PT>> >
+      , typename= std::enable_if_t< I < size_v<remove_cv_t<remove_reference_t<PT>>> >
     >
     constexpr decltype(auto) get(PT && pt) noexcept
     {
-        return product_type_traits<remove_cvr_t<PT>>::template get<I>(forward<PT>(pt));
+        return product_type_traits<remove_cv_t<remove_reference_t<PT>>>::template get<I>(forward<PT>(pt));
     }
 
   }
