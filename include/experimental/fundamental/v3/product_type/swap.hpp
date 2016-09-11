@@ -19,6 +19,23 @@ namespace experimental
 {
 inline  namespace fundamental_v3
 {
+namespace product_type
+{
+  namespace detail {
+    template <class T, size_t ... ids>
+      constexpr void swap_impl(T& x, T& y, index_sequence<ids...>)
+      {
+        (..., swappable::swap(product_type::get<ids>(x), product_type::get<ids>(y)));
+
+      }
+  }
+
+  template <class T>
+    constexpr void swap(T& x, T& y)
+    {
+      detail::swap_impl(x, y, make_index_sequence<product_type::size_v<T>>{});
+    }
+}
 
   /**
    */
@@ -28,16 +45,10 @@ inline  namespace fundamental_v3
     is_product_type_v<PT>
   >>
   {
-    template <class T, size_t ... ids>
-      static constexpr void swap_aux(T& x, T& y, index_sequence<ids...>)
-      {
-        (..., swappable::swap(product_type::get<ids>(x), product_type::get<ids>(y)));
-
-      }
     template <class T>
       static constexpr void swap(T& x, T& y)
       {
-        swap_aux(x, y, make_index_sequence<product_type::size_v<T>>{});
+        product_type::swap(x, y);
       }
   };
 
