@@ -4,14 +4,11 @@
 //
 // (C) Copyright 2016 Vicente J. Botet Escriba
 
-#ifndef JASEL_NULLABLE_HPP
-#define JASEL_NULLABLE_HPP
+#ifndef JASEL_TYPE_CONSTRUCTIBLE_HPP
+#define JASEL_TYPE_CONSTRUCTIBLE_HPP
 
 // TypeConstructible
-#include <experimental/type_constructible.hpp>
-
-// Nullable
-#include <experimental/fundamental/v3/none.hpp>
-#include <experimental/fundamental/v3/none_type.hpp>
+#include <experimental/fundamental/v3/holder.hpp>
+#include <experimental/fundamental/v3/type_constructor.hpp>
 
 #endif // header
