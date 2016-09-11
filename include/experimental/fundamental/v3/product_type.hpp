@@ -36,6 +36,10 @@ namespace experimental
 {
 inline namespace fundamental_v3
 {
+  // this should be moved away (meta?)
+  template <class ... Ts>
+  void swallow(Ts&&...) {  }
+
 namespace detail
 {
   template <class T>
