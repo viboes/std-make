@@ -53,6 +53,10 @@ int main()
 
   }
   {
+    static_assert(std::is_same<int&&, decltype(stde::product_type::get<0>(std::make_tuple(0,1)))>::value, "Hrr");
+    BOOST_TEST(0 == stde::product_type::get<0>(std::make_tuple(0,1)));
+  }
+  {
     using T = std::tuple<int,int>;
     const T p = {0,1};
     BOOST_TEST(0 == stde::product_type::apply(f, p));

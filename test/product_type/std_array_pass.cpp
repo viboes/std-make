@@ -18,6 +18,44 @@ struct X {
   int k;
   X(int i, int j, int k) : i(i), j(j), k(k){}
 };
+namespace std
+{
+namespace experimental
+{
+inline namespace fundamental_v3
+{
+#if 0
+  namespace details {
+    template<class> struct is_ref_wrapper : std::false_type {};
+    template<class T> struct is_ref_wrapper<std::reference_wrapper<T>> : std::true_type {};
+
+    template<class T>
+    using not_ref_wrapper = std::negation<is_ref_wrapper<std::decay_t<T>>>;
+
+    template <class D, class...> struct return_type_helper { using type = D; };
+    template <class... Types>
+    struct return_type_helper<void, Types...> : std::common_type<Types...> {
+        static_assert(std::conjunction_v<not_ref_wrapper<Types>...>,
+                      "Types cannot contain reference_wrappers when D is void");
+    };
+
+    template <class D, class... Types>
+    using return_type = std::array<typename return_type_helper<D, Types...>::type,
+                                   sizeof...(Types)>;
+  }
+
+  template < class D = void, class... Types>
+  constexpr details::return_type<D, Types...> make_array(Types&&... t) {
+    return {std::forward<Types>(t)... };
+  }
+#else
+std::array<int,2> make_array(int i, int j) {
+  return {{i,j}};
+}
+#endif
+}
+}
+}
 
 int main()
 {
@@ -29,7 +67,6 @@ int main()
       static_assert(stde::detail::has_tuple_like_get_access<0, T>::value, "Hrr");
       static_assert(stde::has_tuple_like_access<T>::value, "Hrr");
       static_assert(stde::is_product_type_v<T>, "Hrr");
-
 
       T p  = { {0,1,2} };
       static_assert(3 == stde::product_type::size<T>::value, "Hrr");
@@ -57,6 +94,10 @@ int main()
       BOOST_TEST(1 == stde::product_type::get<1>(p));
       BOOST_TEST(2 == stde::product_type::get<2>(p));
       //auto x = stde::product_type::get<3>(p); // COMPILE FAIL AS REQUIRED
+  }
+  {
+    static_assert(std::is_same<int&&, decltype(stde::product_type::get<0>(stde::make_array(0,1)))>::value, "Hrr");
+    BOOST_TEST(0 == stde::product_type::get<0>(stde::make_array(0,1)));
   }
   {
     using T = std::array<int,3>;

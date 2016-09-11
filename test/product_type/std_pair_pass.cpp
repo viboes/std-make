@@ -58,6 +58,9 @@ int main()
       //auto x = stde::product_type::get<2>(p); // COMPILE FAIL AS REQUIRED
   }
   {
+    BOOST_TEST(0 == stde::product_type::get<0>(std::make_pair(0,1)));
+  }
+  {
     using T = std::pair<int,int>;
     const T p = {0,1};
     BOOST_TEST(0 == stde::product_type::apply(f, p));

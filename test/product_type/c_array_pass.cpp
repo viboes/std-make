@@ -19,6 +19,12 @@ struct X {
   X(int i, int j, int k) : i(i), j(j), k(k){}
 };
 
+#if 0
+// fixme: We can not have rvalue to c-arrays
+int[2] make_carray(int i, int j) {
+  return {i,j};
+}
+#endif
 int main()
 {
   namespace stde = std::experimental;
@@ -44,6 +50,13 @@ int main()
       static_assert(0 == stde::product_type::get<0>(arr), "Hrr");
       static_assert(std::is_same<const int, stde::product_type::element_t<0,decltype(arr)>>::value, "Hrr");
   }
+#if 0
+// We can not have rvalue to c-arrays
+  {
+    static_assert(std::is_same<int&&, decltype(stde::product_type::get<0>(make_carray(0,1)))>::value, "Hrr");
+    BOOST_TEST(0 == stde::product_type::get<0>(make_carray(0,1)));
+  }
+#endif
   {
       const int arr[] = {0,1,2};
       static_assert(3 == stde::product_type::size<decltype(arr)>::value, "Hrr");
