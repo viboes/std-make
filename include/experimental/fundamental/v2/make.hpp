@@ -44,6 +44,9 @@ inline namespace fundamental_v2
     }
   };
 
+
+inline namespace factories
+{
   // make() overload
   template <class TC, int = 0, int...>
   constexpr
@@ -91,6 +94,7 @@ inline namespace fundamental_v2
   {
     return factory_traits<M<meta::decay_unwrap_t<Xs>...>>::make(std::forward<Xs>(xs)...);
   }
+}
 }
 }
 }

@@ -16,6 +16,10 @@ namespace experimental
 {
 inline namespace fundamental_v2
 {
+inline namespace factories {
+
+namespace detail_maker
+{
 
   template <class TC>
   struct maker_tc
@@ -52,22 +56,23 @@ inline namespace fundamental_v2
       return make<M>(std::forward<Args>(args)...);
     }
   };
+}
 
   template <class T>
   typename enable_if<
       ! is_type_constructor<T>::value
-      , maker_t<T>
-    >::type maker() { return maker_t<T>{}; }
+      , detail_maker::maker_t<T>
+    >::type maker() { return detail_maker::maker_t<T>{}; }
 
   template <class TC>
   typename enable_if<
       is_type_constructor<TC>::value
-      , maker_tc<TC>
-    >::type maker() { return maker_tc<TC>{}; }
+      , detail_maker::maker_tc<TC>
+    >::type maker() { return detail_maker::maker_tc<TC>{}; }
 
   template <template <class ...> class TC>
-  maker_tmpl<TC> maker() { return maker_tmpl<TC>{}; }
-
+  detail_maker::maker_tmpl<TC> maker() { return detail_maker::maker_tmpl<TC>{}; }
+}
 }
 }
 }
