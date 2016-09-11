@@ -28,6 +28,7 @@
 #include <utility>
 #include <tuple>
 #include <type_traits>
+#include <experimental/meta.hpp>
 
 namespace std
 {
@@ -110,15 +111,24 @@ namespace detail
   template <size_t N, class T>
   struct has_tuple_like_access<T (&)[N]> : false_type {};
 
-  template <class PT, typename = void>
-  struct product_type_traits {};
+  template <class PT, typename Enabler=void>
+  struct product_type_traits : product_type_traits<PT, meta::when<true>> {};
+
+  // Default failing specialization
+  template <typename PT, bool condition>
+  struct product_type_traits<PT, meta::when<condition>>
+  {
+      template <class T>
+        static constexpr auto get(T&& x) =delete;
+  };
+
 
   struct product_type_tag{};
 
   // Forward to customized class using tuple-like access
   template <class PT>
   struct product_type_traits
-  <  PT, enable_if_t< has_tuple_like_access<PT>::value >  > : product_type_tag
+  <  PT, meta::when< has_tuple_like_access<PT>::value >  > : product_type_tag
   {
     using size = tuple_size<PT>;
 
