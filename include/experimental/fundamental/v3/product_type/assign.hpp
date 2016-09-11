@@ -21,9 +21,6 @@ namespace experimental
 inline  namespace fundamental_v3
 {
 
-  template <class ... Ts>
-  void swallow(Ts&&...) {  }
-
 namespace product_type
 {
   namespace product_type_detail {
