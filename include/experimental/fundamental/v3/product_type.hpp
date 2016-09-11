@@ -153,8 +153,6 @@ namespace detail
     template <size_t I, class U, size_t M, class= std::enable_if_t< I<N >>
         static constexpr U& get(U (&arr)[M]) noexcept { return arr[I]; }
   };
-  template <class T, size_t N>
-  struct product_type_traits<T (&)[N]> : product_type_traits<T [N]> {};
 
   namespace product_type {
     template <class PT>
@@ -173,7 +171,6 @@ namespace detail
     template <size_t I, class T> struct element<I, volatile T> { using type = volatile element_t<I, T>; };
     template <size_t I, class T> struct element<I, const volatile T> { using type = const volatile element_t<I, T>; };
 
-
     template <size_t I, class PT
       , class= std::enable_if_t< I < size_v<remove_cv_t<remove_reference_t<PT>>> >
     >
@@ -181,7 +178,6 @@ namespace detail
     {
         return product_type_traits<remove_cv_t<remove_reference_t<PT>>>::template get<I>(forward<PT>(pt));
     }
-
   }
 
   // fixme redefine it as we did for has_tuple_like_access
@@ -196,10 +192,9 @@ namespace detail
   template <class T>
   constexpr bool is_product_type_v = is_product_type<T>::value ;
 
-  template <class T, size_t N>
-  struct is_product_type<T[N]> : true_type {};
-  template <class T, size_t N>
-  struct is_product_type<T(&)[N]> : true_type {};
+  // fixme: Is this needed? Do we want that is_product_type<T(&)[N]>::value to be true?
+  //template <class T, size_t N>
+  //struct is_product_type<T(&)[N]> : true_type {};
 
 }}
 }
