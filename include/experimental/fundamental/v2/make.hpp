@@ -9,7 +9,6 @@
 
 #include <utility>
 #include <type_traits>
-//#include <experimental/meta/v1/id.hpp>
 #include <experimental/meta/v1/is_callable.hpp>
 #include <experimental/meta/v1/decay_unwrap.hpp>
 
@@ -17,31 +16,6 @@ namespace std
 {
 namespace experimental
 {
-namespace meta
-{
-inline namespace v1
-{
-//  // default customization point for constructor from Xs...
-//  template <class M, class ...Xs>
-//  constexpr auto
-//  make_custom(meta::id<M>, Xs&& ...xs)
-//  -> decltype(M(std::forward<Xs>(xs)...))
-////  -> decltype(auto)
-//  {
-//    return M(std::forward<Xs>(xs)...);
-//  }
-
-//  // default customization point for constructor from Xs...
-//  template <class T, class ...Xs>
-//  constexpr auto
-//  make_custom(meta::id<T*>, Xs&& ...xs)
-//  -> decltype(new T(std::forward<Xs>(xs)...))
-////  -> decltype(auto)
-//  {
-//    return new T(std::forward<Xs>(xs)...);
-//  }
-}
-}
 inline namespace fundamental_v2
 {
   template <class T>
