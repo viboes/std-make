@@ -36,7 +36,7 @@ namespace product_type
    * Invoke the Callable object f with a product_type of the arguments.
    *
    * @par f Callable object to be invoked
-   * @par pt tuple whose elements to be used as arguments to f
+   * @par pt product type whose elements to be used as arguments to f
    *
    * @pre
    * - DF is a model of Callable<product_type::element_t<I, DProductType>... > and
