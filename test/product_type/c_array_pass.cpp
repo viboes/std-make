@@ -96,5 +96,28 @@ int main()
     BOOST_TEST(1 == x.j);
     BOOST_TEST(2 == x.k);
   }
+  {
+    int p[] = {0,1};
+    int q[] = {2,3};
+    stde::product_type::assign(p,q);
+    BOOST_TEST(2 == q[0]);
+    BOOST_TEST(3 == q[1]);
+    BOOST_TEST(2 == p[0]);
+    BOOST_TEST(3 == p[1]);
+  }
+  // COMPILE FAILS AS EXPECTED
+#if 0
+  {
+    int p[] = {0,1};
+    std::string q[] = {"2","3"};
+    stde::product_type::assign(p,q);
+  }
+#endif
+  {
+    int p[] = {0,1};
+    const int q[] = {2,3};
+    stde::product_type::assign(p,q);
+  }
+
   return ::boost::report_errors();
 }

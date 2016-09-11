@@ -13,5 +13,6 @@
 #include <experimental/fundamental/v3/product_type/to_tuple.hpp>
 #include <experimental/fundamental/v3/product_type/swap.hpp>
 #include <experimental/fundamental/v3/product_type/make_from_product_type.hpp>
+#include <experimental/fundamental/v3/product_type/assign.hpp>
 
 #endif // header
