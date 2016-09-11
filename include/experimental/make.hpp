@@ -11,10 +11,6 @@
 #include <experimental/fundamental/v2/holder.hpp>
 #include <experimental/fundamental/v2/type_constructor.hpp>
 
-// Nullable
-#include <experimental/fundamental/v2/none.hpp>
-#include <experimental/fundamental/v2/none_type.hpp>
-
 // Factory
 #include <experimental/fundamental/v2/maker.hpp>
 #include <experimental/fundamental/v2/make.hpp>

@@ -17,10 +17,7 @@
 ///
 ///////////////////////////////////////////////////////////////////////////////////////
 
-#include <experimental/fundamental/v2/type_constructor.hpp>
-#include <experimental/fundamental/v2/value_type.hpp>
-
-#include <experimental/fundamental/v2/make.hpp>
+#include <experimental/make.hpp>
 #include <experimental/fundamental/v2/functor/functor_tag.hpp>
 #include <experimental/fundamental/v2/functor/fmap.hpp>
 

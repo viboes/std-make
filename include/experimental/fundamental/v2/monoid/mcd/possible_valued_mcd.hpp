@@ -17,8 +17,7 @@
 
 #include <experimental/fundamental/v2/monoid.hpp>
 #include <experimental/fundamental/v2/possible_valued.hpp>
-#include <experimental/fundamental/v2/type_constructor.hpp>
-#include <experimental/fundamental/v2/none.hpp>
+#include <experimental/nullable.hpp>
 
 namespace std
 {
