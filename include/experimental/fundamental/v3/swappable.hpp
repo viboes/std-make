@@ -67,7 +67,7 @@ inline namespace fundamental_v3
   struct swappable_traits<R, S, meta::when<condition>>
   {
       template <class T, class U>
-        static constexpr auto swap(const T& x, const U& y) =delete;
+        static auto swap(const T& x, const U& y) =delete;
   };
 
 namespace adl_swappable {
@@ -89,7 +89,7 @@ namespace adl_swappable {
 
   struct fn {
     template <class T, class U>
-      static constexpr auto apply(T&& t, U&& u)
+      static auto apply(T&& t, U&& u)
         JASEL_DECLTYPE_RETURN_NOEXCEPT(
           swap(std::forward<T>(t), std::forward<U>(u))
         )
@@ -116,7 +116,7 @@ namespace swappable {
 
   // overload for adl swappables: for backward compatibility
   template <class T, class U>
-    constexpr enable_if_t <
+    enable_if_t <
       is_adl_swappable_v<T,U>
     >
     swap(T&& t, U&& u)
@@ -126,7 +126,7 @@ namespace swappable {
 
   // overload for swappable by trait: extension
   template <class T, class U>
-    constexpr enable_if_t<
+    enable_if_t<
          ! is_adl_swappable_v<T,U>
       &&   is_trait_swappable_v<T,U>
     >
@@ -137,7 +137,7 @@ namespace swappable {
 
   // overload for move swappable: std
   template <class T>
-    constexpr enable_if_t<
+    enable_if_t<
          ! is_adl_swappable_v<T>
       && ! is_trait_swappable_v<T>
       &&   is_move_constructible<T>::value
@@ -150,7 +150,7 @@ namespace swappable {
 
   // overload for c-arrays of swappables: std
   template <class T, std::size_t N>
-    constexpr enable_if_t<
+    enable_if_t<
          ! is_adl_swappable_v<T (&)[N]>
       && ! is_trait_swappable_v<T (&)[N]>
       &&   ::std::experimental::is_swappable_v<T>
