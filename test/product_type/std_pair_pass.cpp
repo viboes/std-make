@@ -11,11 +11,13 @@
 
 int f(int,int) { return 0; }
 
+
 struct X {
   int i;
   int j;
   X(int i, int j) : i(i), j(j) {}
 };
+
 
 int main()
 {
@@ -96,6 +98,13 @@ int main()
     auto x = stde::product_type::make_from_product_type<X>(p);
     BOOST_TEST(0 == x.i);
     BOOST_TEST(1 == x.j);
+  }
+  {
+    using T = std::pair<int,int>;
+    T p  = {1,2};
+    int r=0 ;
+    stde::product_type::for_each(p, [&r](auto x) {r+=x;});
+    BOOST_TEST(3 == r);
   }
   return ::boost::report_errors();
 }

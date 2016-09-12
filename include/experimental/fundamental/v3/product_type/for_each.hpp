@@ -19,15 +19,16 @@ namespace experimental
 {
 inline  namespace fundamental_v3
 {
-
 namespace product_type
 {
   namespace detail {
 
     template <class F, class ProductType, std::size_t... I>
-    constexpr void for_each_impl( F&& f, ProductType&& pt, index_sequence<I...> )
+    constexpr void for_each_impl( ProductType&& pt, F&& f, index_sequence<I...> )
     {
-      swallow(invoke(std::forward<F>(f), product_type::get<I>(forward<ProductType>(pt)))...);
+      swallow(
+          (invoke(f, product_type::get<I>(forward<ProductType>(pt))),0) ...
+      );
     }
 
   } // namespace detail
@@ -49,9 +50,9 @@ namespace product_type
   // todo add constraint on F
   , class = enable_if_t< is_product_type_v<remove_cv_t<remove_reference_t<ProductType>>> >
   >
-  constexpr void for_each(F&& f, ProductType&& pt)
+  constexpr void for_each(ProductType&& pt, F&& f)
   {
-      detail::for_each_impl(forward<F>(f), forward<ProductType>(pt),
+      detail::for_each_impl(forward<ProductType>(pt), forward<F>(f),
           make_index_sequence<product_type::size_v<remove_cv_t<remove_reference_t<ProductType>>>>{});
   }
 
