@@ -12,6 +12,7 @@
 #include <experimental/fundamental/v3/product_type/to_tuple.hpp>
 #include <experimental/fundamental/v3/product_type.hpp>
 #include <utility>
+#include <experimental/fundamental/v2/config.hpp>
 
 namespace std
 {
@@ -31,7 +32,11 @@ namespace product_type
    */
 
   template <class ...ProductTypes
+#if defined JASE_HAS_FOLD_EXPRESSIONS
   , class = enable_if_t< (is_product_type_v<remove_cv_t<remove_reference_t<ProductTypes>>> && ...) >
+#else
+  // todo Add for C++14
+#endif
   >
   constexpr decltype(auto) cat(ProductTypes&& ...pts)
   {

@@ -16,6 +16,16 @@
 #include <boost/config.hpp>
 
 
+#if __cplusplus > 201402L
+#define JASE_HAS_FOLD_EXPRESSIONS
+#else
+#endif
+
+#if __cplusplus > 201402L
+#define JASE_HAS_INVOKE
+#else
+#endif
+
 #if __cplusplus >= 201402L
 #define JASE_MUTABLE_CONSTEXPR BOOST_CONSTEXPR
 #else

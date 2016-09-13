@@ -40,8 +40,30 @@ inline namespace fundamental_v3
   template <class ... Ts>
   void swallow(Ts&&...) {  }
 
+
 namespace detail
 {
+  template <class TypeList>
+  struct conjuntion_aux;
+  template <>
+  struct conjuntion_aux <meta::types<>> : true_type {  };
+  template <class C1>
+  struct conjuntion_aux <meta::types<C1>> : C1 {};
+  template <class C1, class C2, class ...Cs>
+  struct conjuntion_aux <meta::types<C1,C2,Cs...>> :
+    conjuntion_aux<
+      meta::types<
+        integral_constant<bool, C1::value&&C2::value>,
+        Cs...
+      >
+    > {  };
+
+  template <class ...Cnds>
+  struct conjuntion : conjuntion_aux<meta::types<Cnds...>>{};
+
+  template <class ...Cnds>
+  constexpr bool conjuntion_v = conjuntion<Cnds...>::value;
+
   template <class T>
   struct has_tuple_like_size_access
   {
@@ -88,12 +110,21 @@ namespace detail
 
   template <class T, class  Indexes>
   struct has_tuple_like_element_get_access_aux;
+#if defined JASE_HAS_FOLD_EXPRESSIONS
   template <class T, size_t ...N>
   struct has_tuple_like_element_get_access_aux<T, index_sequence<N...>> : integral_constant<bool,
     (has_tuple_like_element_access<N, T>::value && ...)
     &&
     (has_tuple_like_get_access<N, T>::value && ...)
     > {};
+#else
+  template <class T, size_t ...N>
+  struct has_tuple_like_element_get_access_aux<T, index_sequence<N...>> : detail::conjuntion<
+    has_tuple_like_element_access<N, T> ...
+    ,
+    has_tuple_like_get_access<N, T> ...
+    > {};
+#endif
 
   template <class T, bool B>
   struct has_tuple_like_element_get_access:

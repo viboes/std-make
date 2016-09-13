@@ -35,14 +35,22 @@ namespace product_type
     template <class PT1, class PT2, bool B>
     struct have_same_size : false_type {};
     template <class PT1, class PT2>
-    struct have_same_size<PT1,  PT2, true> : bool_constant<size_v<PT1> == size_v<PT2>> {};
+    struct have_same_size<PT1,  PT2, true> : integral_constant<bool, size_v<PT1> == size_v<PT2>> {};
 
     template <class PT1, class PT2, bool B, class Ids>
     struct have_assignable_elements : false_type {};
     template <class PT1, class PT2, std::size_t... I>
-    struct have_assignable_elements<PT1&,  PT2&&, true, index_sequence<I...>> : bool_constant<
-      (... && std::is_assignable<element_t<I, PT1>&, element_t<I, PT2>&&>::value)
-    > {};
+    struct have_assignable_elements<PT1&,  PT2&&, true, index_sequence<I...>> :
+#if defined JASE_HAS_FOLD_EXPRESSIONS
+      integral_constant<bool,
+        (... && std::is_assignable<element_t<I, PT1>&, element_t<I, PT2>&&>::value)
+      >
+#else
+    std::experimental::fundamental_v3::detail::conjuntion<
+      std::is_assignable<element_t<I, PT1>&, element_t<I, PT2>&&>...
+    >
+#endif
+    {};
 
   } // namespace detail
 
