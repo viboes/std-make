@@ -16,6 +16,12 @@
 #include <boost/config.hpp>
 
 
+
+#if __cplusplus >= 201402L
+#define JASEL_VARIABLE_TEMPLATES
+#else
+#endif
+
 #if __cplusplus > 201402L
 #define JASE_HAS_FOLD_EXPRESSIONS
 #else

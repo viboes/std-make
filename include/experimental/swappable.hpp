@@ -6,7 +6,9 @@
 
 #ifndef JASEL_EXPERIMENTALSWAPPABLE_HPP
 #define JASEL_EXPERIMENTALSWAPPABLE_HPP
+#if __cplusplus >= 201402L
 
 #include <experimental/fundamental/v3/swappable.hpp>
 
+#endif
 #endif // header

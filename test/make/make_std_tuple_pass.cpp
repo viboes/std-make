@@ -40,11 +40,13 @@ int main()
     BOOST_TEST(std::get<0>(x) == 0);
     BOOST_TEST(std::get<1>(x) == 0);
   }
+#if __cplusplus >= 201402L
   {
     constexpr int v=0;
     constexpr std::tuple<int, int> x = stde::make<std::tuple>(v, v);
     BOOST_TEST(std::get<0>(x) == 0);
     BOOST_TEST(std::get<1>(x) == 0);
   }
+#endif
   return ::boost::report_errors();
 }

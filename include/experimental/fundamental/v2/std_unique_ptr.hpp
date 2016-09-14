@@ -17,22 +17,22 @@ namespace std
 {
 #if __cplusplus <= 201103L
   template <int = 0, int..., class T>
-    unique_ptr<decay_t<T>> make_unique(T&& x)
+    unique_ptr<typename decay<T>::type> make_unique(T&& x)
   {
-    return unique_ptr<decay_t<T>>(new decay_t<T>(x));
+    return unique_ptr<typename decay<T>::type>(new typename decay<T>::type(x));
   }
 
   // explicit overloads
   template <class T>
-    unique_ptr<T> make_unique(remove_reference_t<T> const& x)
+    unique_ptr<T> make_unique(typename remove_reference<T>::type const& x)
   {
     return unique_ptr<T>(new T(x));
   }
 
   template <class T>
-    unique_ptr<T> make_unique(remove_reference_t<T>&& x)
+    unique_ptr<T> make_unique(typename remove_reference<T>::type&& x)
   {
-    return unique_ptr<T>(new T(std::forward<remove_reference_t<T>>(x)));
+    return unique_ptr<T>(new T(std::forward<typename remove_reference<T>::type>(x)));
   }
 
   // variadic overload

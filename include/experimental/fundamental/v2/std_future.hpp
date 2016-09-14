@@ -58,7 +58,7 @@ inline namespace concurrency_v1
 
   // explicit overloads
   template <class T>
-    future<T> make_ready_future(remove_reference_t<T> const& x)
+    future<T> make_ready_future(typename remove_reference<T>::type const& x)
   {
     promise<T> p;
     p.set_value(x);
@@ -66,10 +66,10 @@ inline namespace concurrency_v1
   }
 
   template <class T>
-    future<T> make_ready_future(remove_reference_t<T>&& x)
+    future<T> make_ready_future(typename remove_reference<T>::type&& x)
   {
     promise<T> p;
-    p.set_value(forward<remove_reference_t<T>>(x));
+    p.set_value(forward<typename remove_reference<T>::type>(x));
     return p.get_future();
   }
 

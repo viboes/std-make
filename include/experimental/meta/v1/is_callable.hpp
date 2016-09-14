@@ -53,15 +53,18 @@ inline namespace v1
   template <class Fn, class ...U, class R >
   struct is_callable<Fn(U...), R> : detail::is_callable<Fn(U...), R> {};
 
+#if defined  JASEL_VARIABLE_TEMPLATES
   template <class Sig, class R = void>
   constexpr bool is_callable_v = meta::is_callable<Sig, R>::value;
+#endif
 
   template <class TC>
   struct is_invokable : detail::is_invokable<TC> {};
 
+#if defined  JASEL_VARIABLE_TEMPLATES
   template <class TC>
   constexpr bool is_invokable_v = meta::is_invokable<TC>::value;
-
+#endif
 }
 }
 }

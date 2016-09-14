@@ -42,11 +42,13 @@ int main()
     BOOST_TEST(x.first == 0);
     BOOST_TEST(x.second == 0);
   }
+#if __cplusplus >= 201402L
   {
     constexpr int v=0;
     constexpr std::pair<int, int> x = stde::make<std::pair>(v, v);
     BOOST_TEST(x.first == 0);
     BOOST_TEST(x.second == 0);
   }
+#endif
   return ::boost::report_errors();
 }

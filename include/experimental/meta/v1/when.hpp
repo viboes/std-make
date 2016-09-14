@@ -22,8 +22,10 @@ inline namespace v1
   template <bool Condition>
   struct when;
 
+#if defined  JASEL_VARIABLE_TEMPLATES
   template <typename ...T>
   constexpr bool is_valid = true;
+#endif
 }
 }
 }

@@ -4,6 +4,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 // <experimental/product_type.hpp>
+#if __cplusplus >= 201402L
 
 #include <experimental/swappable.hpp>
 #include <array>
@@ -99,3 +100,6 @@ int main()
 
   return ::boost::report_errors();
 }
+#else
+int main() { return 0; }
+#endif

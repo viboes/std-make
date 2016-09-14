@@ -23,7 +23,7 @@ R f_fptr(R (&c)(int)) { return c(0); }
 //int f_fptr(int (&c)(int)) { return c(0); }
 
 template <class C>
-std::result_of_t<C(int)> f_orig(C  c) { return c(0); }
+typename std::result_of<C(int)>::type f_orig(C  c) { return c(0); }
 
 
 template <class R, class C >
@@ -44,10 +44,10 @@ std::experimental::optional<U> mbind_aux(std::experimental::optional<T> o, std::
 
 // auto mbind(std::experimental::optional<T>, (T -> optional<U>) ) -> optional<U>
 
-template <class T, class C, typename = std::enable_if_t<
+template <class T, class C, typename = typename std::enable_if<
     //std::experimental::meta::is_callable_v<C(T)> &&
-    is_optional<std::result_of_t<C(T)>>::value
-    > >
+    is_optional<typename std::result_of<C(T)>::type>::value
+    >::type >
 auto mbind(std::experimental::optional<T> o, C c)
     -> decltype( mbind_aux(o, std::experimental::make_callable_wrapper<T>(c)) )
 {
@@ -62,9 +62,9 @@ std::experimental::optional<U> fmap_aux(std::experimental::callable_wrapper<C, U
 
 // auto fmap((T -> U), std::experimental::optional<T> ) -> optional<U>
 
-template <class T, class C, typename = std::enable_if_t<true
+template <class T, class C, typename = typename std::enable_if<true
     //&& std::experimental::meta::is_callable_v<C(T)>
-> >
+>::type >
 auto fmap(C c, std::experimental::optional<T> o)
     -> decltype( fmap_aux(std::experimental::make_callable_wrapper<T>(c), o) )
 {
@@ -101,10 +101,10 @@ int main() {
     X x;
     assert(f_orig(x) == 0);
 
-    static_assert(is_same<result_of_t<X(int)>, int>::value, "");
+    static_assert(is_same<typename result_of<X(int)>::type, int>::value, "");
     assert(x(1) == 1);
 
-    stde::callable_wrapper<X, result_of_t<X(int)>(int)>c {x};
+    stde::callable_wrapper<X, typename result_of<X(int)>::type(int)>c {x};
     assert(c(1) == 1);
     assert(f_aux(c) == 0);
     assert(f(x) == 0);
@@ -112,7 +112,7 @@ int main() {
     assert(f(fX) == 0);
 
     {
-    static_assert(is_optional<result_of_t<XO(int)>>::value, "");
+    static_assert(is_optional<typename result_of<XO(int)>::type>::value, "");
     XO xo;
     stde::optional<int> o{1};
     assert(*mbind(o, xo) == 1);

@@ -9,6 +9,8 @@
 #ifndef JASEL_FUNDAMENTAL_V3_PRODUCT_TYPE_HPP
 #define JASEL_FUNDAMENTAL_V3_PRODUCT_TYPE_HPP
 
+#if __cplusplus >= 201402L
+
 ///////////////////////////////////////////////////////////////////////////////////////
 ///
 /// A type PT is a model of a ProductType if given a variables pt of type PT
@@ -233,4 +235,5 @@ namespace detail
 
 }}
 }
+#endif
 #endif // header

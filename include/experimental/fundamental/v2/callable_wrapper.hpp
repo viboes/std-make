@@ -36,9 +36,9 @@ private:
 
 
 template <class ...Args, class C>
-auto make_callable_wrapper(C c) -> decltype(callable_wrapper<C, std::result_of_t<C(Args...)>(Args...)>(c))
+auto make_callable_wrapper(C c) -> decltype(callable_wrapper<C, typename std::result_of<C(Args...)>::type(Args...)>(c))
 {
-    return callable_wrapper<C, std::result_of_t<C(Args...)>(Args...)>(c);
+    return callable_wrapper<C, typename std::result_of<C(Args...)>::type(Args...)>(c);
 }
 
 

@@ -15,6 +15,7 @@
 
 namespace std
 {
+
 namespace experimental
 {
 inline namespace fundamental_v2
@@ -31,11 +32,11 @@ inline namespace fundamental_v2
   template <class T >
   struct none_type<T*> : enable_if<is_object<T>::value, nullptr_t>  {};
   template <class I>
-  struct none_type<I const> : none_type<decay_t<I>> { };
+  struct none_type<I const> : none_type<typename decay<I>::type> { };
   template <class I>
-  struct none_type<I volatile> : none_type<decay_t<I>> { };
+  struct none_type<I volatile> : none_type<typename decay<I>::type> { };
   template <class I>
-  struct none_type<I const volatile> : none_type<decay_t<I>> { };
+  struct none_type<I const volatile> : none_type<typename decay<I>::type> { };
 
 
   namespace detail {

@@ -44,9 +44,9 @@ inline namespace fundamental_v2
   };
 
   template <class R, class ...Ts, class F>
-  signature<decay_t<F>, R(Ts...)> make_signature(F&& f)
+  signature<typename decay<F>::type, R(Ts...)> make_signature(F&& f)
   {
-    return signature<decay_t<F>, R(Ts...)>(forward<F>(f));
+    return signature<typename decay<F>::type, R(Ts...)>(forward<F>(f));
   }
 }
 }
