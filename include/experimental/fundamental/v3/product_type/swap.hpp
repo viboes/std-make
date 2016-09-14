@@ -8,6 +8,7 @@
 
 #ifndef JASEL_FUNDAMENTAL_V3_PRODUCT_TYPE_SWAP_HPP
 #define JASEL_FUNDAMENTAL_V3_PRODUCT_TYPE_SWAP_HPP
+#if __cplusplus >= 201402L and defined JASE_SUPPORT_SWAPPABLE
 
 #include <experimental/fundamental/v3/swappable.hpp>
 #include <experimental/fundamental/v3/product_type.hpp>
@@ -78,5 +79,5 @@ namespace product_type
 
 }}
 }
-
+#endif
 #endif // header

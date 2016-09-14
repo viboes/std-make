@@ -82,6 +82,7 @@ int main()
     const U q = {2,3};
     BOOST_TEST(std::make_tuple(0,1,2,3) == stde::product_type::cat(p, q));
   }
+#if __cplusplus >= 201402L and defined JASE_SUPPORT_SWAPPABLE
   {
     using T = std::pair<int,int>;
     T p  = {0,1};
@@ -93,6 +94,7 @@ int main()
     BOOST_TEST(2 == stde::product_type::get<0>(p));
     BOOST_TEST(3 == stde::product_type::get<1>(p));
   }
+#endif
   {
     using T = std::pair<int,int>;
     T p  = {0,1};

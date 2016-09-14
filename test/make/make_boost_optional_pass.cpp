@@ -68,7 +68,7 @@ namespace std
       using factory_traits_default<boost::optional<T>>::make;
 
       template <class ...Xs>
-      static constexpr
+      static JASEL_CXX14_CONSTEXPR
       boost::optional<T> make(std::experimental::in_place_t, Xs&& ...xs)
       {
         boost::optional<T> res;

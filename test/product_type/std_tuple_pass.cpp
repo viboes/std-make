@@ -60,35 +60,65 @@ int main()
   }
   {
     using T = std::tuple<int,int>;
+#if defined JASE_SUPPORT_TUPLE
     const T p = {0,1};
+#else
+    const T p = std::make_tuple(0,1);
+#endif
     BOOST_TEST(0 == stde::product_type::apply(f, p));
   }
   {
     using T = std::tuple<int,int>;
+#if defined JASE_SUPPORT_TUPLE
     const T p = {0,1};
+#else
+    const T p = std::make_tuple(0,1);
+#endif
     BOOST_TEST(std::make_tuple(0,1) == stde::product_type::to_tuple(p));
   }
   {
     using T = std::tuple<int,int>;
+#if defined JASE_SUPPORT_TUPLE
     const T p = {0,1};
+#else
+    const T p = std::make_tuple(0,1);
+#endif
     using U = std::tuple<int,int>;
+#if defined JASE_SUPPORT_TUPLE
     const U q = {2,3};
+#else
+    const U q = std::make_tuple(2,3);
+#endif
     BOOST_TEST(std::make_tuple(0,1,2,3) == stde::product_type::cat(p, q));
   }
+#if __cplusplus >= 201402L and defined JASE_SUPPORT_SWAPPABLE
   {
     using T = std::tuple<int,int>;
-    T p  = {0,1};
+#if defined JASE_SUPPORT_TUPLE
+    const T p = {0,1};
+#else
+    const T p = std::make_tuple(0,1);
+#endif
     using U = std::tuple<int,int>;
-    U q  = {2,3};
+#if defined JASE_SUPPORT_TUPLE
+    const U q = {2,3};
+#else
+    const U q = std::make_tuple(2,3);
+#endif
     stde::swappable::swap(p,q);
     BOOST_TEST(0 == stde::product_type::get<0>(q));
     BOOST_TEST(1 == stde::product_type::get<1>(q));
     BOOST_TEST(2 == stde::product_type::get<0>(p));
     BOOST_TEST(3 == stde::product_type::get<1>(p));
   }
+#endif
   {
     using T = std::tuple<int,int>;
-    T p  = {0,1};
+#if defined JASE_SUPPORT_TUPLE
+    const T p = {0,1};
+#else
+    const T p = std::make_tuple(0,1);
+#endif
     auto x = stde::product_type::make_from_product_type<X>(p);
     BOOST_TEST(0 == x.i);
     BOOST_TEST(1 == x.j);

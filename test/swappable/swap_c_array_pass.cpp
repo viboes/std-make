@@ -4,7 +4,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 // <experimental/product_type.hpp>
-#if __cplusplus >= 201402L
+#if __cplusplus >= 201402L and defined JASE_SUPPORT_SWAPPABLE
 
 #include <experimental/swappable.hpp>
 #include <array>

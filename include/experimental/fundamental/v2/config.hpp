@@ -23,19 +23,29 @@
 #endif
 
 #if __cplusplus > 201402L
+#if defined __GNUC__ and ! defined __clang
+#if __GNUC__ >6
 #define JASE_HAS_FOLD_EXPRESSIONS
+#define JASE_HAS_INVOKE
+#define JASE_SUPPORT_SWAPPABLE
+#define JASE_SUPPORT_TUPLE
+#endif
+#else
+#define JASE_HAS_FOLD_EXPRESSIONS
+#define JASE_HAS_INVOKE
+#define JASE_SUPPORT_SWAPPABLE
+#define JASE_SUPPORT_TUPLE
+#endif
 #else
 #endif
 
-#if __cplusplus > 201402L
-#define JASE_HAS_INVOKE
-#else
-#endif
 
 #if __cplusplus >= 201402L
 #define JASE_MUTABLE_CONSTEXPR BOOST_CONSTEXPR
+#define JASEL_CXX14_CONSTEXPR BOOST_CONSTEXPR
 #else
 #define JASE_MUTABLE_CONSTEXPR
+#define JASEL_CXX14_CONSTEXPR
 #endif
 
 #define JASEL_DECLTYPE_RETURN_NOEXCEPT(...)               \
