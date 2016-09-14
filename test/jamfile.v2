@@ -102,6 +102,11 @@ test-suite swappable
       [ run swappable/swap_c_array_pass.cpp  ]
     ;
 
+test-suite functional
+    : 
+      [ run functional/overload_pass.cpp  ]
+    ;
+
 explicit fix ;
 test-suite fix
     : 
