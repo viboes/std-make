@@ -9,6 +9,7 @@
 #ifndef JASEL_META_V1_WHEN_HPP
 #define JASEL_META_V1_WHEN_HPP
 
+#include <experimental/fundamental/v2/config.hpp>
 
 namespace std
 {

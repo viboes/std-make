@@ -27,14 +27,14 @@ Most of the source code in this project are mine, and those are under the Boost 
 
 The code is known to work with the following compilers:
 
-* Clang 3.7.0 -std=c++14 -std=c++1y
-* Clang 3.9.0 -std=c++14 -std=c++1y
-* GCC 5.2.1   -std=c++14 -std=c++1z
-* GCC 6.1.1   -std=c++14 -std=c++1z
+* Clang 3.7.0 -std=c++11 -std=c++14 -std=c++1y
+* Clang 3.9.0 -std=c++11 -std=c++14 -std=c++1y
+* GCC 5.2.1   -std=c++11 -std=c++14 -std=c++1z
+* GCC 6.1.1   -std=c++11 -std=c++14 -std=c++1z
 
 *Development Status:* The aim of the library is to be portable on comforming C++11/14/17 compilers. 
-However some parts require a C++1z, other C++14 and other C++11 :(
-Hopefully this will change in te future.
+However some parts require a C++14 (product_type and swappable).
+Hopefully this will change in the future.
 
 # Header only library
 
