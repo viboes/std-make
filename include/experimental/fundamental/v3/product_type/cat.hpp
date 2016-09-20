@@ -10,7 +10,7 @@
 #define JASEL_FUNDAMENTAL_V3_PRODUCT_TYPE_CAT_HPP
 
 #include <experimental/fundamental/v3/product_type/to_tuple.hpp>
-#include <experimental/fundamental/v3/product_type.hpp>
+#include <experimental/fundamental/v3/product_type/product_type.hpp>
 #include <utility>
 #include <experimental/fundamental/v2/config.hpp>
 

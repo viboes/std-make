@@ -9,8 +9,11 @@
 #ifndef JASEL_FUNDAMENTAL_V3_PRODUCT_TYPE_FOLD_LEFT_HPP
 #define JASEL_FUNDAMENTAL_V3_PRODUCT_TYPE_FOLD_LEFT_HPP
 
-#include <experimental/fundamental/v3/product_type.hpp>
+#include <experimental/fundamental/v3/product_type/product_type.hpp>
 #include <utility>
+
+// fixme: fold_let is implementable, as Hana does it, using foldable::apply (hana::unpack).
+// Which implementation is more efficient at run-time? at compile time?
 
 namespace std
 {

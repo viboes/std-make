@@ -21,7 +21,7 @@ namespace experimental
 inline namespace fundamental_v2
 {
   template <class T, class Enabler =  void >
-  struct none_type;;
+  struct none_type;
 
   // none_type getter meta-function
   template <class T>

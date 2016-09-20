@@ -9,7 +9,7 @@
 
 #if __cplusplus >= 201402L
 
-#include <experimental/fundamental/v3/product_type.hpp>
+#include <experimental/fundamental/v3/product_type/product_type.hpp>
 #include <experimental/fundamental/v3/product_type/assign.hpp>
 #include <experimental/fundamental/v3/product_type/apply.hpp>
 #include <experimental/fundamental/v3/product_type/cat.hpp>

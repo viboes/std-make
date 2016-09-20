@@ -9,7 +9,7 @@
 #ifndef JASEL_FUNDAMENTAL_V3_PRODUCT_TYPE_MAKE_FROM_PRODUCT_TYPE_HPP
 #define JASEL_FUNDAMENTAL_V3_PRODUCT_TYPE_MAKE_FROM_PRODUCT_TYPE_HPP
 
-#include <experimental/fundamental/v3/product_type.hpp>
+#include <experimental/fundamental/v3/product_type/product_type.hpp>
 #include <tuple>
 #include <utility>
 

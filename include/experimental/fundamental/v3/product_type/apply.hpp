@@ -9,9 +9,12 @@
 #ifndef JASEL_FUNDAMENTAL_V3_PRODUCT_TYPE_APPLY_HPP
 #define JASEL_FUNDAMENTAL_V3_PRODUCT_TYPE_APPLY_HPP
 
-#include <experimental/fundamental/v3/product_type.hpp>
+#include <experimental/fundamental/v3/product_type/product_type.hpp>
 #include <utility>
 #include <functional>
+
+// fixme: apply is implementable, as Hana does it, using foldable::fold_left.
+// Which implementation is more efficient at run-time? at compile time?
 
 namespace std
 {
