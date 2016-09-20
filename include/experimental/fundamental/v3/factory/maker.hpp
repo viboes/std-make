@@ -4,8 +4,8 @@
 //
 // Copyright (C) 2014-2015 Vicente J. Botet Escriba
 
-#ifndef JASEL_FUNDAMENTAL_V2_MAKER_HPP
-#define JASEL_FUNDAMENTAL_V2_MAKER_HPP
+#ifndef JASEL_FUNDAMENTAL_V2_FACTORY_MAKER_HPP
+#define JASEL_FUNDAMENTAL_V2_FACTORY_MAKER_HPP
 
 #include <utility>
 #include <experimental/fundamental/v3/factory/make.hpp>

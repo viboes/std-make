@@ -4,8 +4,8 @@
 //
 // (C) Copyright 2016 Vicente J. Botet Escriba
 
-#ifndef JASEL_NULLABLE_HPP
-#define JASEL_NULLABLE_HPP
+#ifndef JASEL_EXPERIMENTAL_NULLABLE_HPP
+#define JASEL_EXPERIMENTAL_NULLABLE_HPP
 
 // TypeConstructible
 #include <experimental/type_constructible.hpp>

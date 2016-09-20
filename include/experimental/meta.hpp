@@ -4,8 +4,8 @@
 //
 // (C) Copyright 2014-2016 Vicente J. Botet Escriba
 
-#ifndef JASEL_META_HPP
-#define JASEL_META_HPP
+#ifndef JASEL_EXPERIMENTAL_META_HPP
+#define JASEL_EXPERIMENTAL_META_HPP
 
 #include <experimental/meta/v1/always.hpp>
 #include <experimental/meta/v1/bind_back.hpp>

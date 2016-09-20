@@ -6,8 +6,8 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef JASEL_FUNDAMENTAL_V2_HOLDER_HPP
-#define JASEL_FUNDAMENTAL_V2_HOLDER_HPP
+#ifndef JASEL_FUNDAMENTAL_V2_TYPE_CONSTRUCTIBLE_HOLDER_HPP
+#define JASEL_FUNDAMENTAL_V2_TYPE_CONSTRUCTIBLE_HOLDER_HPP
 
 namespace std
 {

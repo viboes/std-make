@@ -4,8 +4,8 @@
 //
 // Copyright (C) 2014-2015 Vicente J. Botet Escriba
 
-#ifndef JASEL_FUNDAMENTAL_V2_NONE_HPP
-#define JASEL_FUNDAMENTAL_V2_NONE_HPP
+#ifndef JASEL_FUNDAMENTAL_V2_NULLABLE_NONE_HPP
+#define JASEL_FUNDAMENTAL_V2_NULLABLE_NONE_HPP
 
 #include <experimental/type_constructible.hpp>
 #include <experimental/meta.hpp>

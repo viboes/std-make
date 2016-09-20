@@ -6,8 +6,8 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef YAFPL_FUCTIONAL_V1_OVERLOAD_HPP
-#define YAFPL_FUCTIONAL_V1_OVERLOAD_HPP
+#ifndef YAFPL_FUCTIONAL_V1_FUNCTIONAL_OVERLOAD_HPP
+#define YAFPL_FUCTIONAL_V1_FUNCTIONAL_OVERLOAD_HPP
 
 #if __cplusplus >= 201402L
 

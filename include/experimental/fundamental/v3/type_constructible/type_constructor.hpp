@@ -6,8 +6,8 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef JASEL_V2_FUNDAMENTAL_TYPE_CONSTRUCTOR_HPP
-#define JASEL_V2_FUNDAMENTAL_TYPE_CONSTRUCTOR_HPP
+#ifndef JASEL_V2_FUNDAMENTAL_TYPE_CONSTRUCTIBLE_TYPE_CONSTRUCTOR_HPP
+#define JASEL_V2_FUNDAMENTAL_TYPE_CONSTRUCTIBLE_TYPE_CONSTRUCTOR_HPP
 
 #include <experimental/meta/v1/id.hpp>
 #include <experimental/meta/v1/eval.hpp>

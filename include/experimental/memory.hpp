@@ -4,8 +4,8 @@
 //
 // (C) Copyright 2016 Vicente J. Botet Escriba
 
-#ifndef JASEL_MEMORY_HPP
-#define JASEL_MEMORY_HPP
+#ifndef JASEL_EXPERIMENTAL_MEMORY_HPP
+#define JASEL_EXPERIMENTAL_MEMORY_HPP
 
 #include <experimental/fundamental/v2/std_unique_ptr.hpp>
 #include <experimental/fundamental/v2/std_shared_ptr.hpp>

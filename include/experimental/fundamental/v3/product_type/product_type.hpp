@@ -6,8 +6,8 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef JASEL_FUNDAMENTAL_V3_PRODUCT_TYPE_HPP
-#define JASEL_FUNDAMENTAL_V3_PRODUCT_TYPE_HPP
+#ifndef JASEL_FUNDAMENTAL_V3_PRODUCT_TYPE_PRODUCT_TYPE_HPP
+#define JASEL_FUNDAMENTAL_V3_PRODUCT_TYPE_PRODUCT_TYPE_HPP
 
 #if __cplusplus >= 201402L
 

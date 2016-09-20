@@ -4,8 +4,8 @@
 //
 // Copyright (C) 2014-2015 Vicente J. Botet Escriba
 
-#ifndef JASEL_FUNDAMENTAL_V2_MAKE_HPP
-#define JASEL_FUNDAMENTAL_V2_MAKE_HPP
+#ifndef JASEL_FUNDAMENTAL_V2_FACTORY_MAKE_HPP
+#define JASEL_FUNDAMENTAL_V2_FACTORY_MAKE_HPP
 
 #include <utility>
 #include <type_traits>

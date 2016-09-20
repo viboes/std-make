@@ -6,8 +6,8 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef JASEL_V2_FUNDAMENTAL_NONE_TYPE_HPP
-#define JASEL_V2_FUNDAMENTAL_NONE_TYPE_HPP
+#ifndef JASEL_V2_FUNDAMENTAL_NULLABLE_NONE_TYPE_HPP
+#define JASEL_V2_FUNDAMENTAL_NULLABLE_NONE_TYPE_HPP
 
 #include <experimental/meta/v1/id.hpp>
 #include <experimental/meta/v1/eval.hpp>
