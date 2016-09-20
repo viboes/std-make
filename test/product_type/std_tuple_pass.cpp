@@ -8,6 +8,7 @@
 
 #include <experimental/product_type.hpp>
 #include <tuple>
+#include <sstream>
 
 #include <boost/detail/lightweight_test.hpp>
 
@@ -122,6 +123,28 @@ int main()
     auto x = stde::product_type::make_from_product_type<X>(p);
     BOOST_TEST(0 == x.i);
     BOOST_TEST(1 == x.j);
+  }
+  {
+    auto to_string = [](auto x) {
+        std::ostringstream ss;
+        ss << x;
+        return ss.str();
+    };
+    auto f = [=](std::string s, auto element) {
+        return "f(" + s + ", " + to_string(element) + ")";
+    };
+    // with an initial state
+    BOOST_TEST(
+        stde::product_type::fold_left(std::make_tuple(2, '3', 4, 5.0), "1", f)
+            ==
+        "f(f(f(f(1, 2), 3), 4), 5)"
+    );
+    // without initial state
+    BOOST_TEST(
+        stde::product_type::fold_left(std::make_tuple("1", 2, '3', 4, 5.0), f)
+            ==
+        "f(f(f(f(1, 2), 3), 4), 5)"
+    );
   }
   return ::boost::report_errors();
 }
