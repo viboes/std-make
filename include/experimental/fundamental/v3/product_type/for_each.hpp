@@ -28,7 +28,7 @@ namespace product_type
     {
       swallow(
 #if defined JASE_HAS_INVOKE
-          (invoke(f, product_type::get<I>(forward<ProductType>(pt))),0) ...
+          (invoke(forward<F>(f), product_type::get<I>(forward<ProductType>(pt))),0) ...
 #else
           (f(product_type::get<I>(forward<ProductType>(pt))),0) ...
 #endif
@@ -38,7 +38,7 @@ namespace product_type
   } // namespace detail
 
   /**
-   * Invoke the Callable object f with a product_type of the arguments.
+   * Invoke the Callable object f for each one of the product type elements discarding the result.
    *
    * @par f Callable object to be invoked on each product type element
    * @par pt product type whose elements to be used as arguments to f

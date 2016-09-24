@@ -17,6 +17,7 @@
 #include <experimental/fundamental/v3/product_type/for_each.hpp>
 #include <experimental/fundamental/v3/product_type/make_from_product_type.hpp>
 #include <experimental/fundamental/v3/product_type/swap.hpp>
+#include <experimental/fundamental/v3/product_type/transform.hpp>
 #include <experimental/fundamental/v3/product_type/to_tuple.hpp>
 
 #endif

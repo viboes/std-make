@@ -8,6 +8,8 @@
 
 #include <experimental/product_type.hpp>
 #include <array>
+#include <tuple>
+#include <sstream>
 
 #include <boost/detail/lightweight_test.hpp>
 
@@ -197,8 +199,65 @@ int main()
     BOOST_TEST(2 == stde::product_type::get<0>(p));
     BOOST_TEST(3 == stde::product_type::get<1>(p));
   }
+  {
+    using T = std::array<int,2>;
+    T p  = { {1,2} };
+    int r=0 ;
+    stde::product_type::for_each(p, [&r](auto x) {r+=x;});
+    BOOST_TEST(3 == r);
+  }
+  {
+    using T = std::array<int,2>;
+    T p  = { {1,2} };
+    stde::product_type::for_each(p,[](auto& v) {std::cout << v << "\n";});
+  }
+  {
+    auto to_string = [](auto x) {
+        std::ostringstream ss;
+        ss << x;
+        return ss.str();
+    };
 
+    using T = std::array<int,2>;
+    T p  = { {0,1} };
+    auto res = stde::product_type::transform(p, to_string);
+    static_assert(
+        std::is_same<std::tuple<std::string, std::string>, decltype(res)>::value,
+        "");
 
+    BOOST_TEST(stde::product_type::transform(p, to_string)
+      ==
+        std::make_tuple("0", "1")
+    );
+  }
+
+  {
+    auto to_string = [](auto x) {
+        std::ostringstream ss;
+        ss << x;
+        return ss.str();
+    };
+    auto f = [=](std::string s, auto element) {
+        return "f(" + s + ", " + to_string(element) + ")";
+    };
+    // with an initial state
+    using T = std::array<int,4>;
+    T p  = { {2,3,4,5} };
+
+    BOOST_TEST(
+        stde::product_type::fold_left(p, "1", f)
+            ==
+        "f(f(f(f(1, 2), 3), 4), 5)"
+    );
+    // without initial state
+    using U = std::array<std::string, 5>;
+    U q  = { {"1", "2", "3", "4", "5"} };
+    BOOST_TEST(
+        stde::product_type::fold_left(q, f)
+            ==
+        "f(f(f(f(1, 2), 3), 4), 5)"
+    );
+  }
   return ::boost::report_errors();
 }
 #else

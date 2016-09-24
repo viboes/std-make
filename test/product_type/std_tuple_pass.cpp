@@ -115,7 +115,7 @@ int main()
 #endif
   {
     using T = std::tuple<int,int>;
-#if defined JASE_SUPPORT_TUPLE
+#if defined JASEL_SUPPORT_TUPLE
     const T p = {0,1};
 #else
     const T p = std::make_tuple(0,1);
@@ -124,6 +124,40 @@ int main()
     BOOST_TEST(0 == x.i);
     BOOST_TEST(1 == x.j);
   }
+
+  {
+    using T = std::tuple<int,int>;
+#if defined JASEL_SUPPORT_TUPLE
+    const T p = {0,1};
+#else
+    const T p = std::make_tuple(0,1);
+#endif
+    stde::product_type::for_each(p,[](auto& v) {std::cout << v << "\n";});
+  }
+  {
+    auto to_string = [](auto x) {
+        std::ostringstream ss;
+        ss << x;
+        return ss.str();
+    };
+
+    using T = std::tuple<int,int>;
+#if defined JASEL_SUPPORT_TUPLE
+    const T p = {0,1};
+#else
+    const T p = std::make_tuple(0,1);
+#endif
+    auto res = stde::product_type::transform(p, to_string);
+    static_assert(
+        std::is_same<std::tuple<std::string, std::string>, decltype(res)>::value,
+        "");
+
+    BOOST_TEST(stde::product_type::transform(p, to_string)
+      ==
+        std::make_tuple("0", "1")
+    );
+  }
+
   {
     auto to_string = [](auto x) {
         std::ostringstream ss;

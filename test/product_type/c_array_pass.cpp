@@ -7,6 +7,8 @@
 #if __cplusplus >= 201402L
 
 #include <experimental/product_type.hpp>
+#include <tuple>
+#include <sstream>
 
 #include <boost/detail/lightweight_test.hpp>
 
@@ -26,6 +28,7 @@ int[2] make_carray(int i, int j) {
   return {i,j};
 }
 #endif
+
 int main()
 {
   namespace stde = std::experimental;
@@ -121,7 +124,29 @@ int main()
     const int q[] = {2,3};
     stde::product_type::assign(p,q);
   }
-#if 0
+  {
+    int p[] = {0,1};
+    stde::product_type::for_each(p,[](auto& v) {std::cout << v << "\n";});
+  }
+  {
+    auto to_string = [](auto x) {
+        std::ostringstream ss;
+        ss << x;
+        return ss.str();
+    };
+
+    int p[] = {0,1};
+    auto res = stde::product_type::transform(p, to_string);
+    static_assert(
+        std::is_same<std::tuple<std::string, std::string>, decltype(res)>::value,
+        "");
+
+    BOOST_TEST(stde::product_type::transform(p, to_string)
+      ==
+        std::make_tuple("0", "1")
+    );
+  }
+
   {
     auto to_string = [](auto x) {
         std::ostringstream ss;
@@ -131,20 +156,23 @@ int main()
     auto f = [=](std::string s, auto element) {
         return "f(" + s + ", " + to_string(element) + ")";
     };
+
+    int p[] = {2, 3, 4, 5};
+
     // with an initial state
     BOOST_TEST(
-        stde::product_type::fold_left(std::make_tuple(2, '3', 4, 5.0), "1", f)
+        stde::product_type::fold_left(p, "1", f)
             ==
         "f(f(f(f(1, 2), 3), 4), 5)"
     );
     // without initial state
+    std::string q[] = {"1", "2", "3", "4", "5"};
     BOOST_TEST(
-        stde::product_type::fold_left(std::make_tuple("1", 2, '3', 4, 5.0), f)
+        stde::product_type::fold_left(q, f)
             ==
         "f(f(f(f(1, 2), 3), 4), 5)"
     );
   }
-#endif
   return ::boost::report_errors();
 }
 
