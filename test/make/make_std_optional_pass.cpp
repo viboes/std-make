@@ -20,6 +20,8 @@ int main()
 #else
 
 #define JASEL_STD_EXPERIMENTAL_FACTORIES_USE_OPTIONAL
+#define JASEL_FUNDAMENTAL_EXTENDED
+
 #include <experimental/optional.hpp>
 
 #include <boost/detail/lightweight_test.hpp>
@@ -49,8 +51,9 @@ int main()
   static_assert(not stde::is_nullable<stde::none_t>::value, "ERROR");
   static_assert(stde::is_nullable<stde::optional<int>>::value, "ERROR");
   static_assert(stde::meta::is_callable<stde::optional<stde::_t>(int)>::value, "ERROR");
+#if defined JASEL_FUNDAMENTAL_EXTENDED
   static_assert(std::is_same<stde::value_type_t<stde::optional<int&>>, int&>::value, "ERROR");
-
+#endif
 #if defined __clang__
   {
     stde::optional<stde::optional<int>> x { { null() } };
@@ -66,9 +69,10 @@ int main()
     int v=1;
     stde::optional<int> x = stde::make<stde::optional>(v);
     BOOST_TEST(*x == 1);
+#if defined JASEL_FUNDAMENTAL_EXTENDED
     stde::optional<int> y = stde::fmap(twice, x);
     BOOST_TEST(y);
-
+#endif
   }
   {
     int v=0;

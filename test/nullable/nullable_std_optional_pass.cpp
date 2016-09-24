@@ -14,6 +14,8 @@ int main()
 #else
 
 #define JASEL_STD_EXPERIMENTAL_FACTORIES_USE_OPTIONAL
+//#define JASEL_FUNDAMENTAL_EXTENDED
+
 #include <experimental/optional.hpp>
 
 #include <boost/detail/lightweight_test.hpp>
@@ -43,8 +45,9 @@ int main()
   static_assert(not stde::is_nullable<stde::none_t>::value, "ERROR");
   static_assert(stde::is_nullable<stde::optional<int>>::value, "ERROR");
   static_assert(stde::meta::is_callable<stde::optional<stde::_t>(int)>::value, "ERROR");
+#if defined JASEL_FUNDAMENTAL_EXTENDED
   static_assert(std::is_same<stde::value_type_t<stde::optional<int&>>, int&>::value, "ERROR");
-
+#endif
   {
     auto n = stde::none_t{};
     stde::optional<int> x(n);
@@ -111,24 +114,30 @@ int main()
     stde::optional<int> x = stde::none<stde::optional>();
     BOOST_TEST(! x);
     BOOST_TEST(! has_value(x));
+#if defined JASEL_FUNDAMENTAL_EXTENDED
     stde::optional<int> y = stde::fmap(twice, x);
     BOOST_TEST(! stde::has_value(y));
+#endif
   }
   {
     int v=1;
     stde::optional<int> x = stde::make_optional(v);
     BOOST_TEST(*x == 1);
+    BOOST_TEST(x != stde::none());
+#if defined JASEL_FUNDAMENTAL_EXTENDED
     BOOST_TEST(value(x) == 1);
     stde::optional<int> y = stde::fmap(twice, x);
     BOOST_TEST(stde::value(y) == 2);
-    BOOST_TEST(x != stde::none());
+#endif
 
   }
   {
     int v=0;
     stde::optional<int> x = stde::make_optional(v);
     BOOST_TEST(*x == 0);
+#if defined JASEL_FUNDAMENTAL_EXTENDED
     BOOST_TEST(value(x) == 0);
+#endif
   }
 #if 0
   {
@@ -175,7 +184,10 @@ int main()
     stde::optional<int&> x = stde::make_optional(std::ref(v));
     BOOST_TEST(&v == &x.value());
     BOOST_TEST(&v == std::addressof(x.value()));
+#if defined JASEL_FUNDAMENTAL_EXTENDED
     BOOST_TEST(&v == std::addressof(value(x)));
+#endif
+
   }
 
   return ::boost::report_errors();

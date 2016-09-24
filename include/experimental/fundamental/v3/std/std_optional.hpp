@@ -12,10 +12,12 @@
 #include <experimental/make.hpp>
 #include <experimental/nullable.hpp>
 #include <experimental/meta.hpp>
+
+#if defined JASEL_FUNDAMENTAL_EXTENDED
 #include <experimental/fundamental/v2/possible_valued/mcd/pointer_like_mcd.hpp>
 #include <experimental/fundamental/v2/functor/mcd/possible_valued_mcd.hpp>
 #include <experimental/fundamental/v2/monad/mcd/possible_valued_mcd.hpp>
-
+#endif
 namespace std
 {
 namespace experimental
@@ -25,8 +27,7 @@ namespace experimental
   template <>
   struct optional<_t>  : meta::quote<optional> {};
 
-//inline namespace fundamental_v2
-  //{
+#if defined JASEL_FUNDAMENTAL_EXTENDED
   template <class T>
   struct possible_value::tag<optional<T>> : meta::id<pointer_like> {};
 
@@ -35,16 +36,18 @@ namespace experimental
 
   template <class T>
   struct monad::tag<optional<T>> : meta::id<possible_value> {};
-
+#endif
   // type_constructor customization
   template <class T>
   struct type_constructor<optional<T>> : meta::id<optional<_t>> {};
 
+#if defined JASEL_FUNDAMENTAL_EXTENDED
   template <class T>
   struct value_type<optional<T>> : meta::id<T> { };
 
   template <class T>
   struct none_type<optional<T>> : meta::id<nullopt_t> { };
+#endif
 
   template <class T>
   struct nullable_traits<optional<T>> : std::true_type {
