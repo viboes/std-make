@@ -121,7 +121,30 @@ int main()
     const int q[] = {2,3};
     stde::product_type::assign(p,q);
   }
-
+#if 0
+  {
+    auto to_string = [](auto x) {
+        std::ostringstream ss;
+        ss << x;
+        return ss.str();
+    };
+    auto f = [=](std::string s, auto element) {
+        return "f(" + s + ", " + to_string(element) + ")";
+    };
+    // with an initial state
+    BOOST_TEST(
+        stde::product_type::fold_left(std::make_tuple(2, '3', 4, 5.0), "1", f)
+            ==
+        "f(f(f(f(1, 2), 3), 4), 5)"
+    );
+    // without initial state
+    BOOST_TEST(
+        stde::product_type::fold_left(std::make_tuple("1", 2, '3', 4, 5.0), f)
+            ==
+        "f(f(f(f(1, 2), 3), 4), 5)"
+    );
+  }
+#endif
   return ::boost::report_errors();
 }
 

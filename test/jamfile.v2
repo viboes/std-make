@@ -89,6 +89,15 @@ test-suite callable_wrapper
       [ run callable_wrapper/ex_pass.cpp  ]
     ;
 
+test-suite nullable
+    : 
+      [ run nullable/nullable_pass.cpp  ]
+      [ run nullable/nullable_std_optional_pass.cpp  ]
+      [ run nullable/nullable_std_unique_ptr_pass.cpp  ]
+      [ run nullable/nullable_std_shared_ptr_pass.cpp  ]
+
+    ;
+
 test-suite product_type
     : 
       [ run product_type/c_array_pass.cpp  ]
