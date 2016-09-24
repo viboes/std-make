@@ -9,7 +9,7 @@
 #ifndef JASEL_FUNDAMENTAL_V3_SWAPPABLE_SWAPPABLE_HPP
 #define JASEL_FUNDAMENTAL_V3_SWAPPABLE_SWAPPABLE_HPP
 
-#if __cplusplus >= 201402L and defined JASE_SUPPORT_SWAPPABLE
+#if __cplusplus >= 201402L and defined JASEL_SUPPORT_SWAPPABLE
 
 ///////////////////////////////////////////////////////////////////////////////////////
 ///

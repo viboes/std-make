@@ -112,7 +112,7 @@ namespace detail
 
   template <class T, class  Indexes>
   struct has_tuple_like_element_get_access_aux;
-#if defined JASE_HAS_FOLD_EXPRESSIONS
+#if defined JASEL_HAS_FOLD_EXPRESSIONS
   template <class T, size_t ...N>
   struct has_tuple_like_element_get_access_aux<T, index_sequence<N...>> : integral_constant<bool,
     (has_tuple_like_element_access<N, T>::value && ...)

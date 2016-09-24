@@ -6,8 +6,8 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef JASE_V1_META_NONE_HPP
-#define JASE_V1_META_NONE_HPP
+#ifndef JASEL_V1_META_NONE_HPP
+#define JASEL_V1_META_NONE_HPP
 
 namespace std
 {

@@ -8,7 +8,7 @@
 
 #ifndef JASEL_FUNDAMENTAL_V3_PRODUCT_TYPE_SWAP_HPP
 #define JASEL_FUNDAMENTAL_V3_PRODUCT_TYPE_SWAP_HPP
-#if __cplusplus >= 201402L and defined JASE_SUPPORT_SWAPPABLE
+#if __cplusplus >= 201402L and defined JASEL_SUPPORT_SWAPPABLE
 
 #include <experimental/fundamental/v3/swappable/swappable.hpp>
 #include <experimental/fundamental/v3/product_type/product_type.hpp>
@@ -24,7 +24,7 @@ inline  namespace fundamental_v3
 namespace product_type
 {
   namespace detail {
-#if defined JASE_HAS_FOLD_EXPRESSIONS
+#if defined JASEL_HAS_FOLD_EXPRESSIONS
 
     template <class T, size_t ... ids>
       constexpr void swap_impl(T& x, T& y, index_sequence<ids...>)
@@ -54,10 +54,10 @@ namespace product_type
   template <class T>
     constexpr void swap(T& x, T& y)
     {
-#if defined JASE_HAS_FOLD_EXPRESSIONS
+#if defined JASEL_HAS_FOLD_EXPRESSIONS
       detail::swap_impl(x, y, make_index_sequence<product_type::size_v<T>>{});
 #else
-      detail::swap_impl<product_type::size_v<T>, T>::template eapply(x, y);
+      detail::swap_impl<product_type::size_v<T>, T>::template apply(x, y);
 #endif
     }
 }

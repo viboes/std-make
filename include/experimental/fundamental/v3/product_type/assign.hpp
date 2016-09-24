@@ -41,7 +41,7 @@ namespace product_type
     struct have_assignable_elements : false_type {};
     template <class PT1, class PT2, std::size_t... I>
     struct have_assignable_elements<PT1&,  PT2&&, true, index_sequence<I...>> :
-#if defined JASE_HAS_FOLD_EXPRESSIONS
+#if defined JASEL_HAS_FOLD_EXPRESSIONS
       integral_constant<bool,
         (... && std::is_assignable<element_t<I, PT1>&, element_t<I, PT2>&&>::value)
       >

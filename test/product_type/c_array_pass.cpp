@@ -84,7 +84,7 @@ int main()
     int q[] = {2,3};
     BOOST_TEST(std::make_tuple(0,1,2,3) == stde::product_type::cat(p, q));
   }
-#if __cplusplus >= 201402L and defined JASE_SUPPORT_SWAPPABLE
+#if __cplusplus >= 201402L and defined JASEL_SUPPORT_SWAPPABLE
   {
     int p[] = {0,1};
     int q[] = {2,3};

@@ -27,7 +27,7 @@ namespace product_type
     constexpr decltype(auto) transform_impl( ProductType&& pt, F&& f, index_sequence<I...> )
     {
       return make_tuple(
-#if defined JASE_HAS_INVOKE
+#if defined JASEL_HAS_INVOKE
           invoke(forward<F>(f), product_type::get<I>(forward<ProductType>(pt))) ...
 #else
           f(product_type::get<I>(forward<ProductType>(pt))) ...

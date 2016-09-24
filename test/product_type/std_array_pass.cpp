@@ -120,7 +120,7 @@ int main()
     const U q  = { {2,3} };
     BOOST_TEST(std::make_tuple(0,1,2,3) == stde::product_type::cat(p, q));
   }
-#if __cplusplus >= 201402L and defined JASE_SUPPORT_SWAPPABLE
+#if __cplusplus >= 201402L and defined JASEL_SUPPORT_SWAPPABLE
   {
     using T = std::array<int,2>;
     T p  = { {0,1} };
@@ -166,7 +166,7 @@ int main()
     using T = std::array<int,2>;
     T p  = { {0,1} };
     using U = std::tuple<int,int>;
-#if defined JASE_SUPPORT_TUPLE
+#if defined JASEL_SUPPORT_TUPLE
     const U q = {2,3};
 #else
     const U q = std::make_tuple(2,3);
@@ -181,7 +181,7 @@ int main()
     using T = std::array<int,2>;
     T p  = { {0,1} };
     using U = std::tuple<int,int>;
-#if defined JASE_SUPPORT_TUPLE
+#if defined JASEL_SUPPORT_TUPLE
     const U q  = {2,3};
 #else
     const U q = std::make_tuple(2,3);
