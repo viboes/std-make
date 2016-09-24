@@ -192,8 +192,11 @@ namespace detail
   };
 
   namespace product_type {
+    template <class T>
+      using traits = product_type_traits<T>;
+
     template <class PT>
-    struct size : product_type_traits<PT>::size {};
+    struct size : traits<PT>::size {};
     template <class T> struct size<const T> : size<T> {};
     template <class T> struct size<volatile T> : size<T> {};
     template <class T> struct size<const volatile T> : size<T> {};
@@ -201,7 +204,7 @@ namespace detail
     constexpr size_t size_v = size<PT>::value;
 
     template <size_t I, class PT, class= std::enable_if_t< I<size_v<PT> >>
-    struct element : product_type_traits<PT>::template element<I> {};
+    struct element : traits<PT>::template element<I> {};
     template <size_t I, class PT>
     using element_t = typename element<I,PT>::type;
     template <size_t I, class T> struct element<I, const T> { using type = const element_t<I, T>; };
@@ -213,7 +216,7 @@ namespace detail
     >
     constexpr decltype(auto) get(PT && pt) noexcept
     {
-        return product_type_traits<remove_cv_t<remove_reference_t<PT>>>::template get<I>(forward<PT>(pt));
+        return traits<remove_cv_t<remove_reference_t<PT>>>::template get<I>(forward<PT>(pt));
     }
   }
 
