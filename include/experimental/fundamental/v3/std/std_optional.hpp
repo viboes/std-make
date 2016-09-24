@@ -4,8 +4,8 @@
 //
 // Copyright (C) 2016 Vicente J. Botet Escriba
 
-#ifndef JASEL_FUNDAMENTAL_V2_OPTIONAL_HPP
-#define JASEL_FUNDAMENTAL_V2_OPTIONAL_HPP
+#ifndef JASEL_FUNDAMENTAL_V3_OPTIONAL_HPP
+#define JASEL_FUNDAMENTAL_V3_OPTIONAL_HPP
 
 #include <optional.hpp>
 

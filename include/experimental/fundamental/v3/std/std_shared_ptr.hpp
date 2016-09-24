@@ -4,8 +4,8 @@
 //
 // Copyright (C) 2016 Vicente J. Botet Escriba
 
-#ifndef JASEL_FUNDAMENTAL_V2_SHARED_PTR_HPP
-#define JASEL_FUNDAMENTAL_V2_SHARED_PTR_HPP
+#ifndef JASEL_FUNDAMENTAL_V3_SHARED_PTR_HPP
+#define JASEL_FUNDAMENTAL_V3_SHARED_PTR_HPP
 
 #include <experimental/make.hpp>
 #include <experimental/meta.hpp>
