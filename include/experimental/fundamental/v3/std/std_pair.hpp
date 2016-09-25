@@ -24,16 +24,15 @@ namespace std
 namespace experimental
 {
 
-//inline namespace fundamental_v2
-//{
+  using pair_tc = pair<experimental::_t, experimental::_t>;
+
   // type_constructor customization
   template <class T1, class T2>
-  struct type_constructor<pair<T1,T2>> : meta::id<pair<_t, _t>> {};
+  struct type_constructor<pair<T1,T2>> : meta::id<pair_tc> {};
 
   template <>
-  struct type_constructor<meta::quote<pair>> : meta::id<pair<_t, _t>> {};
+  struct type_constructor<meta::quote<pair>> : meta::id<pair_tc> {};
 
-//}
 }
 }
 

@@ -6,14 +6,15 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef JASEL_V2_FUNDAMENTAL_TYPE_CONSTRUCTIBLE_TYPE_CONSTRUCTOR_HPP
-#define JASEL_V2_FUNDAMENTAL_TYPE_CONSTRUCTIBLE_TYPE_CONSTRUCTOR_HPP
+#ifndef JASEL_FUNDAMENTAL_V3_TYPE_CONSTRUCTIBLE_TYPE_CONSTRUCTOR_HPP
+#define JASEL_FUNDAMENTAL_V3_TYPE_CONSTRUCTIBLE_TYPE_CONSTRUCTOR_HPP
 
 #include <experimental/meta/v1/id.hpp>
 #include <experimental/meta/v1/eval.hpp>
 #include <experimental/meta/v1/quote.hpp>
 #include <experimental/meta/v1/void_.hpp>
 #include <experimental/meta/v1/quote.hpp>
+#include <experimental/meta/v1/when.hpp>
 #include <experimental/fundamental/v3/type_constructible/holder.hpp>
 
 #include <type_traits> //add_pointer
@@ -25,14 +26,22 @@ namespace std
 
 namespace experimental
 {
-inline namespace fundamental_v2
+inline namespace fundamental_v3
 {
   // T* type constructor
   using add_pointer_f = add_pointer<experimental::_t>;
 
   // type constructor customization point.
   template<class T, class = void>
-  struct type_constructor {};
+  struct type_constructor : type_constructor<T, meta::when<true>> {};
+
+  template<class T, bool B>
+  struct type_constructor<T, meta::when<B>> {};
+
+  template<class T>
+  struct type_constructor<const T> : type_constructor<T> {};
+  template<class T>
+  struct type_constructor<volatile T> : type_constructor<T> {};
 
   // type constructor getter meta-function
   template <class M >
@@ -78,28 +87,12 @@ inline namespace fundamental_v2
   }
 
   template <class T >
-  struct type_constructor<T> : detail::type_constructor_if_has_type_constructor_member<T, detail::has_type_constructor_member<T>> {};
+  struct type_constructor<T, meta::when<detail::has_type_constructor_member<T>::value> > : detail::type_constructor_if_has_type_constructor_member<T, detail::has_type_constructor_member<T>> {};
 
-#if 0
-// fixme this doesn't compile
   template <template <class...> class TC >
-  struct type_constructor<meta::quote<TC>>
+  struct type_constructor<meta::quote<TC>, meta::when<detail::valid_type_constructor_tc_t<TC>::value>>
     : detail::type_constructor_if_valid_type_constructor_tc_t<TC,
         detail::valid_type_constructor_tc_t<TC>> {};
-#else
-  template <template <class...> class TC >
-  struct type_constructor<meta::quote<TC>> : type_constructor<TC<_t> > {};
-#endif
-
-//  // Default implementation make use of a nested type type_constructor
-//  template <class M >
-//  struct type_constructor<M> : id<typename M::type_constructor>
-//  {};
-//  template <class T, void_<typename T::type_constructor>>
-//  struct type_constructor<T>
-//    //requires requires { typename T::type_constructor; }
-//    : enable_if<is_object<typename T::type_constructor>::value, typename T::type_constructor> { };
-
 
   template <class T>
   struct type_constructor<T*> : meta::id<add_pointer<_t>>  {};
