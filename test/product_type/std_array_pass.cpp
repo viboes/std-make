@@ -7,8 +7,7 @@
 #if __cplusplus >= 201402L
 
 #include <experimental/product_type.hpp>
-#include <array>
-#include <tuple>
+#include <experimental/array.hpp>
 #include <sstream>
 
 #include <boost/detail/lightweight_test.hpp>
@@ -211,6 +210,7 @@ int main()
     T p  = { {1,2} };
     stde::product_type::for_each(p,[](auto& v) {std::cout << v << "\n";});
   }
+#if 1
   {
     auto to_string = [](auto x) {
         std::ostringstream ss;
@@ -222,15 +222,15 @@ int main()
     T p  = { {0,1} };
     auto res = stde::product_type::transform(p, to_string);
     static_assert(
-        std::is_same<std::tuple<std::string, std::string>, decltype(res)>::value,
+        std::is_same<std::array<std::string, 2>, decltype(res)>::value,
         "");
 
     BOOST_TEST(stde::product_type::transform(p, to_string)
       ==
-        std::make_tuple("0", "1")
+        std::make_array(std::string("0"), "1")
     );
   }
-
+#endif
   {
     auto to_string = [](auto x) {
         std::ostringstream ss;

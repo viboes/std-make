@@ -7,7 +7,7 @@
 #if __cplusplus >= 201402L
 
 #include <experimental/product_type.hpp>
-#include <tuple>
+#include <experimental/utility.hpp>
 #include <sstream>
 
 #include <boost/detail/lightweight_test.hpp>
@@ -127,12 +127,12 @@ int main()
     T p  = {0,1};
     auto res = stde::product_type::transform(p, to_string);
     static_assert(
-        std::is_same<std::tuple<std::string, std::string>, decltype(res)>::value,
+        std::is_same<std::pair<std::string, std::string>, decltype(res)>::value,
         "");
 
     BOOST_TEST(stde::product_type::transform(p, to_string)
       ==
-        std::make_tuple("0", "1")
+        std::make_pair(std::string("0"), std::string("1"))
     );
   }
   {
