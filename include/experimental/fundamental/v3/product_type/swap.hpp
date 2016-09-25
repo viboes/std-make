@@ -55,7 +55,7 @@ namespace product_type
     constexpr void swap(T& x, T& y)
     {
 #if defined JASEL_HAS_FOLD_EXPRESSIONS
-      detail::swap_impl(x, y, make_index_sequence<product_type::size_v<T>>{});
+      detail::swap_impl(x, y, element_sequence_for<T>{});
 #else
       detail::swap_impl<product_type::size_v<T>, T>::template apply(x, y);
 #endif

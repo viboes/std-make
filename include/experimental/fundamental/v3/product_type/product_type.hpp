@@ -218,6 +218,9 @@ namespace detail
     {
         return traits<remove_cv_t<remove_reference_t<PT>>>::template get<I>(forward<PT>(pt));
     }
+    template <class PT>
+    using element_sequence_for = make_index_sequence<product_type::size_v<remove_cv_t<remove_reference_t<PT>>>>;
+
   }
 
   // fixme redefine it as we did for has_tuple_like_access
@@ -235,6 +238,7 @@ namespace detail
   // fixme: Is this needed? Do we want that is_product_type<T(&)[N]>::value to be true?
   //template <class T, size_t N>
   //struct is_product_type<T(&)[N]> : true_type {};
+
 
 }}
 }

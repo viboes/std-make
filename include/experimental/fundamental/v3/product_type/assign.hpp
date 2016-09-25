@@ -73,14 +73,14 @@ namespace product_type
       && product_type_detail::have_assignable_elements<
           PT1&, remove_cv_t<remove_reference_t<PT2>&&>,
           (is_product_type_v<PT1> && is_product_type_v<remove_cv_t<remove_reference_t<PT2>>>),
-          make_index_sequence<product_type::size_v<PT1>>
+          element_sequence_for<PT1>
         >::value
     >
   >
   PT1& assign(PT1& pt1, PT2&& pt2)
   {
     return product_type_detail::assign_impl(pt1, forward<PT2>(pt2),
-        make_index_sequence<product_type::size_v<PT1>>{}
+        element_sequence_for<PT1>{}
         );
 
   }
@@ -89,7 +89,7 @@ namespace product_type
   auto assign(PT1& pt1, PT2&& pt2)
       JASEL_DECLTYPE_RETURN_NOEXCEPT(
           detail::assign_impl(pt1, forward<PT2>(pt2),
-                    make_index_sequence<product_type::size_v<PT1>>{})
+              element_sequence_for<PT1>{})
       )
 #endif
 }

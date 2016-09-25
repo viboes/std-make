@@ -57,7 +57,7 @@ namespace product_type
   constexpr decltype(auto) transform(ProductType&& pt, F&& f)
   {
       return detail::transform_impl(forward<ProductType>(pt), forward<F>(f),
-          make_index_sequence<product_type::size_v<remove_cv_t<remove_reference_t<ProductType>>>>{});
+          element_sequence_for<ProductType>{});
   }
 
 }

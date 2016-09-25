@@ -21,6 +21,7 @@ inline  namespace fundamental_v3
 {
 namespace product_type
 {
+
   namespace detail {
 
     template <class F, class ProductType, std::size_t... I>
@@ -57,7 +58,7 @@ namespace product_type
   constexpr void for_each(ProductType&& pt, F&& f)
   {
       detail::for_each_impl(forward<ProductType>(pt), forward<F>(f),
-          make_index_sequence<product_type::size_v<remove_cv_t<remove_reference_t<ProductType>>>>{});
+          element_sequence_for<ProductType>{});
   }
 
 }

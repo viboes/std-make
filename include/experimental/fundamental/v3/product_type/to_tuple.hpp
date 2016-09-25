@@ -46,7 +46,7 @@ namespace product_type
   constexpr decltype(auto) to_tuple(ProductType&& pt)
   {
       return detail::to_tuple_impl(forward<ProductType>(pt),
-          make_index_sequence<product_type::size_v<remove_cv_t<remove_reference_t<ProductType>>>>{});
+          element_sequence_for<ProductType>{});
   }
 
 }
