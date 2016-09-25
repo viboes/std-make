@@ -105,7 +105,7 @@ int main()
   {
     int p[] = {0,1};
     int q[] = {2,3};
-    stde::product_type::assign(p,q);
+    stde::product_type::copy(q,p);
     BOOST_TEST(2 == q[0]);
     BOOST_TEST(3 == q[1]);
     BOOST_TEST(2 == p[0]);
@@ -116,13 +116,13 @@ int main()
   {
     int p[] = {0,1};
     std::string q[] = {"2","3"};
-    stde::product_type::assign(p,q);
+    stde::product_type::copy(q,p);
   }
 #endif
   {
     int p[] = {0,1};
     const int q[] = {2,3};
-    stde::product_type::assign(p,q);
+    stde::product_type::copy(q,p);
   }
   {
     int p[] = {0,1};

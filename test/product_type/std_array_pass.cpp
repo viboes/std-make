@@ -145,7 +145,7 @@ int main()
     T p  = { {0,1} };
     using U = std::array<short,2>;
     U q  = { {2,3} };
-    stde::product_type::assign(p,q);
+    stde::product_type::copy(q,p);
     BOOST_TEST(2 == stde::product_type::get<0>(q));
     BOOST_TEST(3 == stde::product_type::get<1>(q));
     BOOST_TEST(2 == stde::product_type::get<0>(p));
@@ -158,7 +158,7 @@ int main()
     T p  = { {0,1} };
     using U = std::array<int,1>;
     U q  = { {2} };
-    stde::product_type::assign(p,q);
+    stde::product_type::copy(q,p);
   }
 #endif
   {
@@ -170,7 +170,7 @@ int main()
 #else
     const U q = std::make_tuple(2,3);
 #endif
-    stde::product_type::assign(p,q);
+    stde::product_type::copy(q,p);
     BOOST_TEST(2 == stde::product_type::get<0>(q));
     BOOST_TEST(3 == stde::product_type::get<1>(q));
     BOOST_TEST(2 == stde::product_type::get<0>(p));
@@ -185,7 +185,7 @@ int main()
 #else
     const U q = std::make_tuple(2,3);
 #endif
-    stde::product_type::assign(p,q);
+    stde::product_type::copy(q,p);
     BOOST_TEST(2 == stde::product_type::get<0>(q));
     BOOST_TEST(3 == stde::product_type::get<1>(q));
     BOOST_TEST(2 == stde::product_type::get<0>(p));
@@ -194,7 +194,7 @@ int main()
   {
     using T = std::array<int,2>;
     T p  = { {0,1} };
-    stde::product_type::assign(p,std::make_tuple(2,3));
+    stde::product_type::copy(std::make_tuple(2,3), p);
     BOOST_TEST(2 == stde::product_type::get<0>(p));
     BOOST_TEST(3 == stde::product_type::get<1>(p));
   }
