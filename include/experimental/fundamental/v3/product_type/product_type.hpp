@@ -211,6 +211,15 @@ namespace detail
     template <size_t I, class T> struct element<I, volatile T> { using type = volatile element_t<I, T>; };
     template <size_t I, class T> struct element<I, const volatile T> { using type = const volatile element_t<I, T>; };
 
+    template <class PT>
+    struct empty : integral_constant<bool, 0 == product_type::size_v<PT>> {};
+    template <class PT>
+    constexpr size_t empty_v = empty<PT>::value;
+    template <class PT>
+    struct not_empty : integral_constant<bool, (0 != product_type::size_v<PT>)> {};
+    template <class PT>
+    constexpr size_t not_empty_v = not_empty<PT>::value;
+
     template <size_t I, class PT
       , class= std::enable_if_t< I < size_v<remove_cv_t<remove_reference_t<PT>>> >
     >
@@ -218,9 +227,15 @@ namespace detail
     {
         return traits<remove_cv_t<remove_reference_t<PT>>>::template get<I>(forward<PT>(pt));
     }
+
+    template <class PT>
+    constexpr size_t get_size(PT && pt) noexcept { return product_type::size_v<remove_reference_t<PT>>; }
+
+    template <class PT>
+    constexpr size_t is_empty(PT && pt) noexcept { return product_type::empty_v<remove_reference_t<PT>>; }
+
     template <class PT>
     using element_sequence_for = make_index_sequence<product_type::size_v<remove_cv_t<remove_reference_t<PT>>>>;
-
   }
 
   // fixme redefine it as we did for has_tuple_like_access
@@ -239,6 +254,12 @@ namespace detail
   //template <class T, size_t N>
   //struct is_product_type<T(&)[N]> : true_type {};
 
+  namespace product_type {
+    template <class PT, template <class> class Trait, bool B = is_product_type_v<PT> >
+    struct friendly_type_trait : false_type {};
+    template <class PT, template <class> class Trait>
+    struct friendly_type_trait<PT, Trait, true> : Trait<PT> {};
+  }
 
 }}
 }
