@@ -48,14 +48,18 @@
 #define JASEL_CXX14_CONSTEXPR
 #endif
 
-#define JASEL_DECLTYPE_RETURN_NOEXCEPT(...)               \
-    noexcept(noexcept(decltype(__VA_ARGS__)(__VA_ARGS__))) ->   \
-    decltype(__VA_ARGS__)                                       \
-    { return (__VA_ARGS__); }                                   \
+#define JASEL_DECLTYPE_RETURN_NOEXCEPT(...)                 \
+    noexcept(noexcept(decltype(__VA_ARGS__)(__VA_ARGS__)))  \
+    -> decltype(__VA_ARGS__)                                \
+    { return (__VA_ARGS__); }                               \
 
-#define JASEL_NOEXCEPT_RETURN(...)               \
-    noexcept(noexcept(decltype(__VA_ARGS__)(__VA_ARGS__)))    \
-    { return (__VA_ARGS__); }                                   \
+#define JASEL_DECLTYPE_RETURN(...)                          \
+    -> decltype(__VA_ARGS__)                                \
+    { return (__VA_ARGS__); }                               \
+
+#define JASEL_NOEXCEPT_RETURN(...)                          \
+    noexcept(noexcept(decltype(__VA_ARGS__)(__VA_ARGS__)))  \
+    { return (__VA_ARGS__); }                               \
 
 /**/
 

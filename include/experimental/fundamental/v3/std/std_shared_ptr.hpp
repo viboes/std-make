@@ -20,15 +20,10 @@ namespace std
 
 namespace experimental
 {
-//inline namespace fundamental_v2
-//{
 
   // type_constructor customization
   template <class T>
   struct type_constructor<shared_ptr<T>> : meta::id<shared_ptr<_t>> {};
-
-  template <class T>
-  struct none_type<shared_ptr<T>> : meta::id<nullptr_t> { };
 
   template <class T>
   struct factory_traits<shared_ptr<T>> {
@@ -43,7 +38,6 @@ namespace experimental
   template <class T>
   struct nullable_traits<shared_ptr<T>> : nullable_traits_pointer_like {};
 
-//}
 }
 }
 

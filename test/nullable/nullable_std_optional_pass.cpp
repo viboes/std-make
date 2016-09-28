@@ -42,6 +42,8 @@ std::experimental::optional<double> inverse(double x) {
 int main()
 {
   namespace stde = std::experimental;
+
+  static_assert(not std::is_base_of<stde::nullable_tag, stde::nullable_traits<stde::none_t>>::value, "ERROR");
   static_assert(not stde::is_nullable<stde::none_t>::value, "ERROR");
   static_assert(stde::is_nullable<stde::optional<int>>::value, "ERROR");
   static_assert(stde::meta::is_callable<stde::optional<stde::_t>(int)>::value, "ERROR");
@@ -124,20 +126,20 @@ int main()
     stde::optional<int> x = stde::make_optional(v);
     BOOST_TEST(*x == 1);
     BOOST_TEST(x != stde::none());
+    BOOST_TEST(deref(x) == 1);
 #if defined JASEL_FUNDAMENTAL_EXTENDED
-    BOOST_TEST(value(x) == 1);
     stde::optional<int> y = stde::fmap(twice, x);
-    BOOST_TEST(stde::value(y) == 2);
+    BOOST_TEST(deref(y) == 2);
 #endif
+    x = 2;
+    BOOST_TEST(deref(x) == 2);
 
   }
   {
     int v=0;
     stde::optional<int> x = stde::make_optional(v);
     BOOST_TEST(*x == 0);
-#if defined JASEL_FUNDAMENTAL_EXTENDED
-    BOOST_TEST(value(x) == 0);
-#endif
+    BOOST_TEST(deref(x) == 0);
   }
 #if 0
   {
@@ -158,12 +160,12 @@ int main()
     int v=1;
     stde::optional<A> x = stde::make_optional<A>(stde::in_place, v,v);
     BOOST_TEST(x->v == 2);
-    BOOST_TEST(value(x).v == 2);
+    BOOST_TEST(deref(x).v == 2);
   }
   {
     stde::optional<int> x = stde::make_optional<int>(stde::in_place);
     BOOST_TEST_EQ(*x,  0);
-    BOOST_TEST(value(x) == 0);
+    BOOST_TEST(deref(x) == 0);
   }
 #endif
   {
@@ -184,9 +186,7 @@ int main()
     stde::optional<int&> x = stde::make_optional(std::ref(v));
     BOOST_TEST(&v == &x.value());
     BOOST_TEST(&v == std::addressof(x.value()));
-#if defined JASEL_FUNDAMENTAL_EXTENDED
-    BOOST_TEST(&v == std::addressof(value(x)));
-#endif
+    BOOST_TEST(&v == std::addressof(deref(x)));
 
   }
 

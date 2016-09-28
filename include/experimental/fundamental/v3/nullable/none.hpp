@@ -12,17 +12,20 @@
 #include <experimental/fundamental/v2/config.hpp>
 
 #include <utility>
+#include <type_traits>
 
 namespace std
 {
 namespace experimental
 {
-inline namespace fundamental_v2
+inline namespace fundamental_v3
 {
-  template <class T>
-  struct nullable_traits : std::false_type {};
+  struct nullable_tag {};
 
-  struct nullable_traits_pointer_like: std::true_type
+  template <class T>
+  struct nullable_traits  {};
+
+  struct nullable_traits_pointer_like : nullable_tag
   {
     template <class U>
     struct none_type : meta::id<nullptr_t> { };
@@ -32,15 +35,18 @@ inline namespace fundamental_v2
 
     template <class U>
     static constexpr
-    bool has_value(U ptr) noexcept { return ptr!=nullptr; }
+    bool has_value(U const& ptr) noexcept { return ptr!=nullptr; }
 
+    template <class U>
+    static constexpr
+    auto deref(U ptr)
+      JASEL_DECLTYPE_RETURN (
+          *ptr
+      )
   };
 
   template <>
   struct nullable_traits<add_pointer<_t>> : nullable_traits_pointer_like {};
-
-
-
 
   namespace nullable {
 
@@ -86,8 +92,26 @@ inline namespace fundamental_v2
 
   template <class T>
   constexpr
-  bool has_value(T* ptr) noexcept {
+  bool has_value(T const* ptr) noexcept {
     return ptr != nullptr;
+  }
+
+  template <class T>
+  constexpr
+  auto deref(T& x)
+    JASEL_DECLTYPE_RETURN (
+      nullable_traits<T>::deref(x)
+    )
+
+  template <class T>
+  constexpr
+  T const& deref(T const* ptr) noexcept {
+    return *ptr ;
+  }
+  template <class T>
+  constexpr
+  T& deref(T* ptr) noexcept {
+    return *ptr ;
   }
 
   template <class M>
@@ -111,12 +135,14 @@ inline namespace fundamental_v2
   }
 
   using nullable::none_t;
+  using nullable::none_type;
   using nullable::none;
   using nullable::has_value;
   using nullable::have_value;
+  using nullable::deref;
 
   template <class T>
-  struct is_nullable : nullable_traits<T> {};
+  struct is_nullable : is_base_of<nullable_tag, nullable_traits<T>> {};
 
   template <class T>
   struct is_nullable<T*> : true_type {};

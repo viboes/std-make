@@ -97,7 +97,6 @@ int main()
     accept_nullptr_t({}); // shouldn't compile fails :)
   }
   static_assert(stde::is_nullable<int*>::value, "ERROR");
-  static_assert(stde::nullable_traits<stde::type_constructor_t<int*>>::value, "ERROR");
   {
     int * x = nullptr;
     BOOST_TEST(! stde::has_value(x));

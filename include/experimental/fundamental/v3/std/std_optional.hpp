@@ -45,12 +45,10 @@ namespace experimental
   template <class T>
   struct value_type<optional<T>> : meta::id<T> { };
 
-  template <class T>
-  struct none_type<optional<T>> : meta::id<nullopt_t> { };
 #endif
 
   template <class T>
-  struct nullable_traits<optional<T>> : std::true_type {
+  struct nullable_traits<optional<T>> : nullable_tag {
     template <class U>
     struct none_type : meta::id<nullopt_t> { };
 
@@ -60,6 +58,19 @@ namespace experimental
     template <class U>
     static constexpr
     bool has_value(optional<U> const& x) noexcept { return bool(x); }
+
+    template <class U>
+    static constexpr
+    auto deref(optional<U> const& x)
+      JASEL_DECLTYPE_RETURN (
+          *x
+      )
+    template <class U>
+    static constexpr
+    auto deref(optional<U>& x)
+      JASEL_DECLTYPE_RETURN (
+          *x
+      )
   };
 
 //}

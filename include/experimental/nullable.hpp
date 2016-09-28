@@ -12,6 +12,5 @@
 
 // Nullable
 #include <experimental/fundamental/v3/nullable/none.hpp>
-#include <experimental/fundamental/v3/nullable/none_type.hpp>
 
 #endif // header

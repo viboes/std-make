@@ -61,9 +61,6 @@ namespace std
     struct type_constructor<boost::optional<T>> : meta::id<boost::optional<_t>> {};
 
     template <class T>
-    struct none_type<boost::optional<T>> : meta::id<boost::none_t> { };
-
-    template <class T>
     struct factory_traits<boost::optional<T>> : factory_traits_default<boost::optional<T>> {
       using factory_traits_default<boost::optional<T>>::make;
 

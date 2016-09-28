@@ -25,11 +25,6 @@ namespace product_type
 {
   namespace detail {
 
-    template <class PT, bool B>
-    struct has_at_least_one_element : false_type {};
-    template <class PT>
-    struct has_at_least_one_element<PT, true> : integral_constant<bool, size_v<PT> >= 1> {};
-
     template <class T>
     struct drop_front;
     template <class T>
@@ -85,10 +80,10 @@ namespace product_type
   template <class F, class ProductType
   // todo add constraint on F
   , class = enable_if_t<
-            detail::has_at_least_one_element<
-              remove_cv_t<remove_reference_t<ProductType>>,
-              is_product_type_v<remove_cv_t<remove_reference_t<ProductType>>>
-            >::value
+              product_type::friendly_type_trait<
+                remove_cv_t<remove_reference_t<ProductType>>,
+                product_type::not_empty
+              >::value
       >
   >
   constexpr decltype(auto) fold_left(ProductType&& pt, F&& f)
