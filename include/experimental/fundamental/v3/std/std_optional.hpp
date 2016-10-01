@@ -71,6 +71,18 @@ namespace experimental
       JASEL_DECLTYPE_RETURN (
           *x
       )
+    template <class U>
+    static constexpr
+    auto deref(optional<U> const&& x)
+      JASEL_DECLTYPE_RETURN (
+          *move(x)
+      )
+    template <class U>
+    static constexpr
+    auto deref(optional<U>&& x)
+      JASEL_DECLTYPE_RETURN (
+          *move(x)
+      )
   };
 
 //}

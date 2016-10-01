@@ -39,6 +39,32 @@ std::experimental::optional<double> inverse(double x) {
   return 1/x;
 }
 
+template <class T>
+struct check;
+
+
+template<class T>
+T& g(T &x) {
+  return std::experimental::deref(T(1));
+}
+
+template<class T>
+void g1(T &x) {
+  auto xx = std::experimental::deref(T(1));
+  std::cout << xx << std::endl;
+
+}
+
+template<class T>
+T const& h(T const &x) {
+  return g(x);
+}
+template<class T>
+void h1(T const &x) {
+  g1(x);
+}
+
+
 int main()
 {
   namespace stde = std::experimental;
@@ -56,11 +82,36 @@ int main()
     BOOST_TEST(! x);
     BOOST_TEST(! has_value(x));
     BOOST_TEST(x == stde::none());
+    BOOST_TEST(stde::none() == x);
+    BOOST_TEST(x == stde::none<stde::optional<stde::_t>>());
+  }
+  {
+    stde::optional<stde::optional<int>> x = stde::none() ;
+    BOOST_TEST(! x);
+    BOOST_TEST(! has_value(x));
+    BOOST_TEST(x == stde::none());
+    BOOST_TEST(stde::none() == x);
+    BOOST_TEST(x == stde::none<stde::optional<stde::_t>>());
   }
   {
     stde::optional<stde::optional<int>> x { stde::none() };
     BOOST_TEST(! x);
     BOOST_TEST(! has_value(x));
+    BOOST_TEST(x == stde::none());
+    BOOST_TEST(stde::none() == x);
+    BOOST_TEST(x == stde::none<stde::optional<stde::_t>>());
+  }
+  {
+    stde::optional<stde::optional<int>> x = stde::optional<int>(stde::none()) ;
+    BOOST_TEST(x);
+    BOOST_TEST(has_value(x));
+    BOOST_TEST(x != stde::none());
+    BOOST_TEST(stde::none() != x);
+    BOOST_TEST(x != stde::none<stde::optional<stde::_t>>());
+
+    BOOST_TEST(stde::deref(x) == stde::none());
+    BOOST_TEST(stde::none() == stde::deref(x));
+    BOOST_TEST(stde::deref(x) == stde::none<stde::optional<stde::_t>>());
   }
   {
     stde::optional<stde::optional<int>> x { stde::optional<int>(stde::none()) };
@@ -116,6 +167,10 @@ int main()
     stde::optional<int> x = stde::none<stde::optional>();
     BOOST_TEST(! x);
     BOOST_TEST(! has_value(x));
+    BOOST_TEST(x == stde::none());
+    BOOST_TEST(stde::none() == x);
+    BOOST_TEST(x == stde::none<stde::optional<stde::_t>>());
+
 #if defined JASEL_FUNDAMENTAL_EXTENDED
     stde::optional<int> y = stde::fmap(twice, x);
     BOOST_TEST(! stde::has_value(y));
@@ -136,10 +191,34 @@ int main()
 
   }
   {
+    int v=1;
+    const stde::optional<int> x = stde::make_optional(v);
+    BOOST_TEST(*x == 1);
+    BOOST_TEST(x != stde::none());
+    BOOST_TEST(deref(x) == 1);
+    h1(x);
+    //BOOST_TEST(h(x) == 1);
+
+#if defined JASEL_FUNDAMENTAL_EXTENDED
+    stde::optional<int> y = stde::fmap(twice, x);
+    BOOST_TEST(deref(y) == 2);
+#endif
+
+  }
+  {
     int v=0;
     stde::optional<int> x = stde::make_optional(v);
     BOOST_TEST(*x == 0);
     BOOST_TEST(deref(x) == 0);
+    //check<decltype(deref(stde::make_optional(v)))> xx;
+    static_assert(std::is_same<int&, decltype(deref(x))>::value, "a");
+  }
+  {
+
+    int v=0;
+    BOOST_TEST(deref(stde::make_optional(v)) == 0);
+    //check<decltype(stde::make_optional(v))> xx;
+    static_assert(std::is_same<stde::optional<int>, decltype(stde::make_optional(v))>::value, "a");
   }
 #if 0
   {

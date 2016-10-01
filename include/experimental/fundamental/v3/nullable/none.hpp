@@ -39,9 +39,27 @@ inline namespace fundamental_v3
 
     template <class U>
     static constexpr
-    auto deref(U ptr)
+    auto deref(U const& ptr)
       JASEL_DECLTYPE_RETURN (
           *ptr
+      )
+    template <class U>
+    static constexpr
+    auto deref(U & ptr)
+      JASEL_DECLTYPE_RETURN (
+          *ptr
+      )
+    template <class U>
+    static constexpr
+    auto deref(U const&& ptr)
+      JASEL_DECLTYPE_RETURN (
+          *move(ptr)
+      )
+    template <class U>
+    static constexpr
+    auto deref(U && ptr)
+      JASEL_DECLTYPE_RETURN (
+          *move(ptr)
       )
   };
 
@@ -98,16 +116,11 @@ inline namespace fundamental_v3
 
   template <class T>
   constexpr
-  auto deref(T& x)
+  auto deref(T&& x)
     JASEL_DECLTYPE_RETURN (
-      nullable_traits<T>::deref(x)
+      nullable_traits<typename decay<T>::type>::deref(x)
     )
 
-  template <class T>
-  constexpr
-  T const& deref(T const* ptr) noexcept {
-    return *ptr ;
-  }
   template <class T>
   constexpr
   T& deref(T* ptr) noexcept {
@@ -132,7 +145,7 @@ inline namespace fundamental_v3
     //    nullable::has_value(v2) && (nullable::has_value(vs) && ...);
   }
 
-  }
+}
 
   using nullable::none_t;
   using nullable::none_type;
