@@ -11,7 +11,6 @@
 #define JASEL_FUNDAMENTAL_V3_NULLABLE_TRANSFORM_HPP
 
 #include <experimental/fundamental/v2/config.hpp>
-#include <experimental/fundamental/v2/result_type.hpp>
 #include <experimental/fundamental/v2/value_type.hpp>
 #include <experimental/fundamental/v3/nullable/none.hpp>
 #include <experimental/make.hpp>

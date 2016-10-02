@@ -26,7 +26,6 @@ inline namespace v1
     using result_type_t = eval<result_type<F, Args...> >;
     template < class F, class ...Args >
     using ResultType = eval<result_type<F, Args...> >;
-
 }
 }
 }

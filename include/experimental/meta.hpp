@@ -19,6 +19,7 @@
 #include <experimental/meta/v1/quote_trait.hpp>
 #include <experimental/meta/v1/quote.hpp>
 #include <experimental/meta/v1/rebind.hpp>
+#include <experimental/meta/v1/result_type.hpp>
 #include <experimental/meta/v1/when.hpp>
 
 #endif // header
