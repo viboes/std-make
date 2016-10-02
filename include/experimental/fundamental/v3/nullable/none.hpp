@@ -35,32 +35,20 @@ inline namespace fundamental_v3
 
     template <class U>
     static constexpr
-    bool has_value(U const& ptr) noexcept { return ptr!=nullptr; }
+    bool has_value(U const& ptr) noexcept { return bool(ptr); }
 
-    template <class U>
-    static constexpr
-    auto deref(U const& ptr)
-      JASEL_DECLTYPE_RETURN (
-          *ptr
-      )
-    template <class U>
-    static constexpr
-    auto deref(U & ptr)
-      JASEL_DECLTYPE_RETURN (
-          *ptr
-      )
-    template <class U>
-    static constexpr
-    auto deref(U const&& ptr)
-      JASEL_DECLTYPE_RETURN (
-          *move(ptr)
-      )
     template <class U>
     static constexpr
     auto deref(U && ptr)
       JASEL_DECLTYPE_RETURN (
-          *move(ptr)
+          *(forward<U>(ptr))
       )
+
+    template <class U>
+    static constexpr
+    std::nullptr_t deref_none(U &&)
+      { return nullptr; }
+
   };
 
   template <>
@@ -127,6 +115,19 @@ inline namespace fundamental_v3
     return *ptr ;
   }
 
+  template <class T>
+  constexpr
+  auto deref_none(T&& x)
+    JASEL_DECLTYPE_RETURN (
+      nullable_traits<typename decay<T>::type>::deref_none(x)
+    )
+
+  template <class T>
+  constexpr
+  std::nullptr_t deref_none(T* ptr) noexcept {
+    return nullptr ;
+  }
+
   template <class M>
   auto have_value(M const& v)
     JASEL_DECLTYPE_RETURN_NOEXCEPT (
@@ -153,6 +154,7 @@ inline namespace fundamental_v3
   using nullable::has_value;
   using nullable::have_value;
   using nullable::deref;
+  using nullable::deref_none;
 
   template <class T>
   struct is_nullable : is_base_of<nullable_tag, nullable_traits<T>> {};

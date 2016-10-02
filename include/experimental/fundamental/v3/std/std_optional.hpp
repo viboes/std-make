@@ -48,7 +48,7 @@ namespace experimental
 #endif
 
   template <class T>
-  struct nullable_traits<optional<T>> : nullable_tag {
+  struct nullable_traits<optional<T>> : nullable_traits_pointer_like {
     template <class U>
     struct none_type : meta::id<nullopt_t> { };
 
@@ -57,32 +57,9 @@ namespace experimental
 
     template <class U>
     static constexpr
-    bool has_value(optional<U> const& x) noexcept { return bool(x); }
+    nullopt_t deref_none(U &&)
+      { return nullopt; }
 
-    template <class U>
-    static constexpr
-    auto deref(optional<U> const& x)
-      JASEL_DECLTYPE_RETURN (
-          *x
-      )
-    template <class U>
-    static constexpr
-    auto deref(optional<U>& x)
-      JASEL_DECLTYPE_RETURN (
-          *x
-      )
-    template <class U>
-    static constexpr
-    auto deref(optional<U> const&& x)
-      JASEL_DECLTYPE_RETURN (
-          *move(x)
-      )
-    template <class U>
-    static constexpr
-    auto deref(optional<U>&& x)
-      JASEL_DECLTYPE_RETURN (
-          *move(x)
-      )
   };
 
 //}

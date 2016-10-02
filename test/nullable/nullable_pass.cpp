@@ -102,30 +102,36 @@ int main()
     BOOST_TEST(! stde::has_value(x));
     BOOST_TEST(x == stde::none());
     BOOST_TEST(stde::none() == x);
+    BOOST_TEST(nullptr == nullptr);
+    BOOST_TEST(stde::deref_none(x) == nullptr);
   }
   {
     int * x = stde::none();
     BOOST_TEST(! stde::has_value(x));
     BOOST_TEST(x == stde::none());
     BOOST_TEST(stde::none() == x);
+    BOOST_TEST(stde::deref_none(x) == nullptr);
   }
   {
     int * x = stde::none<std::add_pointer<stde::_t>>();
     BOOST_TEST(! stde::has_value(x));
     BOOST_TEST(x == stde::none());
     BOOST_TEST(stde::none() == x);
+    BOOST_TEST(stde::deref_none(x) == nullptr);
   }
   {
     const int * x = nullptr;
     BOOST_TEST(! stde::has_value(x));
     BOOST_TEST(x == stde::none());
     BOOST_TEST(stde::none() == x);
+    BOOST_TEST(stde::deref_none(x) == nullptr);
   }
   {
     const int * x = stde::none();
     BOOST_TEST(! stde::has_value(x));
     BOOST_TEST(x == stde::none());
     BOOST_TEST(stde::none() == x);
+    BOOST_TEST(stde::deref_none(x) == nullptr);
   }
   {
     const int * x = stde::none<std::add_pointer<stde::_t>>();
@@ -133,6 +139,7 @@ int main()
     BOOST_TEST(x == stde::none());
     BOOST_TEST(stde::none() == x);
     BOOST_TEST(x == stde::none<std::add_pointer<stde::_t>>());
+    BOOST_TEST(stde::deref_none(x) == nullptr);
   }
   {
     int * x = new int(1);

@@ -84,6 +84,9 @@ int main()
     BOOST_TEST(x == stde::none());
     BOOST_TEST(stde::none() == x);
     BOOST_TEST(x == stde::none<stde::optional<stde::_t>>());
+    BOOST_TEST(stde::nullopt == stde::nullopt);
+    BOOST_TEST(stde::deref_none(x) == stde::nullopt);
+
   }
   {
     stde::optional<stde::optional<int>> x = stde::none() ;
