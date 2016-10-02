@@ -46,7 +46,7 @@ inline namespace fundamental_v3
         static auto transform(T&& x, F&& y) =delete;
   };
 
-namespace functor2 {
+namespace functor {
   template <class T>
     using traits = functor_traits<T>;
 

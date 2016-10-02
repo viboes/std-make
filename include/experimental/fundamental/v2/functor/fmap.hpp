@@ -26,9 +26,9 @@ inline namespace fundamental_v2
   // && Same<TypeConstructor<M>, TypeConstructor<Ms>>...
   auto fmap(F&& f, const M& m, const Ms& ...ms)
     //-> meta::invoke<TypeConstructor<M>, meta::ResultType<F, ValueType<M>...>>
-    -> decltype(fmap_custom(concept_tag_t<functor, M>{}, forward<F>(f), m, ms...))
+    -> decltype(fmap_custom(concept_tag_t<functorv2, M>{}, forward<F>(f), m, ms...))
   {
-    return fmap_custom(concept_tag_t<functor, M>{}, forward<F>(f), m, ms...);
+    return fmap_custom(concept_tag_t<functorv2, M>{}, forward<F>(f), m, ms...);
   }
 
 //  template <class F, class M, class ...Ms>
@@ -36,9 +36,9 @@ inline namespace fundamental_v2
 //  // && Same<TypeConstructor<M>, TypeConstructor<M>>...
 //  auto fmap(F&& f, M&& m, Ms&& ...ms)
 //    // -> meta::invoke<TypeConstructor<M>, meta::ResultType<F, ValueType<M>...>>
-//    -> decltype(concept_instance_t<functor, decay_t<M>>::fmap_impl(forward<F>(f), forward<M>(m), forward<Ms>(ms)...))
+//    -> decltype(concept_instance_t<functorv2, decay_t<M>>::fmap_impl(forward<F>(f), forward<M>(m), forward<Ms>(ms)...))
 //  {
-//    return concept_instance_t<functor, decay_t<M>>::fmap_impl(forward<F>(f), forward<M>(m), forward<Ms>(ms)...);
+//    return concept_instance_t<functorv2, decay_t<M>>::fmap_impl(forward<F>(f), forward<M>(m), forward<Ms>(ms)...);
 //  }
 
   template <class F, class M, class ...Ms>
@@ -46,9 +46,9 @@ inline namespace fundamental_v2
   // && Same<TypeConstructor<M>, TypeConstructor<M>>...
   auto fmap(F&& f, const M& m, const Ms& ...ms)
     // -> meta::invoke<TypeConstructor<M>, meta::ResultType<F, ValueType<M>...>>
-    -> decltype(concept_instance_t<functor, M>::fmap_impl(forward<F>(f), m, ms...))
+    -> decltype(concept_instance_t<functorv2, M>::fmap_impl(forward<F>(f), m, ms...))
   {
-    return concept_instance_t<functor, M>::fmap_impl(forward<F>(f), m, ms...);
+    return concept_instance_t<functorv2, M>::fmap_impl(forward<F>(f), m, ms...);
   }
 
 }

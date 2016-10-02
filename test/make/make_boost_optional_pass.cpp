@@ -48,7 +48,7 @@ namespace std
     struct monoid::tag<boost::optional<T>> : meta::id<possible_value> {};
 
     template <class T>
-    struct functor::tag<boost::optional<T>> : meta::id<possible_value> {};
+    struct functorv2::tag<boost::optional<T>> : meta::id<possible_value> {};
 
     template <class T>
     struct applicative::tag<boost::optional<T>> : meta::id<possible_value> {};

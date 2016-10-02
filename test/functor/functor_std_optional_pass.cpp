@@ -44,7 +44,7 @@ int main()
     BOOST_TEST(stde::none() == x);
     BOOST_TEST(x == stde::none<stde::optional<stde::_t>>());
 
-    stde::optional<int> y = stde::functor2::transform(x, twice);
+    stde::optional<int> y = stde::functor::transform(x, twice);
     BOOST_TEST(! stde::has_value(y));
   }
   {
@@ -53,7 +53,7 @@ int main()
     BOOST_TEST(*x == 1);
     BOOST_TEST(x != stde::none());
     BOOST_TEST(deref(x) == 1);
-    stde::optional<int> y = stde::functor2::transform(x, twice);
+    stde::optional<int> y = stde::functor::transform(x, twice);
     BOOST_TEST(deref(y) == 2);
     x = 2;
     BOOST_TEST(deref(x) == 2);
@@ -65,7 +65,7 @@ int main()
     BOOST_TEST(x != stde::none());
     BOOST_TEST(deref(x) == 1);
 
-    stde::optional<int> y = stde::functor2::transform(x, twice);
+    stde::optional<int> y = stde::functor::transform(x, twice);
     BOOST_TEST(deref(y) == 2);
   }
 #endif

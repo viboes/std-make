@@ -32,7 +32,7 @@ namespace experimental
   struct possible_value::tag<optional<T>> : meta::id<pointer_like> {};
 
   template <class T>
-  struct functor::tag<optional<T>> : meta::id<possible_value> {};
+  struct functorv2::tag<optional<T>> : meta::id<possible_value> {};
 
   template <class T>
   struct monad::tag<optional<T>> : meta::id<possible_value> {};

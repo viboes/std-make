@@ -18,7 +18,7 @@ namespace experimental
 inline namespace fundamental_v2
 {
 
-  struct functor {
+  struct functorv2 {
     template <class Tag>
     struct instance;
 
