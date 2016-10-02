@@ -16,10 +16,20 @@ namespace std
 {
 namespace experimental
 {
-inline namespace fundamental_v2
+inline namespace fundamental_v3
 {
   template <class T>
-  struct factory_traits_default {
+    struct is_type_constructible;
+
+#if __cplusplus >= 201402L
+  template <class T>
+    constexpr bool is_type_constructible_v = is_type_constructible<T>::value;
+#endif
+
+  struct type_constructible_tag {};
+
+  template <class T>
+  struct factory_traits_default : type_constructible_tag {
     template <class ...Xs>
     static constexpr
     auto make(Xs&& ...xs)
@@ -33,7 +43,7 @@ inline namespace fundamental_v2
   struct factory_traits : factory_traits_default<T> {};
 
   template <class T>
-  struct factory_traits<T*>
+  struct factory_traits<T*> : type_constructible_tag
   {
     template <class ...Xs>
     static
@@ -95,6 +105,16 @@ inline namespace factories
     return factory_traits<M<meta::decay_unwrap_t<Xs>...>>::make(std::forward<Xs>(xs)...);
   }
 }
+
+template <class T>
+struct is_type_constructible : is_base_of<type_constructible_tag, factory_traits<T>> {};
+template <class T>
+struct is_type_constructible<const T> : is_type_constructible<T> {};
+template <class T>
+struct is_type_constructible<volatile T> : is_type_constructible<T> {};
+template <class T>
+struct is_type_constructible<const volatile T> : is_type_constructible<T> {};
+
 }
 }
 }
