@@ -158,6 +158,17 @@ inline namespace fundamental_v3
 
   template <class T>
   struct is_nullable : is_base_of<nullable_tag, nullable_traits<T>> {};
+  template <class T>
+  struct is_nullable<const T> : is_nullable<T> {};
+  template <class T>
+  struct is_nullable<volatile T> : is_nullable<T> {};
+  template <class T>
+  struct is_nullable<const volatile T> : is_nullable<T> {};
+
+#if __cplusplus >= 201402L
+  template <class T>
+  constexpr bool is_nullable_v = is_nullable<T>::value ;
+#endif
 
   template <class T>
   struct is_nullable<T*> : true_type {};
