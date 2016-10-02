@@ -28,7 +28,7 @@
 
 #include <experimental/make.hpp>
 #include <experimental/nullable.hpp>
-#include <experimental/fundamental/v2/value_type.hpp>
+#include <experimental/fundamental/v3/value_type.hpp>
 #include <experimental/fundamental/v2/possible_valued/has_value.hpp>
 #include <experimental/fundamental/v2/possible_valued/value.hpp>
 #include <experimental/fundamental/v2/possible_valued/not_a_value.hpp>
