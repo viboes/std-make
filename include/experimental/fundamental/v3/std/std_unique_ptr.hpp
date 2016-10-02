@@ -63,7 +63,7 @@ namespace experimental
   struct type_constructor<unique_ptr<T,D>> : meta::id<unique_ptr<_t, D>> {};
 
   template <class T, class D>
-  struct factory_traits<unique_ptr<T, D>>
+  struct factory_traits<unique_ptr<T, D>> : type_constructible_tag
   {
     template <class ...Xs>
     static //constexpr

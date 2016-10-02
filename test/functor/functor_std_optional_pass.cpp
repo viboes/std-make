@@ -36,7 +36,7 @@ int main()
   {
     stde::optional<int> x = stde::none<stde::optional>();
     BOOST_TEST(! x);
-    BOOST_TEST(! has_value(x));
+    BOOST_TEST(! stde::has_value(x));
     BOOST_TEST(x == stde::none());
     BOOST_TEST(stde::none() == x);
     BOOST_TEST(x == stde::none<stde::optional<stde::_t>>());
@@ -49,21 +49,21 @@ int main()
     stde::optional<int> x = stde::make_optional(v);
     BOOST_TEST(*x == 1);
     BOOST_TEST(x != stde::none());
-    BOOST_TEST(deref(x) == 1);
+    BOOST_TEST(stde::deref(x) == 1);
     stde::optional<int> y = stde::functor::transform(x, twice);
-    BOOST_TEST(deref(y) == 2);
+    BOOST_TEST(stde::deref(y) == 2);
     x = 2;
-    BOOST_TEST(deref(x) == 2);
+    BOOST_TEST(stde::deref(x) == 2);
   }
   {
     int v=1;
     const stde::optional<int> x = stde::make_optional(v);
     BOOST_TEST(*x == 1);
     BOOST_TEST(x != stde::none());
-    BOOST_TEST(deref(x) == 1);
+    BOOST_TEST(stde::deref(x) == 1);
 
     stde::optional<int> y = stde::functor::transform(x, twice);
-    BOOST_TEST(deref(y) == 2);
+    BOOST_TEST(stde::deref(y) == 2);
   }
 #endif
 

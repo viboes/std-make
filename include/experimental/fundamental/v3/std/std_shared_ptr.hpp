@@ -26,7 +26,8 @@ namespace experimental
   struct type_constructor<shared_ptr<T>> : meta::id<shared_ptr<_t>> {};
 
   template <class T>
-  struct factory_traits<shared_ptr<T>> {
+  struct factory_traits<shared_ptr<T>> : type_constructible_tag
+  {
 
     template <class ...Xs>
     static //constexpr
