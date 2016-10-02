@@ -26,11 +26,6 @@ inline namespace v1
   template<class TC, class... Args>
   using invoke = typename TC::template invoke<Args...>;
 
-  template <class T, template <class> class TraitCnd, template <class> class Trait, bool B = TraitCnd<T>::value >
-  struct invoke_if : false_type {};
-  template <class T, template <class> class TraitCnd, template <class> class Trait>
-  struct invoke_if<T, TraitCnd, Trait, true> : Trait<T> {};
-
 }
 }
 }
