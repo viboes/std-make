@@ -119,6 +119,13 @@ test-suite functional
       [ run functional/overload_pass.cpp  ]
     ;
 
+test-suite functor
+    : 
+      [ run functor/functor_pass.cpp  ]
+      [ run functor/functor_std_optional_pass.cpp  ]
+
+    ;
+
 explicit fix ;
 test-suite fix
     : 
