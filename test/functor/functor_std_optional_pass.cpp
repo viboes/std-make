@@ -19,9 +19,6 @@ int main()
 
 #include <boost/detail/lightweight_test.hpp>
 
-template <class T>
-struct check;
-
 int twice(int i) {
   return 2*i;
 }

@@ -123,6 +123,8 @@ test-suite functor
     : 
       [ run functor/functor_pass.cpp  ]
       [ run functor/functor_std_optional_pass.cpp  ]
+      [ run functor/functor_std_pair_pass.cpp  ]
+      [ run functor/functor_std_tuple_pass.cpp  ]
 
     ;
 

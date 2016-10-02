@@ -11,6 +11,7 @@
 
 #include <experimental/fundamental/v3/product_type/product_type.hpp>
 #include <experimental/make.hpp>
+#include <experimental/functor.hpp>
 #include <utility>
 #include <functional>
 
@@ -74,6 +75,20 @@ namespace product_type
   }
 
 }
+
+template <class N>
+struct functor_traits<N, meta::when<
+  is_product_type_v<N> && is_type_constructible_v<N>
+>> : functor_tag
+{
+  template <class T, class F>
+    static constexpr auto transform(T&& x, F&& f)
+    {
+      return product_type::transform(forward<T>(x), forward<F>(f));
+    }
+};
+
+
 }}
 }
 
