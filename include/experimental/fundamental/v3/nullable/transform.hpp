@@ -20,9 +20,6 @@
 #include <utility>
 #include <functional>
 
-// fixme: apply is implementable, as Hana does it, using foldable::fold_left.
-// Which implementation is more efficient at run-time? at compile time?
-
 namespace std
 {
 namespace experimental
