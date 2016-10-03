@@ -712,7 +712,8 @@ int main()
   static_assert(! std::is_default_constructible<stde::expected<NoDefaultConstructible>>::value, "");
   static_assert(! std::is_copy_constructible<NoCopyConstructible>::value, "");
   static_assert(! std::is_constructible<stde::expected<NoCopyConstructible>, NoCopyConstructible const& >::value, "");
-  //static_assert(! std::is_constructible<stde::expected<NoCopyConstructible>, stde::expected<NoCopyConstructible> const& >::value, "");
+  static_assert(! std::is_constructible<stde::expected<NoCopyConstructible>, stde::expected<NoCopyConstructible> const& >::value, "");
+  static_assert(! std::is_copy_constructible<stde::expected<NoCopyConstructible>>::value, "");
 
   except_default_constructor();
   except_default_constructor_error_code();
