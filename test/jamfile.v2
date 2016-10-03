@@ -92,6 +92,11 @@ test-suite callable_wrapper
       [ run callable_wrapper/ex_pass.cpp  ]
     ;
 
+test-suite stde_expected
+    : 
+      [ run expected/expected_pass.cpp  ]
+    ;
+
 test-suite nullable
     : 
       [ run nullable/nullable_pass.cpp  ]
