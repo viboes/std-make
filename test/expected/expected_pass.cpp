@@ -23,9 +23,17 @@ struct NoDefaultConstructible
 
 struct NoCopyConstructible
 {
+  NoCopyConstructible()  {};
   NoCopyConstructible(NoCopyConstructible const&) = delete;
   NoCopyConstructible(NoCopyConstructible &&) = default;
-  NoCopyConstructible()  {};
+};
+struct NoMoveConstructible
+{
+  NoMoveConstructible()  {};
+  NoMoveConstructible(NoMoveConstructible const&) = default;
+  NoMoveConstructible(NoMoveConstructible &&) = delete;
+  NoMoveConstructible& operator=(NoMoveConstructible const&) = default;
+  NoMoveConstructible& operator=(NoMoveConstructible &&) = delete;
 };
 
 enum State
@@ -690,30 +698,24 @@ void expected_swap_function_value()
 
 int main()
 {
-#if 0
-  {
-    stde::expected<NoDefaultConstructible> x; // FAILS as expected
-  }
-  {
-    NoCopyConstructible ncc;
-    stde::expected<NoCopyConstructible> x{ncc}; // FAILS as expected
-    static_assert(std::is_constructible<stde::expected<NoCopyConstructible>, NoCopyConstructible >::value, ""); // DOESN'T FAILS :( fixme
-  }
-  {
-    NoCopyConstructible ncc;
-    stde::expected<NoCopyConstructible> x{std::move(ncc)};
-    stde::expected<NoCopyConstructible> y{x}; // FAILS as expected
-    static_assert(! std::is_copy_constructible<stde::expected<NoCopyConstructible>>::value, ""); // DOESN'T FAILS :( fixme
-
-  }
-#endif
 
   static_assert(! std::is_default_constructible<NoDefaultConstructible>::value, "");
   static_assert(! std::is_default_constructible<stde::expected<NoDefaultConstructible>>::value, "");
+
   static_assert(! std::is_copy_constructible<NoCopyConstructible>::value, "");
   static_assert(! std::is_constructible<stde::expected<NoCopyConstructible>, NoCopyConstructible const& >::value, "");
   static_assert(! std::is_constructible<stde::expected<NoCopyConstructible>, stde::expected<NoCopyConstructible> const& >::value, "");
   static_assert(! std::is_copy_constructible<stde::expected<NoCopyConstructible>>::value, "");
+
+  {
+    NoMoveConstructible nmc;
+    //NoMoveConstructible nmc2 = std::move(nmc); // FAILS as expected
+
+    stde::expected<NoMoveConstructible> x = std::move(nmc); // DOESN'T FAIL as copy is selected instead
+  }
+  static_assert(! std::is_move_constructible<NoMoveConstructible>::value, "");
+  static_assert( std::is_constructible<stde::expected<NoMoveConstructible>, NoMoveConstructible && >::value, "");
+  static_assert( std::is_move_constructible<stde::expected<NoMoveConstructible>>::value, "");
 
   except_default_constructor();
   except_default_constructor_error_code();
