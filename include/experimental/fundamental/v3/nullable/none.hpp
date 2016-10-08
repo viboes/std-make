@@ -27,9 +27,6 @@ inline namespace fundamental_v3
 
   struct nullable_traits_pointer_like : nullable_tag
   {
-    template <class U>
-    struct none_type : meta::id<nullptr_t> { };
-
     static constexpr
     nullptr_t none() noexcept { return nullptr; }
 
@@ -68,9 +65,6 @@ inline namespace fundamental_v3
   constexpr bool operator>(none_t, none_t) noexcept { return false; }
   constexpr bool operator>=(none_t, none_t) noexcept { return true; }
 
-  template <class T>
-  struct none_type : nullable_traits<T>::template none_type<T> { };
-
   constexpr
   none_t none() noexcept { return none_t{}; }
 
@@ -88,6 +82,9 @@ inline namespace fundamental_v3
         //none<type_constructor_t<meta::quote<TC>>>()
         none< TC<_t> >()
     )
+
+  template <class T>
+  using none_type_t = decltype(nullable::none<T>());
 
   template <class T>
   constexpr
@@ -149,7 +146,7 @@ inline namespace fundamental_v3
 }
 
   using nullable::none_t;
-  using nullable::none_type;
+  using nullable::none_type_t;
   using nullable::none;
   using nullable::has_value;
   using nullable::have_value;
@@ -173,6 +170,7 @@ inline namespace fundamental_v3
   template <class T>
   struct is_nullable<T*> : true_type {};
 
+  // todo: implement this traits
   template <class T>
   struct is_strict_weakly_ordered_nullable : false_type {};
 

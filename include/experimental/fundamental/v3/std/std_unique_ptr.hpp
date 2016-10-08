@@ -12,7 +12,6 @@
 #include <experimental/nullable.hpp>
 #include <memory>
 
-
 namespace std
 {
 #if __cplusplus <= 201103L

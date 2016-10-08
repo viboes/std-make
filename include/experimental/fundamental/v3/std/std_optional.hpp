@@ -49,9 +49,6 @@ namespace experimental
 
   template <class T>
   struct nullable_traits<optional<T>> : nullable_traits_pointer_like {
-    template <class U>
-    struct none_type : meta::id<nullopt_t> { };
-
     static constexpr
     nullopt_t none() { return nullopt; }
 

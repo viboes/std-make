@@ -72,7 +72,10 @@ int main()
   static_assert(not std::is_base_of<stde::nullable_tag, stde::nullable_traits<stde::none_t>>::value, "ERROR");
   static_assert(not stde::is_nullable<stde::none_t>::value, "ERROR");
   static_assert(stde::is_nullable<stde::optional<int>>::value, "ERROR");
-  static_assert(stde::meta::is_callable<stde::optional<stde::_t>(int)>::value, "ERROR");
+  static_assert(std::is_same<
+      stde::nullable::none_type_t<stde::optional<int>>,
+      stde::nullopt_t
+    >::value, "ERROR");
 #if defined JASEL_FUNDAMENTAL_EXTENDED
   static_assert(std::is_same<stde::value_type_t<stde::optional<int&>>, int&>::value, "ERROR");
 #endif
