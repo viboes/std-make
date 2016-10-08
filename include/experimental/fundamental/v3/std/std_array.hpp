@@ -53,8 +53,10 @@ namespace experimental
   template <class T, size_t N>
   struct type_constructor<array<T, N>> : meta::id<array_tc> {};
 
+inline namespace fundamental_v3 {
+namespace type_constructible {
   template <class T, size_t N>
-  struct factory_traits<array<T, N>>
+  struct traits<array<T, N>>
   {
     template <class ...Xs>
     static constexpr
@@ -63,6 +65,8 @@ namespace experimental
       return {{forward<Xs>(xs)...}};
     }
   };
+}
+}
 }
 }
 

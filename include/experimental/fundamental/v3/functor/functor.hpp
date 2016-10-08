@@ -33,22 +33,20 @@ inline namespace fundamental_v3
   template <class T>
     constexpr bool is_functor_v = is_functor<T>::value;
 
-  struct functor_tag{};
+namespace functor
+{
+  struct tag{};
 
   template <class F, class Enabler=void>
-    struct functor_traits : functor_traits<F, meta::when<true>> {};
+    struct traits : traits<F, meta::when<true>> {};
 
   // Default failing specialization
   template <typename U, bool condition>
-  struct functor_traits<U, meta::when<condition>>
+  struct traits<U, meta::when<condition>>
   {
       template <class T, class F>
         static auto transform(T&& x, F&& y) =delete;
   };
-
-namespace functor {
-  template <class T>
-    using traits = functor_traits<T>;
 
   template <class T, class F>
   auto
@@ -59,7 +57,7 @@ namespace functor {
 }
 
   template <class T>
-    struct is_functor : is_base_of<functor_tag, functor_traits<T>> {};
+    struct is_functor : is_base_of<functor::tag, functor::traits<T>> {};
   template <class T>
   struct is_functor<const T> : is_functor<T> {};
   template <class T>

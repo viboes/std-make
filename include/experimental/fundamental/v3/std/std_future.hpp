@@ -97,9 +97,11 @@ inline namespace concurrency_v1
   template <class T>
   struct type_constructor<shared_future<T&>> : meta::id<shared_future<_t&>> {};
 
-  template <class T>
-  struct factory_traits<future<T>> {
+inline namespace fundamental_v3 {
+namespace type_constructible {
 
+  template <class T>
+  struct traits<future<T>> {
     template <class ...Xs>
     static
     future<T> make(Xs&& ...xs)
@@ -108,8 +110,7 @@ inline namespace concurrency_v1
     }
   };
   template <>
-  struct factory_traits<future<void>> {
-
+  struct traits<future<void>> {
     static
     future<void> make()
     {
@@ -119,8 +120,7 @@ inline namespace concurrency_v1
 
 
   template <class T>
-  struct factory_traits<shared_future<T>> {
-
+  struct traits<shared_future<T>> {
     template <class ...Xs>
     static
     shared_future<T> make(Xs&& ...xs)
@@ -131,8 +131,7 @@ inline namespace concurrency_v1
     }
   };
   template <>
-  struct factory_traits<shared_future<void>> {
-
+  struct traits<shared_future<void>> {
     static
     shared_future<void> make()
     {
@@ -141,7 +140,8 @@ inline namespace concurrency_v1
       return p.get_future().share();
     }
   };
-//}
+}
+}
 }
 }
 

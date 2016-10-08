@@ -62,11 +62,12 @@ namespace product_type
     }
 }
 
+namespace swappable {
   /**
    */
 
   template <class PT>
-  struct swappable_traits<PT, PT, meta::when<
+  struct traits<PT, PT, meta::when<
     is_product_type_v<PT>
   >>
   {
@@ -76,7 +77,7 @@ namespace product_type
         product_type::swap(x, y);
       }
   };
-
+}
 }}
 }
 #endif

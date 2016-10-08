@@ -30,7 +30,7 @@ int main()
 
   static_assert(stde::is_nullable_v<stde::optional<int>>, "ERROR");
   static_assert(stde::is_type_constructible_v<stde::optional<int>>, "ERROR");
-  static_assert(std::is_base_of<stde::functor_tag, stde::functor_traits<stde::optional<int>>> ::value, "ERROR");
+  static_assert(std::is_base_of<stde::functor::tag, stde::functor::traits<stde::optional<int>>> ::value, "ERROR");
   static_assert(stde::is_functor<stde::optional<int>>::value, "ERROR");
 
   {

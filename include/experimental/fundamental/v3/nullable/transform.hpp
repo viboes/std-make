@@ -60,10 +60,11 @@ namespace nullable
 /**
  */
 
+namespace functor {
 template <class N>
-struct functor_traits<N, meta::when<
+struct traits<N, meta::when<
   is_nullable_v<N> && is_type_constructible_v<N>
->> : functor_tag
+>> : tag
 {
   template <class T, class F>
     static constexpr auto transform(T&& x, F&& f)
@@ -71,7 +72,7 @@ struct functor_traits<N, meta::when<
       return nullable::transform(forward<T>(x), forward<F>(f));
     }
 };
-
+}
 }}
 }
 #endif // header

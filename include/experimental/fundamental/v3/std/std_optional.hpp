@@ -47,8 +47,11 @@ namespace experimental
 
 #endif
 
+inline namespace fundamental_v3 {
+namespace nullable
+{
   template <class T>
-  struct nullable_traits<optional<T>> : nullable_traits_pointer_like {
+  struct traits<optional<T>> : traits_pointer_like {
     static constexpr
     nullopt_t none() { return nullopt; }
 
@@ -58,7 +61,8 @@ namespace experimental
       { return nullopt; }
 
   };
-
+}
+}
 //}
 }
 }

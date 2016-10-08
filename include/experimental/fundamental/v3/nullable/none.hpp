@@ -4,12 +4,13 @@
 //
 // Copyright (C) 2014-2015 Vicente J. Botet Escriba
 
-#ifndef JASEL_FUNDAMENTAL_V2_NULLABLE_NONE_HPP
-#define JASEL_FUNDAMENTAL_V2_NULLABLE_NONE_HPP
+#ifndef JASEL_FUNDAMENTAL_V3_NULLABLE_NONE_HPP
+#define JASEL_FUNDAMENTAL_V3_NULLABLE_NONE_HPP
 
 #include <experimental/type_constructible.hpp>
 #include <experimental/meta.hpp>
 #include <experimental/fundamental/v2/config.hpp>
+#include <experimental/meta/v1/when.hpp>
 
 #include <utility>
 #include <type_traits>
@@ -20,38 +21,60 @@ namespace experimental
 {
 inline namespace fundamental_v3
 {
-  struct nullable_tag {};
-
-  template <class T>
-  struct nullable_traits  {};
-
-  struct nullable_traits_pointer_like : nullable_tag
-  {
-    static constexpr
-    nullptr_t none() noexcept { return nullptr; }
-
-    template <class U>
-    static constexpr
-    bool has_value(U const& ptr) noexcept { return bool(ptr); }
-
-    template <class U>
-    static constexpr
-    auto deref(U && ptr)
-      JASEL_DECLTYPE_RETURN (
-          *(forward<U>(ptr))
-      )
-
-    template <class U>
-    static constexpr
-    std::nullptr_t deref_none(U &&)
-      { return nullptr; }
-
-  };
-
-  template <>
-  struct nullable_traits<add_pointer<_t>> : nullable_traits_pointer_like {};
 
   namespace nullable {
+    struct tag {};
+
+    template <class T, class Enabler=void>
+      struct traits : traits<T, meta::when<true>> {};
+
+    // Default specialization
+    template <typename T, bool condition>
+    struct traits<T, meta::when<condition>>
+    {
+      static
+      auto none()  = delete;
+
+      template <class U>
+      static
+      bool has_value(U const& ptr)  = delete;
+
+      template <class U>
+      static
+      auto deref(U && ptr) = delete;
+
+      template <class U>
+      static
+      std::nullptr_t deref_none(U &&) = delete;
+
+    };
+
+    struct traits_pointer_like : tag
+    {
+      static constexpr
+      nullptr_t none() noexcept { return nullptr; }
+
+      template <class U>
+      static constexpr
+      bool has_value(U const& ptr) noexcept { return bool(ptr); }
+
+      template <class U>
+      static constexpr
+      auto deref(U && ptr)
+        JASEL_DECLTYPE_RETURN (
+            *(forward<U>(ptr))
+        )
+
+      template <class U>
+      static constexpr
+      std::nullptr_t deref_none(U &&)
+        { return nullptr; }
+
+    };
+
+    template <>
+    struct traits<add_pointer<_t>> : traits_pointer_like {};
+
 
   struct none_t {
     explicit none_t() = default;
@@ -72,7 +95,7 @@ inline namespace fundamental_v3
   constexpr
   auto none()
     JASEL_DECLTYPE_RETURN_NOEXCEPT (
-      nullable_traits<TC>::none()
+      traits<TC>::none()
     )
 
   template <template <class ...> class TC>
@@ -90,7 +113,7 @@ inline namespace fundamental_v3
   constexpr
   auto has_value(T const& x)
     JASEL_DECLTYPE_RETURN_NOEXCEPT (
-      nullable_traits<T>::has_value(x)
+      traits<T>::has_value(x)
     )
 
   template <class T>
@@ -103,7 +126,7 @@ inline namespace fundamental_v3
   constexpr
   auto deref(T&& x)
     JASEL_DECLTYPE_RETURN (
-      nullable_traits<typename decay<T>::type>::deref(x)
+      traits<typename decay<T>::type>::deref(x)
     )
 
   template <class T>
@@ -116,7 +139,7 @@ inline namespace fundamental_v3
   constexpr
   auto deref_none(T&& x)
     JASEL_DECLTYPE_RETURN (
-      nullable_traits<typename decay<T>::type>::deref_none(x)
+      traits<typename decay<T>::type>::deref_none(x)
     )
 
   template <class T>
@@ -153,8 +176,15 @@ inline namespace fundamental_v3
   using nullable::deref;
   using nullable::deref_none;
 
+  // todo: define in function of whether
+  // EqualityComparable && DefaultConstructible && Destructible
+  // nullable::none<T>()
+  // nullable::has_value(t)
+  // T{none_t}
+  // T{none<T>()}
+
   template <class T>
-  struct is_nullable : is_base_of<nullable_tag, nullable_traits<T>> {};
+  struct is_nullable : is_base_of<nullable::tag, nullable::traits<T>> {};
   template <class T>
   struct is_nullable<const T> : is_nullable<T> {};
   template <class T>

@@ -40,12 +40,17 @@ namespace boost {
 
 namespace std
 {
-  namespace experimental
-  {
+namespace experimental
+{
+
+inline namespace fundamental_v3
+{
+namespace type_constructible
+{
 
     template <class T, class E>
-    struct factory_traits<boost::expected<T,E>> : factory_traits_default<boost::expected<T,E>> {
-      using factory_traits_default<boost::expected<T,E>>::make;
+    struct traits<boost::expected<T,E>> : traits_constructor<boost::expected<T,E>> {
+      using traits_constructor<boost::expected<T,E>>::make;
 
       template <class ...Xs>
       static constexpr
@@ -55,13 +60,15 @@ namespace std
       }
     };
 
-    // type_constructor customization
-    template <class T, class E>
-    struct type_constructor<boost::expected<T, E>> : meta::id<boost::expected<_t, E>> {};
-  //    // value_type customization
-  //    template <class T, class E>
-  //    struct value_type<boost::expected<T, E>> : id<T> {};
-  }
+}
+// type_constructor customization
+template <class T, class E>
+struct type_constructor<boost::expected<T, E>> : meta::id<boost::expected<_t, E>> {};
+//    // value_type customization
+//    template <class T, class E>
+//    struct value_type<boost::expected<T, E>> : id<T> {};
+}
+}
 }
 
 struct A

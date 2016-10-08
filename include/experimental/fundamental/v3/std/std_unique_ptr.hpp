@@ -56,13 +56,15 @@ namespace std
 
 namespace experimental
 {
-
+inline namespace fundamental_v3
+{
   // type_constructor customization
   template <class T, class D>
   struct type_constructor<unique_ptr<T,D>> : meta::id<unique_ptr<_t, D>> {};
 
+namespace type_constructible {
   template <class T, class D>
-  struct factory_traits<unique_ptr<T, D>> : type_constructible_tag
+  struct traits<unique_ptr<T, D>> : tag
   {
     template <class ...Xs>
     static //constexpr
@@ -71,10 +73,13 @@ namespace experimental
       return make_unique<T>(forward<Xs>(xs)...);
     }
   };
+}
 
+namespace nullable {
   template <class T, class D>
-  struct nullable_traits<unique_ptr<T, D>> : nullable_traits_pointer_like {};
-
+  struct traits<unique_ptr<T, D>> : traits_pointer_like {};
+}
+}
 }
 }
 

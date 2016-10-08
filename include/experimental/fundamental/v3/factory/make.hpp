@@ -11,6 +11,7 @@
 #include <type_traits>
 #include <experimental/meta/v1/is_callable.hpp>
 #include <experimental/meta/v1/decay_unwrap.hpp>
+#include <experimental/meta/v1/when.hpp>
 
 namespace std
 {
@@ -26,10 +27,12 @@ inline namespace fundamental_v3
     constexpr bool is_type_constructible_v = is_type_constructible<T>::value;
 #endif
 
-  struct type_constructible_tag {};
+namespace type_constructible
+{
+  struct tag {};
 
   template <class T>
-  struct factory_traits_default : type_constructible_tag {
+  struct traits_constructor : tag {
     template <class ...Xs>
     static constexpr
     auto make(Xs&& ...xs)
@@ -39,11 +42,15 @@ inline namespace fundamental_v3
     }
   };
 
-  template <class T>
-  struct factory_traits : factory_traits_default<T> {};
+  template <class T, class Enabler=void>
+    struct traits : traits<T, meta::when<true>> {};
+
+  // Default specialization
+  template <typename T, bool condition>
+  struct traits<T, meta::when<condition>> : traits_constructor<T>  {};
 
   template <class T>
-  struct factory_traits<T*> : type_constructible_tag
+  struct traits<T*> : tag
   {
     template <class ...Xs>
     static
@@ -54,9 +61,6 @@ inline namespace fundamental_v3
     }
   };
 
-
-inline namespace factories
-{
   // make() overload
   template <class TC, int = 0, int...>
   constexpr
@@ -65,13 +69,13 @@ inline namespace factories
       meta::invoke<TC, void>
   >::type make()
   {
-    return factory_traits<meta::invoke<TC, void>>::make();
+    return traits<meta::invoke<TC, void>>::make();
   }
 
   template <template <class> class M>
   constexpr M<void> make()
   {
-    return factory_traits<M<void>>::make();
+    return traits<M<void>>::make();
   }
 
   // make overload: requires a type constructor, deduce the underlying type
@@ -82,7 +86,7 @@ inline namespace factories
   >::type
   make(Xs&& ...xs)
   {
-    return factory_traits<meta::invoke<TC, meta::decay_unwrap_t<Xs>...>>::make(std::forward<Xs>(xs)...);
+    return traits<meta::invoke<TC, meta::decay_unwrap_t<Xs>...>>::make(std::forward<Xs>(xs)...);
 
   }
 
@@ -94,7 +98,7 @@ inline namespace factories
   >::type
   make(Xs&& ...xs)
   {
-    return factory_traits<M>::make(std::forward<Xs>(xs)...);
+    return traits<M>::make(std::forward<Xs>(xs)...);
   }
 
   // make overload: requires a template class, deduce the underlying type
@@ -102,12 +106,14 @@ inline namespace factories
   constexpr M<meta::decay_unwrap_t<Xs>...>
   make(Xs&& ...xs)
   {
-    return factory_traits<M<meta::decay_unwrap_t<Xs>...>>::make(std::forward<Xs>(xs)...);
+    return traits<M<meta::decay_unwrap_t<Xs>...>>::make(std::forward<Xs>(xs)...);
   }
 }
 
+using type_constructible::make;
+
 template <class T>
-struct is_type_constructible : is_base_of<type_constructible_tag, factory_traits<T>> {};
+struct is_type_constructible : is_base_of<type_constructible::tag, type_constructible::traits<T>> {};
 template <class T>
 struct is_type_constructible<const T> : is_type_constructible<T> {};
 template <class T>

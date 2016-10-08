@@ -7,11 +7,12 @@
 #ifndef JASEL_EXPERIMENTAL_NULLABLE_HPP
 #define JASEL_EXPERIMENTAL_NULLABLE_HPP
 
-// TypeConstructible
-#include <experimental/type_constructible.hpp>
 
 // Nullable
 #include <experimental/fundamental/v3/nullable/none.hpp>
 #include <experimental/fundamental/v3/nullable/transform.hpp>
+
+// TypeConstructible
+#include <experimental/type_constructible.hpp>
 
 #endif // header

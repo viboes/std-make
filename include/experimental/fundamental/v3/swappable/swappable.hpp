@@ -24,16 +24,16 @@
 /// std::experimental::swappable::swap is defined as:
 ///
 /// If is_adl_swappable<T,U> call swap(a,b).
-/// Otherwise, the expression swappable_traits<T,U>::swap(a,b) if it is a valid expression
+/// Otherwise, the expression swappable::traits<T,U>::swap(a,b) if it is a valid expression
 /// Otherwise if it is MoveConstructible and MoveAssignable exchange
 /// Otherwise if it is a c-array of swappables swap the parts
 /// Otherwise it is not defined
 ///
 /// is_adl_swappable<T,U> is true if the expression to swap(a,b) is a valid when evaluated in the following context:
 /// - 20.2.2, swap when the requirements are satisfied and the types are not ADL swappable or
-/// - using the std::experimental::swappable_traits<T,U>::swap
+/// - using the std::experimental::swappable::traits<T,U>::swap
 ///
-/// std::experimental::swappable_traits<T,U> is specialized for types for which the expression
+/// std::experimental::swappable::traits<T,U> is specialized for types for which the expression
 /// swap(t, u) is a valid when evaluated in the following context:
 ///////////////////////////////////////////////////////////////////////////////////////
 
@@ -61,17 +61,19 @@ inline namespace fundamental_v3
   template <class T, class U=T>
     constexpr bool is_nothrow_swappable_v = is_nothrow_swappable<T,U>::value;
 
+namespace swappable {
+
   template <class R, class S, class Enabler=void>
-    struct swappable_traits : swappable_traits<R, S, meta::when<true>> {};
+    struct traits : traits<R, S, meta::when<true>> {};
 
   // Default failing specialization
   template <typename R, typename S, bool condition>
-  struct swappable_traits<R, S, meta::when<condition>>
+  struct traits<R, S, meta::when<condition>>
   {
       template <class T, class U>
         static auto swap(const T& x, const U& y) =delete;
   };
-
+}
 namespace adl_swappable {
 
 #if defined __clang
@@ -99,9 +101,6 @@ namespace adl_swappable {
 }
 
 namespace swappable {
-  template <class T, class U>
-    using traits = swappable_traits<T, U>;
-
   template <class T, class U=T>
     constexpr bool is_adl_swappable_v = adl_swappable::is_adl_swappable<T,U>::value;
 

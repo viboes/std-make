@@ -12,6 +12,7 @@
 //  template <class M, class ...Args>
 //  auto make(Args&& ...args);
 
+#include <experimental/nullable.hpp>
 #include <experimental/make.hpp>
 #include <experimental/meta.hpp>
 #include <experimental/fundamental/v2/in_place.hpp>
@@ -60,24 +61,27 @@ namespace std
     template <class T>
     struct type_constructor<boost::optional<T>> : meta::id<boost::optional<_t>> {};
 
-    template <class T>
-    struct factory_traits<boost::optional<T>> : factory_traits_default<boost::optional<T>> {
-      using factory_traits_default<boost::optional<T>>::make;
+inline namespace fundamental_v3 {
+namespace type_constructible
+{
+  template <class T>
+  struct traits<boost::optional<T>> : traits_constructor<boost::optional<T>> {
+    using traits_constructor<boost::optional<T>>::make;
 
-      template <class ...Xs>
-      static JASEL_CXX14_CONSTEXPR
-      boost::optional<T> make(std::experimental::in_place_t, Xs&& ...xs)
-      {
-        boost::optional<T> res;
-        res.emplace(std::forward<Xs>(xs)...);
-        return std::move(res);
-      }
-    };
+    template <class ...Xs>
+    static JASEL_CXX14_CONSTEXPR
+    boost::optional<T> make(std::experimental::in_place_t, Xs&& ...xs)
+    {
+      boost::optional<T> res;
+      res.emplace(std::forward<Xs>(xs)...);
+      return std::move(res);
+    }
+  };
+}
+namespace nullable {
+    tag xx;
     template <class T>
-    struct nullable_traits<boost::optional<T>> {
-
-      template <class U>
-      struct none_type : meta::id<boost::none_t> { };
+    struct traits<boost::optional<T>> : traits_pointer_like {
 
       static //constexpr
       boost::none_t none() { return boost::none; }
@@ -85,9 +89,9 @@ namespace std
       template <class U>
       static constexpr
       bool has_value(boost::optional<U> const& x) noexcept { return bool(x); }
-
-
     };
+}
+}
   }
 }
 

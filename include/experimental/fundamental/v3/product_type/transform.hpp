@@ -76,10 +76,12 @@ namespace product_type
 
 }
 
+namespace functor {
+
 template <class N>
-struct functor_traits<N, meta::when<
+struct traits<N, meta::when<
   is_product_type_v<N> && is_type_constructible_v<N>
->> : functor_tag
+>> : tag
 {
   template <class T, class F>
     static constexpr auto transform(T&& x, F&& f)
@@ -87,7 +89,7 @@ struct functor_traits<N, meta::when<
       return product_type::transform(forward<T>(x), forward<F>(f));
     }
 };
-
+}
 
 }}
 }

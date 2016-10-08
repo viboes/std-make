@@ -69,7 +69,7 @@ int main()
 {
   namespace stde = std::experimental;
 
-  static_assert(not std::is_base_of<stde::nullable_tag, stde::nullable_traits<stde::none_t>>::value, "ERROR");
+  static_assert(not std::is_base_of<stde::nullable::tag, stde::nullable::traits<stde::none_t>>::value, "ERROR");
   static_assert(not stde::is_nullable<stde::none_t>::value, "ERROR");
   static_assert(stde::is_nullable<stde::optional<int>>::value, "ERROR");
   static_assert(std::is_same<

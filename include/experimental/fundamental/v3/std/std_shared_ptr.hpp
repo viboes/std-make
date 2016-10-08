@@ -20,13 +20,16 @@ namespace std
 
 namespace experimental
 {
+inline namespace fundamental_v3
+{
 
   // type_constructor customization
   template <class T>
   struct type_constructor<shared_ptr<T>> : meta::id<shared_ptr<_t>> {};
 
+namespace type_constructible {
   template <class T>
-  struct factory_traits<shared_ptr<T>> : type_constructible_tag
+  struct traits<shared_ptr<T>> : tag
   {
 
     template <class ...Xs>
@@ -36,9 +39,13 @@ namespace experimental
       return make_shared<T>(forward<Xs>(xs)...);
     }
   };
-  template <class T>
-  struct nullable_traits<shared_ptr<T>> : nullable_traits_pointer_like {};
+}
 
+namespace nullable {
+  template <class T>
+  struct traits<shared_ptr<T>> : traits_pointer_like {};
+}
+}
 }
 }
 
