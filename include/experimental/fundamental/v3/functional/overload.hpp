@@ -23,188 +23,206 @@ namespace experimental
 {
 inline namespace fundamental_v3
 {
-
-    namespace detail
-    {
-      template <class F, bool IsFinal=is_class<F>::value && is_final<F>::value>
-      struct forwarder : F
-      {
-        using type = F;
-        using F::operator();
-        constexpr forwarder(F fct) : F(move(fct))
-        {}
-      };
+namespace detail
+{
       template< class F>
       struct wrap_call {
           using type = F;
           type f;
 
-          template<typename G,
+          /* Perfect forwardign constructor */
+          template<typename U,
                    /* Make sure that it does not act as copy constructor for wrap_call& */
-                   enable_if_t<!is_base_of<wrap_call, decay_t<G>>::value
+                   std::enable_if_t<!std::is_base_of<wrap_call, std::decay_t<U>>::value
                    /* require that F can be constructed from U&& */
-                   && is_constructible<F, G>::value, bool> = true>
-          constexpr wrap_call(G&& fct) : f(forward<G>(fct)) { }
+                   && std::is_constructible<F, U>::value, bool> = true>
+          constexpr wrap_call(U&& fct) : f(std::forward<U>(fct)) { }
 
+          /* You may want to use std::invoke to handle member pointers here */
           template< class ...Xs >
           constexpr auto operator () (Xs &&... xs) const &
-            noexcept(noexcept( f(forward<Xs>(xs)...) ))
-            -> decltype(f(forward<Xs>(xs)...))
+            noexcept(noexcept( f(std::forward<Xs>(xs)...) ))
+            -> decltype(f(std::forward<Xs>(xs)...))
           {
-              return f(forward<Xs>(xs)...);
+              return f(std::forward<Xs>(xs)...);
           }
           template< class ...Xs >
           constexpr auto operator () (Xs &&... xs) const &&
-            noexcept(noexcept( move(f)(forward<Xs>(xs)...) ))
-            -> decltype(move(f)(forward<Xs>(xs)...))
+            noexcept(noexcept( std::move(f)(std::forward<Xs>(xs)...) ))
+            -> decltype(std::move(f)(std::forward<Xs>(xs)...))
           {
-              return move(f)(forward<Xs>(xs)...);
+              return std::move(f)(std::forward<Xs>(xs)...);
           }
           template< class ...Xs >
           constexpr auto operator () (Xs &&... xs) &
-            noexcept(noexcept( f(forward<Xs>(xs)...) ))
-            -> decltype(f(forward<Xs>(xs)...))
+            noexcept(noexcept( f(std::forward<Xs>(xs)...) ))
+            -> decltype(f(std::forward<Xs>(xs)...))
           {
-              return f(forward<Xs>(xs)...);
+              return f(std::forward<Xs>(xs)...);
           }
           template< class ...Xs >
           constexpr auto operator () (Xs &&... xs) &&
-            noexcept(noexcept( move(f)(forward<Xs>(xs)...) ))
-            -> decltype(move(f)(forward<Xs>(xs)...))
+            noexcept(noexcept( std::move(f)(std::forward<Xs>(xs)...) ))
+            -> decltype(std::move(f)(std::forward<Xs>(xs)...))
           {
-              return move(f)(forward<Xs>(xs)...);
+              return std::move(f)(std::forward<Xs>(xs)...);
           }
       };
-      template< class F>
-      struct forwarder<F, true>
-#if 0
 
-      : wrap_call<F>
+      /* Function version */
+      /* I just ignore eplisis, there is no way to wrap it */
+      template<typename R, typename... Args>
+      struct wrap_call<R(*)(Args...)>
       {
-        template<typename G,
-                 /* Make sure that it does not act as copy constructor for wrap_call& */
-                 enable_if_t<!is_base_of<forwarder, decay_t<G>>::value
-                 /* require that F can be constructed from U&& */
-                 && is_constructible<F, G>::value, bool> = true>
-        constexpr forwarder(G&& fct) : wrap_call<F>(forward<G>(fct)) { }
-      };
-#else
-      {
-          using type = F;
+          using type = R(*)(Args...);
           type f;
 
-          template<typename G,
-                   /* Make sure that it does not act as copy constructor for wrap_call& */
-                   enable_if_t<!is_base_of<forwarder, decay_t<G>>::value
-                   /* require that F can be constructed from U&& */
-                   && is_constructible<F, G>::value, bool> = true>
-          constexpr forwarder(G&& fct) : f(forward<G>(fct)) { }
+          constexpr wrap_call(type fct) : f(fct) {}
 
-          //template <class FF>
-          //constexpr forwarder(FF&& fct) : f(move(fct)) { }
-
-          template< class ...Xs >
-          constexpr auto operator () (Xs &&... xs) const &
-            noexcept(noexcept( f(forward<Xs>(xs)...) ))
-            -> decltype(f(forward<Xs>(xs)...))
+          /* Really need to not select other overload based on constness */
+          #if 0
+          constexpr R operator()(Args... args)
           {
-              return f(forward<Xs>(xs)...);
+              /* Esentially does an move for values and rvalue reference, normal operation otherwise */
+              return f(std::forward<Args>(args)...);
           }
-          template< class ...Xs >
-          constexpr auto operator () (Xs &&... xs) const &&
-            noexcept(noexcept( move(f)(forward<Xs>(xs)...) ))
-            -> decltype(move(f)(forward<Xs>(xs)...))
+          #endif
+          constexpr R operator()(Args... args) const
           {
-              return move(f)(forward<Xs>(xs)...);
-          }
-          template< class ...Xs >
-          constexpr auto operator () (Xs &&... xs) &
-            noexcept(noexcept( f(forward<Xs>(xs)...) ))
-            -> decltype(f(forward<Xs>(xs)...))
-          {
-              return f(forward<Xs>(xs)...);
-          }
-          template< class ...Xs >
-          constexpr auto operator () (Xs &&... xs) &&
-            noexcept(noexcept( move(f)(forward<Xs>(xs)...) ))
-            -> decltype(move(f)(forward<Xs>(xs)...))
-          {
-              return move(f)(forward<Xs>(xs)...);
+              return f(std::forward<Args>(args)...);
           }
       };
-#endif
-      template< class R, class ...X>
-      struct forwarder<R(*)(X...), false> {
-          using type = R(*)(X...);
-          type f;
-
-          constexpr forwarder(type f) : f(f) { }
-
-          constexpr R operator () (X &&... x) const noexcept(noexcept( f(forward<X>(x)...) ))
-          {
-              return f(forward<X>(x)...);
-          }
-      };
-
-      template< class R, class ...X >
-      struct forwarder<R(&)(X...), false> {
-          using type = R(&)(X...);
-          type f;
-
-          constexpr forwarder(type f) : f(f) { }
-
-          constexpr R operator () (X &&... x) const noexcept(noexcept( f(forward<X>(x)...) ))
-          {
-              return f(forward<X>(x)...);
-          }
-      };
-
-      template<class R, class O, class...X>
-      struct forwarder<R(O::*)(X...), false> : forwarder<decltype(mem_fn(declval<R(O::*)(X...)>())), false> {
-        using base = forwarder<decltype(mem_fn(declval<R(O::*)(X...)>())), false>;
-        using type = R(O::*)(X...);
-
-        constexpr forwarder(type f) : base(mem_fn(f)) { }
-        using base::operator();
-      };
-
-      template <class R, class F>
-      struct explicit_forwarder : forwarder<F>
+      template<typename R, typename... Args>
+      struct wrap_call<R(&)(Args...)>
       {
-        using result_type = R;
-        using forwarder<F>::operator();
-        constexpr explicit_forwarder(F fct) : forwarder<F>(move(fct))
-        {}
+          using type = R(&)(Args...);
+          type f;
+
+          constexpr wrap_call(type fct) : f(fct) {}
+
+          /* Really need to not select other overload based on constness */
+          #if 0
+          constexpr R operator()(Args... args)
+          {
+              /* Esentially does an move for values and rvalue reference, normal operation otherwise */
+              return f(std::forward<Args>(args)...);
+          }
+          #endif
+
+          constexpr R operator()(Args... args) const
+          {
+              return f(std::forward<Args>(args)...);
+          }
       };
+
+      //Probably there is also need to have version for noexcept pointer/reference
+
+      template<typename PointerType, typename Clazz, typename R, typename... Args>
+      struct function_member_wrapper
+      {
+          using type = PointerType;
+          type f;
+
+          constexpr function_member_wrapper(type fct) : f(fct) {}
+
+          template<typename U,
+                   std::enable_if_t<std::is_base_of<Clazz, std::decay_t<U>>::value
+                                 && std::is_convertible<decltype((std::declval<U>().*f)(std::declval<Args>()...)), R>::value, bool> = true>
+          constexpr R operator()(U&& obj, Args... args) const
+          {
+             return (std::forward<U>(obj).*f)(std::forward<Args>(args)...);
+          }
+
+          template<typename U,
+                   std::enable_if_t<std::is_convertible<decltype((std::declval<U&>().*f)(std::declval<Args>()...)), R>::value, bool> = true>
+          constexpr R operator()(std::reference_wrapper<U> ref, Args... args) const
+          {
+             return (ref.get().*f)(std::forward<Args>(args)...);
+          }
+
+          template<typename U,
+                   std::enable_if_t<!std::is_base_of<Clazz, std::decay_t<U>>::value
+                                 && std::is_convertible<decltype(((*std::declval<U>()).*f)(std::declval<Args>()...)), R>::value, bool> = true>
+          constexpr R operator()(U&& ptr, Args... args) const
+          {
+             return ((*std::forward<U>(ptr)).*f)(std::forward<Args>(args)...);
+          }
+
+      };
+
+      /* Function version */
+      /* I just ignore eplisis, there is no way to wrap it */
+      #define WRAP_CALL_FOR_MEMBER_FUNCTION(cv_ref_qual) \
+      template<typename C, typename R, typename... Args> \
+      struct wrap_call<R (C::*)(Args...) cv_ref_qual>  \
+         : function_member_wrapper<R (C::*)(Args...) cv_ref_qual, C, R, Args...> \
+      {  \
+          using base = function_member_wrapper<R (C::*)(Args...) cv_ref_qual, C, R, Args...>; \
+          using base::base; \
+      };
+
+      WRAP_CALL_FOR_MEMBER_FUNCTION();
+      WRAP_CALL_FOR_MEMBER_FUNCTION(const);
+      WRAP_CALL_FOR_MEMBER_FUNCTION(volatile);
+      WRAP_CALL_FOR_MEMBER_FUNCTION(const volatile);
+
+      WRAP_CALL_FOR_MEMBER_FUNCTION(&);
+      WRAP_CALL_FOR_MEMBER_FUNCTION(const&);
+      WRAP_CALL_FOR_MEMBER_FUNCTION(volatile&);
+      WRAP_CALL_FOR_MEMBER_FUNCTION(const volatile&);
+
+      WRAP_CALL_FOR_MEMBER_FUNCTION(&&);
+      WRAP_CALL_FOR_MEMBER_FUNCTION(const&&);
+      WRAP_CALL_FOR_MEMBER_FUNCTION(volatile&&);
+      WRAP_CALL_FOR_MEMBER_FUNCTION(const volatile&&);
+
+      // You may also need to add noexcept version of each of them
+
+      #undef WRAP_CALL_FOR_MEMBER_FUNCTION
+
+      /* If F is not final class make it direct base of the overload, otherwise wrap in into a call.
+         Notice that both F and wrap_call<F> will be constructible from same object (prefect forwarding constructor) */
+      template<typename F>
+      struct overload_storage
+         : std::conditional<std::is_class<F>::value && !std::is_final<F>::value, F, wrap_call<F>>
+      {};
+
+      template<typename F>
+      using overload_storage_t = typename overload_storage<F>::type;
 
       template <class F, class ...Fs>
-      struct overloader;
+      class overloader;
 
-      template <class F>
-      struct overloader<F> : forwarder<F>
+      template<typename F1>
+      class overloader<F1> : overload_storage_t<F1>
       {
-        template <class OF>
-        constexpr overloader(OF&& of)
-        : forwarder<F>(forward<OF>(of))
-        {}
+          using base1 = overload_storage_t<F1>;
 
-        using forwarder<F>::operator();
+      public:
+          template<typename U1>
+          constexpr explicit overloader(U1&& fct1)
+              : base1(std::forward<U1>(fct1))
+          {}
+
+          using base1::operator();
+      };
+      template<typename F1, typename F2, class ...Fs>
+      class overloader<F1, F2, Fs...> : overload_storage_t<F1>, overloader<F2, Fs...>
+      {
+          using base1 = overload_storage_t<F1>;
+          using bases = overloader<F2, Fs...>;
+
+      public:
+          template<typename U1, typename U2, typename ...Us>
+          constexpr explicit overloader(U1&& fct1, U2&& fct2, Us&& ...fcts)
+              : base1(std::forward<U1>(fct1))
+              , bases(std::forward<U2>(fct2), std::forward<Us>(fcts)...)
+          {}
+
+          using base1::operator();
+          using bases::operator();
       };
 
-      template <class F1, class F2, class ...Fs>
-      struct overloader<F1, F2, Fs...>
-      : forwarder<F1>, overloader<F2, Fs...>
-      {
-        template <class OF1, class OF2, class ...OFs>
-        constexpr overloader(OF1&& of1, OF2&& of2, OFs&& ...ofs)
-        : forwarder<F1>(forward<OF1>(of1)), overloader<F2, Fs...>(forward<OF2>(of2), forward<OFs>(ofs)...)
-        {}
-
-        using forwarder<F1>::operator();
-        using overloader<F2, Fs...>::operator();
-      };
-
-      ///
       template <class R, class ...Fs>
       struct explicit_overloader : overloader<Fs...>
       {
@@ -212,38 +230,24 @@ inline namespace fundamental_v3
         using overloader<Fs...>::operator();
 
         template <class ...OFs>
-        constexpr explicit_overloader(OFs&& ...fs) : overloader<Fs...>(forward<OFs>(fs)...) {}
+        constexpr explicit_overloader(OFs&& ...fs) : overloader<Fs...>(std::forward<OFs>(fs)...) {}
       };
 
-    } // detail
+}
+      template<typename F1, typename ...Fs>
+      constexpr auto overload(F1&& f1, Fs&& ...fs)
+      {
+          return detail::overloader<std::decay_t<F1>, std::decay_t<Fs>...>(std::forward<F1>(f1), std::forward<Fs>(fs)...);
+      }
 
-    template <class F>
-    constexpr auto overload(F && f) noexcept(noexcept( detail::forwarder<decay_t<F>>(forward<F>(f)) ))
-    {
-      return detail::forwarder<decay_t<F>>(forward<F>(f));
-
-    }
-
-    template <class F1, class F2, class ... Fs>
-    constexpr auto overload(F1 && f1, F2 && f2, Fs &&... fcts)
-    {
-      return detail::overloader<decay_t<F1>,decay_t<F2>, decay_t<Fs>...>(
-          forward<F1>(f1), forward<F2>(f2), forward<Fs>(fcts)...);
-    }
-
-    template <class R, class F>
-    constexpr auto overload(F && f) noexcept(noexcept( detail::explicit_forwarder<R, decay_t<F>>(forward<F>(f)) ))
-    {
-      return detail::explicit_forwarder<R, decay_t<F>>(forward<F>(f));
-    }
-
-    template <class R, class F1, class F2, class ... Fs>
-    constexpr auto overload(F1 && f1, F2 && f2, Fs &&... fcts)
-    {
-      return detail::explicit_overloader<R, decay_t<F1>,decay_t<F2>, decay_t<Fs>...>(
-          forward<F1>(f1), forward<F2>(f2), forward<Fs>(fcts)...);
-    }
+      template <class R, class F1, class ... Fs>
+      constexpr auto overload(F1 && f1, Fs &&... fcts)
+      {
+        return detail::explicit_overloader<R, std::decay_t<F1>, std::decay_t<Fs>...>(
+          std::forward<F1>(f1), std::forward<Fs>(fcts)...);
+      }
 
 }}}
+
 #endif
 #endif // header
