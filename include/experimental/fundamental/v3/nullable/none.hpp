@@ -32,6 +32,7 @@ inline namespace fundamental_v3
     template <typename T, bool condition>
     struct traits<T, meta::when<condition>>
     {
+#if __cplusplus >= 201402L
       static
       auto none()  = delete;
 
@@ -46,7 +47,7 @@ inline namespace fundamental_v3
       template <class U>
       static
       std::nullptr_t deref_none(U &&) = delete;
-
+#endif
     };
 
     struct traits_pointer_like : tag
@@ -74,6 +75,8 @@ inline namespace fundamental_v3
 
     template <>
     struct traits<add_pointer<_t>> : traits_pointer_like {};
+    template <class T>
+    struct traits<T*> : traits_pointer_like {};
 
 
   struct none_t {
@@ -102,8 +105,8 @@ inline namespace fundamental_v3
   constexpr
   auto none()
     JASEL_DECLTYPE_RETURN_NOEXCEPT (
-        //none<type_constructor_t<meta::quote<TC>>>()
-        none< TC<_t> >()
+        none<type_constructor_t<meta::quote<TC>>>()
+        //none< TC<_t> >()
     )
 
   template <class T>

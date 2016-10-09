@@ -12,6 +12,10 @@
 //#include <algorithm>
 //#include <iterator>
 //#include <vector>
+#define JASEL_HAS_EXPERIMENTAL_ANY 0
+#if JASEL_HAS_EXPERIMENTAL_ANY
+#include <experimental/any>
+#endif
 #include <boost/detail/lightweight_test.hpp>
 
 template <class T>
@@ -63,12 +67,67 @@ constexpr nullopt_t2 nullopt2{nullopt_t2::init{}};
 
 void accept_nullopt_t2(nullopt_t2) {
 }
+#if __cplusplus >= 201402L
 
+template <template <class ...> class TC, class T>
+TC<T> make_none(T) {
+  //return TC{};
+  return std::add_pointer_t<T>{};
+}
+#endif
+template <template <class ...> class TC, class T>
+TC<T> make_none3(T) {
+  return std::experimental::none<TC>();
+}
+template <template <class ...> class TC, class T>
+TC<T> make_none4(T) {
+  return std::experimental::none<TC<T>>();
+}
+#if JASEL_HAS_EXPERIMENTAL_ANY
 
+template <class>
+using any_t = std::experimental::any;
+
+template <template <class ...> class TC, class T>
+TC<T> make_none2(T) {
+  //return TC{};
+  return any_t<T>{};
+}
+#endif
 int main()
 {
   namespace stde = std::experimental;
 
+#if __cplusplus >= 201402L
+  {
+    auto ip = make_none<std::add_pointer_t>(0);
+    BOOST_TEST(ip == nullptr);
+  }
+#endif
+#if 0
+  // no type named 'type' in 'std::__1::add_pointer<experimental::_t>'
+  {
+    auto ip = make_none3<std::add_pointer_t>(0);
+    BOOST_TEST(ip == nullptr);
+  }
+#endif
+#if __cplusplus >= 201402L
+  // no type named 'type' in 'std::__1::add_pointer<experimental::_t>'
+  {
+    auto ip = make_none4<std::add_pointer_t>(0);
+    BOOST_TEST(ip == nullptr);
+  }
+#endif
+#if JASEL_HAS_EXPERIMENTAL_ANY
+  {
+    std::experimental::any a,b;
+    //BOOST_TEST(a == b); // compile fail: std::experimental::any can not be a Nullable as is not EqualityComparable :(
+    BOOST_TEST(a.empty());
+    auto x = make_none2<any_t>(0);
+    //BOOST_TEST(x == std::experimental::any{});
+    BOOST_TEST(x.empty());
+  }
+#endif
   {
     nullopt_t2 ip = nullopt2;
     accept_nullopt_t2(ip);
@@ -119,6 +178,12 @@ int main()
     BOOST_TEST(stde::none() == x);
     BOOST_TEST(stde::deref_none(x) == nullptr);
   }
+#if 0
+// no type named 'type' in 'std::__1::add_pointer<experimental::_t>'
+  {
+    int * x = stde::none<std::add_pointer_t>();
+  }
+#endif
   {
     const int * x = nullptr;
     BOOST_TEST(! stde::has_value(x));
