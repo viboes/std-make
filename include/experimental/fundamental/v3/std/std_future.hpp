@@ -84,8 +84,6 @@ inline namespace concurrency_v1
   }
 }
 
-//inline namespace fundamental_v2
-//{
   // type_constructor customization
   template <class T>
   struct type_constructor<future<T>> : meta::id<future<_t>> {};
