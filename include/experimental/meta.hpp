@@ -16,6 +16,7 @@
 #include <experimental/meta/v1/id.hpp>
 #include <experimental/meta/v1/identity.hpp>
 #include <experimental/meta/v1/is_callable.hpp>
+#include <experimental/meta/v1/types.hpp>
 #include <experimental/meta/v1/quote_trait.hpp>
 #include <experimental/meta/v1/quote.hpp>
 #include <experimental/meta/v1/rebind.hpp>
