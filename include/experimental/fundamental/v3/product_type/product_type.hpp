@@ -160,7 +160,17 @@ namespace detail
 
     // customization for C-arrays
     template <class T, size_t N>
-    struct traits<T [N]> : tag
+    struct traits<T (&) [N]> : tag
+    {
+      using size = integral_constant<size_t, N>;
+      template <size_t I>
+      struct element { using type = T; };
+
+      template <size_t I, class U, size_t M, class= std::enable_if_t< I<N >>
+          static constexpr U& get(U (&arr)[M]) noexcept { return arr[I]; }
+    };
+    template <class T, size_t N>
+    struct traits<T  [N]> : tag
     {
       using size = integral_constant<size_t, N>;
       template <size_t I>
@@ -189,11 +199,11 @@ namespace detail
     template <class PT>
     struct empty : integral_constant<bool, 0 == product_type::size_v<PT>> {};
     template <class PT>
-    constexpr size_t empty_v = empty<PT>::value;
+    constexpr bool empty_v = empty<PT>::value;
     template <class PT>
     struct not_empty : integral_constant<bool, (0 != product_type::size_v<PT>)> {};
     template <class PT>
-    constexpr size_t not_empty_v = not_empty<PT>::value;
+    constexpr bool not_empty_v = not_empty<PT>::value;
 
     template <size_t I, class PT
       , class= std::enable_if_t< I < size_v<remove_cv_t<remove_reference_t<PT>>> >
