@@ -124,52 +124,51 @@ namespace detail
   template <size_t N, class T>
   struct has_tuple_like_access<T (&)[N]> : false_type {};
 
-  template <class PT, class Enabler=void>
-  struct product_type_traits : product_type_traits<PT, meta::when<true>> {};
 
-  // Default failing specialization
-  template <class  PT, bool condition>
-  struct product_type_traits<PT, meta::when<condition>>
-  {
-      template <class T>
-        static constexpr auto get(T&& x) =delete;
-  };
-
-
-  struct product_type_tag{};
-
-  // Forward to customized class using tuple-like access
-  template <class PT>
-  struct product_type_traits
-  <  PT, meta::when< has_tuple_like_access<PT>::value >  > : product_type_tag
-  {
-    using size = tuple_size<PT>;
-
-    template <size_t I>
-    using element = tuple_element<I, PT>;
-
-    template <size_t I, class PT2, class= std::enable_if_t< I < size::value > >
-      static constexpr decltype(auto) get(PT2&& pt) noexcept
-      {
-        return detail::get_adl::xget<I>(forward<PT2>(pt));
-      }
-  };
-
-  // customization for C-arrays
-  template <class T, size_t N>
-  struct product_type_traits<T [N]> : product_type_tag
-  {
-    using size = integral_constant<size_t, N>;
-    template <size_t I>
-    struct element { using type = T; };
-
-    template <size_t I, class U, size_t M, class= std::enable_if_t< I<N >>
-        static constexpr U& get(U (&arr)[M]) noexcept { return arr[I]; }
-  };
 
   namespace product_type {
-    template <class T>
-      using traits = product_type_traits<T>;
+
+    template <class PT, class Enabler=void>
+    struct traits : traits<PT, meta::when<true>> {};
+
+    // Default failing specialization
+    template <class  PT, bool condition>
+    struct traits<PT, meta::when<condition>>
+    {
+        template <class T>
+          static constexpr auto get(T&& x) =delete;
+    };
+
+    struct tag{};
+
+    // Forward to customized class using tuple-like access
+    template <class PT>
+    struct traits
+    <  PT, meta::when< has_tuple_like_access<PT>::value >  > : tag
+    {
+      using size = tuple_size<PT>;
+
+      template <size_t I>
+      using element = tuple_element<I, PT>;
+
+      template <size_t I, class PT2, class= std::enable_if_t< I < size::value > >
+        static constexpr decltype(auto) get(PT2&& pt) noexcept
+        {
+          return detail::get_adl::xget<I>(forward<PT2>(pt));
+        }
+    };
+
+    // customization for C-arrays
+    template <class T, size_t N>
+    struct traits<T [N]> : tag
+    {
+      using size = integral_constant<size_t, N>;
+      template <size_t I>
+      struct element { using type = T; };
+
+      template <size_t I, class U, size_t M, class= std::enable_if_t< I<N >>
+          static constexpr U& get(U (&arr)[M]) noexcept { return arr[I]; }
+    };
 
     template <class PT>
     struct size : traits<PT>::size {};
@@ -216,7 +215,7 @@ namespace detail
 
   // fixme redefine it as we did for has_tuple_like_access
   template <class T>
-  struct is_product_type : is_base_of<product_type_tag, product_type_traits<T>> {};
+  struct is_product_type : is_base_of<product_type::tag, product_type::traits<T>> {};
   template <class T>
   struct is_product_type<const T> : is_product_type<T> {};
   template <class T>
