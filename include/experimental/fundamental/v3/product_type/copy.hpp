@@ -12,7 +12,7 @@
 #include <experimental/fundamental/v3/product_type/product_type.hpp>
 #include <tuple>
 #include <utility>
-#include <type_traits>
+#include <experimental/type_traits.hpp>
 
 namespace std
 {
@@ -46,7 +46,7 @@ namespace product_type
         (... && std::is_assignable<element_t<I, PT1>&, element_t<I, PT2>&&>::value)
       >
 #else
-    std::experimental::fundamental_v3::detail::conjunction<
+    conjunction<
       std::is_assignable<element_t<I, PT1>&, element_t<I, PT2>&&>...
     >
 #endif
