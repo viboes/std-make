@@ -13,7 +13,7 @@
 
 ///////////////////////////////////////////////////////////////////////////////////////
 ///
-/// A type PT is a model of a ProductType if given a variables pt of type PT
+/// A type PT is a model of a ProductType if given variable pt of type PT
 ///
 ///   product_type::size<PT>::value
 ///   product_type::element<I,PT>::type
@@ -45,26 +45,21 @@ inline namespace fundamental_v3
 
 namespace detail
 {
-  template <class TypeList>
-  struct conjuntion_aux;
-  template <>
-  struct conjuntion_aux <meta::types<>> : true_type {  };
-  template <class C1>
-  struct conjuntion_aux <meta::types<C1>> : C1 {};
-  template <class C1, class C2, class ...Cs>
-  struct conjuntion_aux <meta::types<C1,C2,Cs...>> :
-    conjuntion_aux<
-      meta::types<
-        integral_constant<bool, C1::value&&C2::value>,
-        Cs...
-      >
-    > {  };
+  // conjunction
+  template<class...> struct conjunction;
+  template<> struct conjunction<> : true_type {};
 
-  template <class ...Cnds>
-  struct conjuntion : conjuntion_aux<meta::types<Cnds...>>{};
+  template<class B0> struct conjunction<B0> : B0 {};
 
-  template <class ...Cnds>
-  constexpr bool conjuntion_v = conjuntion<Cnds...>::value;
+  template<class B0, class B1>
+  struct conjunction<B0, B1> : conditional<B0::value, B1, B0>::type {};
+
+  template<class B0, class B1, class B2, class... Bs>
+  struct conjunction<B0, B1, B2, Bs...>
+          : conditional<B0::value, conjunction<B1, B2, Bs...>, B0>::type {};
+
+  template <class ...Bs>
+  constexpr bool conjunction_v = conjunction<Bs...>::value;
 
   template <class T>
   struct has_tuple_like_size_access
@@ -121,7 +116,7 @@ namespace detail
     > {};
 #else
   template <class T, size_t ...N>
-  struct has_tuple_like_element_get_access_aux<T, index_sequence<N...>> : detail::conjuntion<
+  struct has_tuple_like_element_get_access_aux<T, index_sequence<N...>> : detail::conjunction<
     has_tuple_like_element_access<N, T> ...
     ,
     has_tuple_like_get_access<N, T> ...
