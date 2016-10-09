@@ -7,6 +7,19 @@
 #ifndef JASEL_EXPERIMENTAL_UTILITY_HPP
 #define JASEL_EXPERIMENTAL_UTILITY_HPP
 
+namespace std
+{
+namespace experimental
+{
+inline namespace fundamental_v3
+{
+
+  // this should be moved away (meta?)
+  template <class ... Ts>
+  void swallow(Ts&&...) {  }
+
+}}}
+
 #include <experimental/fundamental/v3/std/std_pair.hpp>
 
 #endif // header

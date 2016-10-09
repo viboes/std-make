@@ -27,7 +27,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////
 
 #include <cstddef>
-#include <utility>
+#include <experimental/utility.hpp>
 #include <tuple>
 #include <experimental/type_traits.hpp>
 #include <experimental/meta.hpp>
@@ -38,10 +38,6 @@ namespace experimental
 {
 inline namespace fundamental_v3
 {
-  // this should be moved away (meta?)
-  template <class ... Ts>
-  void swallow(Ts&&...) {  }
-
 
 namespace detail
 {
