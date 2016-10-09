@@ -32,17 +32,19 @@ namespace product_type
         (..., swappable::swap(product_type::get<ids>(x), product_type::get<ids>(y)));
       }
 #else
-  template <size_t N, class T>
+  template <size_t N>
   struct swap_impl {
+    template <class T>
     static constexpr void apply(T& x, T& y)
     {
-      swap_impl<N-1, T>:: template apply(x,y);
+      swap_impl<N-1>::template  apply(x,y);
       swappable::swap(product_type::get<N>(x), product_type::get<N>(y));
       return;
     }
   };
-  template <class T>
-  struct swap_impl<0, T> {
+  template <>
+  struct swap_impl<0> {
+    template <class T>
     static constexpr void apply(T& x, T& y)
     {
       return;
@@ -57,8 +59,23 @@ namespace product_type
 #if defined JASEL_HAS_FOLD_EXPRESSIONS
       detail::swap_impl(x, y, element_sequence_for<T>{});
 #else
-      detail::swap_impl<product_type::size_v<T>, T>::template apply(x, y);
+      detail::swap_impl<product_type::size_v<T>>::template apply(x, y);
 #endif
+    }
+
+  template <class T, std::size_t N>
+  // fixme
+  //enable_if_t<
+  //  ::std::experimental::is_swappable_v<T>
+  //>
+  void
+    swap(T (&t)[N], T (&u)[N])
+      noexcept(::std::experimental::is_nothrow_swappable_v<T>)
+    {
+      for (std::size_t i = 0; i < N; ++i)
+      {
+          ::std::experimental::swappable::swap(t[i], u[i]);
+      }
     }
 }
 

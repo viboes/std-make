@@ -42,7 +42,7 @@ int main()
       static_assert(std::is_same<int, stde::product_type::element_t<0,decltype(arr)>>::value, "Hrr");
       //static_assert(std::is_same<int, stde::product_type::element_t<3,decltype(arr)>>::value, "Hrr");// COMPILE FAIL AS REQUIRED
       static_assert(stde::is_product_type_v<decltype(arr)>, "Hrr");
-      static_assert(! stde::is_product_type_v<int(&)[3]>, "Hrr");
+      static_assert(stde::is_product_type_v<int(&)[3]>, "Hrr");
 
       BOOST_TEST(3 == stde::product_type::size<decltype(arr)>::value);
       BOOST_TEST(0 == stde::product_type::get<0>(arr));
@@ -85,6 +85,15 @@ int main()
     BOOST_TEST(std::make_tuple(0,1,2,3) == stde::product_type::cat(p, q));
   }
 #if __cplusplus >= 201402L and defined JASEL_SUPPORT_SWAPPABLE
+  {
+    int p[] = {0,1};
+    int q[] = {2,3};
+    stde::product_type::swap(p,q);
+    BOOST_TEST(0 == q[0]);
+    BOOST_TEST(1 == q[1]);
+    BOOST_TEST(2 == p[0]);
+    BOOST_TEST(3 == p[1]);
+  }
   {
     int p[] = {0,1};
     int q[] = {2,3};

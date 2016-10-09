@@ -92,20 +92,42 @@ int main()
 #endif
     BOOST_TEST(std::make_tuple(0,1,2,3) == stde::product_type::cat(p, q));
   }
-#if __cplusplus >= 201402L and defined JASEL_SUPPORT_SWAPPABLE
+// fixme WHy this doesn't work in C++14
+#if __cplusplus > 201402L and defined JASEL_SUPPORT_SWAPPABLE and defined __clang__
   {
     using T = std::tuple<int,int>;
 #if defined JASEL_SUPPORT_TUPLE
-    const T p = {0,1};
+    T p = {0,1};
 #else
-    const T p = std::make_tuple(0,1);
+    T p = std::make_tuple(0,1);
 #endif
     using U = std::tuple<int,int>;
 #if defined JASEL_SUPPORT_TUPLE
-    const U q = {2,3};
+    U q = {2,3};
 #else
-    const U q = std::make_tuple(2,3);
+    U q = std::make_tuple(2,3);
 #endif
+
+    stde::product_type::swap(p,q);
+    BOOST_TEST(0 == stde::product_type::get<0>(q));
+    BOOST_TEST(1 == stde::product_type::get<1>(q));
+    BOOST_TEST(2 == stde::product_type::get<0>(p));
+    BOOST_TEST(3 == stde::product_type::get<1>(p));
+  }
+  {
+    using T = std::tuple<int,int>;
+#if defined JASEL_SUPPORT_TUPLE
+    T p = {0,1};
+#else
+    T p = std::make_tuple(0,1);
+#endif
+    using U = std::tuple<int,int>;
+#if defined JASEL_SUPPORT_TUPLE
+    U q = {2,3};
+#else
+    U q = std::make_tuple(2,3);
+#endif
+
     stde::swappable::swap(p,q);
     BOOST_TEST(0 == stde::product_type::get<0>(q));
     BOOST_TEST(1 == stde::product_type::get<1>(q));

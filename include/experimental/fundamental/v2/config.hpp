@@ -23,22 +23,40 @@
 #endif
 
 #if __cplusplus > 201402L
-#if defined __GNUC__ and ! defined __clang
-#if __GNUC__ >6
-#define JASEL_HAS_FOLD_EXPRESSIONS
-#define JASEL_HAS_INVOKE
-#define JASEL_SUPPORT_SWAPPABLE
-#define JASEL_SUPPORT_TUPLE
-#endif
-#else
-#define JASEL_HAS_FOLD_EXPRESSIONS
-#define JASEL_HAS_INVOKE
-#define JASEL_SUPPORT_SWAPPABLE
-#define JASEL_SUPPORT_TUPLE
-#endif
-#else
+
+# if defined __clang__
+#   define JASEL_HAS_FOLD_EXPRESSIONS
+#   define JASEL_HAS_INVOKE
+#   define JASEL_SUPPORT_SWAPPABLE
+#   define JASEL_SUPPORT_TUPLE
+
+# elif defined __GNUC__
+#   define JASEL_SUPPORT_SWAPPABLE
+#   if __GNUC__ > 6
+#     define JASEL_HAS_FOLD_EXPRESSIONS
+#     define JASEL_HAS_INVOKE
+#     define JASEL_SUPPORT_TUPLE
+#   else
+#   endif
+
+# else
+
+#   define JASEL_HAS_FOLD_EXPRESSIONS
+#   define JASEL_HAS_INVOKE
+#   define JASEL_SUPPORT_SWAPPABLE
+#   define JASEL_SUPPORT_TUPLE
+# endif
+
+#elif __cplusplus >= 201402L
+
+# if defined __clang__
+# elif defined __GNUC__
+#   define JASEL_SUPPORT_SWAPPABLE
+# else
 #endif
 
+
+#endif
 
 #if __cplusplus >= 201402L
 #define JASEL_MUTABLE_CONSTEXPR BOOST_CONSTEXPR
