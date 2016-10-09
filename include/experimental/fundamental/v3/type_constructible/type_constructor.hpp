@@ -77,13 +77,6 @@ inline namespace fundamental_v3
     template< template <class...> class TC >
     struct valid_type_constructor_tc_t<TC, meta::void_<  type_constructor_t<TC<_t>>>>
       : true_type { };
-
-    template <template <class...> class TC, class Enabler >
-    struct type_constructor_if_valid_type_constructor_tc_t;
-    template <template <class...> class TC >
-    struct type_constructor_if_valid_type_constructor_tc_t<TC, true_type>
-      : type_constructor<TC<_t>> {};
-
   }
 
   template <class T >
@@ -91,8 +84,7 @@ inline namespace fundamental_v3
 
   template <template <class...> class TC >
   struct type_constructor<meta::quote<TC>, meta::when<detail::valid_type_constructor_tc_t<TC>::value>>
-    : detail::type_constructor_if_valid_type_constructor_tc_t<TC,
-        detail::valid_type_constructor_tc_t<TC>> {};
+  : type_constructor<TC<_t>> {};
 
   template <class T>
   struct type_constructor<T*> : meta::id<add_pointer<_t>>  {};
