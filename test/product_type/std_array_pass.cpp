@@ -160,6 +160,20 @@ int main()
     BOOST_TEST(2 == stde::product_type::get<0>(p));
     BOOST_TEST(3 == stde::product_type::get<1>(p));
   }
+#if 0
+  // Fails as std::array doen't defines the assignment from another convertible array
+  {
+    using T = std::array<int,2>;
+    T p  = { {0,1} };
+    using U = std::array<short,2>;
+    U q  = { {2,3} };
+    p = q;
+    BOOST_TEST(2 == stde::product_type::get<0>(q));
+    BOOST_TEST(3 == stde::product_type::get<1>(q));
+    BOOST_TEST(2 == stde::product_type::get<0>(p));
+    BOOST_TEST(3 == stde::product_type::get<1>(p));
+  }
+#endif
   {
     using T = std::array<std::unique_ptr<int>,1>;
     T p  = { {std::unique_ptr<int>(new int(1))} };
