@@ -48,7 +48,7 @@ namespace product_type
   constexpr decltype(auto) make_from_product_type(ProductType&& pt)
   {
       return detail::make_from_product_type_impl<T>(forward<ProductType>(pt),
-          element_sequence_for<ProductType>{});
+          product_type::element_sequence_for<ProductType>{});
   }
 
 }

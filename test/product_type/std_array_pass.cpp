@@ -9,6 +9,7 @@
 #include <experimental/product_type.hpp>
 #include <experimental/array.hpp>
 #include <sstream>
+#include <memory>
 
 #include <boost/detail/lightweight_test.hpp>
 
@@ -113,6 +114,14 @@ int main()
       BOOST_TEST(std::make_tuple(0,1,2) == stde::product_type::to_tuple(arr));
   }
   {
+      using T = std::array<std::unique_ptr<int>,1>;
+      T arr  = { {std::unique_ptr<int>(new int(1))} };
+      BOOST_TEST(arr[0]);
+      auto res = stde::product_type::to_tuple(std::move(arr));
+      BOOST_TEST(! arr[0]);
+      BOOST_TEST(stde::product_type::get<0>(res));
+  }
+  {
     using T = std::array<int,2>;
     const T p  = { {0,1} };
     using U = std::array<int,2>;
@@ -150,6 +159,14 @@ int main()
     BOOST_TEST(3 == stde::product_type::get<1>(q));
     BOOST_TEST(2 == stde::product_type::get<0>(p));
     BOOST_TEST(3 == stde::product_type::get<1>(p));
+  }
+  {
+    using T = std::array<std::unique_ptr<int>,1>;
+    T p  = { {std::unique_ptr<int>(new int(1))} };
+    T q;
+    stde::product_type::copy(std::move(p), q);
+    BOOST_TEST(! p[0]);
+    BOOST_TEST(stde::product_type::get<0>(q));
   }
   // COMPILE FAILS AS EXPECTED
 #if 0

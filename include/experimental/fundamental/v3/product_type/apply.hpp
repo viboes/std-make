@@ -59,7 +59,7 @@ namespace product_type
   constexpr decltype(auto) apply(F&& f, ProductType&& pt)
   {
       return detail::apply_impl(forward<F>(f), forward<ProductType>(pt),
-          element_sequence_for<ProductType>{});
+          product_type::element_sequence_for<ProductType>{});
   }
 
 }

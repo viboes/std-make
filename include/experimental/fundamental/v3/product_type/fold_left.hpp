@@ -74,7 +74,7 @@ namespace product_type
   constexpr decltype(auto) fold_left(ProductType&& pt, State&& state, F&& f)
   {
     return detail::fold_left_impl(forward<ProductType>(pt), forward<State>(state), forward<F>(f),
-        element_sequence_for<ProductType>{});
+        product_type::element_sequence_for<ProductType>{});
   }
 
   template <class F, class ProductType
@@ -89,7 +89,7 @@ namespace product_type
   constexpr decltype(auto) fold_left(ProductType&& pt, F&& f)
   {
     return detail::fold_left_impl(forward<ProductType>(pt), product_type::get<0>(forward<ProductType>(pt)), forward<F>(f),
-          detail::drop_front_t<element_sequence_for<ProductType>>{});
+          detail::drop_front_t<product_type::element_sequence_for<ProductType>>{});
   }
 
 }

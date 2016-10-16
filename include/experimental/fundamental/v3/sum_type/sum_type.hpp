@@ -267,7 +267,7 @@ namespace sum_type {
       };
     }
     template <class ST>
-    struct alternatives : detail::alternatives<remove_cv_t<remove_reference_t<ST>>, alternative_sequence_for<ST>> {};
+    struct alternatives : detail::alternatives<remove_cv_t<remove_reference_t<ST>>, sum_type::alternative_sequence_for<ST>> {};
 
   }
 

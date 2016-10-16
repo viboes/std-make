@@ -16,7 +16,7 @@ namespace experimental
 {
 inline namespace fundamental_v3
 {
-inline namespace factories {
+inline namespace type_constructible {
 
 namespace detail_maker
 {
@@ -73,6 +73,8 @@ namespace detail_maker
   template <template <class ...> class TC>
   detail_maker::maker_tmpl<TC> maker() { return detail_maker::maker_tmpl<TC>{}; }
 }
+using type_constructible::maker;
+
 }
 }
 }

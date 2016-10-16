@@ -203,6 +203,7 @@ namespace sum_type
         return move(r).get();
       }
 
+      // fixme: Shouldn't use is_product_type<T>?
       template <class T>
       struct is_tuple : false_type {};
       template <class T>
@@ -233,6 +234,7 @@ namespace sum_type
 
       template<class ...Ts >
       struct have_result_type_member : have_result_type_member_x<meta::types<Ts...>> { };
+      // fixme. Why the following doesn't work?
       //template<class ...Ts >
       //struct have_result_type_member : conjunction<have_result_type_member<Ts...>> { };
 

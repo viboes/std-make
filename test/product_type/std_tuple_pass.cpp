@@ -8,6 +8,7 @@
 
 #include <experimental/product_type.hpp>
 #include <experimental/tuple.hpp>
+#include <experimental/functional.hpp>
 #include <sstream>
 
 #include <boost/detail/lightweight_test.hpp>
@@ -67,6 +68,20 @@ int main()
     const T p = std::make_tuple(0,1);
 #endif
     BOOST_TEST(0 == stde::product_type::apply(f, p));
+  }
+  {
+    using T = std::tuple<int,int>;
+#if defined JASEL_SUPPORT_TUPLE
+    const T p = {0,1};
+#else
+    const T p = std::make_tuple(0,1);
+#endif
+    BOOST_TEST(2 == stde::product_type::apply(
+        stde::overload(
+            []() {return 0;},
+            [](auto) {return 1;},
+            [](auto, auto) {return 2;}
+        ), p));
   }
   {
     using T = std::tuple<int,int>;

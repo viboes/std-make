@@ -58,7 +58,7 @@ namespace product_type
   constexpr void for_each(ProductType&& pt, F&& f)
   {
       detail::for_each_impl(forward<ProductType>(pt), forward<F>(f),
-          element_sequence_for<ProductType>{});
+          product_type::element_sequence_for<ProductType>{});
   }
 
 }

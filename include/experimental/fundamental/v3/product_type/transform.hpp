@@ -60,7 +60,7 @@ namespace product_type
   {
       return detail::transform_impl<type_constructor_t<remove_cv_t<remove_reference_t<ProductType>>>>(
           forward<ProductType>(pt), forward<F>(f),
-          element_sequence_for<ProductType>{});
+          product_type::element_sequence_for<ProductType>{});
   }
 
   template <class TC, class F, class ProductType
@@ -71,7 +71,7 @@ namespace product_type
   {
       return detail::transform_impl<TC>(
           forward<ProductType>(pt), forward<F>(f),
-          element_sequence_for<ProductType>{});
+          product_type::element_sequence_for<ProductType>{});
   }
 
 }
