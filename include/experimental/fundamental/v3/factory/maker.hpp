@@ -16,7 +16,7 @@ namespace experimental
 {
 inline namespace fundamental_v3
 {
-inline namespace type_constructible {
+namespace type_constructible {
 
 namespace detail_maker
 {
