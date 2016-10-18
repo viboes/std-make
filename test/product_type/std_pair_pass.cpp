@@ -151,9 +151,9 @@ int main()
         "f(f(1, 2), 5)"
     );
     // without initial state
-    BOOST_TEST(
+    BOOST_TEST_EQ(
         stde::product_type::fold_left(std::make_pair("1", 2), f)
-            ==
+            ,
         "f(1, 2)"
     );
   }

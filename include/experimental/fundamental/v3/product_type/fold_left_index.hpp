@@ -6,10 +6,11 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef JASEL_FUNDAMENTAL_V3_PRODUCT_TYPE_FOLD_LEFT_HPP
-#define JASEL_FUNDAMENTAL_V3_PRODUCT_TYPE_FOLD_LEFT_HPP
+#ifndef JASEL_FUNDAMENTAL_V3_PRODUCT_TYPE_FOLD_LEFT_INDEX_HPP
+#define JASEL_FUNDAMENTAL_V3_PRODUCT_TYPE_FOLD_LEFT_INDEX_HPP
 
 #include <experimental/fundamental/v3/product_type/product_type.hpp>
+#include <experimental/fundamental/v3/product_type/fold_left.hpp>
 #include <utility>
 
 // fixme: fold_let is implementable, as Hana does it, using foldable::apply (hana::unpack).
@@ -25,28 +26,18 @@ namespace product_type
 {
   namespace detail {
 
-    template <class T>
-    struct drop_front;
-    template <class T>
-    using drop_front_t = typename drop_front<T>::type;
-
-    template <std::size_t I , std::size_t... Is>
-    struct drop_front<index_sequence<I, Is...>> {
-      using type = index_sequence<Is...>;
-    };
-
     template <class F, class State, class ProductType>
-    constexpr decltype(auto) fold_left_impl( ProductType&& pt, State&& state, F&& f, index_sequence<> )
+    constexpr decltype(auto) fold_left_index_impl( ProductType&& pt, State&& state, F&& f, index_sequence<> )
     {
       return forward<State>(state);
     }
 
     template <class F, class State, class ProductType, std::size_t I , std::size_t... Is>
-    constexpr auto fold_left_impl( ProductType&& pt, State&& state, F&& f, index_sequence<I, Is...> )
+    constexpr decltype(auto) fold_left_index_impl( ProductType&& pt, State&& state, F&& f, index_sequence<I, Is...> )
     {
-      return fold_left_impl(
+      return fold_left_index_impl(
           forward<ProductType>(pt),
-          f(forward<State>(state), product_type::get<I>(forward<ProductType>(pt))),
+          f(forward<State>(state), I, product_type::get<I>(forward<ProductType>(pt))),
           forward<F>(f),
           index_sequence<Is...>{}
           );
@@ -56,8 +47,8 @@ namespace product_type
 
   /**
    * Left-fold of a structure using a binary operation and an optional initial reduction state.
-   * fold_left is a left-associative fold using a binary operation.
-   * Given a structure containing x1, ..., xn, a function f and an optional initial state, fold_left applies f as follows.
+   * fold_left_index is a left-associative fold using a binary operation.
+   * Given a structure containing x1, ..., xn, a function f and an optional initial state, fold_left_index applies f as follows.
    *  * f(... f(f(f(x1, x2), x3), x4) ..., xn) // without state
    *  * f(... f(f(f(f(state, x1), x2), x3), x4) ..., xn) // with state
    *
@@ -71,9 +62,9 @@ namespace product_type
   // todo add constraint on F
   , class = enable_if_t< is_product_type_v<remove_cv_t<remove_reference_t<ProductType>>> >
   >
-  constexpr decltype(auto) fold_left(ProductType&& pt, State&& state, F&& f)
+  constexpr decltype(auto) fold_left_index(ProductType&& pt, State&& state, F&& f)
   {
-    return detail::fold_left_impl(forward<ProductType>(pt), forward<State>(state), forward<F>(f),
+    return detail::fold_left_index_impl(forward<ProductType>(pt), forward<State>(state), forward<F>(f),
         product_type::element_sequence_for<ProductType>{});
   }
 
@@ -86,9 +77,9 @@ namespace product_type
               >::value
       >
   >
-  constexpr decltype(auto) fold_left(ProductType&& pt, F&& f)
+  constexpr decltype(auto) fold_left_index(ProductType&& pt, F&& f)
   {
-    return detail::fold_left_impl(forward<ProductType>(pt), product_type::get<0>(forward<ProductType>(pt)), forward<F>(f),
+    return detail::fold_left_index_impl(forward<ProductType>(pt), product_type::get<0>(forward<ProductType>(pt)), forward<F>(f),
           detail::drop_front_t<product_type::element_sequence_for<ProductType>>{});
   }
 

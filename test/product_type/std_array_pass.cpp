@@ -21,6 +21,10 @@ struct X {
   int k;
   X(int i, int j, int k) : i(i), j(j), k(k){}
 };
+
+template <class T>
+struct check;
+
 namespace std
 {
 namespace experimental
@@ -59,7 +63,21 @@ std::array<int,2> make_array(int i, int j) {
 }
 }
 }
+namespace op {
+template <class OSTREAM, class T>
+OSTREAM& sepc(std::ostream& os, unsigned i, T const& element) {
+    auto sep = (i>0)?", ":"";
+    return  os << sep << element ;
+};
 
+template <class OSTREAM, class PT>
+OSTREAM& operator<<(OSTREAM& os, PT const& pt) {
+  os << "{" ;
+  std::experimental::product_type::fold_left_index(pt, os, sepc<OSTREAM, int>);
+  os << "}";
+  return os;
+};
+}
 int main()
 {
   namespace stde = std::experimental;
@@ -288,6 +306,40 @@ int main()
             ==
         "f(f(f(f(1, 2), 3), 4), 5)"
     );
+  }
+  {
+    auto to_string = [](auto x) {
+        std::ostringstream ss;
+        ss << x;
+        return ss.str();
+    };
+    auto sep_to_string = [=](std::string s, unsigned i, auto element) {
+        auto sep = (i>0)?", ":"";
+        return  s + sep + to_string(element) ;
+    };
+    auto pt_to_string = [=](auto const& pt) {
+      return std::string("{") + stde::product_type::fold_left_index(pt,std::string{}, sep_to_string) + "}";
+    };
+    std::cout << "===========\n";
+    using U = std::array<int, 5>;
+    U q  = { {1, 2, 3, 4, 5} };
+    auto x = pt_to_string(q);
+    static_assert(std::is_same<std::string, decltype(x)>::value, "Error");
+    std::cout << pt_to_string(q)<<"\n";
+    BOOST_TEST_EQ(
+        pt_to_string(q)
+            ,
+        "{1, 2, 3, 4, 5}"
+    );
+  }
+  {
+    std::cout << "===========\n";
+    using U = std::array<int, 5>;
+    U q  = { {1, 2, 3, 4, 5} };
+    using namespace op;
+
+    //std::experimental::product_type::fold_left_index(pt,std::string{}, sepc<OSTREAM, int>) ;
+    std::cout << q<<"\n";
   }
   return ::boost::report_errors();
 }

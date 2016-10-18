@@ -14,6 +14,7 @@
 #include <experimental/fundamental/v3/product_type/cat.hpp>
 #include <experimental/fundamental/v3/product_type/copy.hpp>
 #include <experimental/fundamental/v3/product_type/fold_left.hpp>
+#include <experimental/fundamental/v3/product_type/fold_left_index.hpp>
 #include <experimental/fundamental/v3/product_type/for_each.hpp>
 #include <experimental/fundamental/v3/product_type/make_from_product_type.hpp>
 #include <experimental/fundamental/v3/product_type/swap.hpp>
