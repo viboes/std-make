@@ -109,6 +109,7 @@ test-suite nullable
 
 test-suite product_type
     : 
+      [ run product_type/struct_pass.cpp  ]
       [ run product_type/c_array_pass.cpp  ]
       [ run product_type/std_pair_pass.cpp  ]
       [ run product_type/std_tuple_pass.cpp  ]
