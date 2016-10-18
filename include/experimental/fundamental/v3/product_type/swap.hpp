@@ -38,7 +38,7 @@ namespace product_type
     static constexpr void apply(T& x, T& y)
     {
       swap_impl<N-1>::template  apply(x,y);
-      swappable::swap(product_type::get<N>(x), product_type::get<N>(y));
+      swappable::swap(product_type::get<N-1>(x), product_type::get<N-1>(y));
       return;
     }
   };
