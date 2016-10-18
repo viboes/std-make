@@ -9,6 +9,7 @@
 #include <experimental/product_type.hpp>
 #include <experimental/tuple.hpp>
 #include <sstream>
+#include <experimental/fundamental/v3/product_type/stream_insert.hpp>
 
 #include <boost/detail/lightweight_test.hpp>
 
@@ -293,6 +294,11 @@ int main()
             ==
         "f(f(f(1, 2), 3), 4)"
     );
+  }
+  {
+    Point3D p = {2, 3, 4};
+    using namespace stde::product_type::operators;
+    std::cout<< p << "\n";
   }
   return ::boost::report_errors();
 }
