@@ -20,43 +20,42 @@ namespace experimental
 {
 inline  namespace fundamental_v3
 {
-
 namespace product_type
 {
 namespace detail {
-  template <std::size_t FieldIndex, std::size_t FieldsCount>
+  template <std::size_t I, std::size_t N>
   struct stream_insert_impl {
 
-      template <class Stream, class T>
-      static void apply (Stream& out, const T& value) {
-          if (!!FieldIndex) out << ", ";
-          out << product_type::get<FieldIndex>(value);           // std::get<FieldIndex>(value)
-          stream_insert_impl<FieldIndex + 1, FieldsCount>::apply(out, value);
+      template <class Stream, class PT>
+      static void apply (Stream& os, const PT& value) {
+          if (!!I) os << ", ";
+          os << product_type::get<I>(value);
+          stream_insert_impl<I + 1, N>::apply(os, value);
       }
   };
-  template <std::size_t FieldsCount>
-  struct stream_insert_impl<FieldsCount,FieldsCount> {
-    template <class Stream, class T>
-    static void apply (Stream& out, const T& value) {}
+  template <std::size_t N>
+  struct stream_insert_impl<N,N> {
+    template <class Stream, class PT>
+    static void apply (Stream& , const PT& ) {}
 
   };
 }
-  template <class Char, class Traits, class ProductType
+  template <class Char, class Traits, class PT
   , class = enable_if_t<
-      is_product_type_v<remove_cv_t<remove_reference_t<ProductType>>>
+      is_product_type_v<remove_cv_t<remove_reference_t<PT>>>
     >
   >
-  constexpr void stream_insert(basic_ostream<Char, Traits>& os, ProductType const& pt)
+  constexpr void stream_insert(basic_ostream<Char, Traits>& os, PT const& pt)
   {
     os << '{';
-    detail::stream_insert_impl<0, product_type::size<ProductType>::value >::apply(os, pt);
+    detail::stream_insert_impl<0, product_type::size<PT>::value >::apply(os, pt);
     os << '}';
   }
 
   namespace operators {
-    template <class Char, class Traits, class T>
+    template <class Char, class Traits, class PT>
     std::basic_ostream<Char, Traits>&
-        operator<<(std::basic_ostream<Char, Traits>& os, const T& value)
+        operator<<(std::basic_ostream<Char, Traits>& os, const PT& value)
     {
         stream_insert(os, value);
         return os;
