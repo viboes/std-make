@@ -21,6 +21,40 @@ struct X {
   X(int i, int j) : i(i), j(j) {}
 };
 
+template <class PT>
+bool has_padding(PT const& pt) {
+  auto sum = std::experimental::product_type::fold_left(pt, 0u, [](std::size_t s, auto const& element) -> std::size_t
+      {
+        return s + sizeof(decltype(element));
+      }
+  );
+  return sizeof(PT) != sum;
+};
+
+struct  SizeOf {
+  template <class T>
+  constexpr std::size_t operator()(T const& element)
+    {
+      return sizeof(decltype(element));
+    }
+};
+
+struct  accumulate_sizeof {
+  template <class T>
+  constexpr std::size_t operator()(std::size_t s, T const& element)
+    {
+      return s + sizeof(decltype(element));
+    }
+};
+
+template <class PT>
+constexpr bool has_padding_constexpr(PT const& pt) {
+  constexpr auto const sum = std::experimental::product_type::fold_left(pt, 0u, accumulate_sizeof{});
+  return sizeof(PT) != sum;
+};
+
+
+
 namespace op {
 struct  sepc {
   template <std::size_t I, class OSTREAM, class T>
@@ -33,7 +67,12 @@ struct  sepc {
 template <class OSTREAM, class PT>
 OSTREAM& operator<<(OSTREAM& os, PT const& pt) {
   os << "{" ;
-  std::experimental::product_type::fold_left_index(pt, os, sepc{});
+  std::experimental::product_type::fold_left_index(pt, os, [](auto i, OSTREAM& os, auto const& element) -> OSTREAM&
+      {
+        if (decltype(i)::value>0) os << ", ";
+        return os << element;
+      }
+  );
   return os << "}";
 };
 }
@@ -239,9 +278,29 @@ int main()
     auto q  = std::make_tuple(2, '3', 4, 5.2);
     using namespace op;
 
-    //std::experimental::product_type::fold_left_index(pt,std::string{}, sepc<OSTREAM, int>) ;
     std::cout << q<<"\n";
   }
+  {
+    BOOST_TEST(has_padding(std::make_tuple(2, '3', 4, 5.2)));
+    BOOST_TEST(has_padding(std::make_tuple(2, '3')));
+    BOOST_TEST(! has_padding(std::make_tuple(2, 3)));
+    BOOST_TEST(! has_padding(std::make_tuple(2, (unsigned short)3, (unsigned short)4  )));
+  }
+#if not defined __clang__
+  {
+    constexpr auto q = std::make_tuple(2, '3', 4, 5.2);
+
+    static_assert(has_padding_constexpr(q), "");
+  }
+#endif
+  {
+    auto q1 = std::make_tuple(2, '3', 4, 5.2);
+    auto q2 = stde::product_type::transform(q1, [](auto & x) {return sizeof(decltype(x));});
+    auto sum = stde::product_type::fold_left(q2, 0, [](auto x, auto y) { return x+y;});
+
+    BOOST_TEST(sizeof(q1) > sum);
+  }
+
   return ::boost::report_errors();
 }
 #else

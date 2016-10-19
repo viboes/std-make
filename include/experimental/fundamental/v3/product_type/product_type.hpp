@@ -66,7 +66,7 @@ namespace detail
   namespace get_adl {
     using std::get;
     template <size_t N, class T>
-    auto xget(T&& t) noexcept -> decltype( get<N>(forward<T>(t)) )
+    constexpr auto xget(T&& t) noexcept -> decltype( get<N>(forward<T>(t)) )
     {
       return get<N>(forward<T>(t));
     }
@@ -220,7 +220,7 @@ namespace detail
     constexpr size_t is_empty(PT && pt) noexcept { return product_type::empty_v<remove_reference_t<PT>>; }
 
     template <class PT>
-    using element_sequence_for = make_index_sequence<product_type::size_v<remove_cv_t<remove_reference_t<PT>>>>;
+    using element_sequence_for = make_index_sequence<product_type::size_v<remove_reference_t<PT>>>;
   }
 
   // fixme redefine it as we did for has_tuple_like_access
