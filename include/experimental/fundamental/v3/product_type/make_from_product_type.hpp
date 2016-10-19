@@ -45,7 +45,7 @@ namespace product_type
   template <class T, class ProductType
   , class = enable_if_t< is_product_type_v<remove_cv_t<remove_reference_t<ProductType>>>  >
   >
-  constexpr decltype(auto) make_from_product_type(ProductType&& pt)
+  constexpr decltype(auto) make_from(ProductType&& pt)
   {
       return detail::make_from_product_type_impl<T>(forward<ProductType>(pt),
           product_type::element_sequence_for<ProductType>{});

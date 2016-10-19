@@ -21,6 +21,23 @@ struct X {
   X(int i, int j) : i(i), j(j) {}
 };
 
+namespace op {
+struct  sepc {
+  template <std::size_t I, class OSTREAM, class T>
+  OSTREAM& operator()(std::integral_constant<size_t, I>, OSTREAM& os, T const& element) {
+    if (I>0) os << ", ";
+    return  os << element;
+  }
+};
+
+template <class OSTREAM, class PT>
+OSTREAM& operator<<(OSTREAM& os, PT const& pt) {
+  os << "{" ;
+  std::experimental::product_type::fold_left_index(pt, os, sepc{});
+  return os << "}";
+};
+}
+
 int main()
 {
   namespace stde = std::experimental;
@@ -157,7 +174,7 @@ int main()
 #else
     const T p = std::make_tuple(0,1);
 #endif
-    auto x = stde::product_type::make_from_product_type<X>(p);
+    auto x = stde::product_type::make_from<X>(p);
     BOOST_TEST(0 == x.i);
     BOOST_TEST(1 == x.j);
   }
@@ -216,6 +233,14 @@ int main()
             ==
         "f(f(f(f(1, 2), 3), 4), 5)"
     );
+  }
+  {
+    std::cout << "===========\n";
+    auto q  = std::make_tuple(2, '3', 4, 5.2);
+    using namespace op;
+
+    //std::experimental::product_type::fold_left_index(pt,std::string{}, sepc<OSTREAM, int>) ;
+    std::cout << q<<"\n";
   }
   return ::boost::report_errors();
 }

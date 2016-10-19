@@ -37,7 +37,7 @@ namespace product_type
     {
       return fold_left_index_impl(
           forward<ProductType>(pt),
-          f(forward<State>(state), I, product_type::get<I>(forward<ProductType>(pt))),
+          f(integral_constant<size_t, I>{}, forward<State>(state), product_type::get<I>(forward<ProductType>(pt))),
           forward<F>(f),
           index_sequence<Is...>{}
           );

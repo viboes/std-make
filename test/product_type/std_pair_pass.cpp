@@ -100,7 +100,7 @@ int main()
   {
     using T = std::pair<int,int>;
     T p  = {0,1};
-    auto x = stde::product_type::make_from_product_type<X>(p);
+    auto x = stde::product_type::make_from<X>(p);
     BOOST_TEST(0 == x.i);
     BOOST_TEST(1 == x.j);
   }

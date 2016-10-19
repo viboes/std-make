@@ -13,9 +13,6 @@
 
 #include <boost/detail/lightweight_test.hpp>
 
-template <class T>
-struct check;
-
 struct Point3D {
   int x;
   int y;
@@ -223,7 +220,7 @@ int main()
 #endif
   {
     Point3D arr = {0,1,2};
-    auto x = stde::product_type::make_from_product_type<X>(arr);
+    auto x = stde::product_type::make_from<X>(arr);
     BOOST_TEST(0 == x.i);
     BOOST_TEST(1 == x.j);
     BOOST_TEST(2 == x.k);
@@ -231,7 +228,6 @@ int main()
   {
     Point2D p = {0,1};
     Point2D q = {2,3};
-    //check<decltype(stde::product_type::get<0>(p))> xx;
     static_assert(std::is_same<int&, decltype(stde::product_type::get<0>(p))>::value, "Hrr");
     static_assert(std::is_same<int&, decltype(stde::product_type::get<1>(p))>::value, "Hrr");
 

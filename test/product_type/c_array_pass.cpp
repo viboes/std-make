@@ -106,7 +106,7 @@ int main()
 #endif
   {
     int arr[] = {0,1,2};
-    auto x = stde::product_type::make_from_product_type<X>(arr);
+    auto x = stde::product_type::make_from<X>(arr);
     BOOST_TEST(0 == x.i);
     BOOST_TEST(1 == x.j);
     BOOST_TEST(2 == x.k);

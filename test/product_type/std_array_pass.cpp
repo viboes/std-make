@@ -64,18 +64,19 @@ std::array<int,2> make_array(int i, int j) {
 }
 }
 namespace op {
-template <class OSTREAM, class T>
-OSTREAM& sepc(std::ostream& os, unsigned i, T const& element) {
-    auto sep = (i>0)?", ":"";
-    return  os << sep << element ;
+struct  sepc {
+  template <std::size_t I, class OSTREAM, class T>
+  OSTREAM& operator()(std::integral_constant<size_t, I>, OSTREAM& os, T const& element) {
+    if (I>0) os << ", ";
+    return  os << element;
+  }
 };
 
 template <class OSTREAM, class PT>
 OSTREAM& operator<<(OSTREAM& os, PT const& pt) {
   os << "{" ;
-  std::experimental::product_type::fold_left_index(pt, os, sepc<OSTREAM, int>);
-  os << "}";
-  return os;
+  std::experimental::product_type::fold_left_index(pt, os, sepc{});
+  return os << "}";
 };
 }
 int main()
@@ -162,7 +163,7 @@ int main()
   {
     using T = std::array<int,3>;
     const T arr  = { {0,1,2} };
-    auto x = stde::product_type::make_from_product_type<X>(arr);
+    auto x = stde::product_type::make_from<X>(arr);
     BOOST_TEST(0 == x.i);
     BOOST_TEST(1 == x.j);
     BOOST_TEST(2 == x.k);
@@ -308,14 +309,14 @@ int main()
     );
   }
   {
-    auto to_string = [](auto x) {
+    auto to_string = [](auto const& x) {
         std::ostringstream ss;
         ss << x;
         return ss.str();
     };
-    auto sep_to_string = [=](std::string s, unsigned i, auto element) {
-        auto sep = (i>0)?", ":"";
-        return  s + sep + to_string(element) ;
+    auto sep_to_string = [=](auto i, std::string s, auto const& element) {
+        if (decltype(i)::value>0) s+= ", ";
+        return  s + to_string(element) ;
     };
     auto pt_to_string = [=](auto const& pt) {
       return std::string("{") + stde::product_type::fold_left_index(pt,std::string{}, sep_to_string) + "}";
