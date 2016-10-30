@@ -25,6 +25,10 @@ inline namespace v1
   //using void_ = void;
   using void_ = invoke<always<void>, Ts...>;
 
+  template<typename...Ts>
+  //using void_t = void;
+  using void_t = invoke<always<void>, Ts...>;
+
 }
 }
 }

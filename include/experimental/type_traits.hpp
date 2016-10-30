@@ -10,5 +10,16 @@
 #include <type_traits>
 
 #include <experimental/fundamental/v3/type_traits/conjunction.hpp>
+#include <experimental/meta.hpp>
+
+namespace std {
+  namespace experimental {
+#if __cplusplus > 201402L
+    using std::void_t;
+#else
+    using std::experimental::meta::void_t;
+#endif
+  }
+}
 
 #endif // header
