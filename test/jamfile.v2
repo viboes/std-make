@@ -127,6 +127,14 @@ test-suite swappable
       [ run swappable/swap_c_array_pass.cpp  ]
     ;
 
+test-suite range
+    : 
+      [ run range/range_c_array_pass.cpp  ]
+      [ run range/range_std_array_pass.cpp  ]
+    ;
+
+
+
 test-suite functional
     : 
       [ run functional/overload_pass.cpp  ]
