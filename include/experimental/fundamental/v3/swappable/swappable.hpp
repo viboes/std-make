@@ -23,15 +23,17 @@
 ///
 /// std::experimental::swappable::swap is defined as:
 ///
-/// If is_adl_swappable<T,U> call swap(a,b).
+/// If is_adl_swappable<T,U> calls swap(a,b).
 /// Otherwise, the expression swappable::traits<T,U>::swap(a,b) if it is a valid expression
 /// Otherwise if it is MoveConstructible and MoveAssignable exchange
 /// Otherwise if it is a c-array of swappables swap the parts
 /// Otherwise it is not defined
 ///
-/// is_adl_swappable<T,U> is true if the expression to swap(a,b) is a valid when evaluated in the following context:
-/// - 20.2.2, swap when the requirements are satisfied and the types are not ADL swappable or
-/// - using the std::experimental::swappable::traits<T,U>::swap
+/// is_adl_swappable<T,U> is true if the expression to swap(a,b) is a valid expression when evaluated in the following context:
+/// template <class T>
+/// void swap(T&, T&) = delete;
+/// template <class T, size_t N>
+/// void swap(T(&)[N], T(&)[N]) = delete;
 ///
 /// std::experimental::swappable::traits<T,U> is specialized for types for which the expression
 /// swap(t, u) is a valid when evaluated in the following context:
@@ -91,13 +93,11 @@ namespace adl_swappable {
   template <class T, class U>
     constexpr bool is_adl_swappable_v = is_adl_swappable<T,U>::value;
 
-  struct fn {
-    template <class T, class U>
-      static auto apply(T&& t, U&& u)
-        JASEL_DECLTYPE_RETURN_NOEXCEPT(
-          swap(std::forward<T>(t), std::forward<U>(u))
-        )
-  };
+  template <class T, class U>
+    static auto apply_swap(T&& t, U&& u)
+      JASEL_DECLTYPE_RETURN_NOEXCEPT(
+        swap(std::forward<T>(t), std::forward<U>(u))
+      )
 }
 
 namespace swappable {
@@ -122,7 +122,7 @@ namespace swappable {
     >
     swap(T&& t, U&& u)
     JASEL_NOEXCEPT_RETURN(
-        adl_swappable::fn::template apply(std::forward<T>(t), std::forward<U>(u))
+        adl_swappable::apply_swap(std::forward<T>(t), std::forward<U>(u))
     )
 
   // overload for swappable by trait: extension

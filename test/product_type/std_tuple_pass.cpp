@@ -35,7 +35,7 @@ struct  SizeOf {
   template <class T>
   constexpr std::size_t operator()(T const& element)
     {
-      return sizeof(decltype(element));
+      return sizeof(element);
     }
 };
 
@@ -43,7 +43,7 @@ struct  accumulate_sizeof {
   template <class T>
   constexpr std::size_t operator()(std::size_t s, T const& element)
     {
-      return s + sizeof(decltype(element));
+      return s + sizeof(element);
     }
 };
 
