@@ -6,7 +6,7 @@
 #ifndef JASEL_EXAMPLE_FRAMEWORK_STD_VECTOR_HPP
 #define JASEL_EXAMPLE_FRAMEWORK_STD_VECTOR_HPP
 
-#if __cplusplus > 201402L
+#if __cplusplus >= 201402L
 #include "../mem_usage.hpp"
 #include <vector>
 

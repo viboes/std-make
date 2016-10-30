@@ -9,10 +9,14 @@
 #include "framework/mem_usage.hpp"
 #include "framework/Array.hpp"
 #include "framework/boost/optional.hpp"
+#include <tuple>
 
 #include <iostream>
 
 #include <boost/detail/lightweight_test.hpp>
+
+template <class T>
+struct check;
 
 int main()
 {
@@ -33,6 +37,11 @@ int main()
   std::cout << framework::mem_usage(v) << "\n";
   std::cout << framework::mem_usage(o) << "\n";
 
+#if not defined JASEL_EXAMPLE_FRAMEWORK_MEM_USAGE_DIFF
+  decltype(framework::mem_usage(t)) xx;
+  (void)xx;
+#endif
+  //check<decltype(framework::mem_usage(t))> xx;
   //static_assert( not framework::is_valid<decltype(framework::mem_usage(t))>, "");
   //static_assert( not framework::is_valid<decltype(framework::mem_usage(ot))>, "");
   //std::cout << framework::mem_usage(t) << "\n";

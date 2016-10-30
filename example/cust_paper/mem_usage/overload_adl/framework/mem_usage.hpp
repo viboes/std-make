@@ -13,9 +13,18 @@
 #include <vector>
 #include <experimental/meta.hpp>
 
+//#define JASEL_EXAMPLE_FRAMEWORK_MEM_USAGE_DIFF
+#if defined JASEL_EXAMPLE_FRAMEWORK_MEM_USAGE_DIFF
+#else
+#define mem_usage_impl mem_usage
+#endif
+
+
 namespace framework {
   using std::experimental::meta::when;
   using std::experimental::meta::is_valid;
+  using std::experimental::meta::void_t;
+
 namespace adl_mem_usage {
 
   template< class C >
@@ -69,7 +78,7 @@ namespace adl_mem_usage {
   template <class T, typename Enabler=void>
     struct is_adl_mem_usage : std::false_type {};
   template <class T>
-    struct is_adl_mem_usage<T,std::void_t<
+    struct is_adl_mem_usage<T,void_t<
         decltype(mem_usage_impl(std::declval<T>))
         >
         > : std::true_type {};
@@ -78,12 +87,13 @@ namespace adl_mem_usage {
     constexpr auto apply( C& c ) -> decltype(mem_usage_impl(c)) { return mem_usage_impl(c); }
 }
   template <typename T>
-#if 0
-    size_t mem_usage(const T& v)
-#else
+#if defined JASEL_EXAMPLE_FRAMEWORK_MEM_USAGE_DIFF
   // this is possible only of the name of the user and the customization interface are different.
-  auto mem_usage(const T& v)
-    -> decltype(adl_mem_usage::apply(v))
+  // Otherwise there is an infinite recursion between this line and the apply function.
+  auto mem_usage(const T& v) -> decltype(adl_mem_usage::apply(v))
+#else
+  // Without SFINAE, decltype(framework::mem_usage(t)) will be size_t even if there is a compile error.
+  size_t mem_usage(const T& v)
 #endif
     { return adl_mem_usage::apply(v); }
 }

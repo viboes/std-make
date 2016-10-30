@@ -9,6 +9,7 @@
 #include "framework/mem_usage.hpp"
 #include "framework/Array.hpp"
 #include "framework/boost/optional.hpp"
+#include <tuple>
 
 #include <iostream>
 

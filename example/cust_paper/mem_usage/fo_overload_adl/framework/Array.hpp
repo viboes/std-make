@@ -24,7 +24,7 @@ namespace framework
     T const* end() const { return &ptr_[size_]; }
 
     //template <typename T>
-    friend  size_t mem_usage(const Array<T>& v)
+    friend  size_t mem_usage_impl(const Array<T>& v)
       {
         size_t ans = sizeof(v);
         for (const T& e : v) ans += framework::mem_usage(e);

@@ -6,7 +6,7 @@
 #ifndef JASEL_EXAMPLE_FRAMEWORK_STD_OPTIONAL_HPP
 #define JASEL_EXAMPLE_FRAMEWORK_STD_OPTIONAL_HPP
 
-#if __cplusplus > 201402L
+#if __cplusplus >= 201402L
 #include "../mem_usage.hpp"
 #include <experimental/optional.hpp>
 
