@@ -156,6 +156,7 @@ test-suite mem_usage
       [ run ../example/cust_paper/mem_usage/traits/traits_test_pass.cpp  ]
       [ run ../example/cust_paper/mem_usage/overload_adl/overload_test_pass.cpp  ]
       [ run ../example/cust_paper/mem_usage/fo_overload_adl/fo_test_pass.cpp  ]
+      [ run ../example/cust_paper/mem_usage/concept_overload_adl/concept_overload_test_pass.cpp  ]
     ;
 
 

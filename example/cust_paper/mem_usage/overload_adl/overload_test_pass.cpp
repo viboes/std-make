@@ -41,11 +41,7 @@ int main()
   decltype(framework::mem_usage(t)) xx;
   (void)xx;
 #endif
-  //check<decltype(framework::mem_usage(t))> xx;
-  //static_assert( not framework::is_valid<decltype(framework::mem_usage(t))>, "");
-  //static_assert( not framework::is_valid<decltype(framework::mem_usage(ot))>, "");
-  //std::cout << framework::mem_usage(t) << "\n";
-  //std::cout << framework::mem_usage(ot) << "\n";
+
   std::cout << framework::mem_usage(vp) << "\n";
   std::cout << framework::mem_usage(pv) << "\n";
   std::cout << framework::mem_usage(ov) << "\n";

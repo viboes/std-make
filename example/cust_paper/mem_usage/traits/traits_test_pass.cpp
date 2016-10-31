@@ -13,6 +13,7 @@
 #include "framework/boost/optional.hpp"
 #include "framework/Array.hpp"
 #include <iostream>
+#include <tuple>
 
 #include <boost/detail/lightweight_test.hpp>
 
@@ -36,10 +37,11 @@ int main()
   std::cout << framework::mem_usage(v) << "\n";
   std::cout << framework::mem_usage(o) << "\n";
 
-  //static_assert( not framework::is_valid<decltype(framework::mem_usage(t))>, "");
-  //static_assert( not framework::is_valid<decltype(framework::mem_usage(ot))>, "");
-  //std::cout << framework::mem_usage(t) << "\n";
-  //std::cout << framework::mem_usage(ot) << "\n";
+#if 0
+    // compile fails as expected
+    decltype(framework::mem_usage(t)) xx;
+#endif
+
   std::cout << framework::mem_usage(vp) << "\n";
 
   std::cout << framework::mem_usage(pv) << "\n";
