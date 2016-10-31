@@ -218,7 +218,7 @@ namespace sum_type
       template< class, class = void >
       struct has_result_type_member : false_type { };
       template< class T >
-      struct has_result_type_member<T, meta::void_<typename T::result_type>> : true_type { };
+      struct has_result_type_member<T, void_t<typename T::result_type>> : true_type { };
 
       template< class T >
       struct have_result_type_member_x;

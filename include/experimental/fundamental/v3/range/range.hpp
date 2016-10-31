@@ -38,6 +38,7 @@
 #include <utility>
 #include <experimental/type_traits.hpp>
 #include <experimental/meta.hpp>
+#include <experimental/type_traits.hpp>
 #include <experimental/fundamental/v2/config.hpp>
 
 namespace std
@@ -64,7 +65,7 @@ namespace std
             struct has_adl_begin_end
               : false_type {};
           template <class T>
-            struct has_adl_begin_end<T, meta::void_<
+            struct has_adl_begin_end<T, void_t<
                   decltype( begin((T&&)declval<T>()) )
                 , decltype( end((T&&)declval<T>()) )
                 > >
@@ -106,7 +107,7 @@ namespace std
           struct has_trait_range
             : false_type {};
         template <class T>
-          struct has_trait_range<T, meta::void_<
+          struct has_trait_range<T, void_t<
                 decltype( traits<T>::begin(declval<T>()) )
               , decltype( traits<T>::end(declval<T>()) )
             > >

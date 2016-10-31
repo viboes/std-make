@@ -40,7 +40,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////
 
 #include <utility>
-#include <type_traits>
+#include <experimental/type_traits.hpp>
 #include <experimental/meta.hpp>
 #include <experimental/fundamental/v2/config.hpp>
 
@@ -87,7 +87,7 @@ namespace adl_swappable {
     struct is_adl_swappable
       : false_type {};
   template <class T, class U>
-    struct is_adl_swappable<T, U, meta::void_<decltype(swap((T&&)declval<T>(), (U&&)declval<U>())) > >
+    struct is_adl_swappable<T, U, void_t<decltype(swap((T&&)declval<T>(), (U&&)declval<U>())) > >
       : true_type {};
 
   template <class T, class U>
@@ -108,7 +108,7 @@ namespace swappable {
     struct is_trait_swappable
       : false_type {};
   template <class T, class U>
-    struct is_trait_swappable<T, U, meta::void_< decltype( traits<T, U>::swap(declval<T>(),declval<U>()) ) > >
+    struct is_trait_swappable<T, U, void_t< decltype( traits<T, U>::swap(declval<T>(),declval<U>()) ) > >
       : true_type {};
 
   template <class T, class U=T>

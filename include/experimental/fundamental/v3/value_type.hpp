@@ -11,7 +11,7 @@
 
 #include <experimental/meta/v1/id.hpp>
 #include <experimental/meta/v1/eval.hpp>
-#include <experimental/meta/v1/void_.hpp>
+#include <experimental/type_traits.hpp>
 #include <type_traits>
 
 namespace std
@@ -23,12 +23,12 @@ inline namespace fundamental_v3
   template< class, class = void >
   struct has_value_type_member : false_type { };
   template< class T >
-  struct has_value_type_member<T, meta::void_<typename T::value_type>> : true_type { };
+  struct has_value_type_member<T, void_t<typename T::value_type>> : true_type { };
 
   template< class, class = void >
   struct has_element_type_member : false_type { };
   template< class T >
-  struct has_element_type_member<T, meta::void_<typename T::element_type>> : true_type { };
+  struct has_element_type_member<T, void_t<typename T::element_type>> : true_type { };
 
   template<class T, class = void>
   struct value_type;

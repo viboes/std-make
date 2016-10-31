@@ -9,7 +9,7 @@
 #ifndef JASEL_META_V1_IS_CALLABLE_HPP
 #define JASEL_META_V1_IS_CALLABLE_HPP
 
-#include <experimental/meta/v1/void_.hpp>
+#include <experimental/type_traits.hpp>
 #include <experimental/meta/v1/invoke.hpp>
 #include <experimental/meta/v1/quote.hpp>
 #include <type_traits> //false_type
@@ -41,7 +41,7 @@ inline namespace v1
     template <class TC, class = void>
     struct is_invokable : false_type {};
     template <class TC>
-    struct is_invokable<TC, meta::void_< meta::quote<TC::template invoke> > >
+    struct is_invokable<TC, void_t< meta::quote<TC::template invoke> > >
       : true_type {};
 
   }

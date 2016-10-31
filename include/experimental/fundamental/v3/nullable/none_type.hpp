@@ -11,7 +11,7 @@
 
 #include <experimental/meta/v1/id.hpp>
 #include <experimental/meta/v1/eval.hpp>
-#include <experimental/meta/v1/void_.hpp>
+#include <experimental/type_traits.hpp>
 
 namespace std
 {
@@ -43,7 +43,7 @@ inline namespace fundamental_v3
     template< class, class = void >
     struct has_none_type_member : false_type { };
     template< class T >
-    struct has_none_type_member<T, meta::void_<typename T::none_type>> : true_type { };
+    struct has_none_type_member<T, void_t<typename T::none_type>> : true_type { };
 
     template <class T, class Enabler>
     struct none_type;

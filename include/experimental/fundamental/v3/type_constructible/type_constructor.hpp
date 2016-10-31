@@ -12,7 +12,7 @@
 #include <experimental/meta/v1/id.hpp>
 #include <experimental/meta/v1/eval.hpp>
 #include <experimental/meta/v1/quote.hpp>
-#include <experimental/meta/v1/void_.hpp>
+#include <experimental/type_traits.hpp>
 #include <experimental/meta/v1/quote.hpp>
 #include <experimental/meta/v1/when.hpp>
 #include <experimental/fundamental/v3/type_constructible/holder.hpp>
@@ -53,7 +53,7 @@ inline namespace fundamental_v3
     template <class TC, class = void>
     struct is_type_constructor : false_type {};
     template <class TC>
-    struct is_type_constructor<TC, meta::void_< meta::quote<TC::template invoke> > >
+    struct is_type_constructor<TC, void_t< meta::quote<TC::template invoke> > >
       : true_type {};
   }
 
@@ -65,7 +65,7 @@ inline namespace fundamental_v3
     template< class, class = void >
     struct has_type_constructor_member : false_type { };
     template< class T >
-    struct has_type_constructor_member<T, meta::void_<typename T::type_constructor>> : true_type { };
+    struct has_type_constructor_member<T, void_t<typename T::type_constructor>> : true_type { };
 
     template <class T, class Enabler >
     struct type_constructor_if_has_type_constructor_member;
@@ -75,7 +75,7 @@ inline namespace fundamental_v3
     template< template <class...> class TC, class = void >
     struct valid_type_constructor_tc_t : false_type { };
     template< template <class...> class TC >
-    struct valid_type_constructor_tc_t<TC, meta::void_<  type_constructor_t<TC<_t>>>>
+    struct valid_type_constructor_tc_t<TC, void_t<  type_constructor_t<TC<_t>>>>
       : true_type { };
   }
 
