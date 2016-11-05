@@ -27,13 +27,13 @@ namespace product_type
     template <class F, class ProductType, std::size_t... I>
     constexpr void for_each_impl( ProductType&& pt, F&& f, index_sequence<I...> )
     {
-      swallow(
+      swallow{
 #if defined JASEL_HAS_INVOKE
-          (invoke(forward<F>(f), product_type::get<I>(forward<ProductType>(pt))),0) ...
+          (invoke(forward<F>(f), product_type::get<I>(forward<ProductType>(pt))),unit{}) ...
 #else
-          (f(product_type::get<I>(forward<ProductType>(pt))),0) ...
+          (f(product_type::get<I>(forward<ProductType>(pt))),unit{}) ...
 #endif
-      );
+      };
     }
 
   } // namespace detail

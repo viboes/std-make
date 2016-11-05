@@ -14,9 +14,12 @@ namespace experimental
 inline namespace fundamental_v3
 {
 
+  struct unit{};
   // this should be moved away (meta?)
-  template <class ... Ts>
-  void swallow(Ts&&...) {  }
+  struct swallow {
+    template <class ... Ts>
+    swallow(Ts&&...) {  }
+  };
 
 }}}
 

@@ -11,7 +11,7 @@
 
 #include <experimental/fundamental/v3/product_type/product_type.hpp>
 #include <tuple>
-#include <utility>
+#include <experimental/utility.hpp>
 #include <experimental/type_traits.hpp>
 
 namespace std
@@ -28,7 +28,7 @@ namespace product_type
     template <class PT1, class PT2, size_t... I>
     decltype(auto) copy_impl( PT1&& pt1, PT2& pt2, index_sequence<I...>)
     {
-       swallow(product_type::get<I>(pt2) = product_type::get<I>(forward<PT1>(pt1)) ...);
+       swallow{product_type::get<I>(pt2) = product_type::get<I>(forward<PT1>(pt1)) ...};
        return pt2;
     }
 
