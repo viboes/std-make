@@ -64,11 +64,9 @@ namespace product_type
     }
 
   template <class T, std::size_t N>
-  // fixme
   enable_if_t<
     ::std::experimental::is_swappable_v<T>
   >
-  //void
     swap(T (&t)[N], T (&u)[N])
       noexcept(::std::experimental::is_nothrow_swappable_v<T>)
     {
