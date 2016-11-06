@@ -33,9 +33,9 @@
 
 
 #if __cplusplus >= 201402L
-//and defined JASEL_SUPPORT_SWAPPABLE
 
-#include <utility>
+#include <iterator>
+#include <experimental/utility.hpp>
 #include <experimental/type_traits.hpp>
 #include <experimental/meta.hpp>
 #include <experimental/type_traits.hpp>
@@ -135,18 +135,27 @@ namespace std
 
         template <class T>
         constexpr auto begin(T&& x) noexcept -> decltype( traits<remove_cv_t<remove_reference_t<T>>>::begin(forward<T>(x)) )
-        { return traits<T>::begin(forward<T>(x));}
+        { return traits<remove_cv_t<remove_reference_t<T>>>::begin(forward<T>(x));}
         template <class T>
         constexpr auto end(T&& x) noexcept -> decltype( traits<remove_cv_t<remove_reference_t<T>>>::end(forward<T>(x)) )
-        { return traits<T>::end(forward<T>(x));}
+        { return traits<remove_cv_t<remove_reference_t<T>>>::end(forward<T>(x));}
 
         // overload for c-arrays
+#if 0
         template <class T, std::size_t N>
           T* begin(T (&t)[N]) noexcept { return t+0; }
         template <class T, std::size_t N>
           T* end(T (&t)[N]) noexcept { return t+N; }
-
-
+#else
+        template <class U, std::size_t M>
+        struct traits<U [M]>
+        {
+          template <class T, std::size_t N>
+            static constexpr T* begin(T (&t)[N]) noexcept { return t+0; }
+          template <class T, std::size_t N>
+            static constexpr T* end(T (&t)[N]) noexcept { return t+N; }
+        };
+#endif
         template <typename R>
         struct traits<R, meta::when<has_members_begin_end_v<R>>>
         {

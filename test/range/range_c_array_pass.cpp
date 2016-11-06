@@ -17,6 +17,9 @@ int main()
   namespace stde = std::experimental;
   {
       int arr[] = {0,1};
+      {
+      //decltype(stde::range::traits<int[2]>::begin(arr)) xx;
+      }
       static_assert(stde::is_range<decltype(arr)>::value, "Hrr");
 
       auto it = stde::range::begin(arr);
