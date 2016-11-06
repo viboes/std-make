@@ -73,7 +73,7 @@ namespace swappable {
   struct traits<R, S, meta::when<condition>>
   {
       template <class T, class U>
-        static auto swap(const T& x, const U& y) =delete;
+        static auto swap(T& x, U& y) =delete;
   };
 }
 namespace adl_swappable {
@@ -114,7 +114,7 @@ namespace swappable {
   template <class T, class U=T>
     constexpr bool is_trait_swappable_v = is_trait_swappable<T,U>::value;
 
-
+#if 0
   // overload for adl swappables: for backward compatibility
   template <class T, class U>
     enable_if_t <
@@ -164,6 +164,59 @@ namespace swappable {
           ::std::experimental::swappable::swap(t[i], u[i]);
       }
     }
+#else
+  // overload for swappable by trait: extension
+  template <class T, class U>
+  enable_if_t<
+    is_trait_swappable_v<T,U>
+  >
+  swap(T&& x, U&& y)
+      JASEL_NOEXCEPT_RETURN(
+          traits<remove_cv_t<remove_reference_t<T>>, remove_cv_t<remove_reference_t<U>>>::swap(forward<T>(x),forward<U>(y))
+       )
+
+   // overload for move swappable: std
+   template <class T>
+     enable_if_t<
+       not is_trait_swappable_v<T>
+       and is_move_constructible<T>::value
+       and is_move_assignable<T>::value
+     >
+     swap(T& x, T& y)
+       JASEL_NOEXCEPT_RETURN(
+           (void)(y = ::std::exchange(x, ::std::move(y)))
+       )
+
+   template <typename R, typename S>
+   struct traits<R, S, meta::when<
+     is_adl_swappable_v<R,S>
+   >>
+   {
+       template <class T, class U>
+         static auto swap(T& x, U& y)
+         JASEL_NOEXCEPT_RETURN(
+           adl_swappable::apply_swap(x, y)
+         )
+   };
+
+  template <class R, std::size_t M>
+  struct traits<R[M], R[M], meta::when<
+    not is_adl_swappable_v<R[M],R[M]>
+  &&   ::std::experimental::is_swappable_v<R>
+  >>
+  {
+    template <class T, std::size_t N>
+    static void swap(T (&t)[N], T (&u)[N])
+      noexcept(::std::experimental::is_nothrow_swappable_v<T>)
+    {
+      for (std::size_t i = 0; i < N; ++i)
+      {
+          ::std::experimental::swappable::swap(t[i], u[i]);
+      }
+    }
+  };
+
+#endif
 }
 
 namespace swap_detail {

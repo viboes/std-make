@@ -65,10 +65,10 @@ namespace product_type
 
   template <class T, std::size_t N>
   // fixme
-  //enable_if_t<
-  //  ::std::experimental::is_swappable_v<T>
-  //>
-  void
+  enable_if_t<
+    ::std::experimental::is_swappable_v<T>
+  >
+  //void
     swap(T (&t)[N], T (&u)[N])
       noexcept(::std::experimental::is_nothrow_swappable_v<T>)
     {
@@ -85,7 +85,8 @@ namespace swappable {
 
   template <class PT>
   struct traits<PT, PT, meta::when<
-    is_product_type_v<PT>
+    not is_adl_swappable_v<PT,PT> // this is needed if ADL is used as a specialization of traits
+    and is_product_type_v<PT>
   >>
   {
     template <class T>
