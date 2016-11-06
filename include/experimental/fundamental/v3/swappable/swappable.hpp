@@ -78,10 +78,8 @@ namespace swappable {
 }
 namespace adl_swappable {
 
-#if defined __clang__
   template <class T> void swap(T&, T&) = delete;
   template <class T, std::size_t N> void swap(T(&)[N], T(&)[N]) = delete;
-#endif
 
   template <class T, class U, typename = void>
     struct is_adl_swappable
