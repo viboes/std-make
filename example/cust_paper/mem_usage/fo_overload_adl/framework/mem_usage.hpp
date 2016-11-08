@@ -42,7 +42,11 @@ namespace framework
     template <typename T, typename U>
     size_t mem_usage_impl(const std::pair<T, U>& v)
     {
-      return mem_usage_impl(v.first) + mem_usage_impl(v.second);
+      return mem_usage_impl(v.first)
+      + mem_usage_impl(v.second)
+      + sizeof(v)
+      - sizeof(v.first)
+      - sizeof(v.second);
     }
 
     template <typename T>
