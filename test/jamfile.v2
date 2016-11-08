@@ -159,6 +159,14 @@ test-suite mem_usage
       [ run ../example/cust_paper/mem_usage/concept_overload_adl/concept_overload_test_pass.cpp  ]
     ;
 
+test-suite std_mem_usage
+    : 
+      [ run ../example/cust_paper/std_mem_usage/traits/std_traits_test_pass.cpp  ]
+      [ run ../example/cust_paper/std_mem_usage/overload_adl/std_overload_test_pass.cpp  ]
+      [ run ../example/cust_paper/std_mem_usage/fo_overload_adl/std_fo_test_pass.cpp  ]
+      [ run ../example/cust_paper/std_mem_usage/concept_overload_adl/std_concept_overload_test_pass.cpp  ]
+    ;
+
 
 explicit fix ;
 test-suite fix
