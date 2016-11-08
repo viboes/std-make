@@ -53,10 +53,10 @@ int main()
   boost::optional<std::vector<int>> ov;
 
   std::cout << framework::mem_usage(i) << "\n";
-  // fixme std::cout << framework::mem_usage(a) << "\n";
+  std::cout << framework::mem_usage(a) << "\n";
   std::cout << framework::mem_usage(v) << "\n";
   std::cout << framework::mem_usage(o) << "\n";
-  // fixme std::cout << framework::mem_usage(vp) << "\n";
+  std::cout << framework::mem_usage(vp) << "\n";
   std::cout << framework::mem_usage(ov) << "\n";
 
   return ::boost::report_errors();

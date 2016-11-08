@@ -13,7 +13,7 @@
 namespace boost
 {
   template <typename T>
-    size_t mem_usage_impl(const optional<T>& v)
+    size_t mem_usage(const optional<T>& v)
     {
       size_t ans = sizeof(v);
       if (v) ans += framework::mem_usage(*v) - sizeof(*v);

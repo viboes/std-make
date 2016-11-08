@@ -6,22 +6,20 @@
 #ifndef JASEL_EXAMPLE_FRAMEWORK_STD_OPTIONAL_HPP
 #define JASEL_EXAMPLE_FRAMEWORK_STD_OPTIONAL_HPP
 
-#if __cplusplus >= 201402L
+#if __cplusplus > 201402L
 #include "../mem_usage.hpp"
-#include <experimental/optional.hpp>
+#include <optional>
 
 namespace std
 {
-namespace experimental
-{
   template <typename T>
-    size_t mem_usage(const optional<T>& v)
+    size_t mem_usage_impl(const optional<T>& v)
+  -> decltype( std::experimental::mem_usage_able::mem_usage(*v) )
     {
       size_t ans = sizeof(v);
-      if (v) ans += std::experimental::mem_usage(*v) - sizeof(*v);
+      if (v) ans += std::experimental::mem_usage_able::mem_usage(*v) - sizeof(*v);
       return ans;
     }
-}
 }
 
 #endif

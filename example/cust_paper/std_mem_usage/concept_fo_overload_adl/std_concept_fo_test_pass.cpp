@@ -10,7 +10,6 @@
 #include "framework/Array.hpp"
 #include "framework/std/utility.hpp"
 #include "framework/std/vector.hpp"
-
 #include "framework/boost/optional.hpp"
 #include <tuple>
 
@@ -21,7 +20,6 @@
 int main()
 {
   using namespace std::experimental;
-  namespace mem_usage_able = std::experimental;
   {
     int i = 0;
     std::experimental::Array<int> a (10);

@@ -9,6 +9,8 @@
 #if __cplusplus >= 201402L
 
 #include <type_traits>
+#include <vector>
+#include <utility>
 #include <cstddef>
 #include <experimental/meta.hpp>
 
@@ -18,12 +20,15 @@ namespace experimental
 {
 inline namespace fundamental_v3
 {
-  namespace adl_mem_usage
+namespace mem_usage_able
+{
+  namespace adl
   {
     template <typename T>
     typename std::enable_if<std::is_trivial<T>::value, size_t>::type
     mem_usage(const T& v)
     { return sizeof v;}
+
     struct mem_usage_fn
     {
       template <typename T>
@@ -35,8 +40,9 @@ inline namespace fundamental_v3
     template <class T>  constexpr T __static_const{};
     // std::begin is a global function object
     namespace {
-      constexpr auto const & mem_usage = __static_const<adl_mem_usage::mem_usage_fn>;
+      constexpr auto const & mem_usage = __static_const<adl::mem_usage_fn>;
     }
+} // mem_usage_able
 } // funcdamental_v3
 } // experimental
 } // std

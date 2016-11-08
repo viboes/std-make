@@ -16,7 +16,7 @@ namespace boost
     size_t mem_usage(const optional<T>& v)
     {
       size_t ans = sizeof(v);
-      if (v) ans += std::experimental::mem_usage(*v) - sizeof(*v);
+      if (v) ans += std::experimental::mem_usage_able::mem_usage(*v) - sizeof(*v);
       return ans;
     }
 }
