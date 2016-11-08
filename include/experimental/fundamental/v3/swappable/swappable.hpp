@@ -173,34 +173,34 @@ namespace swappable {
           traits<remove_cv_t<remove_reference_t<T>>, remove_cv_t<remove_reference_t<U>>>::swap(forward<T>(x),forward<U>(y))
        )
 
-   // overload for move swappable: std
-   template <class T>
-     enable_if_t<
-       not is_trait_swappable_v<T>
-       and is_move_constructible<T>::value
-       and is_move_assignable<T>::value
-     >
-     swap(T& x, T& y)
-       JASEL_NOEXCEPT_RETURN(
-           (void)(y = ::std::exchange(x, ::std::move(y)))
-       )
+  // overload for move swappable: std
+  template <class T>
+   enable_if_t<
+     not is_trait_swappable_v<T>
+     and is_move_constructible<T>::value
+     and is_move_assignable<T>::value
+   >
+   swap(T& x, T& y)
+     JASEL_NOEXCEPT_RETURN(
+         (void)(y = ::std::exchange(x, ::std::move(y)))
+     )
 
-   template <typename R, typename S>
-   struct traits<R, S, meta::when<
-     is_adl_swappable_v<R,S>
-   >>
-   {
-       template <class T, class U>
-         static auto swap(T& x, U& y)
-         JASEL_NOEXCEPT_RETURN(
-           adl_swappable::apply_swap(x, y)
-         )
-   };
+  template <typename R, typename S>
+  struct traits<R, S, meta::when<
+   is_adl_swappable_v<R,S>
+  >>
+  {
+     template <class T, class U>
+       static auto swap(T& x, U& y)
+       JASEL_NOEXCEPT_RETURN(
+         adl_swappable::apply_swap(x, y)
+       )
+  };
 
   template <class R, std::size_t M>
   struct traits<R[M], R[M], meta::when<
     not is_adl_swappable_v<R[M],R[M]>
-  &&   ::std::experimental::is_swappable_v<R>
+    and ::std::experimental::is_swappable_v<R>
   >>
   {
     template <class T, std::size_t N>
