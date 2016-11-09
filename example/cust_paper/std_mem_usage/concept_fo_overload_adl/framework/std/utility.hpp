@@ -19,8 +19,8 @@ namespace std
     return experimental::mem_usage_able::mem_usage(v.first)
      + experimental::mem_usage_able::mem_usage(v.second)
      + sizeof(v)
-     + sizeof(v.first)
-     + sizeof(v.second);
+     - sizeof(v.first)
+     - sizeof(v.second);
   }
 }
 

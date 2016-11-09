@@ -10,7 +10,9 @@
 
 #include <type_traits>
 #include <cstddef>
+#include <utility>
 #include <experimental/meta.hpp>
+#include <experimental/product_type.hpp>
 
 namespace std
 {
@@ -21,9 +23,31 @@ inline namespace fundamental_v3
   namespace adl_mem_usage
   {
     template <typename T>
-    typename std::enable_if<std::is_trivial<T>::value, size_t>::type
+    typename std::enable_if<is_trivial<T>::value, size_t>::type
     mem_usage(const T& v)
     { return sizeof v;}
+
+#if __cplusplus > 201402L
+
+    namespace detail {
+      template <class PT, std::size_t... I>
+      constexpr decltype(auto) mem_usage_impl( PT&& pt, index_sequence<I...> )
+      {
+        return  sizeof(pt)
+            + ( mem_usage(product_type::get<I>(forward<PT>(pt)) ) + ... )
+            - ( sizeof(                 product_type::get<I>(forward<PT>(pt)) ) + ... )
+            ;
+
+      }
+    }
+    template <typename PT>
+      std::enable_if_t<is_product_type<remove_cv_t<remove_reference_t<PT>>>::value, size_t>
+    mem_usage(PT&& pt)
+    {
+      return detail::mem_usage_impl(forward<PT>(pt), product_type::element_sequence_for<PT>{});
+    }
+#endif
+
     struct mem_usage_fn
     {
       template <typename T>

@@ -31,7 +31,7 @@ int main()
     boost::optional<int> o;
     boost::optional<std::vector<int>> ov;
     std::vector<boost::optional<int>> vo;
-    std::tuple<int> t (10);
+    std::unique_ptr<int> up;
     boost::optional<std::tuple<int>> ot;
 
     static_assert(meta::is_valid<decltype(mem_usage_able::mem_usage(i))>, "");
@@ -42,7 +42,7 @@ int main()
 
 #if 0
     // compile fails as expected
-    decltype(mem_usage_able::mem_usage(t)) xx;
+    decltype(mem_usage_able::mem_usage(up)) xx;
 #endif
 
     std::cout << mem_usage_able::mem_usage(vp) << "\n";
@@ -64,6 +64,20 @@ int main()
   // fixme std::cout << mem_usage_able::mem_usage(vp) << "\n";
   std::cout << mem_usage_able::mem_usage(ov) << "\n";
 
+#if __cplusplus > 201402L
+  {
+    std::tuple<int, int> t;
+    std::cout <<"std::tuple<int, int> " << mem_usage_able::mem_usage(t) << "\n";
+  }
+  {
+    std::tuple<std::vector<int>, int> t;
+    std::cout << mem_usage_able::mem_usage(t) << "\n";
+  }
+  {
+    std::vector<std::tuple<int, int>> t;
+    std::cout << mem_usage_able::mem_usage(t) << "\n";
+  }
+#endif
   return ::boost::report_errors();
 }
 
