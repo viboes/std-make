@@ -140,6 +140,17 @@ int main()
   std::cout << mem_usage_able::mem_usage(vp) << "\n";
   std::cout << mem_usage_able::mem_usage(ov) << "\n";
 
+  {
+    int* t;
+    std::cout << "int* " << mem_usage_able::mem_usage(t) << "\n";
+  }
+  {
+    trace = true;
+    int* t=new int;
+    std::cout << "int* " << mem_usage_able::mem_usage(t) << "\n";
+    trace = false;
+  }
+
 #if __cplusplus > 201402L
   {
     std::tuple<int, int> t;
@@ -169,6 +180,7 @@ int main()
 #if 0
   {
     // COMPILE FAIL AS EXPECTED: mem_usage for pt is been defined
+    // However we don't want this behavior.
     trace = true;
     using T = std::pair<short, Point2D>;
     static_assert(! std::is_trivial<T>::value, "");
@@ -220,7 +232,6 @@ int main()
   }
   {
     trace = false;
-    std::cout << "std::array<std::pair<int, short>,2> \n";
     std::array<std::pair<int, short>,2> t;
     std::cout << "std::array<std::pair<int, short>,2> "<< mem_usage_able::mem_usage(t) << "\n";
     trace = false;
@@ -228,16 +239,6 @@ int main()
   {
     std::pair<std::array<int,2>, std::array<int,2> > t;
     std::cout << mem_usage_able::mem_usage(t) << "\n";
-  }
-  {
-    int* t;
-    std::cout << "int* " << mem_usage_able::mem_usage(t) << "\n";
-  }
-  {
-    trace = true;
-    int* t=new int;
-    std::cout << "int* " << mem_usage_able::mem_usage(t) << "\n";
-    trace = false;
   }
 #if 0
   {
