@@ -20,14 +20,14 @@ namespace boost
       if (v) ans += std::experimental::mem_usage(*v) - sizeof(*v);
       return ans;
     }
-  template <typename T>
-    constexpr auto mem_usage(optional<T>&& v) noexcept
-      -> decltype( std::experimental::mem_usage(declval<T>()) )
-    {
-      size_t ans = sizeof(T);
-      if (v) ans += std::experimental::mem_usage(*v) - sizeof(*v);
-      return ans;
-    }
+//  template <typename T>
+//    constexpr auto mem_usage(optional<T>&& v) noexcept
+//      -> decltype( std::experimental::mem_usage(declval<T>()) )
+//    {
+//      size_t ans = sizeof(T);
+//      if (v) ans += std::experimental::mem_usage(*v) - sizeof(*v);
+//      return ans;
+//    }
 }
 
 

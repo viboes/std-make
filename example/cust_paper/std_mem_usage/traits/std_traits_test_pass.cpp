@@ -49,7 +49,13 @@ int main()
   std::cout << mem_usage_able::mem_usage(pv) << "\n";
   std::cout << mem_usage_able::mem_usage(ov) << "\n";
   std::cout << mem_usage_able::mem_usage(vo) << "\n";
-
+#if 1
+  {
+    int* t=new int;
+    std::cout << "int* " << mem_usage_able::mem_usage_traits<int*>::apply(t) << "\n";
+    //std::cout << "int* " << mem_usage_able::mem_usage(t) << "\n";
+  }
+#endif
   return ::boost::report_errors();
 }
 

@@ -39,8 +39,7 @@ inline namespace fundamental_v3
     }
 
     template <typename T>
-    size_t
-    mem_usage(T* v)
+    auto mem_usage(T* v) -> decltype( mem_usage ( *v ) )
     {
 #ifdef JASEL_UT_TRACE
       if (trace) std::cout << "is_pointer" << "\n";
