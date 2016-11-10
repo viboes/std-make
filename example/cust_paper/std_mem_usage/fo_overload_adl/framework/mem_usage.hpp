@@ -14,6 +14,11 @@
 #include <experimental/meta.hpp>
 #include <experimental/product_type.hpp>
 
+#ifdef JASEL_UT_TRACE
+#include <iostream>
+extern bool trace;
+#endif
+
 namespace std
 {
 namespace experimental
@@ -23,9 +28,25 @@ inline namespace fundamental_v3
   namespace adl_mem_usage
   {
     template <typename T>
-    constexpr typename std::enable_if<is_trivial<T>::value, size_t>::type
-    mem_usage(const T& v)
-    { return sizeof v;}
+    constexpr typename std::enable_if<is_trivial< remove_cv_t<remove_reference_t<T>> >::value, size_t>::type
+    //constexpr typename std::enable_if<is_trivial< decay_t<T> >::value, size_t>::type
+    mem_usage(T&& v)
+    {
+#ifdef JASEL_UT_TRACE
+      if (trace) std::cout << typeid(remove_cv_t<remove_reference_t<T>>).name() << " is_trivial\n";
+#endif
+      return sizeof ( remove_cv_t<remove_reference_t<T>> );
+    }
+
+    template <typename T>
+    size_t
+    mem_usage(T* v)
+    {
+#ifdef JASEL_UT_TRACE
+      if (trace) std::cout << "is_pointer" << "\n";
+#endif
+      return sizeof v + (v?mem_usage ( *v ):0);
+    }
 
 #if __cplusplus > 201402L
 
@@ -41,13 +62,19 @@ inline namespace fundamental_v3
     }
     template <typename PT>
     constexpr
-//    enable_if_t<conjunction_v<
-//          is_product_type<remove_cv_t<remove_reference_t<PT>>>
+    enable_if_t<
+    //conjunction_v<
+      not is_trivial<remove_cv_t<remove_reference_t<PT>>>::value
+      and is_product_type<remove_cv_t<remove_reference_t<PT>>>::value
 //      //, all_of<is_adl_mem_usage_able<product_type::element<I,PT>>
 //      >
-//      , size_t>
-    decltype(auto) mem_usage(PT&& pt) noexcept
+      , size_t>
+    //decltype(auto)
+    mem_usage(PT&& pt) noexcept
     {
+#ifdef JASEL_UT_TRACE
+      if (trace) std::cout << "is_product_type size=" <<      product_type::size<        remove_cv_t<remove_reference_t<PT>>      >::value << "\n";
+#endif
       return detail::mem_usage_impl(forward<PT>(pt), product_type::element_sequence_for<PT>{});
     }
 #endif
@@ -55,8 +82,13 @@ inline namespace fundamental_v3
     struct mem_usage_fn
     {
       template <typename T>
-      constexpr auto operator()(const T& v)  const noexcept -> decltype(mem_usage(v))
-      { return mem_usage(v);}
+      constexpr auto operator()(T&& v)  const noexcept -> decltype(mem_usage(std::forward<T>(v)))
+      {
+#ifdef JASEL_UT_TRACE
+        if (trace) std::cout << typeid(remove_cv_t<remove_reference_t<T>>).name() << " mem_usage_fn\n";
+#endif
+        return mem_usage(std::forward<T>(v));
+      }
     };
   } // adl
   // To avoid ODR violations:
