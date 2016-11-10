@@ -10,20 +10,81 @@
 #include "framework/std/utility.hpp"
 #include "framework/std/vector.hpp"
 #include "framework/std/optional.hpp"
+#include "framework/std/product_type.hpp"
 #include "framework/boost/optional.hpp"
 #include "framework/Array.hpp"
 #include <iostream>
 #include <tuple>
+#include <array>
+#include "experimental/utility.hpp"
 
 #include <boost/detail/lightweight_test.hpp>
 
+struct Point2D {
+  Point2D() {}
+  Point2D(int,int) {}
+  int x;
+  int y;
+};
+
+namespace std {
+namespace experimental {
+inline namespace fundamental_v3 {
+namespace product_type {
+
+  template <>
+  struct traits<Point2D> : tag
+  {
+    using size = integral_constant<size_t, 2>;
+
+    template <size_t I>
+    using element = meta::id<int>;
+
+    static constexpr int& get_detail(integral_constant<size_t, 0>, Point2D & pt) noexcept
+    {      return pt.x;    }
+    static constexpr int const& get_detail(integral_constant<size_t, 0>, Point2D const& pt) noexcept
+    {      return pt.x;    }
+    static constexpr int&& get_detail(integral_constant<size_t, 0>, Point2D && pt) noexcept
+    {      return move(pt).x;    }
+//    static constexpr int && get_detail(integral_constant<size_t, 0>, Point2D const&& pt) noexcept
+//    {      return pt.x;    }
+
+    static constexpr int& get_detail(integral_constant<size_t, 1>, Point2D & pt) noexcept
+    {      return pt.y;    }
+    static constexpr int const& get_detail(integral_constant<size_t, 1>, Point2D const& pt) noexcept
+    {      return pt.y;    }
+    static constexpr int&& get_detail(integral_constant<size_t, 1>, Point2D && pt) noexcept
+    {      return move(pt).y;    }
+//    static constexpr int && get_detail(integral_constant<size_t, 1>, Point2D const&& pt) noexcept
+//    {      return pt.y;    }
+
+    template <size_t I>
+      static constexpr int& get(Point2D & pt) noexcept
+      {
+        return get_detail(integral_constant<size_t, I>{}, pt);
+      }
+    template <size_t I>
+      static constexpr int const& get(Point2D const& pt) noexcept
+      {
+        return get_detail(integral_constant<size_t, I>{}, pt);
+      }
+    template <size_t I>
+      static constexpr auto get(Point2D && pt) noexcept
+      {
+        return get_detail(integral_constant<size_t, I>{}, move(pt));
+      }
+  };
+
+
+}
+}}}
 
 int main()
 {
-  using namespace std::experimental;
+  namespace stdx = std::experimental;
 
   int i = 0;
-  Array<int> a (10);
+  stdx::Array<int> a (10);
   std::vector<int> v (10);
   std::vector<std::pair<int, int>> vp;
   std::pair<std::vector<int>, std::vector<int>> pv;
@@ -33,27 +94,111 @@ int main()
   std::tuple<int> t (10);
   boost::optional<std::tuple<int>> ot;
 
-  static_assert(meta::is_valid<decltype(mem_usage_able::mem_usage(i))>, "");
-  std::cout << mem_usage_able::mem_usage(i) << "\n";
-  std::cout << mem_usage_able::mem_usage(a) << "\n";
-  std::cout << mem_usage_able::mem_usage(v) << "\n";
-  std::cout << mem_usage_able::mem_usage(o) << "\n";
+  static_assert(stdx::meta::is_valid<decltype(stdx::mem_usage_able::mem_usage(i))>, "");
+  std::cout << stdx::mem_usage_able::mem_usage(i) << "\n";
+  std::cout << stdx::mem_usage_able::mem_usage(a) << "\n";
+  std::cout << stdx::mem_usage_able::mem_usage(v) << "\n";
+  std::cout << stdx::mem_usage_able::mem_usage(o) << "\n";
 
 #if 0
     // compile fails as expected
-    decltype(mem_usage_able::mem_usage(t)) xx;
+    decltype(stdx::mem_usage_able::mem_usage(t)) xx;
 #endif
 
-  std::cout << mem_usage_able::mem_usage(vp) << "\n";
+  std::cout << stdx::mem_usage_able::mem_usage(vp) << "\n";
 
-  std::cout << mem_usage_able::mem_usage(pv) << "\n";
-  std::cout << mem_usage_able::mem_usage(ov) << "\n";
-  std::cout << mem_usage_able::mem_usage(vo) << "\n";
-#if 1
+  std::cout << stdx::mem_usage_able::mem_usage(pv) << "\n";
+  std::cout << stdx::mem_usage_able::mem_usage(vo) << "\n";
+  std::cout << stdx::mem_usage_able::mem_usage(ov) << "\n";
+  {
+    int* t;
+    std::cout << "int* " << stdx::mem_usage_able::mem_usage(t) << "\n";
+  }
   {
     int* t=new int;
-    std::cout << "int* " << mem_usage_able::traits<int*>::apply(t) << "\n";
-    //std::cout << "int* " << mem_usage_able::mem_usage(t) << "\n";
+    std::cout << "int* " << stdx::mem_usage_able::mem_usage(t) << "\n";
+  }
+#if __cplusplus > 201402L
+  {
+    Point2D* t=new Point2D;
+    std::cout << "Point2D* " << stdx::mem_usage_able::mem_usage(t) << "\n";
+  }
+
+  {
+    std::tuple<int, int> t;
+    std::cout <<"std::tuple<int, int> " << stdx::mem_usage_able::mem_usage(t) << "\n";
+  }
+  {
+    std::tuple<std::vector<int>, int> t;
+    std::cout << stdx::mem_usage_able::mem_usage(t) << "\n";
+  }
+  {
+    using T = std::pair<int, int>;
+    static_assert(! std::is_trivial<T>::value, "");
+    static_assert(stdx::is_product_type<T>::value, "");
+    T t;
+    std::cout << stdx::mem_usage_able::mem_usage(t) << "\n";
+  }
+  {
+    typedef Point2D T;
+    T t;
+    std::cout << "Point2D=== " << stdx::mem_usage_able::mem_usage(t) << "\n";
+
+  }
+  {
+    using T = std::pair<short, Point2D>;
+    static_assert(! std::is_trivial<T>::value, "");
+    static_assert(stdx::is_product_type<T>::value, "");
+    T t;
+    std::cout << "std::pair<short, Point2D>=== " << stdx::mem_usage_able::mem_usage(t) << "\n";
+  }
+  {
+    using T = std::pair<short, std::pair<Point2D, int>>;
+    static_assert(! std::is_trivial<T>::value, "");
+    static_assert(stdx::is_product_type<T>::value, "");
+    T t;
+    std::cout << "std::pair<short, std::pair<Point2D, int>> === " << stdx::mem_usage_able::mem_usage(t) << "\n";
+  }
+  {
+    using T = std::array<int, 3>;
+    static_assert(std::is_trivial<T>::value, "");
+    static_assert(stdx::is_product_type<T>::value, "");
+    T t;
+    std::cout << stdx::mem_usage_able::mem_usage(t) << "\n";
+
+  }
+  {
+    typedef int T[3];
+    static_assert(std::is_trivial<T>::value, "");
+    static_assert(stdx::is_product_type<T>::value, "");
+    T t;
+    std::cout << "int[3] " << stdx::mem_usage_able::mem_usage(t) << "\n";
+  }
+  {
+    typedef std::pair<int,int> T;
+    static_assert(!std::is_trivial<T>::value, "");
+    static_assert(stdx::is_product_type<T>::value, "");
+    T t;
+    std::cout << stdx::mem_usage_able::mem_usage(t) << "\n";
+  }
+  {
+    typedef std::pair<int,int> T[3];
+    static_assert(!std::is_trivial<T>::value, "");
+    static_assert(stdx::is_product_type<T>::value, "");
+    T t;
+    std::cout << stdx::mem_usage_able::mem_usage(t) << "\n";
+  }
+  {
+    std::vector<std::tuple<int, int>> t;
+    std::cout << stdx::mem_usage_able::mem_usage(t) << "\n";
+  }
+  {
+    std::array<std::pair<int, short>,2> t;
+    std::cout << "std::array<std::pair<int, short>,2> "<< stdx::mem_usage_able::mem_usage(t) << "\n";
+  }
+  {
+    std::pair<std::array<int,2>, std::array<int,2> > t;
+    std::cout << stdx::mem_usage_able::mem_usage(t) << "\n";
   }
 #endif
   return ::boost::report_errors();
