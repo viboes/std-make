@@ -22,7 +22,7 @@ namespace mem_usage_able
   struct mem_usage_traits< std::vector<U>>
   {
     template <typename T>
-    static auto apply(const std::vector<T>& v) -> decltype(mem_usage_able::mem_usage(std::declval<T>()))
+    static constexpr auto apply(const std::vector<T>& v) noexcept -> decltype(mem_usage_able::mem_usage(std::declval<T>()))
     {
       size_t ans = sizeof(v);
       for (const T& e : v) ans += mem_usage_able::mem_usage(e);

@@ -13,7 +13,7 @@
 namespace boost {
   // overload for boost::optinal
   template <typename T>
-    size_t mem_usage(const optional<T>& v)
+  constexpr size_t mem_usage(const optional<T>& v) noexcept
     {
       size_t ans = sizeof(v);
       if (v) ans += std::experimental::mem_usage_able::mem_usage(*v) - sizeof(*v);

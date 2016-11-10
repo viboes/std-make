@@ -33,7 +33,7 @@ namespace mem_usage_able
   template <typename T>
   struct mem_usage_traits< Array<T> >
   {
-    static auto apply(const Array<T>& v) -> decltype(mem_usage_able::mem_usage(std::declval<T>()))
+    static constexpr auto apply(const Array<T>& v) noexcept -> decltype(mem_usage_able::mem_usage(std::declval<T>()))
     {
       size_t ans = sizeof(v);
       for (const T& e : v)

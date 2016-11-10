@@ -22,7 +22,7 @@ namespace mem_usage_able
   struct mem_usage_traits< std::pair<R, S> >
   {
     template <typename T, typename U>
-    static auto apply(const std::pair<T, U>& v) -> decltype(mem_usage_able::mem_usage(v.first)
+    static constexpr auto apply(const std::pair<T, U>& v) noexcept -> decltype(mem_usage_able::mem_usage(v.first)
            + mem_usage_able::mem_usage(v.second))
     {
       return mem_usage_able::mem_usage(v.first)

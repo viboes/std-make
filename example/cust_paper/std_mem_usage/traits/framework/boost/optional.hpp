@@ -23,7 +23,7 @@ namespace mem_usage_able
   {
 
     template <typename T>
-    static auto apply(const boost::optional<T>& v) -> decltype( mem_usage_able::mem_usage(*v) )
+    static constexpr auto apply(const boost::optional<T>& v) noexcept -> decltype( mem_usage_able::mem_usage(*v) )
     {
       size_t ans = sizeof(v);
       if (v) ans += mem_usage_able::mem_usage(*v) - sizeof(*v);

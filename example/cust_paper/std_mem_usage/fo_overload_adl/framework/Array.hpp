@@ -27,7 +27,8 @@ inline namespace fundamental_v3
     T const* begin() const { return &ptr_[0]; }
     T const* end() const { return &ptr_[size_]; }
 
-    friend  auto mem_usage(const Array<T>& v) -> decltype(experimental::mem_usage(std::declval<T>()))
+    friend  constexpr auto mem_usage(const Array<T>& v) noexcept
+            -> decltype(experimental::mem_usage(std::declval<T>()))
       {
         size_t ans = sizeof(v);
         for (const T& e : v) ans += experimental::mem_usage(e);

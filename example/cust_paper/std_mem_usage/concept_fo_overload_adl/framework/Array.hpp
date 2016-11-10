@@ -31,7 +31,7 @@ inline namespace fundamental_v3
   };
 
   template <typename T>
-  auto mem_usage(const Array<T>& v) -> decltype(mem_usage_able::mem_usage(std::declval<T>()))
+  constexpr auto mem_usage(const Array<T>& v) noexcept -> decltype(mem_usage_able::mem_usage(std::declval<T>()))
     {
       size_t ans = sizeof(v);
       for (const T& e : v) ans += mem_usage_able::mem_usage(e);

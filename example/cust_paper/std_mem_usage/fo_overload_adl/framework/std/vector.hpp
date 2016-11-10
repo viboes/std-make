@@ -13,8 +13,8 @@
 namespace std
 {
   template <typename T>
-  size_t mem_usage(const vector<T>& v)
-  //auto mem_usage(const vector<T>& v) -> decltype( experimental::mem_usage(v) )
+  constexpr auto mem_usage(const vector<T>& v) noexcept
+      -> decltype( experimental::mem_usage(declval<T>()) )
   {
     size_t ans = sizeof(v);
     for (const T& e : v) ans += experimental::mem_usage(e);

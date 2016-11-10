@@ -13,7 +13,8 @@
 namespace boost
 {
   template <typename T>
-    size_t mem_usage(const optional<T>& v)
+    constexpr auto mem_usage(const optional<T>& v) noexcept
+        -> decltype( std::experimental::mem_usage(declval<T>()) )
     {
       size_t ans = sizeof(v);
       if (v) ans += std::experimental::mem_usage(*v) - sizeof(*v);

@@ -25,14 +25,15 @@ namespace mem_usage_able
   namespace adl
   {
     template <typename T>
+    constexpr
     typename std::enable_if<std::is_trivial<T>::value, size_t>::type
-    mem_usage(const T& v)
+    mem_usage(const T& v) noexcept
     { return sizeof v;}
 
     struct mem_usage_fn
     {
       template <typename T>
-      auto operator()(const T& v)  const-> decltype(mem_usage(v))
+      constexpr auto operator()(const T& v)  const noexcept -> decltype(mem_usage(v))
       { return mem_usage(v);}
     };
   } // adl

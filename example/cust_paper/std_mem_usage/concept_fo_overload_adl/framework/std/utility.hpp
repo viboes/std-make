@@ -13,7 +13,7 @@
 namespace std
 {
   template <typename T, typename U>
-  auto mem_usage(const std::pair<T, U>& v)
+  constexpr auto mem_usage(const std::pair<T, U>& v) noexcept
   -> decltype( experimental::mem_usage_able::mem_usage(v.first) + experimental::mem_usage_able::mem_usage(v.second) )
   {
     return experimental::mem_usage_able::mem_usage(v.first)

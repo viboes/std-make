@@ -23,7 +23,7 @@ inline namespace fundamental_v3
   namespace adl_mem_usage
   {
     template <typename T>
-    typename std::enable_if<is_trivial<T>::value, size_t>::type
+    constexpr typename std::enable_if<is_trivial<T>::value, size_t>::type
     mem_usage(const T& v)
     { return sizeof v;}
 
@@ -31,18 +31,22 @@ inline namespace fundamental_v3
 
     namespace detail {
       template <class PT, std::size_t... I>
-      constexpr decltype(auto) mem_usage_impl( PT&& pt, index_sequence<I...> )
+      constexpr decltype(auto) mem_usage_impl( PT&& pt, index_sequence<I...> ) noexcept
       {
         return  sizeof(pt)
             + ( mem_usage(product_type::get<I>(forward<PT>(pt)) ) + ... )
-            - ( sizeof(                 product_type::get<I>(forward<PT>(pt)) ) + ... )
+            - ( sizeof(   product_type::get<I>(forward<PT>(pt)) ) + ... )
             ;
-
       }
     }
     template <typename PT>
-      std::enable_if_t<is_product_type<remove_cv_t<remove_reference_t<PT>>>::value, size_t>
-    mem_usage(PT&& pt)
+    constexpr
+//    enable_if_t<conjunction_v<
+//          is_product_type<remove_cv_t<remove_reference_t<PT>>>
+//      //, all_of<is_adl_mem_usage_able<product_type::element<I,PT>>
+//      >
+//      , size_t>
+    decltype(auto) mem_usage(PT&& pt) noexcept
     {
       return detail::mem_usage_impl(forward<PT>(pt), product_type::element_sequence_for<PT>{});
     }
@@ -51,7 +55,7 @@ inline namespace fundamental_v3
     struct mem_usage_fn
     {
       template <typename T>
-      auto operator()(const T& v)  const-> decltype(mem_usage(v))
+      constexpr auto operator()(const T& v)  const noexcept -> decltype(mem_usage(v))
       { return mem_usage(v);}
     };
   } // adl

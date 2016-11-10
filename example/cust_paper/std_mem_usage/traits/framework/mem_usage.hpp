@@ -21,29 +21,22 @@ inline namespace fundamental_v3
 {
 namespace mem_usage_able
 {
-  using std::experimental::meta::when;
-  using std::experimental::meta::is_valid;
-  using std::experimental::meta::void_t;
 
   template <typename T, typename Enabler=void>
-  struct mem_usage_traits : mem_usage_traits<T, when<true>>
-  {
-    //static_assert(std::is_trivial<T>::value, "specialize");
-    //static size_t apply(const T& v) { return sizeof v; }
-  };
+  struct mem_usage_traits : mem_usage_traits<T, meta::when<true>> {};
   template <typename T, bool B>
-  struct mem_usage_traits<T, when<B>>
+  struct mem_usage_traits<T, meta::when<B>>
   {
-    static size_t apply(const T& v) = delete;
+    static constexpr size_t apply(const T& v) = delete;
   };
   template <typename T>
-  struct mem_usage_traits<T, when<std::is_trivial<T>::value>>
+  struct mem_usage_traits<T, meta::when<std::is_trivial<T>::value>>
   {
-    static size_t apply(const T& v) { return sizeof v; }
+    static constexpr size_t apply(const T& v) noexcept { return sizeof v; }
   };
 
   template <typename T>
-  auto mem_usage(const T& v) -> decltype(mem_usage_traits<T>::apply(v))
+  constexpr auto mem_usage(const T& v) noexcept -> decltype(mem_usage_traits<T>::apply(v))
   {
     return mem_usage_traits<T>::apply(v);
   }

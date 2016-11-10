@@ -30,22 +30,22 @@ namespace mem_usage_able
 namespace adl {
 
   template< class C >
-    constexpr auto mem_usage( C& c ) -> decltype(c.mem_usage()) { return c.mem_usage(); }
+    constexpr auto mem_usage( C& c ) noexcept -> decltype(c.mem_usage()) { return c.mem_usage(); }
   template <typename T>
-  std::enable_if_t<std::is_trivial<T>::value, size_t>
-     mem_usage(const T& v) { return sizeof v; }
+  constexpr std::enable_if_t<std::is_trivial<T>::value, size_t>
+     mem_usage(const T& v) noexcept { return sizeof v; }
 
   template <typename T>
 #if 1
-    size_t mem_usage(const std::vector<T>& v);
+  constexpr size_t mem_usage(const std::vector<T>& v) noexcept;
 #else
   // unable to forward declare SFINAE interface
-    auto mem_usage(const std::vector<T>& v) -> decltype(mem_usage(v[0]));
+  constexpr auto mem_usage(const std::vector<T>& v) noexcept -> decltype(mem_usage(v[0]));
 #endif
 
   // overload for std::optional
   template <typename T>
-  auto mem_usage(const std::experimental::optional<T>& v) -> decltype(mem_usage(*v))
+  constexpr auto mem_usage(const std::experimental::optional<T>& v) noexcept -> decltype(mem_usage(*v))
   {
       size_t ans = sizeof(v);
       if (v) ans += mem_usage(*v) - sizeof(*v);
@@ -54,7 +54,7 @@ namespace adl {
 
   // overload for std::pair
   template <typename T, typename U>
-  auto mem_usage(const std::pair<T,U>& v) -> decltype(mem_usage(v.first)
+  constexpr auto mem_usage(const std::pair<T,U>& v) noexcept -> decltype(mem_usage(v.first)
       + mem_usage(v.second))
   {
     return mem_usage(v.first)
@@ -67,10 +67,10 @@ namespace adl {
   // overload for std::vector
   template <typename T>
 #if 1
-    size_t mem_usage(const std::vector<T>& v)
+  constexpr size_t mem_usage(const std::vector<T>& v) noexcept
 #else
     // unable to forward declare SFINAE interface
-    auto mem_usage(const std::vector<T>& v) -> decltype(mem_usage(v[0]))
+    constexpr auto mem_usage(const std::vector<T>& v) noexcept -> decltype(mem_usage(v[0]))
 #endif
   {
       size_t ans = sizeof(v);
@@ -87,12 +87,11 @@ namespace adl {
         > : std::true_type {};
 
   template< class C >
-    constexpr auto apply( C& c ) -> decltype(mem_usage(c)) { return mem_usage(c); }
+    constexpr auto apply( C& c ) noexcept -> decltype(mem_usage(c)) { return mem_usage(c); }
 }
 
-
   template <typename T>
-  auto mem_usage(const T& v) -> decltype(adl::apply(v))
+  constexpr auto mem_usage(const T& v) noexcept -> decltype(adl::apply(v))
     { return adl::apply(v); }
 } // concept
 

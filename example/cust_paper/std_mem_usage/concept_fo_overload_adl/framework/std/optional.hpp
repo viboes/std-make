@@ -13,7 +13,7 @@
 namespace std
 {
   template <typename T>
-    size_t mem_usage_impl(const optional<T>& v)
+  constexpr auto mem_usage_impl(const optional<T>& v) noexcept
   -> decltype( std::experimental::mem_usage_able::mem_usage(*v) )
     {
       size_t ans = sizeof(v);
