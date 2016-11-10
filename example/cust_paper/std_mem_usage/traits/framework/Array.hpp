@@ -31,7 +31,7 @@ inline namespace fundamental_v3
 namespace mem_usage_able
 {
   template <typename T>
-  struct mem_usage_traits< Array<T> >
+  struct traits< Array<T> >
   {
     static constexpr auto apply(const Array<T>& v) noexcept -> decltype(mem_usage_able::mem_usage(std::declval<T>()))
     {

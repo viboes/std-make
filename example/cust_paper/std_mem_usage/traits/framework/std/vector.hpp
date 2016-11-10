@@ -19,7 +19,7 @@ inline namespace fundamental_v3
 namespace mem_usage_able
 {
   template <typename U>
-  struct mem_usage_traits< std::vector<U>>
+  struct traits< std::vector<U>>
   {
     template <typename T>
     static constexpr auto apply(const std::vector<T>& v) noexcept -> decltype(mem_usage_able::mem_usage(std::declval<T>()))

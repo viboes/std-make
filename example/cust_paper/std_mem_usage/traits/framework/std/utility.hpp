@@ -19,7 +19,7 @@ inline namespace fundamental_v3
 namespace mem_usage_able
 {
   template <typename R, typename S>
-  struct mem_usage_traits< std::pair<R, S> >
+  struct traits< std::pair<R, S> >
   {
     template <typename T, typename U>
     static constexpr auto apply(const std::pair<T, U>& v) noexcept -> decltype(mem_usage_able::mem_usage(v.first)

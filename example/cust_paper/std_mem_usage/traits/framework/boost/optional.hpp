@@ -19,7 +19,7 @@ inline namespace fundamental_v3
 namespace mem_usage_able
 {
   template <typename U>
-  struct mem_usage_traits< boost::optional<U> >
+  struct traits< boost::optional<U> >
   {
 
     template <typename T>

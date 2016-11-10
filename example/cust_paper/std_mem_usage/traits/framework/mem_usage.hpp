@@ -23,15 +23,15 @@ namespace mem_usage_able
 {
 
   template <typename T, typename Enabler=void>
-  struct mem_usage_traits : mem_usage_traits<T, meta::when<true>> {};
+  struct traits : traits<T, meta::when<true>> {};
   template <typename R, bool B>
-  struct mem_usage_traits<R, meta::when<B>>
+  struct traits<R, meta::when<B>>
   {
     template <typename T>
     static constexpr size_t apply(T&& v) = delete;
   };
   template <typename R>
-  struct mem_usage_traits<R, meta::when<std::is_trivial<R>::value>>
+  struct traits<R, meta::when<std::is_trivial<R>::value>>
   {
     template <typename T>
     static constexpr size_t apply(T&& v) noexcept { return sizeof ( remove_cv_t<remove_reference_t<T>> ); }
@@ -39,13 +39,13 @@ namespace mem_usage_able
 
 
   template <typename T>
-  constexpr auto mem_usage(T&& v) noexcept -> decltype(mem_usage_traits<remove_cv_t<remove_reference_t<T>>>::apply(std::forward<T>(v)))
+  constexpr auto mem_usage(T&& v) noexcept -> decltype(traits<remove_cv_t<remove_reference_t<T>>>::apply(std::forward<T>(v)))
   {
-    return mem_usage_traits<remove_cv_t<remove_reference_t<T>>>::apply(std::forward<T>(v));
+    return traits<remove_cv_t<remove_reference_t<T>>>::apply(std::forward<T>(v));
   }
 
   template <typename R>
-  struct mem_usage_traits<R*>
+  struct traits<R*>
   {
     template <typename T>
     static constexpr auto apply(T* v) noexcept -> decltype( mem_usage_able::mem_usage ( *v ) )

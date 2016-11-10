@@ -52,7 +52,7 @@ int main()
 #if 1
   {
     int* t=new int;
-    std::cout << "int* " << mem_usage_able::mem_usage_traits<int*>::apply(t) << "\n";
+    std::cout << "int* " << mem_usage_able::traits<int*>::apply(t) << "\n";
     //std::cout << "int* " << mem_usage_able::mem_usage(t) << "\n";
   }
 #endif
