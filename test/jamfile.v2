@@ -167,6 +167,10 @@ test-suite std_mem_usage
       [ run ../example/cust_paper/std_mem_usage/concept_overload_adl/std_concept_overload_test_pass.cpp  ]
     ;
 
+test-suite serializable
+    : 
+      [ run ../example/cust_paper/serializable/n4381/serial_test_pass.cpp  ]
+    ; 
 
 explicit fix ;
 test-suite fix
