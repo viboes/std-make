@@ -30,6 +30,13 @@ int main()
   }
   {
     int v=0;
+    short s=0;
+    std::array<int, 2> x = stde::make<stde::array_tc>(v, s);
+    BOOST_TEST(std::get<0>(x) == 0);
+    BOOST_TEST(std::get<1>(x) == 0);
+  }
+  {
+    int v=0;
     std::array<long, 2> x = stde::make<std::array<long, 2> >(v, v);
     BOOST_TEST(std::get<0>(x) == 0);
     BOOST_TEST(std::get<1>(x) == 0);
