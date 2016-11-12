@@ -73,7 +73,7 @@ namespace serializable
       template <class PT, typename Archine, std::size_t... I>
       constexpr decltype(auto) save_impl( Archine& ar, PT&& pt, index_sequence<I...> ) noexcept
       {
-        swallow ( (save(ar, product_type::get<I>(forward<PT>(pt)) ), 0) ... );
+        swallow { (save(ar, product_type::get<I>(forward<PT>(pt)) ), unit{}) ... };
       }
     }
     template <typename PT, typename Archine>
