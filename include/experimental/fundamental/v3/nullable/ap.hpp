@@ -37,8 +37,8 @@ namespace nullable
   template <class N, class F
   // todo add constraint on F
   //, class = enable_if_t<
-  //    is_nullable_v<remove_cv_t<remove_reference_t<N>>>
-  // && is_type_constructible_v<remove_cv_t<remove_reference_t<N>>>
+  //    is_nullable_v<decay_t<N>>
+  // && is_type_constructible_v<decay_t<N>>
   //>
   >
   constexpr auto
@@ -57,24 +57,32 @@ namespace nullable
 #endif
       );
   }
+  struct as_applicative: applicative::tag
+  {
+    template <class T, class F>
+      static constexpr auto ap(F&& f, T&& x)
+      {
+        return nullable::ap(forward<F>(f), forward<T>(x));
+      }
+  };
 }
 
 /**
  */
 
-namespace applicative {
-template <class N>
-struct traits<N, meta::when<
-    is_nullable_v<N> && is_type_constructible_v<N>
->> : tag
-{
-  template <class T, class F>
-    static constexpr auto ap(F&& f, T&& x)
-    {
-      return nullable::ap(forward<F>(f), forward<T>(x));
-    }
-};
-}
+//namespace applicative {
+//template <class N>
+//struct traits<N, meta::when<
+//    is_nullable_v<N> && is_type_constructible_v<N>
+//>> : tag
+//{
+//  template <class T, class F>
+//    static constexpr auto ap(F&& f, T&& x)
+//    {
+//      return nullable::ap(forward<F>(f), forward<T>(x));
+//    }
+//};
+//}
 }}
 }
 #endif // header

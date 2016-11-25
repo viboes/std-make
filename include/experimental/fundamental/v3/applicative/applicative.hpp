@@ -35,17 +35,17 @@ inline namespace fundamental_v3
 
 namespace applicative
 {
-  //using namespace functor;
-  //using namespace type_constructible;
+  using namespace functor;
+  using namespace type_constructible;
 
   struct tag{};
 
-  template <class F, class Enabler=void>
-    struct traits : traits<F, meta::when<true>> {};
+  template <class A, class Enabler=void>
+    struct traits : traits<A, meta::when<true>> {};
 
   // Default failing specialization
-  template <typename U, bool condition>
-  struct traits<U, meta::when<condition>>
+  template <typename Ap, bool condition>
+  struct traits<Ap, meta::when<condition>>
   {
     // ap:: [T->U] x [T] -> [U]
     template <class F, class A>
@@ -53,10 +53,11 @@ namespace applicative
   };
 
   template <class F, class A>
+  // requires is_same_v<type_constructor_t<decay_t<A>>, type_constructor_t<decay_t<F>>>
   auto
     ap(F&& f, A&& x)
       JASEL_NOEXCEPT_RETURN(
-          traits<decay_t<A>>::ap(forward<F>(f), forward<A>(x))
+          traits<type_constructor_t<decay_t<A>>>::ap(forward<F>(f), forward<A>(x))
        )
 
 }

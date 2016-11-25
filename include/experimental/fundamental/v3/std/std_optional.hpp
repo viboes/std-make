@@ -67,6 +67,18 @@ namespace nullable
   };
 }
 
+namespace applicative {
+template <>
+struct traits<optional<_t>> : nullable::as_applicative
+{
+  template <class T, class F>
+    static constexpr auto ap(F&& f, T&& x)
+    {
+      return nullable::ap(forward<F>(f), forward<T>(x));
+    }
+};
+}
+
 #if __cplusplus >= 201402L
 namespace sum_type
 {
