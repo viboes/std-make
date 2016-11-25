@@ -18,7 +18,7 @@ namespace experimental
 inline namespace fundamental_v2
 {
 
-  struct applicative {
+  struct applicativev2 {
     template <class Tag>
     struct instance;
 

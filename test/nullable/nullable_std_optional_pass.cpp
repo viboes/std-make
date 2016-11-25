@@ -274,6 +274,50 @@ int main()
     BOOST_TEST(&v == std::addressof(deref(x)));
 
   }
+ // nullable::transform
+  {
+    stde::optional<int> x = stde::none<stde::optional>();
+    stde::optional<int> y = stde::nullable::transform(x, twice);
+    BOOST_TEST(! stde::has_value(y));
+  }
+  {
+    int v=1;
+    stde::optional<int> x = stde::make_optional(v);
+    stde::optional<int> y = stde::nullable::transform(x, twice);
+    BOOST_TEST(stde::deref(y) == 2);
+  }
+  {
+    int v=1;
+    const stde::optional<int> x = stde::make_optional(v);
+    stde::optional<int> y = stde::nullable::transform(x, twice);
+    BOOST_TEST(stde::deref(y) == 2);
+  }
+  // nullable::ap
+  {
+    stde::optional<int> x = stde::none<stde::optional>();
+    stde::optional<int(*)(int)> f = stde::none<stde::optional>();
+    stde::optional<int> y = stde::nullable::ap(f, x);
+    BOOST_TEST(! stde::has_value(y));
+  }
+  {
+    stde::optional<int> x = stde::make<stde::optional>(1);
+    stde::optional<int(*)(int)> f = stde::none<stde::optional>();
+    stde::optional<int> y = stde::nullable::ap(f, x);
+    BOOST_TEST(! stde::has_value(y));
+  }
+  {
+    stde::optional<int> x = stde::none<stde::optional>();
+    stde::optional<int(*)(int)> f = stde::make<stde::optional>(twice);
+    stde::optional<int> y = stde::nullable::ap(f, x);
+    BOOST_TEST(! stde::has_value(y));
+  }
+  {
+    int v=1;
+    stde::optional<int> x = stde::make<stde::optional>(v);
+    stde::optional<int(*)(int)> f = stde::make<stde::optional>(twice);
+    stde::optional<int> y = stde::nullable::ap(f, x);
+    BOOST_TEST(stde::deref(y) == 2);
+  }
 
   return ::boost::report_errors();
 }

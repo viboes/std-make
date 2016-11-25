@@ -13,6 +13,8 @@
 #include <experimental/nullable.hpp>
 #include <experimental/sum_type.hpp>
 #include <experimental/meta.hpp>
+#include <experimental/functor.hpp>
+#include <experimental/applicative.hpp>
 
 #if defined JASEL_FUNDAMENTAL_EXTENDED
 #include <experimental/fundamental/v2/possible_valued/mcd/pointer_like_mcd.hpp>

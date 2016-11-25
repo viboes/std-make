@@ -148,7 +148,11 @@ test-suite functor
       [ run functor/functor_std_tuple_pass.cpp  ]
       [ run functor/functor_std_unique_ptr_pass.cpp  ]
       [ run functor/functor_std_shared_ptr_pass.cpp  ]
+    ;
 
+test-suite applicative
+    : 
+      [ run applicative/applicative_std_optional_pass.cpp  ]
     ;
 
 test-suite mem_usage
