@@ -9,6 +9,8 @@
 
 #include <experimental/make.hpp>
 #include <experimental/meta.hpp>
+#include <experimental/product_type.hpp>
+#include <experimental/functor.hpp>
 #include <tuple>
 
 namespace std
@@ -53,6 +55,14 @@ inline namespace fundamental_v3
                           std::tuple_size<std::decay_t<Tuple>>::value>());
       }
 #endif
+#if __cplusplus >= 201402L
+
+  namespace functor {
+    template <>
+    struct traits<tuple<_t>> : product_type::as_functor {};
+  }
+#endif
+
 }
 }
 }

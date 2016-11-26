@@ -9,6 +9,8 @@
 
 #include <experimental/make.hpp>
 #include <experimental/meta.hpp>
+#include <experimental/functor.hpp>
+#include <experimental/product_type.hpp>
 #include <utility>
 
 namespace std
@@ -23,7 +25,8 @@ namespace std
 
 namespace experimental
 {
-
+inline namespace fundamental_v3
+{
   using pair_tc = pair<experimental::_t, experimental::_t>;
 
   // type_constructor customization
@@ -33,6 +36,14 @@ namespace experimental
   template <>
   struct type_constructor<meta::quote<pair>> : meta::id<pair_tc> {};
 
+#if __cplusplus >= 201402L
+
+  namespace functor {
+    template <>
+    struct traits<pair<_t,_t>> : product_type::as_functor {};
+  }
+#endif
+}
 }
 }
 

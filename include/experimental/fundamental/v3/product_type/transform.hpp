@@ -74,8 +74,17 @@ namespace product_type
           product_type::element_sequence_for<ProductType>{});
   }
 
-}
+  struct as_functor : functor::tag
+  {
+    template <class T, class F>
+      static constexpr auto transform(T&& x, F&& f)
+      {
+        return product_type::transform(forward<T>(x), forward<F>(f));
+      }
+  };
 
+}
+#if 0
 namespace functor {
 
 template <class N>
@@ -90,7 +99,7 @@ struct traits<N, meta::when<
     }
 };
 }
-
+#endif
 }}
 }
 

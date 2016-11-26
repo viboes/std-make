@@ -55,11 +55,19 @@ namespace nullable
       return nullable::deref_none(forward<N>(n));
   }
 
+  struct as_functor: functor::tag
+  {
+    template <class T, class F>
+      static constexpr auto transform(T&& x, F&& f)
+      {
+        return nullable::transform(forward<T>(x), forward<F>(f));
+      }
+  };
 }
 
 /**
  */
-
+#if 0
 namespace functor {
 template <class N>
 struct traits<N, meta::when<
@@ -73,6 +81,7 @@ struct traits<N, meta::when<
     }
 };
 }
+#endif
 }}
 }
 #endif // header

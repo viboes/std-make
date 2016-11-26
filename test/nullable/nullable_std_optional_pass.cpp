@@ -274,6 +274,8 @@ int main()
     BOOST_TEST(&v == std::addressof(deref(x)));
 
   }
+#if __cplusplus >= 201402L
+
  // nullable::transform
   {
     stde::optional<int> x = stde::none<stde::optional>();
@@ -318,7 +320,7 @@ int main()
     stde::optional<int> y = stde::nullable::ap(f, x);
     BOOST_TEST(stde::deref(y) == 2);
   }
-
+#endif
   return ::boost::report_errors();
 }
 #endif

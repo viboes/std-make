@@ -35,7 +35,7 @@
 #if __cplusplus >= 201402L
 
 #include <iterator>
-#include <experimental/utility.hpp>
+#include <utility>
 #include <experimental/type_traits.hpp>
 #include <experimental/meta.hpp>
 #include <experimental/type_traits.hpp>
@@ -57,8 +57,8 @@ namespace std
         namespace adl_begin_end {
 
         #if defined __clang__
-          template <class T, std::size_t N> void begin(T(&)[N]) = delete;
-          template <class T, std::size_t N> void end(T(&)[N]) = delete;
+          template <class T, size_t N> void begin(T(&)[N]) = delete;
+          template <class T, size_t N> void end(T(&)[N]) = delete;
         #endif
 
           template <class T, typename = void>
@@ -77,12 +77,12 @@ namespace std
           template <class T>
           auto apply_begin(T&& t)
                 JASEL_DECLTYPE_RETURN_NOEXCEPT(
-                  begin(std::forward<T>(t))
+                  begin(forward<T>(t))
                 )
            template <class T>
            auto apply_end(T&& t)
                 JASEL_DECLTYPE_RETURN_NOEXCEPT(
-                  end(std::forward<T>(t))
+                  end(forward<T>(t))
                 )
         }
 
@@ -142,17 +142,17 @@ namespace std
 
         // overload for c-arrays
 #if 0
-        template <class T, std::size_t N>
+        template <class T, size_t N>
           T* begin(T (&t)[N]) noexcept { return t+0; }
-        template <class T, std::size_t N>
+        template <class T, size_t N>
           T* end(T (&t)[N]) noexcept { return t+N; }
 #else
-        template <class U, std::size_t M>
+        template <class U, size_t M>
         struct traits<U [M]>
         {
-          template <class T, std::size_t N>
+          template <class T, size_t N>
             static constexpr T* begin(T (&t)[N]) noexcept { return t+0; }
-          template <class T, std::size_t N>
+          template <class T, size_t N>
             static constexpr T* end(T (&t)[N]) noexcept { return t+N; }
         };
 #endif
@@ -183,7 +183,7 @@ namespace std
           >
         >: true_type {};
 
-//      template <class T, std::size_t N>
+//      template <class T, size_t N>
 //        struct is_range<T (&)[N]>: true_type {};
     }
   }

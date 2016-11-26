@@ -11,7 +11,7 @@
 
 #include <experimental/fundamental/v3/product_type/product_type.hpp>
 #include <tuple>
-#include <experimental/utility.hpp>
+#include <experimental/fundamental/v3/utility/swallow.hpp>
 #include <experimental/type_traits.hpp>
 
 namespace std

@@ -23,8 +23,8 @@ int main()
 
   static_assert(stde::is_nullable_v<std::shared_ptr<int>>, "ERROR");
   static_assert(stde::is_type_constructible_v<std::shared_ptr<int>>, "ERROR");
-  static_assert(std::is_base_of<stde::functor::tag, stde::functor::traits<std::shared_ptr<int>>> ::value, "ERROR");
-  static_assert(stde::is_functor<std::shared_ptr<int>>::value, "ERROR");
+  static_assert(std::is_base_of<stde::functor::tag, stde::functor::traits<std::shared_ptr<stde::_t>>> ::value, "ERROR");
+  static_assert(stde::is_functor<std::shared_ptr<stde::_t>>::value, "ERROR");
 
   {
     std::shared_ptr<int> x = stde::none<std::shared_ptr>();

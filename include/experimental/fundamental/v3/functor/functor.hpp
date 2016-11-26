@@ -18,6 +18,7 @@
 #include <utility>
 #include <type_traits>
 #include <experimental/meta.hpp>
+#include <experimental/type_constructible.hpp>
 #include <experimental/fundamental/v2/config.hpp>
 
 namespace std
@@ -52,22 +53,22 @@ namespace functor
   auto
     transform(T&& x, F&& f)
       JASEL_NOEXCEPT_RETURN(
-          traits<remove_cv_t<remove_reference_t<T>>>::transform(forward<T>(x),forward<F>(f))
+          traits<type_constructor_t<remove_cv_t<remove_reference_t<T>>>>::transform(forward<T>(x),forward<F>(f))
        )
 }
 
   template <class T>
     struct is_functor : is_base_of<functor::tag, functor::traits<T>> {};
   template <class T>
-  struct is_functor<const T> : is_functor<T> {};
+    struct is_functor<const T> : is_functor<T> {};
   template <class T>
-  struct is_functor<volatile T> : is_functor<T> {};
+    struct is_functor<volatile T> : is_functor<T> {};
   template <class T>
-  struct is_functor<const volatile T> : is_functor<T> {};
+    struct is_functor<const volatile T> : is_functor<T> {};
 
+}
+}
+}
 
-}
-}
-}
 #endif
 #endif // header

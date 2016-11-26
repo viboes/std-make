@@ -23,8 +23,8 @@ int main()
 
   static_assert(stde::is_nullable_v<std::unique_ptr<int>>, "ERROR");
   static_assert(stde::is_type_constructible_v<std::unique_ptr<int>>, "ERROR");
-  static_assert(std::is_base_of<stde::functor::tag, stde::functor::traits<std::unique_ptr<int>>> ::value, "ERROR");
-  static_assert(stde::is_functor<std::unique_ptr<int>>::value, "ERROR");
+  static_assert(std::is_base_of<stde::functor::tag, stde::functor::traits<std::unique_ptr<stde::_t>>> ::value, "ERROR");
+  static_assert(stde::is_functor<std::unique_ptr<stde::_t>>::value, "ERROR");
 
   {
     std::unique_ptr<int> x = stde::none<std::unique_ptr>();

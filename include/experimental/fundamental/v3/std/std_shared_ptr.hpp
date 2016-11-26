@@ -10,6 +10,7 @@
 #include <experimental/make.hpp>
 #include <experimental/meta.hpp>
 #include <experimental/nullable.hpp>
+#include <experimental/functor.hpp>
 #include <memory>
 
 namespace std
@@ -45,6 +46,12 @@ namespace nullable {
   template <class T>
   struct traits<shared_ptr<T>> : traits_pointer_like {};
 }
+#if __cplusplus >= 201402L
+namespace functor {
+  template <>
+  struct traits<shared_ptr<_t>> : nullable::as_functor {};
+}
+#endif
 }
 }
 }
