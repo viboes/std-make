@@ -55,7 +55,7 @@ namespace std
     struct applicativev2::tag<boost::optional<T>> : meta::id<possible_value> {};
 
     template <class T>
-    struct monad::tag<boost::optional<T>> : meta::id<possible_value> {};
+    struct monadv2::tag<boost::optional<T>> : meta::id<possible_value> {};
 
     // type_constructor customization
     template <class T>

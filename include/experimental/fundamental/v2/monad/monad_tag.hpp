@@ -18,7 +18,7 @@ namespace experimental
 inline namespace fundamental_v2
 {
 
-  struct monad {
+  struct monadv2 {
     template <class Tag>
     struct instance;
 

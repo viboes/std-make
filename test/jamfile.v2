@@ -155,6 +155,11 @@ test-suite applicative
       [ run applicative/applicative_std_optional_pass.cpp  ]
     ;
 
+test-suite monad
+    : 
+      [ run monad/monad_std_optional_pass.cpp  ]
+    ;
+
 test-suite mem_usage
     : 
       [ run ../example/cust_paper/mem_usage/traits/traits_test_pass.cpp  ]

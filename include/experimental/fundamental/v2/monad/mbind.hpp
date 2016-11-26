@@ -26,9 +26,9 @@ inline namespace fundamental_v2
   //  && Same<TypeConstructor<meta::ResultType<F, ValueType<PV>>>, TypeConstructor<PV>>
   auto mbind(const M& m, F&& f)
   //-> meta::ResultType<F, ValueType<M>>
-  -> decltype(mbind_custom(concept_tag_t<monad, M>{}, m, std::forward<F>(f)))
+  -> decltype(mbind_custom(concept_tag_t<monadv2, M>{}, m, std::forward<F>(f)))
   {
-    return mbind_custom(concept_tag_t<monad, M>{}, m, std::forward<F>(f));
+    return mbind_custom(concept_tag_t<monadv2, M>{}, m, std::forward<F>(f));
   }
 
   template <class M, class F>
@@ -36,9 +36,9 @@ inline namespace fundamental_v2
   //  && Same<TypeConstructor<meta::ResultType<F, ValueType<PV>>>, TypeConstructor<PV>>
   auto mbind(const M& m, F&& f)
   //-> meta::ResultType<F, ValueType<M>>
-  -> decltype(concept_instance_t<monad, M>::mbind_impl(m, forward<F>(f)))
+  -> decltype(concept_instance_t<monadv2, M>::mbind_impl(m, forward<F>(f)))
   {
-    return concept_instance_t<monad, M>::mbind_impl(m, forward<F>(f));
+    return concept_instance_t<monadv2, M>::mbind_impl(m, forward<F>(f));
   }
 
 }

@@ -15,6 +15,7 @@
 #include <experimental/meta.hpp>
 #include <experimental/functor.hpp>
 #include <experimental/applicative.hpp>
+#include <experimental/monad.hpp>
 
 #if defined JASEL_FUNDAMENTAL_EXTENDED
 #include <experimental/fundamental/v2/possible_valued/mcd/pointer_like_mcd.hpp>
@@ -38,7 +39,7 @@ namespace experimental
   struct functorv2::tag<optional<T>> : meta::id<possible_value> {};
 
   template <class T>
-  struct monad::tag<optional<T>> : meta::id<possible_value> {};
+  struct monadv2::tag<optional<T>> : meta::id<possible_value> {};
 #endif
   // type_constructor customization
   template <class T>
@@ -77,6 +78,11 @@ struct traits<optional<_t>> : nullable::as_functor {};
 namespace applicative {
 template <>
 struct traits<optional<_t>> : nullable::as_applicative {};
+}
+
+namespace monad {
+template <>
+struct traits<optional<_t>> : nullable::as_monad {};
 }
 
 namespace sum_type

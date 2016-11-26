@@ -12,6 +12,7 @@
 #include <experimental/fundamental/v3/nullable/none.hpp>
 #include <experimental/fundamental/v3/nullable/transform.hpp>
 #include <experimental/fundamental/v3/nullable/ap.hpp>
+#include <experimental/fundamental/v3/nullable/bind.hpp>
 
 // TypeConstructible
 #include <experimental/type_constructible.hpp>
