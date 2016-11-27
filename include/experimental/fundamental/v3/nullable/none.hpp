@@ -268,7 +268,7 @@ inline namespace fundamental_v3
   constexpr bool operator>=(C const& x, none_t) { return true; }
 
   template <class N, class F, class T>
-      constexpr auto apply_or(N&& n, F&& f, T&& v)
+    JASEL_CXX14_CONSTEXPR value_type_t<N> apply_or(N&& n, F&& f, T&& v)
   {
     if (nullable::has_value(forward<N>(n)))
       return JASEL_INVOKE(std::forward<F>(f), nullable::deref(forward<N>(n)));
