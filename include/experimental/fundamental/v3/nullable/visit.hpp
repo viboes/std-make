@@ -64,7 +64,7 @@ namespace detail
       {
         if (nullable::has_value(std::forward<ST>(st)))
           return JASEL_INVOKE(forward<V>(v),nullable::deref(forward<ST>(st)));
-        return forward<V>(v)(nullable::deref_none(forward<ST>(st)));
+        return JASEL_INVOKE(forward<V>(v),nullable::deref_none(forward<ST>(st)));
       }
   };
 }
