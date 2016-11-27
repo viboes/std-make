@@ -28,11 +28,7 @@ namespace product_type
     constexpr void for_each_impl( ProductType&& pt, F&& f, index_sequence<I...> )
     {
       swallow{
-#if defined JASEL_HAS_INVOKE
-          (invoke(forward<F>(f), product_type::get<I>(forward<ProductType>(pt))),unit{}) ...
-#else
-          (f(product_type::get<I>(forward<ProductType>(pt))),unit{}) ...
-#endif
+          (JASEL_INVOKE(forward<F>(f), product_type::get<I>(forward<ProductType>(pt))),unit{}) ...
       };
     }
 

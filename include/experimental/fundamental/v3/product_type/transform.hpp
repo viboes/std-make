@@ -29,11 +29,7 @@ namespace product_type
     constexpr decltype(auto) transform_impl( ProductType&& pt, F&& f, index_sequence<I...> )
     {
       return make<TC>(
-#if defined JASEL_HAS_INVOKE
-          invoke(forward<F>(f), product_type::get<I>(forward<ProductType>(pt))) ...
-#else
-          f(product_type::get<I>(forward<ProductType>(pt))) ...
-#endif
+          JASEL_INVOKE(forward<F>(f), product_type::get<I>(forward<ProductType>(pt))) ...
       );
     }
 

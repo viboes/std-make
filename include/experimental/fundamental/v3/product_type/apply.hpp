@@ -30,11 +30,7 @@ namespace product_type
     template <class F, class ProductType, std::size_t... I>
     constexpr decltype(auto) apply_impl( F&& f, ProductType&& pt, index_sequence<I...> )
     {
-#if defined JASEL_HAS_INVOKE
-      return invoke(std::forward<F>(f), product_type::get<I>(forward<ProductType>(pt))...);
-#else
-      return std::forward<F>(f)(product_type::get<I>(forward<ProductType>(pt))...);
-#endif
+      return JASEL_INVOKE(std::forward<F>(f), product_type::get<I>(forward<ProductType>(pt))...);
     }
 
   } // namespace detail

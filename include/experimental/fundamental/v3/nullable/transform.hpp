@@ -45,11 +45,7 @@ namespace nullable
   {
     if (nullable::has_value(forward<N>(n)))
       return make<TypeConstructor<decay_t<N>>>(
-#if defined JASEL_HAS_INVOKE
-          invoke(std::forward<F>(f), nullable::deref(forward<N>(n)))
-#else
-          std::forward<F>(f)(nullable::deref(forward<N>(n)))
-#endif
+          JASEL_INVOKE(std::forward<F>(f), nullable::deref(forward<N>(n)))
       );
     else
       return nullable::deref_none(forward<N>(n));

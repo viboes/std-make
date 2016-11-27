@@ -49,11 +49,7 @@ namespace nullable
       return nullable::deref_none(forward<N>(n));
 
     return make<TypeConstructor<decay_t<N>>>(
-#if defined JASEL_HAS_INVOKE
-          invoke(nullable::deref(std::forward<F>(f)), nullable::deref(forward<N>(n)))
-#else
-          nullable::deref(std::forward<F>(f))(nullable::deref(forward<N>(n)))
-#endif
+        JASEL_INVOKE(nullable::deref(std::forward<F>(f)), nullable::deref(forward<N>(n)))
       );
   }
   struct as_applicative: applicative::tag

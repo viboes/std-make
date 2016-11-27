@@ -47,13 +47,7 @@ namespace nullable
 
   {
     if (nullable::has_value(forward<M>(m)))
-      return
-#if defined JASEL_HAS_INVOKE
-          invoke(std::forward<F>(f), nullable::deref(forward<M>(m)))
-#else
-          std::forward<F>(f)(nullable::deref(forward<M>(m)))
-#endif
-      ;
+      return JASEL_INVOKE(std::forward<F>(f), nullable::deref(forward<M>(m)));
     else
       return nullable::deref_none(forward<M>(m));
   }

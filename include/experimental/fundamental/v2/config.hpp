@@ -66,6 +66,12 @@
 #define JASEL_CXX14_CONSTEXPR
 #endif
 
+#ifdef JASEL_HAS_INVOKE
+#define JASEL_INVOKE(F, ...) std::invoke(F, __VA_ARGS__)
+#else
+#define JASEL_INVOKE(F, ...) F(__VA_ARGS__)
+#endif
+
 #define JASEL_DECLTYPE_RETURN_NOEXCEPT(...)                 \
     noexcept(noexcept(decltype(__VA_ARGS__)(__VA_ARGS__)))  \
     -> decltype(__VA_ARGS__)                                \

@@ -12,6 +12,7 @@
 #include <experimental/meta.hpp>
 #include <experimental/fundamental/v2/config.hpp>
 #include <experimental/meta/v1/when.hpp>
+#include <functional>
 
 #include <utility>
 #include <type_traits>
@@ -265,8 +266,15 @@ inline namespace fundamental_v3
   constexpr bool operator>=(none_t, C const& x) { return ! nullable::has_value(x); }
   template < class C, typename enable_if<is_strict_weakly_ordered_nullable<C>::value, int>::type=0  >
   constexpr bool operator>=(C const& x, none_t) { return true; }
-  }
 
+  template <class N, class F, class T>
+      constexpr auto apply_or(N&& n, F&& f, T&& v)
+  {
+    if (nullable::has_value(forward<N>(n)))
+      return JASEL_INVOKE(std::forward<F>(f), nullable::deref(forward<N>(n)));
+   return std::forward<T>(v);
+  }
+  }
 }
 }
 }

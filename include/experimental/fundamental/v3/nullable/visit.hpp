@@ -63,8 +63,8 @@ namespace detail
       static constexpr decltype(auto) visit(V&& v, ST&& st) noexcept
       {
         if (nullable::has_value(std::forward<ST>(st)))
-          return forward<V>(v)(nullable::deref(forward<ST>(st)));
-        else  return forward<V>(v)(nullable::deref_none(forward<ST>(st)));
+          return JASEL_INVOKE(forward<V>(v),nullable::deref(forward<ST>(st)));
+        return forward<V>(v)(nullable::deref_none(forward<ST>(st)));
       }
   };
 }
