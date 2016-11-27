@@ -8,5 +8,9 @@
 #define JASEL_EXPERIMENTAL_EXPECTED_HPP
 
 #include <experimental/fundamental/v3/expected/expected.hpp>
+#include <experimental/fundamental/v3/expected/transform.hpp>
+#include <experimental/fundamental/v3/expected/ap.hpp>
+#include <experimental/fundamental/v3/expected/bind.hpp>
+#include <experimental/fundamental/v3/expected/visit.hpp>
 
 #endif // header

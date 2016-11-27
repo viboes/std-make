@@ -15,6 +15,7 @@
 #include <experimental/fundamental/v3/expected/error_traits.hpp>
 #include <experimental/fundamental/v3/expected/bad_expected_access.hpp>
 #include <experimental/fundamental/v3/in_place.hpp>
+#include <experimental/type_constructible.hpp>
 //#include <boost/type.hpp>
 
 #ifdef JASEL_EXPERIMENTAL_V3_EXPECTED_USE_BOOST_HPP
@@ -1316,7 +1317,7 @@ public:
     typedef expected<T, error_type> type;
   };
 
-  using type_constructor = expected<holder, error_type>;
+  //using type_constructor = expected<holder, error_type>;
 
 
   // Constructors/Destructors/Assignments
@@ -3005,6 +3006,33 @@ namespace expected_detail
     return expected_detail::unwrap(*this);
   }
 #endif
+
+  template <class E>
+  struct expected<_t, E>: std::experimental::meta::bind_back<expected, E> {};
+
+  namespace type_constructible
+  {
+
+//      template <class T, class E>
+//      struct traits<expected<T,E>> : traits_constructor<expected<T,E>> {
+//        using traits_constructor<expected<T,E>>::make;
+//
+//        template <class ...Xs>
+//        static constexpr
+//        expected<T,E> make(in_place_t, Xs&& ...xs)
+//        {
+//          return expected<T, E>(in_place_t{}, forward<Xs>(xs)...);
+//        }
+//      };
+
+  }
+  // type_constructor customization
+  template <class T, class E>
+  struct type_constructor<expected<T, E>> : meta::id<expected<_t, E>> {};
+  //    // value_type customization
+  //    template <class T, class E>
+  //    struct value_type<boost::expected<T, E>> : id<T> {};
+
 }}
 } // namespace
 

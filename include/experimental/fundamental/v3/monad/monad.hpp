@@ -20,6 +20,7 @@
 #include <experimental/meta.hpp>
 #include <experimental/type_constructible.hpp>
 #include <experimental/fundamental/v2/config.hpp>
+#include <experimental/applicative.hpp>
 
 namespace std
 {

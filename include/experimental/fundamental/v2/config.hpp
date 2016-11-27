@@ -67,7 +67,7 @@
 #endif
 
 #ifdef JASEL_HAS_INVOKE
-#define JASEL_INVOKE(F, ...) std::invoke(F, __VA_ARGS__)
+#define JASEL_INVOKE(F, ...) std::invoke((F), __VA_ARGS__)
 #else
 #define JASEL_INVOKE(F, ...) F(__VA_ARGS__)
 #endif

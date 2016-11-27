@@ -120,6 +120,7 @@ test-suite sum_type
     : 
       [ run sum_type/sum_type_pass.cpp  ]
       [ run sum_type/sum_type_std_optional_pass.cpp  ]
+      [ run sum_type/sum_type_std_expected_pass.cpp  ]
     ;
 
 test-suite swappable
@@ -144,6 +145,7 @@ test-suite functor
     : 
       [ run functor/functor_pass.cpp  ]
       [ run functor/functor_std_optional_pass.cpp  ]
+      [ run functor/functor_std_expected_pass.cpp  ]
       [ run functor/functor_std_pair_pass.cpp  ]
       [ run functor/functor_std_tuple_pass.cpp  ]
       [ run functor/functor_std_unique_ptr_pass.cpp  ]
@@ -153,11 +155,13 @@ test-suite functor
 test-suite applicative
     : 
       [ run applicative/applicative_std_optional_pass.cpp  ]
+      [ run applicative/applicative_std_expected_pass.cpp  ]
     ;
 
 test-suite monad
     : 
       [ run monad/monad_std_optional_pass.cpp  ]
+      [ run monad/monad_std_expected_pass.cpp  ]
     ;
 
 test-suite mem_usage

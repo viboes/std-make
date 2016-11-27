@@ -20,6 +20,8 @@ int main()
 #define JASEL_STD_EXPERIMENTAL_FACTORIES_USE_OPTIONAL
 //#define JASEL_FUNDAMENTAL_EXTENDED
 #include <experimental/optional.hpp>
+#include <experimental/functional.hpp>
+#include <experimental/sum_type.hpp>
 
 #include <boost/detail/lightweight_test.hpp>
 
