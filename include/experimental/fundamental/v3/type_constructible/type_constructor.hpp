@@ -22,7 +22,7 @@
 namespace std
 {
   template <>
-  struct add_pointer<experimental::_t> : experimental::meta::quote<add_pointer> {};
+  struct add_pointer<experimental::_t> : experimental::meta::quote_trait<add_pointer> {};
 
 namespace experimental
 {

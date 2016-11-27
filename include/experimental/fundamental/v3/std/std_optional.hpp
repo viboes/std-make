@@ -26,6 +26,9 @@ namespace std
 {
 namespace experimental
 {
+  // todo: remove this specialization once is_strict_weakly_ordered is defined correctly
+  template <class T>
+  struct is_strict_weakly_ordered<optional<T>> : true_type {};
 
   // Callable specialization
   template <>

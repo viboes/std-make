@@ -22,6 +22,14 @@ int main()
 {
   namespace stde = std::experimental;
   static_assert(stde::is_nullable<std::unique_ptr<int>>::value, "ERROR");
+  static_assert(std::is_same<
+      stde::nullable::none_type_t<std::unique_ptr<int>>,
+      std::nullptr_t
+    >::value, "ERROR");
+  static_assert(std::is_same<
+      stde::nullable::value_type_t<std::unique_ptr<int>>,
+      int
+    >::value, "ERROR");
 
   static_assert(std::is_same<stde::meta::rebind_t<std::default_delete<int>, long>, std::default_delete<long>>::value, "ERROR");
   {

@@ -23,6 +23,14 @@ int main()
   namespace stde = std::experimental;
   static_assert(stde::is_nullable<std::shared_ptr<int>>::value, "ERROR");
   static_assert(stde::meta::is_callable<std::shared_ptr<stde::_t>(int)>::value, "ERROR");
+  static_assert(std::is_same<
+      stde::nullable::none_type_t<std::shared_ptr<int>>,
+      std::nullptr_t
+    >::value, "ERROR");
+  static_assert(std::is_same<
+      stde::nullable::value_type_t<std::shared_ptr<int>>,
+      int
+    >::value, "ERROR");
 
   {
     std::shared_ptr<int> x = stde::none<std::shared_ptr>();

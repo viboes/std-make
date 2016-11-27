@@ -83,6 +83,11 @@ template <template <class ...> class TC, class T>
 TC<T> make_none4(T) {
   return std::experimental::none<TC<T>>();
 }
+template <class TC, class T>
+std::experimental::meta::invoke<TC, T> make_none5(T) {
+  return std::experimental::none<TC>();
+}
+
 #if JASEL_HAS_EXPERIMENTAL_ANY
 
 template <class>
@@ -104,10 +109,18 @@ int main()
     BOOST_TEST(ip == nullptr);
   }
 #endif
-#if 0
+#if __cplusplus >= 201402L
   // no type named 'type' in 'std::__1::add_pointer<experimental::_t>'
+  static_assert(std::is_same<
+      stde::meta::invoke<stde::add_pointer_f, int>,
+      int*
+    >::value, "ERROR");
+  static_assert(std::is_same<
+      stde::nullable::value_type_t<int*>,
+      int
+    >::value, "ERROR");
   {
-    auto ip = make_none3<std::add_pointer_t>(0);
+    auto ip = make_none5<stde::add_pointer_f>(0);
     BOOST_TEST(ip == nullptr);
   }
 #endif

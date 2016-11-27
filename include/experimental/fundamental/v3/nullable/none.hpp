@@ -8,6 +8,7 @@
 #define JASEL_FUNDAMENTAL_V3_NULLABLE_NONE_HPP
 
 #include <experimental/type_constructible.hpp>
+#include <experimental/type_traits.hpp>
 #include <experimental/meta.hpp>
 #include <experimental/fundamental/v2/config.hpp>
 #include <experimental/meta/v1/when.hpp>
@@ -109,8 +110,8 @@ inline namespace fundamental_v3
         //none< TC<_t> >()
     )
 
-  template <class T>
-  using none_type_t = decltype(nullable::none<T>());
+  template <class TC>
+  using none_type_t = decltype(nullable::none<TC>());
 
   template <class T>
   constexpr
@@ -132,11 +133,20 @@ inline namespace fundamental_v3
       traits<typename decay<T>::type>::deref(x)
     )
 
+
   template <class T>
   constexpr
   T& deref(T* ptr) noexcept {
     return *ptr ;
   }
+
+  template <class T>
+    struct value_type;
+  template <class T>
+      using value_type_t = typename value_type<T>::type;
+
+  template <class T>
+    struct value_type { using type = typename remove_reference<decltype(nullable::deref(declval<T>()))>::type; };
 
   template <class T>
   constexpr
@@ -205,7 +215,13 @@ inline namespace fundamental_v3
 
   // todo: implement this traits
   template <class T>
-  struct is_strict_weakly_ordered_nullable : false_type {};
+  struct is_strict_weakly_ordered : false_type {};
+
+  template <class T>
+  struct is_strict_weakly_ordered_nullable : conjunction<
+    is_strict_weakly_ordered<T>
+  , is_nullable<T>
+  > {};
 
   namespace nullable {
 

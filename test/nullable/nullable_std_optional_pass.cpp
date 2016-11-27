@@ -72,10 +72,16 @@ int main()
   static_assert(not std::is_base_of<stde::nullable::tag, stde::nullable::traits<stde::none_t>>::value, "ERROR");
   static_assert(not stde::is_nullable<stde::none_t>::value, "ERROR");
   static_assert(stde::is_nullable<stde::optional<int>>::value, "ERROR");
+
   static_assert(std::is_same<
       stde::nullable::none_type_t<stde::optional<int>>,
       stde::nullopt_t
     >::value, "ERROR");
+  static_assert(std::is_same<
+      stde::nullable::value_type_t<stde::optional<int>>,
+      int
+    >::value, "ERROR");
+
 #if defined JASEL_FUNDAMENTAL_EXTENDED
   static_assert(std::is_same<stde::value_type_t<stde::optional<int&>>, int&>::value, "ERROR");
 #endif
@@ -274,6 +280,23 @@ int main()
     BOOST_TEST(&v == std::addressof(deref(x)));
 
   }
+  {
+    stde::optional<int> x;
+    BOOST_TEST(x == stde::none());
+    BOOST_TEST(stde::none() == x);
+    BOOST_TEST(x <= stde::none());
+    BOOST_TEST(stde::none() <= x);
+    BOOST_TEST(x >= stde::none());
+    BOOST_TEST(stde::none() >= x);
+  }
+  {
+    stde::optional<int> x=stde::make_optional(1);
+    BOOST_TEST(x != stde::none());
+    BOOST_TEST(stde::none() != x);
+    BOOST_TEST(x > stde::none());
+    BOOST_TEST(stde::none() < x);
+  }
+
 #if __cplusplus >= 201402L
 
  // nullable::transform
