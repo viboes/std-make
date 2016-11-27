@@ -11,12 +11,11 @@
 #define JASEL_FUNDAMENTAL_V3_NULLABLE_AP_HPP
 
 #include <experimental/fundamental/v2/config.hpp>
-#include <experimental/fundamental/v3/value_type.hpp>
 #include <experimental/fundamental/v3/nullable/none.hpp>
 #include <experimental/make.hpp>
 #include <experimental/meta.hpp>
 #include <experimental/type_constructible.hpp>
-#include <experimental/applicative.hpp>
+#include <experimental/fundamental/v3/applicative/applicative.hpp>
 #include <utility>
 #include <functional>
 

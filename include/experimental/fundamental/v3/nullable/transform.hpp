@@ -11,12 +11,11 @@
 #define JASEL_FUNDAMENTAL_V3_NULLABLE_TRANSFORM_HPP
 
 #include <experimental/fundamental/v2/config.hpp>
-#include <experimental/fundamental/v3/value_type.hpp>
 #include <experimental/fundamental/v3/nullable/none.hpp>
 #include <experimental/make.hpp>
 #include <experimental/meta.hpp>
 #include <experimental/type_constructible.hpp>
-#include <experimental/functor.hpp>
+#include <experimental/fundamental/v3/functor/functor.hpp>
 #include <utility>
 #include <functional>
 
@@ -41,7 +40,8 @@ namespace nullable
   // && is_type_constructible_v<remove_cv_t<remove_reference_t<N>>>
   //>
   >
-  constexpr meta::invoke<TypeConstructor<decay_t<N>>, meta::ResultType<decay_t<F>, ValueType<decay_t<N>>>> transform(N&& n, F&& f)
+  constexpr meta::invoke<TypeConstructor<decay_t<N>>, meta::ResultType<decay_t<F>, value_type_t<decay_t<N>>>>
+  transform(N&& n, F&& f)
   {
     if (nullable::has_value(forward<N>(n)))
       return make<TypeConstructor<decay_t<N>>>(

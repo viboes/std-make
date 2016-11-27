@@ -88,6 +88,13 @@ template <>
 struct traits<optional<_t>> : nullable::as_monad {};
 }
 
+#if 1
+namespace sum_type
+{
+  template <class T>
+  struct traits<optional<T>> : nullable::as_sum_type<optional<T>> {};
+}
+#else
 namespace sum_type
 {
 namespace detail {
@@ -130,6 +137,7 @@ namespace detail {
       }
   };
 }
+#endif
 #endif
 }
 }
