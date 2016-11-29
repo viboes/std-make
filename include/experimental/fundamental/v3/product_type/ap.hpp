@@ -76,7 +76,7 @@ namespace product_type
     template <class F, class T>
       static constexpr auto ap(F&& f, T&& x)
       {
-        return product_type::transform(forward<F>(f), forward<T>(x));
+        return product_type::ap(forward<F>(f), forward<T>(x));
       }
   };
 

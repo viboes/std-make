@@ -57,10 +57,14 @@ inline namespace fundamental_v3
 #endif
 #if __cplusplus >= 201402L
 
-  namespace functor {
-    template <>
-    struct traits<tuple<_t>> : product_type::as_functor {};
-  }
+namespace functor {
+  template <>
+  struct traits<tuple<_t>> : product_type::as_functor {};
+}
+namespace applicative {
+  template <>
+  struct traits<tuple<_t>> : product_type::as_applicative {};
+}
 #endif
 
 }

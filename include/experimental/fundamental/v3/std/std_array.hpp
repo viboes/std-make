@@ -74,6 +74,10 @@ namespace type_constructible {
     template <>
     struct traits<array_tc> : product_type::as_functor {};
   }
+  namespace applicative {
+    template <>
+    struct traits<array_tc> : product_type::as_applicative {};
+  }
 #endif
 }
 }

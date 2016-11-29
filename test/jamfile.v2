@@ -157,6 +157,8 @@ test-suite applicative
     : 
       [ run applicative/applicative_std_optional_pass.cpp  ]
       [ run applicative/applicative_std_expected_pass.cpp  ]
+      [ run applicative/applicative_std_tuple_pass.cpp  ]
+      [ run applicative/applicative_std_array_pass.cpp  ]
     ;
 
 test-suite monad
