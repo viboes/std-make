@@ -30,7 +30,7 @@ namespace nullable
 {
 
   /**
-   * functor::ap for TypeConstructible Nullable types
+   * applicative::ap for TypeConstructible Nullable types
    */
 
   template <class N, class F

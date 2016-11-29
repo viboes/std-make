@@ -30,7 +30,7 @@ namespace nullable
 {
 
   /**
-   * bind for TypeConstructible Nullable types
+   * monad::bind for TypeConstructible Nullable types
    */
 
   template <class M, class F

@@ -80,7 +80,8 @@ inline namespace fundamental_v3
   }
 
   template <class T >
-  struct type_constructor<T, meta::when<detail::has_type_constructor_member<T>::value> > : detail::type_constructor_if_has_type_constructor_member<T, detail::has_type_constructor_member<T>> {};
+  struct type_constructor<T, meta::when<detail::has_type_constructor_member<T>::value> >
+    : detail::type_constructor_if_has_type_constructor_member<T, detail::has_type_constructor_member<T>> {};
 
   template <template <class...> class TC >
   struct type_constructor<meta::quote<TC>, meta::when<detail::valid_type_constructor_tc_t<TC>::value>>
