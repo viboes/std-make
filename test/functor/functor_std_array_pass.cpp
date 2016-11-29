@@ -6,7 +6,7 @@
 // <experimental/functor.hpp>
 // <experimental/utility.hpp> tuple
 
-#include <experimental/tuple.hpp>
+#include <experimental/array.hpp>
 #include <experimental/functor.hpp>
 #include <experimental/product_type.hpp>
 
@@ -21,16 +21,16 @@ int main()
 #if __cplusplus >= 201402L
   namespace stde = std::experimental;
 
-  using T = std::tuple<int, int>;
+  using T = std::array<int, 2>;
 
   static_assert(stde::is_product_type_v<T>, "ERROR");
   static_assert(stde::is_type_constructible_v<T>, "ERROR");
-  static_assert(std::is_base_of<stde::functor::tag, stde::functor::traits<std::tuple<stde::_t>>> ::value, "ERROR");
-  static_assert(stde::is_functor<std::tuple<stde::_t>>::value, "ERROR");
+  static_assert(std::is_base_of<stde::functor::tag, stde::functor::traits<stde::array_tc>> ::value, "ERROR");
+  static_assert(stde::is_functor<stde::array_tc>::value, "ERROR");
 
   {
     int v=1;
-    T x = std::make_tuple(v,v);
+    T x = std::make_array(v,v);
     BOOST_TEST(std::get<0>(x) == 1);
     BOOST_TEST(std::get<1>(x) == 1);
     T y = stde::functor::transform(x, twice);

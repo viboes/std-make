@@ -9,6 +9,8 @@
 
 #include <experimental/make.hpp>
 #include <experimental/meta.hpp>
+#include <experimental/functor.hpp>
+#include <experimental/product_type.hpp>
 #include <array>
 #include <type_traits>
 
@@ -56,7 +58,7 @@ namespace experimental
 inline namespace fundamental_v3 {
 namespace type_constructible {
   template <class T, size_t N>
-  struct traits<array<T, N>>
+  struct traits<array<T, N>> : type_constructible::tag
   {
     template <class ...Xs>
     static constexpr
@@ -66,6 +68,13 @@ namespace type_constructible {
     }
   };
 }
+#if __cplusplus >= 201402L
+
+  namespace functor {
+    template <>
+    struct traits<array_tc> : product_type::as_functor {};
+  }
+#endif
 }
 }
 }
