@@ -260,7 +260,6 @@ int main()
     T p  = { {1,2} };
     stde::product_type::for_each(p,[](auto& v) {std::cout << v << "\n";});
   }
-#if 1
   {
     auto to_string = [](auto x) {
         std::ostringstream ss;
@@ -280,7 +279,27 @@ int main()
         std::make_array(std::string("0"), "1")
     );
   }
-#endif
+  {
+    auto to_string = [](auto x) {
+        std::ostringstream ss;
+        ss << x;
+        return ss.str();
+    };
+
+    using T = std::array<int,2>;
+    T p  = { {0,1} };
+    auto res = stde::product_type::transform(p, to_string);
+    static_assert(
+        std::is_same<std::array<std::string, 2>, decltype(res)>::value,
+        "");
+
+    using T1 = std::array<decltype(to_string),1>;
+    T1 arrToString = {{to_string}};
+    BOOST_TEST(stde::product_type::ap(arrToString, p)
+      ==
+        std::make_array(std::string("0"), "1")
+    );
+  }
   {
     auto to_string = [](auto x) {
         std::ostringstream ss;

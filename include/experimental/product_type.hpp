@@ -20,6 +20,7 @@
 #include <experimental/fundamental/v3/product_type/swap.hpp>
 #include <experimental/fundamental/v3/product_type/transform.hpp>
 #include <experimental/fundamental/v3/product_type/to_tuple.hpp>
+#include <experimental/fundamental/v3/product_type/ap.hpp>
 
 #endif
 
