@@ -107,6 +107,26 @@ test-suite nullable
 
     ;
 
+test-suite ordinal
+    : 
+      [ run ordinal/ordinal_pass.cpp  ]
+    ;
+
+test-suite ordinal_array
+    : 
+      [ run ordinal/container/ordinal_array/ordinal_array_pass.cpp  ]
+    ;
+
+test-suite ordinal_set
+    : 
+      [ run ordinal/container/ordinal_set/ordinal_set_pass.cpp  ]
+    ;
+
+test-suite ordinal_range
+    : 
+      [ run ordinal/container/ordinal_range/ordinal_range_pass.cpp  ]
+    ;
+
 test-suite product_type
     : 
       [ run product_type/struct_pass.cpp  ]
