@@ -36,7 +36,7 @@ inline namespace fundamental_v3
     {
       using size_type = size_t;
       template <class U>
-      static
+      static constexpr
       Bool val(size_type pos)  {
         switch (pos) {
         case 0: return Bool::False;
@@ -45,7 +45,7 @@ inline namespace fundamental_v3
       }
 
       template <class U>
-      static
+      static constexpr
       size_t pos(U && val)    {
         switch (val) {
         case Bool::False: return 0;

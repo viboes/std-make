@@ -12,7 +12,6 @@
 template <std::intmax_t F, std::intmax_t L, class T>
 struct Bounded {
   using underlying_type = T;
-  //enum {First=F, Last=L, Size=L-F+1};
   static constexpr const T First = F;
   static constexpr const T Last = F;
   static constexpr const std::size_t Size = L-F+1;
@@ -25,7 +24,6 @@ namespace experimental
 {
 inline namespace fundamental_v3
 {
-
   namespace ordinal {
     namespace meta {
       template <std::intmax_t F, std::intmax_t L, class T>
@@ -36,13 +34,13 @@ inline namespace fundamental_v3
     {
       using size_type = size_t;
       template <class U>
-      static
+      static constexpr
       U val(size_type pos)  {
         return U{static_cast<typename U::underlying_type>(U::First+pos)};
       }
 
       template <class U>
-      static
+      static constexpr
       size_t pos(U && val)    {
         return val.value-decay_t<U>::First;
       }
