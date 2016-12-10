@@ -25,6 +25,8 @@ We can say that
 #include <experimental/ordinal.hpp>
 #include <experimental/swappable.hpp>
 #include <cassert>
+#include <iterator>
+#include <algorithm>
 
 namespace std
 {
