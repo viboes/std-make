@@ -11,7 +11,7 @@
 
 #include <experimental/fundamental/v3/product_type/product_type.hpp>
 #include <experimental/make.hpp>
-#include <experimental/functor.hpp>
+#include <experimental/n_functor.hpp>
 #include <utility>
 #include <functional>
 
@@ -27,6 +27,13 @@ namespace product_type
 
     template <class TC, class F, class ProductType, std::size_t... I>
     constexpr decltype(auto) transform_impl( ProductType&& pt, F&& f, index_sequence<I...> )
+    {
+      return make<TC>(
+          JASEL_INVOKE(product_type::get<I>(forward<F>(f)), product_type::get<I>(forward<ProductType>(pt))) ...
+      );
+    }
+    template <class TC, class F, class ProductType, std::size_t... I>
+    constexpr decltype(auto) p_transform_impl( ProductType&& pt, F&& f, index_sequence<I...> )
     {
       return make<TC>(
           JASEL_INVOKE(forward<F>(f), product_type::get<I>(forward<ProductType>(pt))) ...
@@ -70,7 +77,29 @@ namespace product_type
           product_type::element_sequence_for<ProductType>{});
   }
 
-  struct as_functor : functor::tag
+  template <class F, class ProductType
+  // todo add constraint on F
+  , class = enable_if_t< is_product_type_v<remove_cv_t<remove_reference_t<ProductType>>> >
+  >
+  constexpr decltype(auto) p_transform(ProductType&& pt, F&& f)
+  {
+      return detail::p_transform_impl<type_constructor_t<remove_cv_t<remove_reference_t<ProductType>>>>(
+          forward<ProductType>(pt), forward<F>(f),
+          product_type::element_sequence_for<ProductType>{});
+  }
+
+  template <class TC, class F, class ProductType
+  // todo add constraint on F
+  , class = enable_if_t< is_product_type_v<remove_cv_t<remove_reference_t<ProductType>>> >
+  >
+  constexpr decltype(auto) p_transform(ProductType&& pt, F&& f)
+  {
+      return detail::p_transform_impl<TC>(
+          forward<ProductType>(pt), forward<F>(f),
+          product_type::element_sequence_for<ProductType>{});
+  }
+
+  struct as_n_functor : n_functor::tag
   {
     template <class T, class F>
       static constexpr auto transform(T&& x, F&& f)

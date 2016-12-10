@@ -72,6 +72,11 @@ struct traits<expected<T,E>> : applicative::tag
     {
       return expected_helpers::ap(forward<F>(f), forward<Expected>(x));
     }
+  template <class Expected, class U>
+    static auto pure(U&& x)
+    {
+      return make<Expected>(forward<U>(x));
+    }
 };
 }
 }}

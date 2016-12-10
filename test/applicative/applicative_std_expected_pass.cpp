@@ -36,6 +36,12 @@ int main()
     BOOST_TEST(! y);
   }
   {
+    stde::expected<int> x = stde::applicative::pure<stde::expected<int>>(1);
+    stde::expected<int(*)(int)> f = stde::make_unexpected(1);
+    stde::expected<int> y = stde::applicative::ap(f, x);
+    BOOST_TEST(! y);
+  }
+  {
     stde::expected<int> x = stde::make_unexpected(1);
     stde::expected<int(*)(int)> f = stde::make<stde::expected>(twice);
     stde::expected<int> y = stde::applicative::ap(f, x);

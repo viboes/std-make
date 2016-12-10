@@ -166,19 +166,32 @@ test-suite functor
       [ run functor/functor_pass.cpp  ]
       [ run functor/functor_std_optional_pass.cpp  ]
       [ run functor/functor_std_expected_pass.cpp  ]
-      [ run functor/functor_std_pair_pass.cpp  ]
-      [ run functor/functor_std_tuple_pass.cpp  ]
+      #[ run functor/functor_std_pair_pass.cpp  ]
+      #[ run functor/functor_std_tuple_pass.cpp  ]
       [ run functor/functor_std_array_pass.cpp  ]
       [ run functor/functor_std_unique_ptr_pass.cpp  ]
       [ run functor/functor_std_shared_ptr_pass.cpp  ]
     ;
 
+test-suite n_functor
+    : 
+      #[ run n_functor/n_functor_pass.cpp  ]
+      [ run n_functor/n_functor_std_pair_pass.cpp  ]
+      [ run n_functor/n_functor_std_tuple_pass.cpp  ]
+    ;
+
+
 test-suite applicative
     : 
       [ run applicative/applicative_std_optional_pass.cpp  ]
       [ run applicative/applicative_std_expected_pass.cpp  ]
-      [ run applicative/applicative_std_tuple_pass.cpp  ]
+      #[ run applicative/applicative_std_tuple_pass.cpp  ]
       [ run applicative/applicative_std_array_pass.cpp  ]
+    ;
+
+test-suite n_applicative
+    : 
+      [ run n_applicative/n_applicative_std_tuple_pass.cpp  ]
     ;
 
 test-suite monad

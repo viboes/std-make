@@ -269,12 +269,13 @@ int main()
 
     using T = std::array<int,2>;
     T p  = { {0,1} };
-    auto res = stde::product_type::transform(p, to_string);
+    auto call = std::make_array(to_string,to_string);
+    auto res = stde::product_type::transform(p, call);
     static_assert(
         std::is_same<std::array<std::string, 2>, decltype(res)>::value,
         "");
 
-    BOOST_TEST(stde::product_type::transform(p, to_string)
+    BOOST_TEST(stde::product_type::transform(p, call)
       ==
         std::make_array(std::string("0"), "1")
     );
@@ -288,13 +289,14 @@ int main()
 
     using T = std::array<int,2>;
     T p  = { {0,1} };
-    auto res = stde::product_type::transform(p, to_string);
+    auto call = std::make_array(to_string,to_string);
+    auto res = stde::product_type::transform(p, call);
     static_assert(
         std::is_same<std::array<std::string, 2>, decltype(res)>::value,
         "");
 
-    using T1 = std::array<decltype(to_string),1>;
-    T1 arrToString = {{to_string}};
+    using T1 = std::array<decltype(to_string),2>;
+    T1 arrToString = {{to_string, to_string}};
     BOOST_TEST(stde::product_type::ap(arrToString, p)
       ==
         std::make_array(std::string("0"), "1")

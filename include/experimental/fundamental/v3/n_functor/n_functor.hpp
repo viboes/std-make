@@ -6,8 +6,8 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef JASEL_FUNDAMENTAL_V3_FUNCTOR_FUNCTOR_HPP
-#define JASEL_FUNDAMENTAL_V3_FUNCTOR_FUNCTOR_HPP
+#ifndef JASEL_FUNDAMENTAL_V3_N_FUNCTOR_N_FUNCTOR_HPP
+#define JASEL_FUNDAMENTAL_V3_N_FUNCTOR_N_FUNCTOR_HPP
 
 #if __cplusplus >= 201402L
 
@@ -29,12 +29,12 @@ inline namespace fundamental_v3
 {
 
   template <class T>
-    struct is_functor;
+    struct is_n_functor;
 
   template <class T>
-    constexpr bool is_functor_v = is_functor<T>::value;
+    constexpr bool is_n_functor_v = is_n_functor<T>::value;
 
-namespace functor
+namespace n_functor
 {
   struct tag{};
 
@@ -57,21 +57,22 @@ namespace functor
        )
 
   template <class F, class T>
-   auto
-     map(F&& f, T&& x)
-       JASEL_NOEXCEPT_RETURN(
-           functor::transform(forward<F>(f), forward<T>(x))
-        )
+  auto
+    map(F&& f, T&& x)
+      JASEL_NOEXCEPT_RETURN(
+          n_functor::transform(forward<F>(f), forward<T>(x))
+       )
+
 }
 
   template <class T>
-    struct is_functor : is_base_of<functor::tag, functor::traits<T>> {};
+    struct is_n_functor : is_base_of<n_functor::tag, n_functor::traits<T>> {};
   template <class T>
-    struct is_functor<const T> : is_functor<T> {};
+    struct is_n_functor<const T> : is_n_functor<T> {};
   template <class T>
-    struct is_functor<volatile T> : is_functor<T> {};
+    struct is_n_functor<volatile T> : is_n_functor<T> {};
   template <class T>
-    struct is_functor<const volatile T> : is_functor<T> {};
+    struct is_n_functor<const volatile T> : is_n_functor<T> {};
 
 }
 }

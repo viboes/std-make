@@ -10,7 +10,8 @@
 #include <experimental/make.hpp>
 #include <experimental/meta.hpp>
 #include <experimental/product_type.hpp>
-#include <experimental/functor.hpp>
+#include <experimental/n_functor.hpp>
+#include <experimental/n_applicative.hpp>
 #include <tuple>
 
 namespace std
@@ -57,13 +58,13 @@ inline namespace fundamental_v3
 #endif
 #if __cplusplus >= 201402L
 
-namespace functor {
+namespace n_functor {
   template <>
-  struct traits<tuple<_t>> : product_type::as_functor {};
+  struct traits<tuple<_t>> : product_type::as_n_functor {};
 }
-namespace applicative {
+namespace n_applicative {
   template <>
-  struct traits<tuple<_t>> : product_type::as_applicative {};
+  struct traits<tuple<_t>> : product_type::as_n_applicative {};
 }
 #endif
 

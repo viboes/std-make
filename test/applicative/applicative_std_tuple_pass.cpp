@@ -42,7 +42,7 @@ int main()
   {
     int v=1;
     std::tuple<int, int> x = stde::make<std::tuple>(v,v);
-    std::tuple<int(*)(int)> f = stde::make<std::tuple>(twice);
+    auto f = stde::make<std::tuple>(twice,twice);
     std::tuple<int, int> y = stde::applicative::ap(f, x);
     BOOST_TEST(std::get<0>(y) == 2);
     BOOST_TEST(std::get<1>(y) == 2);

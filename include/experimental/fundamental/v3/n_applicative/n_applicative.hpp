@@ -6,8 +6,8 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef JASEL_FUNDAMENTAL_V3_APPLICATIVE_APPLICATIVE_HPP
-#define JASEL_FUNDAMENTAL_V3_APPLICATIVE_APPLICATIVE_HPP
+#ifndef JASEL_FUNDAMENTAL_V3_N_APPLICATIVE_N_APPLICATIVE_HPP
+#define JASEL_FUNDAMENTAL_V3_N_APPLICATIVE_N_APPLICATIVE_HPP
 
 #if __cplusplus >= 201402L
 
@@ -29,14 +29,14 @@ inline namespace fundamental_v3
 {
 
   template <class T>
-    struct is_applicative;
+    struct is_n_applicative;
 
   template <class T>
-    constexpr bool is_applicative_v = is_applicative<T>::value;
+    constexpr bool is_n_applicative_v = is_n_applicative<T>::value;
 
-namespace applicative
+namespace n_applicative
 {
-  using namespace functor;
+  using namespace n_functor;
   //using namespace type_constructible;
 
   struct tag{};
@@ -63,24 +63,24 @@ namespace applicative
           traits<type_constructor_t<decay_t<A>>>::ap(forward<F>(f), forward<A>(x))
        )
 
-   template <class A, class T>
+   template <class A, class ...Ts>
    // requires is_same_v<value_type_t<A>, T>
    auto
-     pure(T&& x)
+     pure(Ts&& ...xs)
        JASEL_NOEXCEPT_RETURN(
-           traits<type_constructor_t<A>>::template pure<A>(forward<T>(x))
+           traits<type_constructor_t<A>>::template pure<A>(forward<Ts>(xs)...)
         )
 
 }
 
   template <class T>
-    struct is_applicative : is_base_of<applicative::tag, applicative::traits<T>> {};
+    struct is_n_applicative : is_base_of<n_applicative::tag, n_applicative::traits<T>> {};
   template <class T>
-    struct is_applicative<const T> : is_applicative<T> {};
+    struct is_n_applicative<const T> : is_n_applicative<T> {};
   template <class T>
-    struct is_applicative<volatile T> : is_applicative<T> {};
+    struct is_n_applicative<volatile T> : is_n_applicative<T> {};
   template <class T>
-    struct is_applicative<const volatile T> : is_applicative<T> {};
+    struct is_n_applicative<const volatile T> : is_n_applicative<T> {};
 
 
 }

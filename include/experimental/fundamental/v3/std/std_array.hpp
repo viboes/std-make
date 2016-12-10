@@ -10,6 +10,7 @@
 #include <experimental/make.hpp>
 #include <experimental/meta.hpp>
 #include <experimental/functor.hpp>
+#include <experimental/applicative.hpp>
 #include <experimental/product_type.hpp>
 #include <array>
 #include <type_traits>
@@ -72,11 +73,35 @@ namespace type_constructible {
 
   namespace functor {
     template <>
-    struct traits<array_tc> : product_type::as_functor {};
+    //struct traits<array_tc>
+    //: product_type::as_functor {};
+    struct traits<array_tc> : functor::tag
+    {
+      template <class Array, class F>
+        static auto transform(Array&& x, F&& f)
+        {
+          return product_type::p_transform(forward<Array>(x), forward<F>(f));
+        }
+
+    };
   }
   namespace applicative {
     template <>
-    struct traits<array_tc> : product_type::as_applicative {};
+    struct traits<array_tc> : applicative::tag
+    {
+      template <class Array, class F>
+        static auto ap(F&& f, Array&& x)
+        {
+          return product_type::ap(forward<F>(f), forward<Array>(x));
+        }
+      template <class Array, class U>
+        static auto pure(U&& x)
+        {
+          Array arr;
+          arr.fill(forward<U>(x));
+          return arr;
+        }
+    };
   }
 #endif
 }

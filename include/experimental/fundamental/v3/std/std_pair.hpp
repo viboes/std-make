@@ -9,7 +9,8 @@
 
 #include <experimental/make.hpp>
 #include <experimental/meta.hpp>
-#include <experimental/functor.hpp>
+#include <experimental/n_functor.hpp>
+#include <experimental/n_applicative.hpp>
 #include <experimental/product_type.hpp>
 #include <utility>
 
@@ -38,9 +39,13 @@ inline namespace fundamental_v3
 
 #if __cplusplus >= 201402L
 
-  namespace functor {
+  namespace n_functor {
     template <>
-    struct traits<pair<_t,_t>> : product_type::as_functor {};
+    struct traits<pair<_t,_t>> : product_type::as_n_functor {};
+  }
+  namespace n_applicative {
+    template <>
+    struct traits<pair<_t,_t>> : product_type::as_n_applicative {};
   }
 #endif
 }

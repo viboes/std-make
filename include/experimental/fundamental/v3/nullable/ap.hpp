@@ -59,6 +59,11 @@ namespace nullable
       {
         return nullable::ap(forward<F>(f), forward<T>(x));
       }
+    template <class N, class T>
+      static auto pure(T&& x)
+      {
+        return make<N>(forward<T>(x));
+      }
   };
 }
 

@@ -11,7 +11,7 @@
 
 #include <experimental/fundamental/v3/product_type/product_type.hpp>
 #include <experimental/make.hpp>
-#include <experimental/applicative.hpp>
+#include <experimental/n_applicative.hpp>
 #include <utility>
 #include <functional>
 
@@ -29,7 +29,7 @@ namespace product_type
     constexpr decltype(auto) ap_impl( F&& f, ProductType&& pt, index_sequence<I...> )
     {
       return make<TC>(
-          JASEL_INVOKE(product_type::get<0>(forward<F>(f)), product_type::get<I>(forward<ProductType>(pt))) ...
+          JASEL_INVOKE(product_type::get<I>(forward<F>(f)), product_type::get<I>(forward<ProductType>(pt))) ...
       );
     }
 
@@ -71,12 +71,17 @@ namespace product_type
           product_type::element_sequence_for<ProductType>{});
   }
 
-  struct as_applicative : applicative::tag
+  struct as_n_applicative : n_applicative::tag
   {
     template <class F, class T>
       static constexpr auto ap(F&& f, T&& x)
       {
         return product_type::ap(forward<F>(f), forward<T>(x));
+      }
+    template <class PT, class ...Ts>
+      static auto pure(Ts&& ...xs)
+      {
+        return make<PT>(forward<Ts>(xs)...);
       }
   };
 
