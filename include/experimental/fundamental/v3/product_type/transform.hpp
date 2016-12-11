@@ -12,6 +12,7 @@
 #include <experimental/fundamental/v3/product_type/product_type.hpp>
 #include <experimental/make.hpp>
 #include <experimental/n_functor.hpp>
+#include <experimental/p_functor.hpp>
 #include <utility>
 #include <functional>
 
@@ -105,6 +106,15 @@ namespace product_type
       static constexpr auto transform(T&& x, F&& f)
       {
         return product_type::transform(forward<T>(x), forward<F>(f));
+      }
+  };
+
+  struct as_p_functor : p_functor::tag
+  {
+    template <class T, class F>
+      static constexpr auto transform(T&& x, F&& f)
+      {
+        return product_type::p_transform(forward<T>(x), forward<F>(f));
       }
   };
 

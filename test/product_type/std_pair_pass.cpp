@@ -125,6 +125,25 @@ int main()
 
     using T = std::pair<int,int>;
     T p  = {0,1};
+    auto res = stde::product_type::p_transform(p, to_string);
+    static_assert(
+        std::is_same<std::pair<std::string, std::string>, decltype(res)>::value,
+        "");
+
+    BOOST_TEST(stde::product_type::p_transform(p, to_string)
+      ==
+        std::make_pair(std::string("0"), std::string("1"))
+    );
+  }
+  {
+    auto to_string = [](auto x) {
+        std::ostringstream ss;
+        ss << x;
+        return ss.str();
+    };
+
+    using T = std::pair<int,int>;
+    T p  = {0,1};
     auto call = std::make_pair(to_string,to_string);
     auto res = stde::product_type::transform(p, call);
     static_assert(

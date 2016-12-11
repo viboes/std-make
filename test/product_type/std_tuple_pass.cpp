@@ -240,6 +240,29 @@ int main()
 #else
     const T p = std::make_tuple(0,1);
 #endif
+    auto res = stde::product_type::p_transform(p, to_string);
+    static_assert(
+        std::is_same<std::tuple<std::string, std::string>, decltype(res)>::value,
+        "");
+
+    BOOST_TEST(stde::product_type::p_transform(p, to_string)
+      ==
+        std::make_tuple("0", "1")
+    );
+  }
+  {
+    auto to_string = [](auto x) {
+        std::ostringstream ss;
+        ss << x;
+        return ss.str();
+    };
+
+    using T = std::tuple<int,int>;
+#if defined JASEL_SUPPORT_TUPLE
+    const T p = {0,1};
+#else
+    const T p = std::make_tuple(0,1);
+#endif
     auto _to_string = std::make_tuple(to_string,to_string);
     auto res = stde::product_type::transform(p, _to_string);
     static_assert(

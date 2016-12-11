@@ -12,6 +12,8 @@
 #include <experimental/product_type.hpp>
 #include <experimental/n_functor.hpp>
 #include <experimental/n_applicative.hpp>
+#include <experimental/p_functor.hpp>
+#include <experimental/p_applicative.hpp>
 #include <tuple>
 
 namespace std
@@ -62,9 +64,17 @@ namespace n_functor {
   template <>
   struct traits<tuple<_t>> : product_type::as_n_functor {};
 }
+namespace p_functor {
+  template <>
+  struct traits<tuple<_t>> : product_type::as_p_functor {};
+}
 namespace n_applicative {
   template <>
   struct traits<tuple<_t>> : product_type::as_n_applicative {};
+}
+namespace p_applicative {
+  template <>
+  struct traits<tuple<_t>> : product_type::as_p_applicative {};
 }
 #endif
 

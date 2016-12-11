@@ -180,6 +180,13 @@ test-suite n_functor
       [ run n_functor/n_functor_std_tuple_pass.cpp  ]
     ;
 
+test-suite p_functor
+    : 
+      #[ run p_functor/p_functor_pass.cpp  ]
+      [ run p_functor/p_functor_std_pair_pass.cpp  ]
+      [ run p_functor/p_functor_std_tuple_pass.cpp  ]
+    ;
+
 
 test-suite applicative
     : 
@@ -192,6 +199,11 @@ test-suite applicative
 test-suite n_applicative
     : 
       [ run n_applicative/n_applicative_std_tuple_pass.cpp  ]
+    ;
+
+test-suite p_applicative
+    : 
+      [ run p_applicative/p_applicative_std_tuple_pass.cpp  ]
     ;
 
 test-suite monad

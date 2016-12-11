@@ -50,6 +50,7 @@
 #elif __cplusplus >= 201402L
 
 # if defined __clang__
+#   define JASEL_SUPPORT_SWAPPABLE
 # elif defined __GNUC__
 #   define JASEL_SUPPORT_SWAPPABLE
 # else
