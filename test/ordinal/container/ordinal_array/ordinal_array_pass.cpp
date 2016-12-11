@@ -13,6 +13,8 @@
 
 int main()
 {
+#if __cplusplus >= 201402L
+
   namespace stde = std::experimental;
   using Indx = Bounded<1,3,unsigned char>;
 
@@ -27,5 +29,6 @@ int main()
     BOOST_TEST(c[Indx{2}] == 2);
     BOOST_TEST(c[Indx{3}] == 3.5);
   }
+#endif
   return ::boost::report_errors();
 }

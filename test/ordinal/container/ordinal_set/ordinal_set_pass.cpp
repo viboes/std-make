@@ -13,6 +13,8 @@
 
 int main()
 {
+#if __cplusplus >= 201402L
+
   namespace stde = std::experimental;
   using Indx = Bounded<1,4,unsigned char>;
   using OSet = stde::ordinal_set<Indx>;
@@ -26,6 +28,6 @@ int main()
     OSet e(Indx{2});
     BOOST_TEST(e[Indx{2}]==true);
   }
-
+#endif
   return ::boost::report_errors();
 }

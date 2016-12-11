@@ -8,6 +8,7 @@
 #define JASEL_EXPERIMENTAL_TEST_ORDINAL_BOOL_HPP
 
 #include <experimental/ordinal.hpp>
+#if __cplusplus >= 201402L
 
 enum class Bool : bool { False, True };
 
@@ -57,4 +58,5 @@ inline namespace fundamental_v3
 }}
 }
 
+#endif
 #endif

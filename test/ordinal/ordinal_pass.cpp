@@ -15,6 +15,8 @@
 
 int main()
 {
+#if __cplusplus >= 201402L
+
   namespace stde = std::experimental;
 
   {
@@ -58,5 +60,6 @@ int main()
     assert(stde::ordinal::pred(T{2}).value == 1);
 
   }
+#endif
   return ::boost::report_errors();
 }

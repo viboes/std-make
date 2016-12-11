@@ -13,6 +13,8 @@
 
 int main()
 {
+#if __cplusplus >= 201402L
+
   namespace stde = std::experimental;
 
   using Indx = Bounded<1,4,unsigned char>;
@@ -22,5 +24,6 @@ int main()
     auto b = rng.begin();
     BOOST_TEST(b->value==1);
   }
+#endif
   return ::boost::report_errors();
 }
