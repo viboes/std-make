@@ -12,9 +12,15 @@
 
 // todo
 // * make use of uninitialized storage
+// * add index based functions
 // * add move semantics
 // * add emplace
 // * add hash support
+// * add SFINAE for requires conditions
+// * try to refactor optional_ref<T> and optional_ref<const T>
+// * Can a optional_ref<U> be converted to an optional_ref<T>? Under which conditions?
+//    T -> const T or
+//    U* is convertible to T* and sizeof(T) == sizeof(U) ?
 
 namespace std
 {
@@ -38,10 +44,20 @@ template <class T>
 class optional_ref {
 public:
 
+  //optional_ref(optional_ref const&) = default;
+  //optional_ref(optional_ref &&) = default;
+  //optional_ref& operator=(optional_ref const&) = default;
+  //optional_ref& operator=(optional_ref &&) = default;
+
+  //optional_ref(optional_ref<U> const&); // ???
+  //optional_ref(optional_ref<U> &&); // ???
+  //optional_ref& operator=(optional_ref<U> const&); // ???
+  //optional_ref& operator=(optional_ref<U> &&); // ???
+
     template< class U = T >
-    optional_ref& operator=(U const& v)
+    optional_ref& operator=(U && v)
     {
-        *ref = v;
+        *ref = forward<U>(v);
         set();
         return *this;
     }
@@ -205,6 +221,11 @@ private:
 template <class T>
 class optional_ref<const T> {
 public:
+  //optional_ref(optional_ref const&) = default;
+  //optional_ref(optional_ref &&) = default;
+  //optional_ref& operator=(optional_ref const&) = default;
+  //optional_ref& operator=(optional_ref &&) = default;
+
     bool has_value() const
     {
         return *mask & (1 << index);
@@ -358,6 +379,10 @@ class optionals: detail::optional_ref_fact<Ts>...
 public:
 
     optionals(): mask(0) {}
+    //optionals(optionals const&) = default;
+    //optionals(optionals &&) = default;
+    //optionals& operator=(optionals const&) = default;
+    //optionals& operator=(optionals &&) = default;
 
     template <size_t I>
     bool has_value() const
@@ -371,15 +396,15 @@ public:
     //}
 
     template <size_t I>
-    optional_ref<tuple_element_t<I, Types>> get()
+    optional_ref<typename tuple_element<I, Types>::type> get()
     {
-        using T = tuple_element_t<I, Types>;
+        using T = typename tuple_element<I, Types>::type;
         return this->detail::optional_ref_fact<T>::make(I, mask, std::get<I>(tpl));
     }
     template <size_t I>
-    optional_ref<const tuple_element_t<I, Types>> get() const
+    optional_ref<const typename tuple_element<I, Types>::type> get() const
     {
-        using T = tuple_element_t<I, Types>;
+        using T = typename tuple_element<I, Types>::type;
         return this->detail::optional_ref_fact<T>::make(I, mask, std::get<I>(tpl));
     }
 
@@ -416,23 +441,23 @@ private:
 };
 
 template <size_t I, class ...Ts>
-auto get(optionals<Ts...>& opts)
+auto get(optionals<Ts...>& opts) -> decltype(opts.template get<I>())
 {
     return opts.template get<I>();
 }
 template <size_t I, class ...Ts>
-auto get(optionals<Ts...> const& opts)
+auto get(optionals<Ts...> const& opts) -> decltype(opts.template get<I>())
 {
     return opts.template get<I>();
 }
 
 template <class T, class ...Ts>
-auto get(optionals<Ts...>& opts)
+auto get(optionals<Ts...>& opts) -> decltype(opts.template get<T>())
 {
     return opts.template get<T>();
 }
 template <class T, class ...Ts>
-auto get(optionals<Ts...> const& opts)
+auto get(optionals<Ts...> const& opts) -> decltype(opts.template get<T>())
 {
     return opts.template get<T>();
 }
