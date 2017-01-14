@@ -233,6 +233,13 @@ test-suite serializable
       [ run ../example/cust_paper/serializable/n4381/serial_test_pass.cpp  ]
     ; 
 
+test-suite optionals
+    : 
+      [ run optionals/optionals_pass.cpp  ]
+    ;
+
+
+
 explicit fix ;
 test-suite fix
     : 
