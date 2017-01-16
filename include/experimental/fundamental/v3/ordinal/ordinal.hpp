@@ -2,7 +2,7 @@
 // accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 //
-// Copyright (C) 2014-2015 Vicente J. Botet Escriba
+// Copyright (C) 2014-2016 Vicente J. Botet Escriba
 
 #ifndef JASEL_FUNDAMENTAL_V3_ORDINAL_ORDINAL_HPP
 #define JASEL_FUNDAMENTAL_V3_ORDINAL_ORDINAL_HPP
@@ -19,7 +19,7 @@ namespace experimental
 inline namespace fundamental_v3
 {
 
-  namespace ordinal {
+namespace ordinal {
     struct tag {};
 
     template <class T, class Enabler=void>
