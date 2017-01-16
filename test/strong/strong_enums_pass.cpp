@@ -3,8 +3,9 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-// <experimental/optionals.hpp>
+// <experimental/strong_enums.hpp>
 
+#include <experimental/strong_ints.hpp>
 #include <experimental/strong_enums.hpp>
 
 #include <boost/detail/lightweight_test.hpp>

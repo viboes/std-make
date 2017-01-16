@@ -81,6 +81,14 @@ inline namespace fundamental_v3
       enum_type enum_value() const { return enum_type(this->value); }
       enum_type get() const { return enum_type(this->value); }
       explicit operator enum_type() const { return enum_type(this->value); }
+
+      friend constexpr bool operator==(strong_enum x, strong_enum y) noexcept { return x.value == y.value; }
+      friend constexpr bool operator!=(strong_enum x, strong_enum y) noexcept { return x.value != y.value; }
+      friend constexpr bool operator<(strong_enum x, strong_enum y) noexcept { return x.value < y.value; }
+      friend constexpr bool operator<=(strong_enum x, strong_enum y) noexcept { return x.value <= y.value; }
+      friend constexpr bool operator>(strong_enum x, strong_enum y) noexcept { return x.value > y.value; }
+      friend constexpr bool operator>=(strong_enum x, strong_enum y) noexcept { return x.value >= y.value; }
+
   };
 
   template <class E, class UT, class D>
@@ -97,6 +105,14 @@ inline namespace fundamental_v3
       // fixme: Why do we need this default constructor
       constexpr safe_enum() noexcept : base_type() {}
       explicit safe_enum(underlying_t v): base_type(to_valid_enum<E>(v)) {}
+
+      friend constexpr bool operator==(safe_enum x, safe_enum y) noexcept { return x.value == y.value; }
+      friend constexpr bool operator!=(safe_enum x, safe_enum y) noexcept { return x.value != y.value; }
+      friend constexpr bool operator<(safe_enum x, safe_enum y) noexcept { return x.value < y.value; }
+      friend constexpr bool operator<=(safe_enum x, safe_enum y) noexcept { return x.value <= y.value; }
+      friend constexpr bool operator>(safe_enum x, safe_enum y) noexcept { return x.value > y.value; }
+      friend constexpr bool operator>=(safe_enum x, safe_enum y) noexcept { return x.value >= y.value; }
+
   };
 
   template <class E, class UT, class D>
@@ -112,6 +128,14 @@ inline namespace fundamental_v3
       using underlying_t = typename  base_type::underlying_t;
 
     explicit ordinal_enum(underlying_t v): base_type(to_enumerator<E>(v)) {}
+
+    friend constexpr bool operator==(ordinal_enum x, ordinal_enum y) noexcept { return x.value == y.value; }
+    friend constexpr bool operator!=(ordinal_enum x, ordinal_enum y) noexcept { return x.value != y.value; }
+    friend constexpr bool operator<(ordinal_enum x, ordinal_enum y) noexcept { return x.value < y.value; }
+    friend constexpr bool operator<=(ordinal_enum x, ordinal_enum y) noexcept { return x.value <= y.value; }
+    friend constexpr bool operator>(ordinal_enum x, ordinal_enum y) noexcept { return x.value > y.value; }
+    friend constexpr bool operator>=(ordinal_enum x, ordinal_enum y) noexcept { return x.value >= y.value; }
+
   };
   template <class E, class UT, class D>
   struct underlying_type<ordinal_enum<E,UT,D>> { typedef UT type; };
