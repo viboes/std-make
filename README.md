@@ -7,13 +7,13 @@ Experimental library for C++11/14/17.
 
 This code form the basis of several formal proposal to the C++ standard library
 
-* P0196R1 - Generic none() factories for Nullable types   (httpshttp://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0196r0.pdf).
-* P0198R0 - Default Swap - (httpshttp://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0198r0.pdf)
-* P0199R0 - Default Hash - (httpshttp://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0199r0.pdf)
-* P0318R0 - decay_unwrap and unwrap_reference  (httpshttp://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0318r0.pdf).
-* P0327R0 - Product types access    (httpshttp://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0327r0.pdf).
-* P0338R0 - C++ generic factories  (httpshttp://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0338r0.pdf).
-* P0343R0 - Meta-programming High-Order Functions (httpshttp://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0343r0.pdf)
+* P0196R1 - Generic none() factories for Nullable types   (http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0196r0.pdf).
+* P0198R0 - Default Swap - (http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0198r0.pdf)
+* P0199R0 - Default Hash - (http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0199r0.pdf)
+* P0318R0 - decay_unwrap and unwrap_reference  (http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0318r0.pdf).
+* P0327R0 - Product types access    (http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0327r0.pdf).
+* P0338R0 - C++ generic factories  (http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0338r0.pdf).
+* P0343R0 - Meta-programming High-Order Functions (http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0343r0.pdf)
  
 # Development Status
 
