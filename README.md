@@ -1,7 +1,7 @@
 JASEL: Just a simple experimental library for C++
 =================================================
 
-Experimental library for C++11/14/17. 
+Experimental library for C++11/14/17.
 
 # Proposals
 
@@ -14,7 +14,7 @@ This code form the basis of several formal proposal to the C++ standard library
 * P0327R0 - Product types access    (http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0327r0.pdf).
 * P0338R0 - C++ generic factories  (http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0338r0.pdf).
 * P0343R0 - Meta-programming High-Order Functions (http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0343r0.pdf)
- 
+
 # Development Status
 
 This code is undocumented (other than via the proposals), not fully tested, constantly changing, and generally not fit for any use whatsoever.
@@ -32,7 +32,7 @@ The code is known to work with the following compilers:
 * GCC 5.2.1   -std=c++11 -std=c++14 -std=c++1z
 * GCC 6.1.1   -std=c++11 -std=c++14 -std=c++1z
 
-*Development Status:* The aim of the library is to be portable on comforming C++11/14/17 compilers. 
+*Development Status:* The aim of the library is to be portable on comforming C++11/14/17 compilers.
 However some parts require a C++14 (product_type and swappable).
 Hopefully this will change in the future.
 
@@ -45,10 +45,10 @@ You will need to set some environment variable to be able to build the test.
 
 Next follows the repositories and the required variable pointing to them:
 
-* Boost: https://github.com/boostorg/boost BOOST_ROOT 
+* Boost: https://github.com/boostorg/boost BOOST_ROOT
 * Optional : https://github.com/viboes/Optional/ STD_OPTIONAL
 * Expected : https://github.com/ptal/expected BOOST_EXPECTED
 
-# Acknowledgements 
+# Acknowledgements
 
-Many thanks to Agustín K-ballo Bergé for his help. 
+Many thanks to Agustín K-ballo Bergé for his help.
