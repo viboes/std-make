@@ -30,6 +30,15 @@ inline namespace fundamental_v3
 {
 
 namespace detail {
+  template <class Tpl, class T>
+  struct index;
+  template <class T, class ...Ts>
+  struct index<std::tuple<T, Ts...>, T> { enum {value =0}; };
+  template <class T, class U, class ...Ts>
+  struct index<std::tuple<T, Ts...>, U> { enum {value =1 + index<std::tuple<Ts...>, U>::value}; };
+}
+
+namespace detail {
 
 template <class T>
 struct optional_ref_fact;
@@ -389,36 +398,91 @@ public:
     {
         return mask & (1 << I);
     }
-    template <class T>
-    bool has_value() const;
-    //{
-    //    return mask & (1 << index<Types, T>::value);
-    //}
-
-    template <size_t I>
-    optional_ref<typename tuple_element<I, Types>::type> get()
-    {
-        using T = typename tuple_element<I, Types>::type;
-        return this->detail::optional_ref_fact<T>::make(I, mask, std::get<I>(tpl));
-    }
-    template <size_t I>
-    optional_ref<const typename tuple_element<I, Types>::type> get() const
-    {
-        using T = typename tuple_element<I, Types>::type;
-        return this->detail::optional_ref_fact<T>::make(I, mask, std::get<I>(tpl));
-    }
 
     template <class T>
-    optional_ref<T> get();
-    //{        return get<index<Types, T>::value>(tpl);    }
+    bool has_value() const
+    {
+        return has_value<detail::index<Types, T>::value>();
+    }
+
+    template <size_t I>
+    void set_mask()
+    {
+        mask |= (1 << I);
+    }
+
+    /// @pre has_value<I>
+    template <size_t I>
+    typename tuple_element<I, Types>::type& get_ref()
+    {
+        return std::get<I>(tpl);
+    }
+    template <size_t I>
+    typename tuple_element<I, Types>::type const& get_ref() const
+    {
+        return std::get<I>(tpl);
+    }
+    /// @pre has_value<T>
     template <class T>
-    optional_ref<const T> get() const;
-    //{        return get<index<Types, T>::value>(tpl);    }
+    T & get_ref()
+    {
+        return get_ref<detail::index<Types, T>::value>();
+    }
+    template <class T>
+    T const& get_ref() const
+    {
+        return get_ref<detail::index<Types, T>::value>();
+    }
+
+    template <size_t I>
+    auto get_if() -> decltype(&get_ref<I>())
+    {
+      if (has_value<I>())
+        return &get_ref<I>();
+      return nullptr;
+    }
+    template <size_t I>
+    auto get_if() const -> decltype(&get_ref<I>())
+    {
+      if (has_value<I>())
+        return &get_ref<I>();
+      return nullptr;
+    }
+    template <class T>
+    T* get_if()
+    {
+      return get_if<detail::index<Types, T>::value>();
+    }
+    template <class T>
+    T const* get_if() const
+    {
+      return get_if<detail::index<Types, T>::value>();
+    }
+
+    template <size_t I>
+    optional_ref<typename tuple_element<I, Types>::type> get_opt()
+    {
+        using T = typename tuple_element<I, Types>::type;
+        return this->detail::optional_ref_fact<T>::make(I, mask, get_ref<I>());
+    }
+    template <size_t I>
+    optional_ref<const typename tuple_element<I, Types>::type> get_opt() const
+    {
+        using T = typename tuple_element<I, Types>::type;
+        return this->detail::optional_ref_fact<T>::make(I, mask, get_ref<I>());
+    }
+
+    template <class T>
+    optional_ref<T> get_opt()
+    {        return get_opt<detail::index<Types, T>::value>();    }
+    template <class T>
+    optional_ref<const T> get_opt() const
+    {        return get_opt<detail::index<Types, T>::value>();    }
 
     template <class T>
     optionals& operator=(T const& v)
     {
-        this->template get<T>() = v;
+        this->template get_opt<T>() = v;
         return *this;
     }
 
@@ -430,36 +494,31 @@ public:
 
 private:
 
-    template <size_t I>
-    void set()
-    {
-        mask |= (1 << I);
-    }
 
     size_t mask;
     Types tpl;
 };
 
 template <size_t I, class ...Ts>
-auto get(optionals<Ts...>& opts) -> decltype(opts.template get<I>())
+auto get(optionals<Ts...>& opts) -> decltype(opts.template get_opt<I>())
 {
-    return opts.template get<I>();
+    return opts.template get_opt<I>();
 }
 template <size_t I, class ...Ts>
-auto get(optionals<Ts...> const& opts) -> decltype(opts.template get<I>())
+auto get(optionals<Ts...> const& opts) -> decltype(opts.template get_opt<I>())
 {
-    return opts.template get<I>();
+    return opts.template get_opt<I>();
 }
 
 template <class T, class ...Ts>
-auto get(optionals<Ts...>& opts) -> decltype(opts.template get<T>())
+auto get(optionals<Ts...>& opts) -> decltype(opts.template get_opt<T>())
 {
-    return opts.template get<T>();
+    return opts.template get_opt<T>();
 }
 template <class T, class ...Ts>
-auto get(optionals<Ts...> const& opts) -> decltype(opts.template get<T>())
+auto get(optionals<Ts...> const& opts) -> decltype(opts.template get_opt<T>())
 {
-    return opts.template get<T>();
+    return opts.template get_opt<T>();
 }
 
 template <class ...Ts>
