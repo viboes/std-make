@@ -5,7 +5,6 @@
 
 // <experimental/strong_enums.hpp>
 
-#include <experimental/strong_ints.hpp>
 #include <experimental/strong_enums.hpp>
 
 #include <boost/detail/lightweight_test.hpp>

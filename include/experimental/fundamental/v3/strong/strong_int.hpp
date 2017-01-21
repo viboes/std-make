@@ -60,7 +60,7 @@ inline namespace fundamental_v3
       constexpr strong_int operator++(int)  noexcept
       { return strong_int(this->value++); }
 
-      friend constexpr strong_int operator+(strong_int x)  noexcept
+      friend constexpr strong_int operator-(strong_int x)  noexcept
       { return strong_int(-x.value); }
       friend constexpr strong_int operator-(strong_int x, strong_int y)  noexcept
       { return strong_int(x.value - y.value); }
