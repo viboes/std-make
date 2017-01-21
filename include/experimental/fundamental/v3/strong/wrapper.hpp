@@ -23,18 +23,30 @@ inline  namespace fundamental_v3
     struct zero_initialized_t
     {};
 
+    //! wrapper wraps an underlying type providing access to the underlying value
+    //!
+    //! @tparam UT the underlying type
+    //! @tparam Default the default constructor policy, but default default initialized
+
     template <class UT, class Default = default_initialized_t>
     struct wrapper
     {
+      //! the underlying type reflected type
       using underlying_t = UT;
 
       constexpr wrapper() noexcept : wrapper(Default{}) {}
+
+      //! default initialize the underlying value
       explicit constexpr wrapper(default_initialized_t) noexcept : value() {}
+      //! zero initialize the underlying value
       explicit constexpr wrapper(zero_initialized_t) noexcept : value{} {}
+      //! not initialize the underlying value
       explicit constexpr wrapper(uninitialized_t) noexcept {}
 
+      //! explicit conversion from the underlying type
       explicit constexpr wrapper(underlying_t v): value(v) {}
 
+      //! underlying value access
 #if __cplusplus >= 201402L
       constexpr
 #endif
@@ -42,12 +54,6 @@ inline  namespace fundamental_v3
       { return value; }
       constexpr underlying_t const& underlying() const noexcept
       { return value; }
-
-      // relational operators
-      friend constexpr bool operator==(wrapper const& x, wrapper const& y) noexcept
-      { return x.value == y.value; }
-      friend constexpr bool operator!=(wrapper const& x, wrapper const& y) noexcept
-      { return x.value != y.value; }
 
     protected:
       underlying_t value;
@@ -57,6 +63,7 @@ inline  namespace fundamental_v3
     struct underlying_type<wrapper<UT, D>>
     { typedef UT type; };
 
+    //! public_wrapper is a wrapper that provides implicit conversion to the underlying type
     template <class UT, class Default = default_initialized_t>
     struct public_wrapper
     : wrapper<UT, Default>
@@ -72,6 +79,7 @@ inline  namespace fundamental_v3
       { return underlying();}
     };
 
+    //! protected_wrapper is a wrapper that provides explicit conversion to the underlying type
     template <class UT, class Default = default_initialized_t>
     struct protected_wrapper
     : wrapper<UT, Default>
@@ -87,6 +95,7 @@ inline  namespace fundamental_v3
       { return underlying();}
     };
 
+    //! private_wrapper is a wrapper that provides no conversion to the underlying type
     template <class UT, class Default = default_initialized_t>
     struct private_wrapper
     : wrapper<UT, Default>
