@@ -67,6 +67,8 @@
 #define JASEL_CXX14_CONSTEXPR
 #endif
 
+#define JASEL_ENABLE_IF(...) typename ::std::enable_if<(__VA_ARGS__), bool>::type = true
+
 #ifdef JASEL_HAS_INVOKE
 #define JASEL_INVOKE(F, ...) std::invoke((F), __VA_ARGS__)
 #else

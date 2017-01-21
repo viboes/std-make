@@ -17,8 +17,6 @@ namespace experimental
 inline  namespace fundamental_v3
 {
 
-#define JASEL_ENABLE_IF(...) typename ::std::enable_if<(__VA_ARGS__), bool>::type = true
-
 template <typename T, template <typename, typename> class TypePred>
 class only_when
 {
@@ -33,8 +31,6 @@ public:
 
   T get() const { return _val; }
 };
-
-#undef JASEL_ENABLE_IF
 
 
 }
