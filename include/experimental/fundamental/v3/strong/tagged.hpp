@@ -40,7 +40,7 @@ inline  namespace fundamental_v3
     {
       using tag_type = Tag;
       using base_type = public_wrapper<UT, Default>;
-      using base_type::public_wrapper;
+      using base_type::base_type;
     };
 
     //! protected_tagged is a wrapper that provides explicit conversion to the underlying type
@@ -60,7 +60,7 @@ inline  namespace fundamental_v3
     {
       using tag_type = Tag;
       using base_type = private_wrapper<UT, Default>;
-      using base_type::private_wrapper;
+      using base_type::base_type;
     };
 
 }

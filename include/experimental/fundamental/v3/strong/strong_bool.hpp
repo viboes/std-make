@@ -7,7 +7,7 @@
 #ifndef JASEL_FUNDAMENTAL_V3_STRONG_STRONG_BOOL_HPP
 #define JASEL_FUNDAMENTAL_V3_STRONG_STRONG_BOOL_HPP
 
-#include <experimental/fundamental/v3/strong/wrapper.hpp>
+#include <experimental/fundamental/v3/strong/tagged.hpp>
 #include <experimental/fundamental/v3/strong/only_when.hpp>
 #include <experimental/fundamental/v3/strong/underlying_type.hpp>
 #include <type_traits>
@@ -18,8 +18,6 @@ namespace experimental
 {
 inline namespace fundamental_v3
 {
-  template <class T, class U>
-  struct is_convertible_flip : std::is_convertible<U,T> {};
 
   /**
   `strong_bool` is a strongly type that wraps a bool and behaves like an `bool`
@@ -40,24 +38,19 @@ inline namespace fundamental_v3
   </code>
   */
   template <class Tag, class Default = uninitialized_t>
-  struct strong_bool final : protected_wrapper<bool, Default>
+  struct strong_bool final : protected_tagged<Tag, bool, Default>
   {
-      using base_type = protected_wrapper<bool, Default>;
+      using base_type = protected_wrapper<Tag, bool, Default>;
       using base_type::base_type;
-      using base_type::underlying;
+      //using base_type::underlying;
 
-      using tag_type = Tag;
-      using underlying_t = bool;
+      //using underlying_t = bool;
 
       // copy constructor/assignment default
       constexpr strong_bool() noexcept : base_type() {}
-#ifdef JASEL_CONVERTIBLE_DELETED
-      constexpr explicit strong_bool (only_when<bool, is_convertible_flip> v) = delete;
-#else
       constexpr explicit strong_bool (int) = delete;
       constexpr explicit strong_bool (double) = delete;
       constexpr explicit strong_bool (void*) = delete;
-#endif
 
       // relational operators
       friend constexpr bool operator==(strong_bool x, strong_bool y)  noexcept { return x.value == y.value; }
