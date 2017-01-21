@@ -8,6 +8,7 @@
 #define JASEL_FUNDAMENTAL_V3_STRONG_WRAPPER_HPP
 
 #include <experimental/fundamental/v3/strong/underlying_type.hpp>
+#include <experimental/fundamental/v3/strong/initializer_tags.hpp>
 
 namespace std
 {
@@ -15,13 +16,6 @@ namespace experimental
 {
 inline  namespace fundamental_v3
 {
-
-    struct default_initialized_t
-    {};
-    struct uninitialized_t
-    {};
-    struct zero_initialized_t
-    {};
 
     //! wrapper wraps an underlying type providing access to the underlying value
     //!
@@ -70,10 +64,13 @@ inline  namespace fundamental_v3
     {
       using base_type = wrapper<UT, Default>;
       using typename base_type::underlying_t;
-      using base_type::wrapper;
+      using base_type::base_type;
       using base_type::underlying;
 
-      constexpr operator UT&() noexcept
+#if __cplusplus >= 201402L
+      constexpr
+#endif
+      operator UT&() noexcept
       { return underlying();}
       constexpr operator UT const&() const noexcept
       { return underlying();}
@@ -86,10 +83,13 @@ inline  namespace fundamental_v3
     {
       using base_type = wrapper<UT, Default>;
       using typename base_type::underlying_t;
-      using base_type::wrapper;
+      using base_type::base_type;
       using base_type::underlying;
 
-      explicit constexpr operator UT&() noexcept
+#if __cplusplus >= 201402L
+      constexpr
+#endif
+      explicit operator UT&() noexcept
       { return underlying();}
       explicit constexpr operator UT const&() const noexcept
       { return underlying();}

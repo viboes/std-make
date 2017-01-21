@@ -50,7 +50,7 @@ inline  namespace fundamental_v3
     {
       using tag_type = Tag;
       using base_type = protected_wrapper<UT, Default>;
-      using base_type::protected_wrapper;
+      using base_type::base_type;
     };
 
     //! private_tagged is a wrapper that provides no conversion to the underlying type

@@ -56,12 +56,8 @@ int main()
       set_status(EngineStarted{true}, CrewReady{true});        // function call
   }
   {
-      //EngineStarted es {Y{}};        // error
-#ifdef JASEL_CONVERTIBLE_DELETED
-      //EngineStarted es {X{}};        // error
-#else
-      EngineStarted es {X{}};        // ok, but shouldn't this be forbiden also?
-#endif
+      //EngineStarted es {Y{}};        // error, explicit conversion
+      EngineStarted es {X{}};        // ok, implicit conversion from UDT
   }
   {
       EngineStarted es1 {true};

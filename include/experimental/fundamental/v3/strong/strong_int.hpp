@@ -7,7 +7,7 @@
 #ifndef JASEL_FUNDAMENTAL_V3_STRONG_STRONG_INT_HPP
 #define JASEL_FUNDAMENTAL_V3_STRONG_STRONG_INT_HPP
 
-#include <experimental/fundamental/v3/strong/wrapper.hpp>
+#include <experimental/fundamental/v3/strong/tagged.hpp>
 #include <experimental/fundamental/v3/strong/underlying_type.hpp>
 
 namespace std
@@ -36,17 +36,10 @@ inline namespace fundamental_v3
   </code>
   */
   template <class Tag, class UT, class Default = uninitialized_t>
-  struct strong_int final : protected_wrapper<UT, Default>
+  struct strong_int final : protected_tagged<Tag, UT, Default>
   {
-      using base_type = protected_wrapper<UT, Default>;
+      using base_type = protected_tagged<Tag, UT, Default>;
       using base_type::base_type;
-      using base_type::underlying;
-
-      using tag_type = Tag;
-      using underlying_t = UT;
-
-      // copy constructor/assignment default
-      constexpr strong_int() noexcept : base_type() {}
 
       // additive operators
       friend constexpr strong_int operator+(strong_int x)  noexcept
