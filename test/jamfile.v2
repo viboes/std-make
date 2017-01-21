@@ -242,6 +242,7 @@ test-suite optionals
 test-suite strong
     : 
       [ run strong/strong_enums_pass.cpp  ]
+      [ run strong/strong_bool_pass.cpp  ]
     ;
 
 
