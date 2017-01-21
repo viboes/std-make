@@ -56,18 +56,10 @@ inline namespace fundamental_v3
   template <class E, class Int>
   constexpr optional<E> try_to_valid_enum(Int x) { if (is_valid_enum<E>(x)) return enum_cast<E>(x); else return nullopt;}
 
-  // strong_enum ensures that there is no allowed cast between two strong_enums
-  // It behaves almost as an C++11 enum class: ut. However there are some syntactical issues.
-  // In C++98, if you want scoped enums you should wrap the enum in a struct
-  // struct SE {
-  //     enum type { E0, E1, E2 };
-  // };
-  // Note that two C++11 enum class can be casted as they are integral types.
-
 
 
   template <class E, class UT=typename underlying_type<E>::type, class Default = default_initialized_t>
-  struct strong_enum : protected_wrapper<UT, Default>
+  struct enum_wrapper : protected_wrapper<UT, Default>
   {
       using base_type = protected_wrapper<UT, Default>;
       using base_type::base_type;
@@ -75,12 +67,31 @@ inline namespace fundamental_v3
       typedef E enum_type;
 
       // fixme: Why do we need this default constructor
-      constexpr strong_enum() noexcept : base_type() {}
-      constexpr strong_enum(enum_type v) noexcept : strong_enum(UT(v)) {}
+      constexpr enum_wrapper() noexcept : base_type() {}
+      constexpr enum_wrapper(enum_type v) noexcept : base_type(UT(v)) {}
 
-      enum_type enum_value() const { return enum_type(this->value); }
-      enum_type get() const { return enum_type(this->value); }
-      explicit operator enum_type() const { return enum_type(this->value); }
+      enum_type enum_value() const noexcept { return enum_type(this->value); }
+      enum_type get() const noexcept { return enum_type(this->value); }
+      explicit operator enum_type() const noexcept { return enum_type(this->value); }
+
+  };
+
+  //! strong_enum ensures that static_cast is not allowed between two strong_enums
+  //! Note that static_cast of two C++11 enum class is allowed as they are integral types.
+  //! strong_enumt behaves almost as an C++11 enum class: ut.
+  //! However there are some syntactical issues.
+  //! In C++98, if you want scoped enums you should wrap the enum in a struct
+  //! struct SE {
+  //!     enum type { E0, E1, E2 };
+  //! };
+  //! typedef strong_enum<SE> SSE
+
+  template <class E, class UT=typename underlying_type<E>::type, class Default = default_initialized_t>
+  struct strong_enum final : enum_wrapper<E, UT, Default>
+  {
+      using base_type = enum_wrapper<E, UT, Default>;
+      using base_type::enum_wrapper;
+      //constexpr strong_enum() noexcept : base_type() {}
 
       friend constexpr bool operator==(strong_enum x, strong_enum y) noexcept { return x.value == y.value; }
       friend constexpr bool operator!=(strong_enum x, strong_enum y) noexcept { return x.value != y.value; }
@@ -96,15 +107,15 @@ inline namespace fundamental_v3
 
   // safe_enum is a strong_enum that checks the validity of the values of the enum using is_valid_enum
   template <class E, class UT=typename underlying_type<E>::type, class Default = default_initialized_t>
-  struct safe_enum final: strong_enum<E,UT, Default>
+  struct safe_enum final: enum_wrapper<E,UT, Default>
   {
-      using base_type = strong_enum<E,UT, Default>;
+      using base_type = enum_wrapper<E,UT, Default>;
       using base_type::base_type;
       using underlying_t = typename base_type::underlying_t;
 
       // fixme: Why do we need this default constructor
       constexpr safe_enum() noexcept : base_type() {}
-      explicit safe_enum(underlying_t v): base_type(to_valid_enum<E>(v)) {}
+      explicit safe_enum(underlying_t v): base_type(UT(to_valid_enum<E>(v))) {}
 
       friend constexpr bool operator==(safe_enum x, safe_enum y) noexcept { return x.value == y.value; }
       friend constexpr bool operator!=(safe_enum x, safe_enum y) noexcept { return x.value != y.value; }
@@ -121,13 +132,13 @@ inline namespace fundamental_v3
   // ordinal_enum is a strong_enum that checks the validity of the values of the enum using is_enumerator
   // is_enumerator is specialized for ordinal enums
   template <class E, class UT=typename underlying_type<E>::type, class Default = default_initialized_t>
-  struct ordinal_enum final: strong_enum<E,UT, Default>
+  struct ordinal_enum final: enum_wrapper<E,UT, Default>
   {
-      using base_type = strong_enum<E,UT, Default>;
+      using base_type = enum_wrapper<E,UT, Default>;
       using base_type::base_type;
       using underlying_t = typename  base_type::underlying_t;
 
-    explicit ordinal_enum(underlying_t v): base_type(to_enumerator<E>(v)) {}
+    explicit ordinal_enum(underlying_t v): base_type(UT(to_enumerator<E>(v))) {}
 
     friend constexpr bool operator==(ordinal_enum x, ordinal_enum y) noexcept { return x.value == y.value; }
     friend constexpr bool operator!=(ordinal_enum x, ordinal_enum y) noexcept { return x.value != y.value; }
