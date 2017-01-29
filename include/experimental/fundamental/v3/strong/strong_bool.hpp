@@ -40,7 +40,7 @@ inline namespace fundamental_v3
   template <class Tag, class Default = uninitialized_t>
   struct strong_bool final : protected_tagged<Tag, bool, Default>
   {
-      using base_type = protected_wrapper<Tag, bool, Default>;
+      using base_type = protected_tagged<Tag, bool, Default>;
       using base_type::base_type;
       //using base_type::underlying;
 
