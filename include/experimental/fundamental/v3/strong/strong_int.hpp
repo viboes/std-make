@@ -35,6 +35,7 @@ inline namespace fundamental_v3
 
   </code>
   */
+
   template <class Tag, class UT, class Default = uninitialized_t>
   struct strong_int final : protected_tagged<Tag, UT, Default>
   {
@@ -95,7 +96,7 @@ inline namespace fundamental_v3
       friend constexpr strong_int operator^(strong_int x, strong_int y)  noexcept
       { return strong_int(x.value ^ y.value); }
       constexpr strong_int& operator^=(strong_int y)  noexcept
-      { this->value |= y.value; return *this; }
+      { this->value ^= y.value; return *this; }
 
       // Bitwise logic operators
       friend constexpr strong_int operator<<(strong_int x, int y)  noexcept
@@ -115,6 +116,12 @@ inline namespace fundamental_v3
       friend constexpr bool operator<=(strong_int x, strong_int y)  noexcept { return x.value <= y.value; }
       friend constexpr bool operator>=(strong_int x, strong_int y)  noexcept { return x.value >= y.value; }
   };
+
+  template <class _Tag, class _Default, class _UT>
+  constexpr strong_int<_Tag, _UT, _Default> make_strong_int(_UT x)
+  {
+    return strong_int<_Tag, _UT, _Default>(x);
+  }
 
 }
 }
