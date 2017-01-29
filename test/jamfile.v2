@@ -212,6 +212,11 @@ test-suite monad
       [ run monad/monad_std_expected_pass.cpp  ]
     ;
 
+test-suite frames
+    : 
+      [ run ../example/chrono/frame_types_pass.cpp  ]
+    ;
+
 test-suite mem_usage
     : 
       [ run ../example/cust_paper/mem_usage/traits/traits_test_pass.cpp  ]
