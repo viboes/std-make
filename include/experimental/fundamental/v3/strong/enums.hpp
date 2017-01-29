@@ -19,7 +19,7 @@ namespace experimental
 inline namespace fundamental_v3
 {
   // By default it should checks if x is in the range of the underlying type
-  // This function must be specialized for C++98 enums wich have a more specific range
+  // This function must be specialized for C++98 enums which have a more specific range
   template <class E, class Int>
   constexpr bool is_valid_enum(Int x) {return true;}
 
