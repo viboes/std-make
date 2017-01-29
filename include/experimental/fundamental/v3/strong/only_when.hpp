@@ -9,6 +9,7 @@
 #define JASEL_FUNDAMENTAL_V3_STRONG_ONLY_WHEN_HPP
 
 #include <utility>
+#include <experimental/fundamental/v2/config.hpp>
 
 namespace std
 {
