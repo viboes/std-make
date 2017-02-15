@@ -12,9 +12,6 @@
 
 #include <boost/detail/lightweight_test.hpp>
 
-int twice(int i) {
-  return 2*i;
-}
 
 int main()
 {
@@ -29,8 +26,13 @@ int main()
   static_assert(stde::is_p_functor<std::pair<stde::_t, stde::_t>>::value, "ERROR");
 
   {
+    auto twice = [](auto i) {
+      return 2*i;
+    };
+
     int v=1;
-    T x = std::make_pair(v,v);
+    short w=1;
+    T x = std::make_pair(v,w);
     BOOST_TEST(x.first == 1);
     BOOST_TEST(x.second == 1);
     T y = stde::p_functor::transform(x, twice);

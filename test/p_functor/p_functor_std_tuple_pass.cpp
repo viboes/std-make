@@ -12,16 +12,12 @@
 
 #include <boost/detail/lightweight_test.hpp>
 
-int twice(int i) {
-  return 2*i;
-}
-
 int main()
 {
 #if __cplusplus >= 201402L
   namespace stde = std::experimental;
 
-  using T = std::tuple<int, int>;
+  using T = std::tuple<int, short>;
 
   static_assert(stde::is_product_type_v<T>, "ERROR");
   static_assert(stde::is_type_constructible_v<T>, "ERROR");
@@ -29,8 +25,13 @@ int main()
   static_assert(stde::is_p_functor<std::tuple<stde::_t>>::value, "ERROR");
 
   {
+    auto twice = [](auto i) {
+      return 2*i;
+    };
+
     int v=1;
-    T x = std::make_tuple(v,v);
+    short w=1;
+    T x = std::make_tuple(v,w);
     BOOST_TEST(std::get<0>(x) == 1);
     BOOST_TEST(std::get<1>(x) == 1);
     T y = stde::p_functor::transform(x, twice);

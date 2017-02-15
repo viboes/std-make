@@ -147,12 +147,12 @@ int main()
     int p[] = {0,1};
     using fprt = std::string(*)(int);
     fprt call[] = {to_string,to_string};
-    auto res = stde::product_type::transform<stde::tuple_tc>(p, call);
+    auto res = stde::product_type::n_transform<stde::tuple_tc>(p, call);
     static_assert(
         std::is_same<std::tuple<std::string, std::string>, decltype(res)>::value,
         "");
 
-    BOOST_TEST(stde::product_type::transform<stde::tuple_tc>(p, call)
+    BOOST_TEST(stde::product_type::n_transform<stde::tuple_tc>(p, call)
       ==
         std::make_tuple("0", "1")
     );

@@ -5,7 +5,7 @@
 
 // <experimental/functor.hpp>
 
-#include <experimental/functor.hpp>
+#include <experimental/n_functor.hpp>
 #include <boost/detail/lightweight_test.hpp>
 
 
@@ -15,7 +15,7 @@ int main()
 
   namespace stde = std::experimental;
 
-  static_assert(! stde::is_functor_v<int>, "");
+  static_assert(! stde::is_n_functor_v<int>, "");
 
   #endif
 

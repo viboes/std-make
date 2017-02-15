@@ -145,12 +145,12 @@ int main()
     using T = std::pair<int,int>;
     T p  = {0,1};
     auto call = std::make_pair(to_string,to_string);
-    auto res = stde::product_type::transform(p, call);
+    auto res = stde::product_type::n_transform(p, call);
     static_assert(
         std::is_same<std::pair<std::string, std::string>, decltype(res)>::value,
         "");
 
-    BOOST_TEST(stde::product_type::transform(p, call)
+    BOOST_TEST(stde::product_type::n_transform(p, call)
       ==
         std::make_pair(std::string("0"), std::string("1"))
     );

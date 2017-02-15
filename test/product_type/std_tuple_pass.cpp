@@ -264,12 +264,12 @@ int main()
     const T p = std::make_tuple(0,1);
 #endif
     auto _to_string = std::make_tuple(to_string,to_string);
-    auto res = stde::product_type::transform(p, _to_string);
+    auto res = stde::product_type::n_transform(p, _to_string);
     static_assert(
         std::is_same<std::tuple<std::string, std::string>, decltype(res)>::value,
         "");
 
-    BOOST_TEST(stde::product_type::transform(p, _to_string)
+    BOOST_TEST(stde::product_type::n_transform(p, _to_string)
       ==
         std::make_tuple("0", "1")
     );
@@ -321,7 +321,7 @@ int main()
     auto q1 = std::make_tuple(2, '3', 4, 5.2);
     auto _sizeof = [](auto & x) {return sizeof(decltype(x));};
     auto call = std::make_tuple(_sizeof, _sizeof, _sizeof, _sizeof);
-    auto q2 = stde::product_type::transform(q1, call);
+    auto q2 = stde::product_type::n_transform(q1, call);
     auto sum = stde::product_type::fold_left(q2, 0, [](auto x, auto y) { return x+y;});
 
     BOOST_TEST(sizeof(q1) > sum);

@@ -11,6 +11,7 @@
 
 #include <experimental/fundamental/v3/product_type/product_type.hpp>
 #include <experimental/make.hpp>
+#include <experimental/functor.hpp>
 #include <experimental/n_functor.hpp>
 #include <experimental/p_functor.hpp>
 #include <utility>
@@ -27,7 +28,7 @@ namespace product_type
   namespace detail {
 
     template <class TC, class F, class ProductType, std::size_t... I>
-    constexpr decltype(auto) transform_impl( ProductType&& pt, F&& f, index_sequence<I...> )
+    constexpr decltype(auto) n_transform_impl( ProductType&& pt, F&& f, index_sequence<I...> )
     {
       return make<TC>(
           JASEL_INVOKE(product_type::get<I>(forward<F>(f)), product_type::get<I>(forward<ProductType>(pt))) ...
@@ -62,21 +63,42 @@ namespace product_type
   >
   constexpr decltype(auto) transform(ProductType&& pt, F&& f)
   {
-      return detail::transform_impl<type_constructor_t<remove_cv_t<remove_reference_t<ProductType>>>>(
+      return detail::p_transform_impl<type_constructor_t<remove_cv_t<remove_reference_t<ProductType>>>>(
           forward<ProductType>(pt), forward<F>(f),
           product_type::element_sequence_for<ProductType>{});
   }
-
   template <class TC, class F, class ProductType
   // todo add constraint on F
   , class = enable_if_t< is_product_type_v<remove_cv_t<remove_reference_t<ProductType>>> >
   >
   constexpr decltype(auto) transform(ProductType&& pt, F&& f)
   {
-      return detail::transform_impl<TC>(
+      return detail::p_transform_impl<TC>(
           forward<ProductType>(pt), forward<F>(f),
           product_type::element_sequence_for<ProductType>{});
   }
+
+  template <class F, class ProductType
+  // todo add constraint on F
+  , class = enable_if_t< is_product_type_v<remove_cv_t<remove_reference_t<ProductType>>> >
+  >
+  constexpr decltype(auto) n_transform(ProductType&& pt, F&& f)
+  {
+      return detail::n_transform_impl<type_constructor_t<remove_cv_t<remove_reference_t<ProductType>>>>(
+          forward<ProductType>(pt), forward<F>(f),
+          product_type::element_sequence_for<ProductType>{});
+  }
+  template <class TC, class F, class ProductType
+  // todo add constraint on F
+  , class = enable_if_t< is_product_type_v<remove_cv_t<remove_reference_t<ProductType>>> >
+  >
+  constexpr decltype(auto) n_transform(ProductType&& pt, F&& f)
+  {
+      return detail::n_transform_impl<TC>(
+          forward<ProductType>(pt), forward<F>(f),
+          product_type::element_sequence_for<ProductType>{});
+  }
+
 
   template <class F, class ProductType
   // todo add constraint on F
@@ -88,7 +110,6 @@ namespace product_type
           forward<ProductType>(pt), forward<F>(f),
           product_type::element_sequence_for<ProductType>{});
   }
-
   template <class TC, class F, class ProductType
   // todo add constraint on F
   , class = enable_if_t< is_product_type_v<remove_cv_t<remove_reference_t<ProductType>>> >
@@ -100,12 +121,21 @@ namespace product_type
           product_type::element_sequence_for<ProductType>{});
   }
 
-  struct as_n_functor : n_functor::tag
+  struct as_functor : functor::tag
   {
     template <class T, class F>
       static constexpr auto transform(T&& x, F&& f)
       {
         return product_type::transform(forward<T>(x), forward<F>(f));
+      }
+  };
+
+  struct as_n_functor : n_functor::tag
+  {
+    template <class T, class F>
+      static constexpr auto transform(T&& x, F&& f)
+      {
+        return product_type::n_transform(forward<T>(x), forward<F>(f));
       }
   };
 

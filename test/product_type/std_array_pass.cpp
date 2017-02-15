@@ -270,12 +270,12 @@ int main()
     using T = std::array<int,2>;
     T p  = { {0,1} };
     auto call = std::make_array(to_string,to_string);
-    auto res = stde::product_type::transform(p, call);
+    auto res = stde::product_type::n_transform(p, call);
     static_assert(
         std::is_same<std::array<std::string, 2>, decltype(res)>::value,
         "");
 
-    BOOST_TEST(stde::product_type::transform(p, call)
+    BOOST_TEST(stde::product_type::n_transform(p, call)
       ==
         std::make_array(std::string("0"), "1")
     );
@@ -290,7 +290,7 @@ int main()
     using T = std::array<int,2>;
     T p  = { {0,1} };
     auto call = std::make_array(to_string,to_string);
-    auto res = stde::product_type::transform(p, call);
+    auto res = stde::product_type::n_transform(p, call);
     static_assert(
         std::is_same<std::array<std::string, 2>, decltype(res)>::value,
         "");

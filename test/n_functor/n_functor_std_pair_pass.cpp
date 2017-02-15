@@ -33,7 +33,7 @@ int main()
     T x = std::make_pair(v,v);
     BOOST_TEST(x.first == 1);
     BOOST_TEST(x.second == 1);
-    auto call = std::make_pair(twice,twice);
+    auto call = std::make_tuple(twice,twice);
     T y = stde::n_functor::transform(x, call);
     BOOST_TEST(y.first == 2);
     BOOST_TEST(y.second == 2);
