@@ -216,9 +216,9 @@ inline namespace fundamental_v3
       //! - If \c I>=pos, the new value is the previous value of the bit at position \c I-pos.
       //! @Returns \c *this.
       //! @NoExcept
-      ordinal_set &operator<<=(const ordinal_set &rhs) noexcept
+      ordinal_set &operator<<=(size_t pos) noexcept
       {
-        bits <<= rhs.bits;
+        bits <<= pos;
         return *this;
       }
 
@@ -228,9 +228,9 @@ inline namespace fundamental_v3
       //! @Returns \c *this.
       //! @NoExcept
 
-      ordinal_set &operator>>=(const ordinal_set &rhs) noexcept
+      ordinal_set &operator>>=(size_t pos) noexcept
       {
-        bits >>= rhs.bits;
+        bits >>= pos;
         return *this;
       }
 
