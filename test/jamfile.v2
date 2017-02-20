@@ -127,6 +127,11 @@ test-suite ordinal_range
       [ run ordinal/container/ordinal_range/ordinal_range_pass.cpp  ]
     ;
 
+test-suite bits
+    : 
+      [ run bits/bit_mask_pass.cpp  ]
+    ;
+
 test-suite product_type
     : 
       [ run product_type/struct_pass.cpp  ]
