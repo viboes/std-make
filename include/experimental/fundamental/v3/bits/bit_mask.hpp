@@ -134,8 +134,8 @@ inline namespace fundamental_v3
       }
     public:
 
-      static_assert(is_integral_v<T>, "T must be an integral type");
-      static_assert(is_unsigned_v<T>, "T must be a unsigned type");
+      static_assert(is_integral<T>::value, "T must be an integral type");
+      static_assert(is_unsigned<T>::value, "T must be a unsigned type");
       //! @brief A proxy class that acts as a reference to a single bit.
 
       //! proxy class representing a reference to a bit

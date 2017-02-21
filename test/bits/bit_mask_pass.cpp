@@ -16,6 +16,10 @@ int main()
   namespace stde = std::experimental;
   using UInt = unsigned char;
   using BitMask = stde::bit_mask<4,UInt>;
+  //using BitMaskError = stde::bit_mask<4,int>;
+
+  static_assert(sizeof(BitMask) == sizeof(UInt), "Bad sizeof");
+  static_assert(alignof(BitMask) == alignof(UInt), "Bad alignof");
 
   {// Default Constructor
     BitMask bm;
@@ -42,7 +46,7 @@ int main()
     bm.set();
     BOOST_TEST_EQ( 0xf , int(bm.to_integer()) );
     BOOST_TEST_EQ( 4 , std::experimental::bit_ops::popcount(0xf0) );
-    BOOST_TEST_EQ( 4 , bm.count() );
+    BOOST_TEST_EQ( 4U , bm.count() );
     BOOST_TEST( bm.all() );
     BOOST_TEST(bm[UInt{0}]);
     BOOST_TEST(bm[UInt{1}]);
