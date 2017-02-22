@@ -65,6 +65,149 @@ int main()
           OrangeCount es {X{}};        // ok, but shouldn't this be forbiden also?
     #endif
       }
+      { // default constructor
+        OrangeCount oc;
+        BOOST_TEST(oc == OrangeCount{});
+      }
+      { // constructor from Int
+        OrangeCount oc{1};
+        BOOST_TEST(oc == OrangeCount{1});
+      }
+
+      { // operator+(x)
+        OrangeCount oc{1};
+        OrangeCount oc2 = +oc;
+        BOOST_TEST(oc2 == OrangeCount{1});
+      }
+      { // operator+(x,y)
+        OrangeCount oc1{1};
+        OrangeCount oc2{2};
+        BOOST_TEST(oc1+oc2 == OrangeCount{3});
+      }
+      { // operator+=(x)
+        OrangeCount oc1{1};
+        OrangeCount oc2{2};
+        oc2 += oc1;
+        BOOST_TEST(oc2 == OrangeCount{3});
+      }
+      { // operator++()
+        OrangeCount oc1{1};
+        auto oc2 = ++oc1;
+        BOOST_TEST(oc1 == OrangeCount{2});
+        BOOST_TEST(oc2 == OrangeCount{2});
+      }
+      { // operator++(int)
+        OrangeCount oc1{1};
+        auto oc2 = oc1++;
+        BOOST_TEST(oc1 == OrangeCount{2});
+        BOOST_TEST(oc2 == OrangeCount{1});
+      }
+
+      { // operator-(x)
+        OrangeCount oc{1};
+        OrangeCount oc2 = -oc;
+        BOOST_TEST(oc2 == OrangeCount{-1});
+      }
+      { // operator-(x,y)
+        OrangeCount oc1{1};
+        OrangeCount oc2{2};
+        BOOST_TEST(oc1-oc2 == OrangeCount{-1});
+      }
+      { // operator-=(x)
+        OrangeCount oc1{1};
+        OrangeCount oc2{2};
+        oc2 -= oc1;
+        BOOST_TEST(oc2 == OrangeCount{1});
+      }
+      { // operator--()
+        OrangeCount oc1{1};
+        auto oc2 = --oc1;
+        BOOST_TEST(oc1 == OrangeCount{0});
+        BOOST_TEST(oc2 == OrangeCount{0});
+      }
+      { // operator--(int)
+        OrangeCount oc1{1};
+        auto oc2 = oc1--;
+        BOOST_TEST(oc1 == OrangeCount{0});
+        BOOST_TEST(oc2 == OrangeCount{1});
+      }
+
+      { // operator*(x,y)
+        OrangeCount oc1{3};
+        OrangeCount oc2{2};
+        BOOST_TEST(oc1*oc2 == OrangeCount{6});
+      }
+      { // operator*=(x)
+        OrangeCount oc1{3};
+        OrangeCount oc2{2};
+        oc2 *= oc1;
+        BOOST_TEST(oc2 == OrangeCount{6});
+      }
+
+      { // operator/(x,y)
+        OrangeCount oc1{6};
+        OrangeCount oc2{2};
+        BOOST_TEST(oc1/oc2 == OrangeCount{3});
+      }
+      { // operator/=(x)
+        OrangeCount oc1{6};
+        OrangeCount oc2{2};
+        oc1 /= oc2;
+        BOOST_TEST(oc1 == OrangeCount{3});
+      }
+
+      { // operator%(x,y)
+        OrangeCount oc1{6};
+        OrangeCount oc2{5};
+        BOOST_TEST(oc1%oc2 == OrangeCount{1});
+      }
+      { // operator%=(x)
+        OrangeCount oc1{6};
+        OrangeCount oc2{5};
+        oc1 %= oc2;
+        BOOST_TEST(oc1 == OrangeCount{1});
+      }
+
+      { // operator==(x,y)
+        OrangeCount oc1{2};
+        OrangeCount oc2{2};
+        BOOST_TEST( oc1==oc2 );
+      }
+      { // operator!=(x,y)
+        OrangeCount oc1{2};
+        OrangeCount oc2{3};
+        BOOST_TEST( oc1!=oc2 );
+      }
+      { // operator<(x,y)
+        OrangeCount oc1{2};
+        OrangeCount oc2{5};
+        BOOST_TEST( oc1<oc2 );
+      }
+      { // operator<=(x,y)
+        OrangeCount oc1{2};
+        OrangeCount oc2{5};
+        BOOST_TEST( oc1<=oc2 );
+      }
+      { // operator<=(x,y)
+        OrangeCount oc1{2};
+        OrangeCount oc2{2};
+        BOOST_TEST( oc1<=oc2 );
+      }
+      { // operator>(x,y)
+        OrangeCount oc1{6};
+        OrangeCount oc2{5};
+        BOOST_TEST( oc1>oc2 );
+      }
+      { // operator>=(x,y)
+        OrangeCount oc1{6};
+        OrangeCount oc2{5};
+        BOOST_TEST( oc1>=oc2 );
+      }
+      { // operator<=(x,y)
+        OrangeCount oc1{2};
+        OrangeCount oc2{2};
+        BOOST_TEST( oc1>=oc2 );
+      }
 
   }
   return ::boost::report_errors();
