@@ -7,7 +7,6 @@
 #ifndef JASEL_EXPERIMENTAL_STRONG_INTS_HPP
 #define JASEL_EXPERIMENTAL_STRONG_INTS_HPP
 
-#include <experimental/fundamental/v3/strong/int_wrapper.hpp>
 #include <experimental/fundamental/v3/strong/strong_int.hpp>
 
 #endif // header

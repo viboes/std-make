@@ -17,10 +17,10 @@ namespace experimental
 inline  namespace fundamental_v3
 {
 
-    //! wrapper wraps an underlying type providing access to the underlying value
+    //! wrapper wraps an underlying type providing access to the underlying value via the underlying function
     //!
     //! @tparam UT the underlying type
-    //! @tparam Default the default constructor policy, but default default initialized
+    //! @tparam Default the default constructor policy, defaults to default_initialized
 
     template <class UT, class Default = default_initialized_t>
     struct wrapper
@@ -40,6 +40,7 @@ inline  namespace fundamental_v3
       //! explicit conversion from the underlying type
       explicit constexpr wrapper(underlying_t v): value(v) {}
 
+      //!@{
       //! underlying value access
 #if __cplusplus >= 201402L
       constexpr
@@ -48,16 +49,22 @@ inline  namespace fundamental_v3
       { return value; }
       constexpr underlying_t const& underlying() const noexcept
       { return value; }
+      //!@}
 
     protected:
+      //! the wrapped value
       underlying_t value;
     };
 
-    template <class UT, class D>
-    struct underlying_type<wrapper<UT, D>>
+    //! underlying_type specialization for wrapper
+    template <class UT, class Default>
+    struct underlying_type<wrapper<UT, Default>>
     { typedef UT type; };
 
     //! public_wrapper is a wrapper that provides implicit conversion to the underlying type
+    //!
+    //! @tparam UT the underlying type
+    //! @tparam Default the default constructor policy, defaults to default_initialized
     template <class UT, class Default = default_initialized_t>
     struct public_wrapper
     : wrapper<UT, Default>
@@ -77,6 +84,9 @@ inline  namespace fundamental_v3
     };
 
     //! protected_wrapper is a wrapper that provides explicit conversion to the underlying type
+    //!
+    //! @tparam UT the underlying type
+    //! @tparam Default the default constructor policy, defaults to default_initialized
     template <class UT, class Default = default_initialized_t>
     struct protected_wrapper
     : wrapper<UT, Default>
@@ -96,6 +106,9 @@ inline  namespace fundamental_v3
     };
 
     //! private_wrapper is a wrapper that provides no conversion to the underlying type
+    //!
+    //! @tparam UT the underlying type
+    //! @tparam Default the default constructor policy, defaults to default_initialized
     template <class UT, class Default = default_initialized_t>
     struct private_wrapper
     : wrapper<UT, Default>

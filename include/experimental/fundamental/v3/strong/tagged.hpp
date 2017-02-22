@@ -17,10 +17,13 @@ namespace experimental
 inline  namespace fundamental_v3
 {
 
-    //! wrapper wraps an underlying type providing access to the underlying value
+    //! tagged wraps an underlying type providing access to the underlying value with a specific @c Tag.
     //!
+    //! The main goal of the tag is to make two tagged types with different tag different types.
+    //!
+    //! @tparam Tag the tag type
     //! @tparam UT the underlying type
-    //! @tparam Default the default constructor policy, but default default initialized
+    //! @tparam Default the default constructor policy, defaults to default_initialized
 
     template <class Tag, class UT, class Default = default_initialized_t>
     struct tagged
@@ -29,11 +32,13 @@ inline  namespace fundamental_v3
       using tag_type = Tag;
       using base_type = wrapper<UT, Default>;
       using base_type::wrapper;
-
-      //constexpr tagged() noexcept : tagged(Default{}) {}
     };
 
-    //! public_tagged is a wrapper that provides implicit conversion to the underlying type
+    //! public_tagged is a tagged wrapper that provides implicit conversion to the underlying type
+    //!
+    //! @tparam Tag the tag type
+    //! @tparam UT the underlying type
+    //! @tparam Default the default constructor policy, defaults to default_initialized
     template <class Tag, class UT, class Default = default_initialized_t>
     struct public_tagged
     : public_wrapper<UT, Default>
@@ -43,7 +48,11 @@ inline  namespace fundamental_v3
       using base_type::base_type;
     };
 
-    //! protected_tagged is a wrapper that provides explicit conversion to the underlying type
+    //! protected_tagged is a tagged wrapper that provides explicit conversion to the underlying type
+    //!
+    //! @tparam Tag the tag type
+    //! @tparam UT the underlying type
+    //! @tparam Default the default constructor policy, defaults to default_initialized
     template <class Tag, class UT, class Default = default_initialized_t>
     struct protected_tagged
     : protected_wrapper<UT, Default>
@@ -53,7 +62,11 @@ inline  namespace fundamental_v3
       using base_type::base_type;
     };
 
-    //! private_tagged is a wrapper that provides no conversion to the underlying type
+    //! private_tagged is a tagged wrapper that provides no conversion to the underlying type
+    //!
+    //! @tparam Tag the tag type
+    //! @tparam UT the underlying type
+    //! @tparam Default the default constructor policy, defaults to default_initialized
     template <class Tag, class UT, class Default = default_initialized_t>
     struct private_tagged
     : private_wrapper<UT, Default>

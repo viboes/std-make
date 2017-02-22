@@ -22,29 +22,26 @@ inline namespace fundamental_v3
   /**
   `strong_bool` is a strongly type that wraps a bool and behaves like an `bool`
   The main goal is to be able to define strong bools that don't mix between them.
-  The single conversion is to the underlying integer type.
+  The single conversion is to the underlying bool type.
 
   Note that this is not a safe bool, it just forbids the conversions between
   different strong bools types.
 
   Example
   <code>
-  using X = strong_bool<XTag, int>;
-  using Y = strong_bool<YTag, int>;
+  using X = strong_bool<XTag>;
+  using Y = strong_bool<YTag>;
   void f(X, Y);
 
-  f(X(1), Y(1));
+  f(X(true), Y(false));
 
   </code>
   */
-  template <class Tag, class Default = uninitialized_t>
-  struct strong_bool final : protected_tagged<Tag, bool, Default>
+  template <class Tag, class Bool = bool, class Default = uninitialized_t>
+  struct strong_bool final : protected_tagged<Tag, Bool, Default>
   {
-      using base_type = protected_tagged<Tag, bool, Default>;
+      using base_type = protected_tagged<Tag, Bool, Default>;
       using base_type::base_type;
-      //using base_type::underlying;
-
-      //using underlying_t = bool;
 
       // copy constructor/assignment default
       constexpr strong_bool() noexcept : base_type() {}
@@ -52,17 +49,22 @@ inline namespace fundamental_v3
       constexpr explicit strong_bool (double) = delete;
       constexpr explicit strong_bool (void*) = delete;
 
-      // relational operators
+      //!@{
+      //! relational operators
+      //!
+      //! Forwards to the underlying value
       friend constexpr bool operator==(strong_bool x, strong_bool y)  noexcept { return x.value == y.value; }
       friend constexpr bool operator!=(strong_bool x, strong_bool y)  noexcept { return x.value != y.value; }
       friend constexpr bool operator<(strong_bool x, strong_bool y)  noexcept { return x.value < y.value; }
       friend constexpr bool operator>(strong_bool x, strong_bool y)  noexcept { return x.value > y.value; }
       friend constexpr bool operator<=(strong_bool x, strong_bool y)  noexcept { return x.value <= y.value; }
       friend constexpr bool operator>=(strong_bool x, strong_bool y)  noexcept { return x.value >= y.value; }
+      //!@}
   };
 
-  template <class E, class D>
-  struct underlying_type<strong_bool<E,D>> { typedef bool type; };
+  //! underlying_type specialization for strong_bool
+  template <class Tag, class Bool, class Default>
+  struct underlying_type<strong_bool<Tag, Bool, Default>> { using type = Bool; };
 
 }
 }

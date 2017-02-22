@@ -14,12 +14,15 @@ namespace experimental
 inline  namespace fundamental_v3
 {
 
-    struct default_initialized_t
-    {};
-    struct uninitialized_t
-    {};
-    struct zero_initialized_t
-    {};
+  //! tag used to explicitly default initialize
+  struct default_initialized_t
+  {};
+  //! tag used to explicitly don't initialize
+  struct uninitialized_t
+  {};
+  //! tag used to explicitly zero initialize
+  struct zero_initialized_t
+  {};
 
 }
 }

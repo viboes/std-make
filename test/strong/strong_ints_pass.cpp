@@ -29,6 +29,10 @@ struct Y {
 
 int main()
 {
+  {
+    auto x = stdex::make_strong_int<OrangeTag>(1);
+    BOOST_TEST(x == OrangeCount{1});
+  }
 
   {
       //OrangeCount oc1 = 1;     // error - explicit required

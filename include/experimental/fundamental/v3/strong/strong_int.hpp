@@ -18,9 +18,9 @@ inline namespace fundamental_v3
 {
 
   /**
-  `strong_int` is a strongly type that wraps an integral type `UT` and behaves like an `UT`
+  `strong_int` is a strongly type tagged by the tag @c Tag that wraps an integral type @c UT and behaves like an @c UT
   The main goal is to be able to define strong integers that don't mix between them.
-  The single conversion it to the underlying integer type.
+  The single allowed conversion is to the underlying integer type.
 
   Note that this is not a safe int, it just forbids the conversions between
   different strong integers types.
@@ -81,6 +81,7 @@ inline namespace fundamental_v3
       constexpr strong_int& operator%=(strong_int y)  noexcept
       { this->value %= y.value; return *this; }
 
+      //fixme: do we want the Bitwise logic operators for an integer
       // Bitwise logic operators
       friend constexpr strong_int operator~(strong_int x)  noexcept
       { return strong_int(~x.value); }
@@ -117,11 +118,15 @@ inline namespace fundamental_v3
       friend constexpr bool operator>=(strong_int x, strong_int y)  noexcept { return x.value >= y.value; }
   };
 
-  template <class _Tag, class _Default, class _UT>
-  constexpr strong_int<_Tag, _UT, _Default> make_strong_int(_UT x)
+  template <class Tag, class UT>
+  constexpr strong_int<Tag, UT, uninitialized_t> make_strong_int(UT x)
   {
-    return strong_int<_Tag, _UT, _Default>(x);
+    return strong_int<Tag, UT, uninitialized_t>(x);
   }
+
+  //! underlying_type specialization for strong_int
+  template <class Tag, class UT, class Default>
+  struct underlying_type<strong_int<Tag,UT,Default>> { using type = UT; };
 
 }
 }

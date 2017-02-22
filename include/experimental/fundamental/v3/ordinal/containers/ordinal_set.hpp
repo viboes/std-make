@@ -123,7 +123,7 @@ inline namespace fundamental_v3
       constexpr ordinal_set() noexcept
       {
       }
-      // constexpr
+      // fixme: constexpr
       // Need to be refactored to be a constexpr
       // error: constexpr constructor does not have empty body
       explicit ordinal_set(T setting)
