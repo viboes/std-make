@@ -12,6 +12,7 @@
 namespace stdex = std::experimental;
 
 using OrangeCount = stdex::strong_int<class OrangeTag, int>;
+using OrangeCountDC = stdex::strong_int<class OrangeTag, int,stdex::default_initialized_t>;
 using AppelCount = stdex::strong_int<class AppelTag, int>;
 
 OrangeCount add(OrangeCount x, OrangeCount y){
@@ -31,11 +32,13 @@ int main()
 {
   {
     auto x = stdex::make_strong_int<OrangeTag>(1);
-    BOOST_TEST(x == OrangeCount{1});
+    BOOST_TEST(x == OrangeCount(1));
   }
 
   {
       //OrangeCount oc1 = 1;     // error - explicit required
+  }
+  {
       OrangeCount oc2{1};
       BOOST_TEST(oc2 == OrangeCount{1});
       short s=1;
@@ -66,14 +69,35 @@ int main()
     #endif
       }
       { // default constructor
-        OrangeCount oc;
-        BOOST_TEST(oc == OrangeCount{});
+        OrangeCountDC oc;
+        BOOST_TEST(oc == OrangeCountDC{});
       }
-      { // constructor from Int
+      { // constructor from UT
         OrangeCount oc{1};
         BOOST_TEST(oc == OrangeCount{1});
       }
-
+      { // constructor from implicitly convertible to UT
+        short s=1;
+        OrangeCount oc{s};
+        BOOST_TEST(oc == OrangeCount{1});
+      }
+      { // copy constructor
+        OrangeCount oc1{1};
+        OrangeCount oc2{oc1};
+        BOOST_TEST(oc1 == oc2);
+      }
+      { // assignment
+        OrangeCount oc1{1};
+        OrangeCount oc2;
+        oc2 = oc1;
+        BOOST_TEST(oc2 == oc1);
+      }
+#if COMPILE_ERROR
+      { // assignment from UT
+        OrangeCount oc1{1};
+        oc1 = 2; // error
+      }
+#endif
       { // operator+(x)
         OrangeCount oc{1};
         OrangeCount oc2 = +oc;

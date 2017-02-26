@@ -11,6 +11,7 @@
 #include <experimental/fundamental/v3/strong/underlying_type.hpp>
 
 #include <stdexcept>
+#include <limits>
 
 
 namespace std
@@ -64,7 +65,7 @@ inline namespace fundamental_v3
       }
       // copy constructor/assignment default
       constexpr strong_bounded_int() noexcept : base_type() {}
-      constexpr strong_bounded_int(UT v) : base_type(cast(v)) {}
+      constexpr explicit strong_bounded_int(UT v) : base_type(cast(v)) {}
 
       // additive operators
       friend constexpr strong_bounded_int operator+(strong_bounded_int x)  noexcept
@@ -158,6 +159,15 @@ inline namespace fundamental_v3
 
 }
 }
+
+  template <class Tag, class UT, UT Low, UT High, class Default>
+  struct numeric_limits<experimental::strong_bounded_int<Tag,UT,Low,High, Default>> : numeric_limits<UT> {
+      using T = experimental::strong_bounded_int<Tag,UT,Low,High, Default>;
+          static constexpr T min() noexcept { return T(Low); }
+          static constexpr T max() noexcept { return T(High); }
+          static constexpr T lowest() noexcept { return T(Low); }
+  };
+
 }
 
 #endif // header

@@ -12,6 +12,7 @@
 namespace stdex = std::experimental;
 
 using Frame = stdex::strong_bounded_int<class FrameTag, int, -1023, 1023>;
+using FrameDC = stdex::strong_bounded_int<class FrameTag, int, -1023, 1023, stdex::default_initialized_t>;
 using Slot = stdex::strong_bounded_int<class SlotTag, int, 0, 6>;
 
 Frame add(Frame x, Frame y){
@@ -46,11 +47,16 @@ int main()
 
   }
   { // default constructor
-    Frame oc;
-    BOOST_TEST(oc == Frame{});
+    FrameDC oc;
+    BOOST_TEST(oc == FrameDC{});
   }
-  { // constructor from Int
+  { // constructor from UT
     Frame oc{1};
+    BOOST_TEST(oc == Frame{1});
+  }
+  { // constructor from implicitly convertible to UT
+    short s=1;
+    Frame oc{s};
     BOOST_TEST(oc == Frame{1});
   }
   { // constructor from invalid Int
@@ -60,7 +66,23 @@ int main()
     } catch(stdex::bad_bounded_int_cast& ex) {
     }
   }
-
+  { // copy constructor
+    Frame oc1{1};
+    Frame oc2{oc1};
+    BOOST_TEST(oc1 == oc2);
+  }
+  { // assignment
+    Frame oc1{1};
+    Frame oc2;
+    oc2 = oc1;
+    BOOST_TEST(oc2 == oc1);
+  }
+#if COMPILE_ERROR
+  { // assignment from UT
+    Frame oc1{1};
+    oc1 = 2; // error
+  }
+#endif
 
   { // operator+(x)
     Frame oc{1};
