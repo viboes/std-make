@@ -235,17 +235,17 @@ namespace sum_type {
     constexpr size_t not_empty_v = not_empty<ST>::value;
 
     template <size_t I, class ST
-      , class= std::enable_if_t< I < size_v<remove_cv_t<remove_reference_t<ST>>> >
+      , class= std::enable_if_t< I < size_v<meta::uncvref_t<ST>> >
     >
     constexpr decltype(auto) get(ST && st) noexcept
     {
-        return traits<remove_cv_t<remove_reference_t<ST>>>::template get<I>(forward<ST>(st));
+        return traits<meta::uncvref_t<ST>>::template get<I>(forward<ST>(st));
     }
 
     template <class V, class ST>
     constexpr decltype(auto) visit(V&& v, ST && st) noexcept
     {
-        return traits<remove_cv_t<remove_reference_t<ST>>>::visit(forward<V>(v), forward<ST>(st));
+        return traits<meta::uncvref_t<ST>>::visit(forward<V>(v), forward<ST>(st));
     }
 
     template <class ST>
@@ -255,7 +255,7 @@ namespace sum_type {
     constexpr size_t is_empty(ST && st) noexcept { return sum_type::empty_v<remove_reference_t<ST>>; }
 
     template <class ST>
-    using alternative_sequence_for = make_index_sequence<sum_type::size_v<remove_cv_t<remove_reference_t<ST>>>>;
+    using alternative_sequence_for = make_index_sequence<sum_type::size_v<meta::uncvref_t<ST>>>;
 
     namespace detail {
       template <class ST, class Ids>
@@ -267,7 +267,7 @@ namespace sum_type {
       };
     }
     template <class ST>
-    struct alternatives : detail::alternatives<remove_cv_t<remove_reference_t<ST>>, sum_type::alternative_sequence_for<ST>> {};
+    struct alternatives : detail::alternatives<meta::uncvref_t<ST>, sum_type::alternative_sequence_for<ST>> {};
 
   }
 

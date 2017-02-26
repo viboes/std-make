@@ -59,17 +59,17 @@ namespace product_type
 
   template <class F, class ProductType
   // todo add constraint on F
-  , class = enable_if_t< is_product_type_v<remove_cv_t<remove_reference_t<ProductType>>> >
+  , class = enable_if_t< is_product_type_v<meta::uncvref_t<ProductType>> >
   >
   constexpr decltype(auto) transform(ProductType&& pt, F&& f)
   {
-      return detail::p_transform_impl<type_constructor_t<remove_cv_t<remove_reference_t<ProductType>>>>(
+      return detail::p_transform_impl<type_constructor_t<meta::uncvref_t<ProductType>>>(
           forward<ProductType>(pt), forward<F>(f),
           product_type::element_sequence_for<ProductType>{});
   }
   template <class TC, class F, class ProductType
   // todo add constraint on F
-  , class = enable_if_t< is_product_type_v<remove_cv_t<remove_reference_t<ProductType>>> >
+  , class = enable_if_t< is_product_type_v<meta::uncvref_t<ProductType>> >
   >
   constexpr decltype(auto) transform(ProductType&& pt, F&& f)
   {
@@ -80,17 +80,17 @@ namespace product_type
 
   template <class F, class ProductType
   // todo add constraint on F
-  , class = enable_if_t< is_product_type_v<remove_cv_t<remove_reference_t<ProductType>>> >
+  , class = enable_if_t< is_product_type_v<meta::uncvref_t<ProductType>> >
   >
   constexpr decltype(auto) n_transform(ProductType&& pt, F&& f)
   {
-      return detail::n_transform_impl<type_constructor_t<remove_cv_t<remove_reference_t<ProductType>>>>(
+      return detail::n_transform_impl<type_constructor_t<meta::uncvref_t<ProductType>>>(
           forward<ProductType>(pt), forward<F>(f),
           product_type::element_sequence_for<ProductType>{});
   }
   template <class TC, class F, class ProductType
   // todo add constraint on F
-  , class = enable_if_t< is_product_type_v<remove_cv_t<remove_reference_t<ProductType>>> >
+  , class = enable_if_t< is_product_type_v<meta::uncvref_t<ProductType>> >
   >
   constexpr decltype(auto) n_transform(ProductType&& pt, F&& f)
   {
@@ -102,17 +102,17 @@ namespace product_type
 
   template <class F, class ProductType
   // todo add constraint on F
-  , class = enable_if_t< is_product_type_v<remove_cv_t<remove_reference_t<ProductType>>> >
+  , class = enable_if_t< is_product_type_v<meta::uncvref_t<ProductType>> >
   >
   constexpr decltype(auto) p_transform(ProductType&& pt, F&& f)
   {
-      return detail::p_transform_impl<type_constructor_t<remove_cv_t<remove_reference_t<ProductType>>>>(
+      return detail::p_transform_impl<type_constructor_t<meta::uncvref_t<ProductType>>>(
           forward<ProductType>(pt), forward<F>(f),
           product_type::element_sequence_for<ProductType>{});
   }
   template <class TC, class F, class ProductType
   // todo add constraint on F
-  , class = enable_if_t< is_product_type_v<remove_cv_t<remove_reference_t<ProductType>>> >
+  , class = enable_if_t< is_product_type_v<meta::uncvref_t<ProductType>> >
   >
   constexpr decltype(auto) p_transform(ProductType&& pt, F&& f)
   {

@@ -206,11 +206,11 @@ namespace detail
     constexpr bool not_empty_v = not_empty<PT>::value;
 
     template <size_t I, class PT
-      , class= std::enable_if_t< I < size_v<remove_cv_t<remove_reference_t<PT>>> >
+      , class= std::enable_if_t< I < size_v<meta::uncvref_t<PT>> >
     >
     constexpr decltype(auto) get(PT && pt) noexcept
     {
-        return traits<remove_cv_t<remove_reference_t<PT>>>::template get<I>(forward<PT>(pt));
+        return traits<meta::uncvref_t<PT>>::template get<I>(forward<PT>(pt));
     }
 
     template <class PT>

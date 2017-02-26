@@ -67,12 +67,12 @@ namespace product_type
   template <class PT1, class PT2
   , class = enable_if_t<
         product_type_detail::have_same_size<
-          PT2, remove_cv_t<remove_reference_t<PT1>>,
-          (is_product_type_v<PT2> && is_product_type_v<remove_cv_t<remove_reference_t<PT1>>>)
+          PT2, meta::uncvref_t<PT1>,
+          (is_product_type_v<PT2> && is_product_type_v<meta::uncvref_t<PT1>>)
         >::value
       && product_type_detail::have_assignable_elements<
-          PT2&, remove_cv_t<remove_reference_t<PT1>&&>,
-          (is_product_type_v<PT2> && is_product_type_v<remove_cv_t<remove_reference_t<PT1>>>),
+          PT2&, meta::uncvref_t<PT1>&&,
+          (is_product_type_v<PT2> && is_product_type_v<meta::uncvref_t<PT1>>),
           product_type::element_sequence_for<PT2>
         >::value
     >

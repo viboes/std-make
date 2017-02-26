@@ -134,11 +134,11 @@ namespace std
           constexpr bool has_members_begin_end_v = has_members_begin_end<T>::value;
 
         template <class T>
-        constexpr auto begin(T&& x) noexcept -> decltype( traits<remove_cv_t<remove_reference_t<T>>>::begin(forward<T>(x)) )
-        { return traits<remove_cv_t<remove_reference_t<T>>>::begin(forward<T>(x));}
+        constexpr auto begin(T&& x) noexcept -> decltype( traits<meta::uncvref_t<T>>::begin(forward<T>(x)) )
+        { return traits<meta::uncvref_t<T>>::begin(forward<T>(x));}
         template <class T>
-        constexpr auto end(T&& x) noexcept -> decltype( traits<remove_cv_t<remove_reference_t<T>>>::end(forward<T>(x)) )
-        { return traits<remove_cv_t<remove_reference_t<T>>>::end(forward<T>(x));}
+        constexpr auto end(T&& x) noexcept -> decltype( traits<meta::uncvref_t<T>>::end(forward<T>(x)) )
+        { return traits<meta::uncvref_t<T>>::end(forward<T>(x));}
 
         // overload for c-arrays
 #if 0

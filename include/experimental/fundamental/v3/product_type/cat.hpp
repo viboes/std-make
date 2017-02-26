@@ -33,7 +33,7 @@ namespace product_type
 
   template <class ...ProductTypes
 #if defined JASEL_HAS_FOLD_EXPRESSIONS
-  , class = enable_if_t< (is_product_type_v<remove_cv_t<remove_reference_t<ProductTypes>>> && ...) >
+  , class = enable_if_t< (is_product_type_v<meta::uncvref_t<ProductTypes>> && ...) >
 #else
   // todo Add for C++14
 #endif

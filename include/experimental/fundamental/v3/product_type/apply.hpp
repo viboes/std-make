@@ -50,7 +50,7 @@ namespace product_type
 
   template <class F, class ProductType
   // todo add constraint on F
-  , class = enable_if_t< is_product_type_v<remove_cv_t<remove_reference_t<ProductType>>> >
+  , class = enable_if_t< is_product_type_v<meta::uncvref_t<ProductType>> >
   >
   constexpr decltype(auto) apply(F&& f, ProductType&& pt)
   {

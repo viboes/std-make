@@ -42,7 +42,7 @@ namespace detail {
 }
   template <class Char, class Traits, class PT
   , class = enable_if_t<
-      is_product_type_v<remove_cv_t<remove_reference_t<PT>>>
+      is_product_type_v<meta::uncvref_t<PT>>
     >
   >
   constexpr void stream_insert(basic_ostream<Char, Traits>& os, PT const& pt)

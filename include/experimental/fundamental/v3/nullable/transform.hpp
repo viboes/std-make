@@ -36,8 +36,8 @@ namespace nullable
   template <class N, class F
   // todo add constraint on F
   //, class = enable_if_t<
-  //    is_nullable_v<remove_cv_t<remove_reference_t<N>>>
-  // && is_type_constructible_v<remove_cv_t<remove_reference_t<N>>>
+  //    is_nullable_v<meta::uncvref_t<N>>
+  // && is_type_constructible_v<meta::uncvref_t<N>>
   //>
   >
   constexpr meta::invoke<TypeConstructor<decay_t<N>>, meta::ResultType<decay_t<F>, value_type_t<decay_t<N>>>>
