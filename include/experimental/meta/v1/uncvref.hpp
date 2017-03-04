@@ -22,7 +22,7 @@ inline namespace v1
 {
 
   template <class T>
-  struct uncvref :remove_cv<remove_reference_t<T>>  {};
+  struct uncvref : remove_cv<eval<remove_reference<T>>>  {};
 
   template <class T>
   using uncvref_t = eval<uncvref<T>>;

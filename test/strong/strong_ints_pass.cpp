@@ -8,11 +8,12 @@
 #include <experimental/strong_ints.hpp>
 
 #include <boost/detail/lightweight_test.hpp>
+#if  __cplusplus >= 201402L
 
 namespace stdex = std::experimental;
 
 using OrangeCount = stdex::strong_int<class OrangeTag, int>;
-using OrangeCountDC = stdex::strong_int<class OrangeTag, int,stdex::default_initialized_t>;
+using OrangeCountDC = stdex::strong_int<class OrangeTag, int>;
 using AppelCount = stdex::strong_int<class AppelTag, int>;
 
 OrangeCount add(OrangeCount x, OrangeCount y){
@@ -26,10 +27,12 @@ struct X {
 struct Y {
     explicit operator int() { return true; }
 };
-
+#endif
 
 int main()
 {
+
+#if  __cplusplus >= 201402L
   {
     auto x = stdex::make_strong_int<OrangeTag>(1);
     BOOST_TEST(x == OrangeCount(1));
@@ -68,8 +71,22 @@ int main()
           OrangeCount es {X{}};        // ok, but shouldn't this be forbiden also?
     #endif
       }
-      { // default constructor
+      { // uninitialize default constructor
         OrangeCountDC oc;
+        (void)oc;
+        //not initialized
+        //BOOST_TEST(oc == OrangeCountDC{});
+      }
+      { // constructor from UT
+        OrangeCount oc{1};
+        BOOST_TEST(oc == OrangeCount{1});
+      }
+      { // zero-initializer C++98 default constructor
+        OrangeCountDC oc = OrangeCountDC();
+        BOOST_TEST(oc == OrangeCountDC{});
+      }
+      { // zero_initializee C++11 default constructor
+        OrangeCountDC oc{};
         BOOST_TEST(oc == OrangeCountDC{});
       }
       { // constructor from UT
@@ -234,6 +251,7 @@ int main()
       }
 
   }
+#endif
   return ::boost::report_errors();
 }
 

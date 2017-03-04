@@ -51,6 +51,23 @@ typedef stdex::strong_enum<E, std::int8_t> ES;
 typedef stdex::strong_enum<SE::type, std::int8_t> SSE;
 typedef stdex::ordinal_enum<E, std::int8_t> OE;
 
+static_assert(! std::is_pod<EC>::value, "");
+static_assert(! std::is_trivially_default_constructible<EC>::value, "");
+static_assert(std::is_trivially_copyable<EC>::value, "");
+static_assert(std::is_standard_layout<EC>::value, "");
+static_assert(! std::is_trivial<EC>::value, "");
+
+static_assert(std::is_pod<ES>::value, "");
+static_assert(std::is_trivially_default_constructible<ES>::value, "");
+static_assert(std::is_trivially_copyable<ES>::value, "");
+static_assert(std::is_standard_layout<ES>::value, "");
+static_assert(std::is_trivial<ES>::value, "");
+
+static_assert(std::is_pod<OE>::value, "");
+static_assert(std::is_trivially_default_constructible<OE>::value, "");
+static_assert(std::is_trivially_copyable<OE>::value, "");
+static_assert(std::is_standard_layout<OE>::value, "");
+static_assert(std::is_trivial<OE>::value, "");
 void f(ES) {}
 void f(SSE) {}
 
@@ -89,18 +106,16 @@ int main()
   }
   // throw if not a value
   {
-    EC e;
+    //EC e;
       BOOST_TEST( ! stdex::is_valid_enumerator<E>(5) );
       try {        EC es(E(5));        } catch(...) {}
   }
   {
-      ES es(stdex::uninitialized_t{});
-      E e = es.enum_value();
-      static_cast<void>(e);
-      //BOOST_TEST(e==0);
+      ES es;
+      static_cast<void>(es);
   }
   {
-      ES es(stdex::zero_initialized_t{});
+      ES es = ES();
       E e = es.enum_value();
       BOOST_TEST(e==0);
   }
@@ -108,6 +123,20 @@ int main()
   {
       ES es;
       f(ES());
+      (void)es;
+      //not initialized
+      //E e = es.get();
+      //BOOST_TEST(e==E(0));
+  }
+  {
+      ES es{};
+      f(ES{});
+      E e = es.get();
+      BOOST_TEST(e==E(0));
+  }
+  {
+      ES es= ES();
+      f(ES{});
       E e = es.get();
       BOOST_TEST(e==E(0));
   }
@@ -115,8 +144,10 @@ int main()
   {
       SSE es;
       f(SSE());
-      SE::type e = es.get();
-      BOOST_TEST(e==SE::type(0));
+      (void)es;
+      //not initialized
+      //SE::type e = es.get();
+      //BOOST_TEST(e==SE::type(0));
   }
   // constructs from  Enum
   {

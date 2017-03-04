@@ -58,16 +58,16 @@ inline namespace fundamental_v3
 
 
 
-  template <class E, class UT=typename underlying_type<E>::type, class Default = default_initialized_t>
-  struct enum_wrapper : protected_wrapper<UT, Default>
+  template <class E, class UT=typename underlying_type<E>::type>
+  struct enum_wrapper : protected_wrapper<UT>
   {
-      using base_type = protected_wrapper<UT, Default>;
+      using base_type = protected_wrapper<UT>;
       using base_type::base_type;
 
       typedef E enum_type;
 
       // fixme: Why do we need this default constructor
-      constexpr enum_wrapper() noexcept : base_type() {}
+      constexpr enum_wrapper() noexcept = default;
       constexpr enum_wrapper(enum_type v) noexcept : base_type(UT(v)) {}
 
       enum_type enum_value() const noexcept { return enum_type(this->value); }
@@ -86,12 +86,11 @@ inline namespace fundamental_v3
   //! };
   //! typedef strong_enum<SE> SSE
 
-  template <class E, class UT=typename underlying_type<E>::type, class Default = default_initialized_t>
-  struct strong_enum final : enum_wrapper<E, UT, Default>
+  template <class E, class UT=typename underlying_type<E>::type>
+  struct strong_enum final : enum_wrapper<E, UT>
   {
-      using base_type = enum_wrapper<E, UT, Default>;
+      using base_type = enum_wrapper<E, UT>;
       using base_type::enum_wrapper;
-      //constexpr strong_enum() noexcept : base_type() {}
 
       friend constexpr bool operator==(strong_enum x, strong_enum y) noexcept { return x.value == y.value; }
       friend constexpr bool operator!=(strong_enum x, strong_enum y) noexcept { return x.value != y.value; }
@@ -102,20 +101,19 @@ inline namespace fundamental_v3
 
   };
 
-  template <class E, class UT, class D>
-  struct underlying_type<strong_enum<E,UT,D>> { typedef UT type; };
+  template <class E, class UT>
+  struct underlying_type<strong_enum<E,UT>> { typedef UT type; };
 
   // safe_enum is a strong_enum that checks the validity of the values of the enum using is_valid_enum
-  template <class E, class UT=typename underlying_type<E>::type, class Default = default_initialized_t>
-  struct safe_enum final: enum_wrapper<E,UT, Default>
+  template <class E, class UT=typename underlying_type<E>::type>
+  struct safe_enum final: enum_wrapper<E,UT>
   {
-      using base_type = enum_wrapper<E,UT, Default>;
+      using base_type = enum_wrapper<E,UT>;
       using base_type::base_type;
       using underlying_t = typename base_type::underlying_t;
 
-      // fixme: Why do we need this default constructor
-      constexpr safe_enum() noexcept : base_type() {}
       explicit safe_enum(underlying_t v): base_type(UT(to_valid_enum<E>(v))) {}
+      //constexpr safe_enum() noexcept : safe_enum(0) {};
 
       friend constexpr bool operator==(safe_enum x, safe_enum y) noexcept { return x.value == y.value; }
       friend constexpr bool operator!=(safe_enum x, safe_enum y) noexcept { return x.value != y.value; }
@@ -126,30 +124,32 @@ inline namespace fundamental_v3
 
   };
 
-  template <class E, class UT, class D>
-  struct underlying_type<safe_enum<E,UT,D>> { typedef UT type; };
+  template <class E, class UT>
+  struct underlying_type<safe_enum<E,UT>> { typedef UT type; };
 
   // ordinal_enum is a strong_enum that checks the validity of the values of the enum using is_enumerator
   // is_enumerator is specialized for ordinal enums
-  template <class E, class UT=typename underlying_type<E>::type, class Default = default_initialized_t>
-  struct ordinal_enum final: enum_wrapper<E,UT, Default>
+  template <class E, class UT=typename underlying_type<E>::type>
+  struct ordinal_enum final: enum_wrapper<E,UT>
   {
-      using base_type = enum_wrapper<E,UT, Default>;
+      using base_type = enum_wrapper<E,UT>;
       using base_type::base_type;
       using underlying_t = typename  base_type::underlying_t;
 
-    explicit ordinal_enum(underlying_t v): base_type(UT(to_enumerator<E>(v))) {}
+      // ordinal_enum is not safe if the default value is not one of the enumerators
+      constexpr ordinal_enum() noexcept = default;
+      explicit ordinal_enum(underlying_t v): base_type(UT(to_enumerator<E>(v))) {}
 
-    friend constexpr bool operator==(ordinal_enum x, ordinal_enum y) noexcept { return x.value == y.value; }
-    friend constexpr bool operator!=(ordinal_enum x, ordinal_enum y) noexcept { return x.value != y.value; }
-    friend constexpr bool operator<(ordinal_enum x, ordinal_enum y) noexcept { return x.value < y.value; }
-    friend constexpr bool operator<=(ordinal_enum x, ordinal_enum y) noexcept { return x.value <= y.value; }
-    friend constexpr bool operator>(ordinal_enum x, ordinal_enum y) noexcept { return x.value > y.value; }
-    friend constexpr bool operator>=(ordinal_enum x, ordinal_enum y) noexcept { return x.value >= y.value; }
+      friend constexpr bool operator==(ordinal_enum x, ordinal_enum y) noexcept { return x.value == y.value; }
+      friend constexpr bool operator!=(ordinal_enum x, ordinal_enum y) noexcept { return x.value != y.value; }
+      friend constexpr bool operator<(ordinal_enum x, ordinal_enum y) noexcept { return x.value < y.value; }
+      friend constexpr bool operator<=(ordinal_enum x, ordinal_enum y) noexcept { return x.value <= y.value; }
+      friend constexpr bool operator>(ordinal_enum x, ordinal_enum y) noexcept { return x.value > y.value; }
+      friend constexpr bool operator>=(ordinal_enum x, ordinal_enum y) noexcept { return x.value >= y.value; }
 
   };
-  template <class E, class UT, class D>
-  struct underlying_type<ordinal_enum<E,UT,D>> { typedef UT type; };
+  template <class E, class UT>
+  struct underlying_type<ordinal_enum<E,UT>> { typedef UT type; };
 
 
 }

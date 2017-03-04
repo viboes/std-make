@@ -9,18 +9,20 @@
 
 #include <boost/detail/lightweight_test.hpp>
 
+#if __cplusplus >= 201402L
 namespace stdex = std::experimental;
 
 using Frame = stdex::strong_bounded_int<class FrameTag, int, -1023, 1023>;
-using FrameDC = stdex::strong_bounded_int<class FrameTag, int, -1023, 1023, stdex::default_initialized_t>;
+using FrameDC = stdex::strong_bounded_int<class FrameTag, int, -1023, 1023>;
 using Slot = stdex::strong_bounded_int<class SlotTag, int, 0, 6>;
 
 Frame add(Frame x, Frame y){
   return x+y;
 }
-
+#endif
 int main()
 {
+#if __cplusplus >= 201402L
 
   {
       //Frame fn1 = 1;     // error - explicit required
@@ -48,7 +50,9 @@ int main()
   }
   { // default constructor
     FrameDC oc;
-    BOOST_TEST(oc == FrameDC{});
+    (void)oc;
+    // not initialized
+    //BOOST_TEST(oc == FrameDC{});
   }
   { // constructor from UT
     Frame oc{1};
@@ -218,7 +222,7 @@ int main()
     Frame oc2{2};
     BOOST_TEST( oc1>=oc2 );
   }
-
+#endif
   return ::boost::report_errors();
 }
 

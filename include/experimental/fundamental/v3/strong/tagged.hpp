@@ -23,14 +23,13 @@ inline  namespace fundamental_v3
     //!
     //! @tparam Tag the tag type
     //! @tparam UT the underlying type
-    //! @tparam Default the default constructor policy, defaults to default_initialized
 
-    template <class Tag, class UT, class Default = default_initialized_t>
+    template <class Tag, class UT>
     struct tagged
-    : wrapper<UT, Default>
+    : wrapper<UT>
     {
       using tag_type = Tag;
-      using base_type = wrapper<UT, Default>;
+      using base_type = wrapper<UT>;
       using base_type::wrapper;
     };
 
@@ -38,13 +37,12 @@ inline  namespace fundamental_v3
     //!
     //! @tparam Tag the tag type
     //! @tparam UT the underlying type
-    //! @tparam Default the default constructor policy, defaults to default_initialized
-    template <class Tag, class UT, class Default = default_initialized_t>
+    template <class Tag, class UT>
     struct public_tagged
-    : public_wrapper<UT, Default>
+    : public_wrapper<UT>
     {
       using tag_type = Tag;
-      using base_type = public_wrapper<UT, Default>;
+      using base_type = public_wrapper<UT>;
       using base_type::base_type;
     };
 
@@ -52,13 +50,12 @@ inline  namespace fundamental_v3
     //!
     //! @tparam Tag the tag type
     //! @tparam UT the underlying type
-    //! @tparam Default the default constructor policy, defaults to default_initialized
-    template <class Tag, class UT, class Default = default_initialized_t>
+    template <class Tag, class UT>
     struct protected_tagged
-    : protected_wrapper<UT, Default>
+    : protected_wrapper<UT>
     {
       using tag_type = Tag;
-      using base_type = protected_wrapper<UT, Default>;
+      using base_type = protected_wrapper<UT>;
       using base_type::base_type;
     };
 
@@ -66,13 +63,12 @@ inline  namespace fundamental_v3
     //!
     //! @tparam Tag the tag type
     //! @tparam UT the underlying type
-    //! @tparam Default the default constructor policy, defaults to default_initialized
-    template <class Tag, class UT, class Default = default_initialized_t>
+    template <class Tag, class UT>
     struct private_tagged
-    : private_wrapper<UT, Default>
+    : private_wrapper<UT>
     {
       using tag_type = Tag;
-      using base_type = private_wrapper<UT, Default>;
+      using base_type = private_wrapper<UT>;
       using base_type::base_type;
     };
 

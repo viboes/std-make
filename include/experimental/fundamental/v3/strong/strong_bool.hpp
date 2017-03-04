@@ -37,14 +37,14 @@ inline namespace fundamental_v3
 
   </code>
   */
-  template <class Tag, class Bool = bool, class Default = uninitialized_t>
-  struct strong_bool final : protected_tagged<Tag, Bool, Default>
+  template <class Tag, class Bool = bool>
+  struct strong_bool final : protected_tagged<Tag, Bool>
   {
-      using base_type = protected_tagged<Tag, Bool, Default>;
+      using base_type = protected_tagged<Tag, Bool>;
       using base_type::base_type;
 
       // copy constructor/assignment default
-      constexpr strong_bool() noexcept : base_type() {}
+      constexpr strong_bool() noexcept = default;
       constexpr explicit strong_bool (int) = delete;
       constexpr explicit strong_bool (double) = delete;
       constexpr explicit strong_bool (void*) = delete;
@@ -62,9 +62,15 @@ inline namespace fundamental_v3
       //!@}
   };
 
+  static_assert(std::is_pod<strong_bool<bool>>::value, "");
+  static_assert(std::is_trivially_default_constructible<strong_bool<bool>>::value, "");
+  static_assert(std::is_trivially_copyable<strong_bool<bool>>::value, "");
+  static_assert(std::is_standard_layout<strong_bool<bool>>::value, "");
+  static_assert(std::is_trivial<strong_bool<bool>>::value, "");
+
   //! underlying_type specialization for strong_bool
-  template <class Tag, class Bool, class Default>
-  struct underlying_type<strong_bool<Tag, Bool, Default>> { using type = Bool; };
+  template <class Tag, class Bool>
+  struct underlying_type<strong_bool<Tag, Bool>> { using type = Bool; };
 
 }
 }

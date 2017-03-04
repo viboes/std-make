@@ -7,6 +7,8 @@
 #ifndef JASEL_FUNDAMENTAL_V3_STRONG_STRONG_INT_HPP
 #define JASEL_FUNDAMENTAL_V3_STRONG_STRONG_INT_HPP
 
+#if __cplusplus >= 201402L
+
 #include <experimental/fundamental/v3/strong/tagged.hpp>
 #include <experimental/fundamental/v3/strong/underlying_type.hpp>
 
@@ -38,10 +40,10 @@ inline namespace fundamental_v3
   </code>
   */
 
-  template <class Tag, class UT, class Default = uninitialized_t>
-  struct strong_int final : protected_tagged<Tag, UT, Default>
+  template <class Tag, class UT>
+  struct strong_int final : protected_tagged<Tag, UT>
   {
-      using base_type = protected_tagged<Tag, UT, Default>;
+      using base_type = protected_tagged<Tag, UT>;
       using base_type::base_type;
 
       // additive operators
@@ -121,21 +123,28 @@ inline namespace fundamental_v3
   };
 
   template <class Tag, class UT>
-  constexpr strong_int<Tag, UT, uninitialized_t> make_strong_int(UT x)
+  constexpr strong_int<Tag, UT> make_strong_int(UT x)
   {
-    return strong_int<Tag, UT, uninitialized_t>(x);
+    return strong_int<Tag, UT>(x);
   }
 
   //! underlying_type specialization for strong_int
-  template <class Tag, class UT, class Default>
-  struct underlying_type<strong_int<Tag,UT,Default>> { using type = UT; };
+  template <class Tag, class UT>
+  struct underlying_type<strong_int<Tag,UT>> { using type = UT; };
+
+  static_assert(std::is_pod<strong_int<bool,int>>::value, "");
+  static_assert(std::is_trivially_default_constructible<strong_int<bool,int>>::value, "");
+  static_assert(std::is_trivially_copyable<strong_int<bool,int>>::value, "");
+  static_assert(std::is_standard_layout<strong_int<bool,int>>::value, "");
+  static_assert(std::is_trivial<strong_int<bool,int>>::value, "");
 
 }
 }
 
-  //template <class Tag, class UT, class Default>
-  //struct numeric_limits<experimental::strong_int<Tag,UT,Default>> : numeric_limits<UT> {  };
+  //template <class Tag, class UT>
+  //struct numeric_limits<experimental::strong_int<Tag,UT>> : numeric_limits<UT> {  };
+
 
 }
-
+#endif
 #endif // header

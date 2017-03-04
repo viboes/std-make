@@ -3,7 +3,7 @@
 // http://www.boost.org/LICENSE_1_0.txt)
 //
 // Copyright (C) 2017 Vicente J. Botet Escriba
-
+#error
 #ifndef JASEL_FUNDAMENTAL_V3_STRONG_INITIALIZER_TAGS_HPP
 #define JASEL_FUNDAMENTAL_V3_STRONG_INITIALIZER_TAGS_HPP
 

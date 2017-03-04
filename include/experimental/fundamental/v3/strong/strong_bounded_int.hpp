@@ -7,6 +7,8 @@
 #ifndef JASEL_FUNDAMENTAL_V3_STRONG_STRONG_INT_HPP
 #define JASEL_FUNDAMENTAL_V3_STRONG_STRONG_INT_HPP
 
+#if __cplusplus >= 201402L
+
 #include <experimental/fundamental/v3/strong/wrapper.hpp>
 #include <experimental/fundamental/v3/strong/underlying_type.hpp>
 
@@ -42,10 +44,10 @@ inline namespace fundamental_v3
 
   </code>
   */
-  template <class Tag, class UT, UT Low, UT High, class Default = uninitialized_t>
-  struct strong_bounded_int final : protected_wrapper<UT, Default>
+  template <class Tag, class UT, UT Low, UT High>
+  struct strong_bounded_int final : protected_wrapper<UT>
   {
-      using base_type = protected_wrapper<UT, Default>;
+      using base_type = protected_wrapper<UT>;
       using base_type::base_type;
       using base_type::underlying;
 
@@ -64,7 +66,7 @@ inline namespace fundamental_v3
         throw bad_bounded_int_cast();
       }
       // copy constructor/assignment default
-      constexpr strong_bounded_int() noexcept : base_type() {}
+      constexpr strong_bounded_int() noexcept = default;
       constexpr explicit strong_bounded_int(UT v) : base_type(cast(v)) {}
 
       // additive operators
@@ -157,17 +159,24 @@ inline namespace fundamental_v3
       friend constexpr bool operator>=(strong_bounded_int x, strong_bounded_int y)  noexcept { return x.value >= y.value; }
   };
 
+  static_assert(std::is_pod<strong_bounded_int<bool,int,0,3>>::value, "");
+  static_assert(std::is_trivially_default_constructible<strong_bounded_int<bool,int,0,3>>::value, "");
+  static_assert(std::is_trivially_copyable<strong_bounded_int<bool,int,0,3>>::value, "");
+  static_assert(std::is_standard_layout<strong_bounded_int<bool,int,0,3>>::value, "");
+  static_assert(std::is_trivial<strong_bounded_int<bool,int,0,3>>::value, "");
+
+
 }
 }
 
-  template <class Tag, class UT, UT Low, UT High, class Default>
-  struct numeric_limits<experimental::strong_bounded_int<Tag,UT,Low,High, Default>> : numeric_limits<UT> {
-      using T = experimental::strong_bounded_int<Tag,UT,Low,High, Default>;
-          static constexpr T min() noexcept { return T(Low); }
-          static constexpr T max() noexcept { return T(High); }
-          static constexpr T lowest() noexcept { return T(Low); }
+  template <class Tag, class UT, UT Low, UT High>
+  struct numeric_limits<experimental::strong_bounded_int<Tag,UT,Low,High>> : numeric_limits<UT> {
+      using T = experimental::strong_bounded_int<Tag,UT,Low,High>;
+      static constexpr T min() noexcept { return T(Low); }
+      static constexpr T max() noexcept { return T(High); }
+      static constexpr T lowest() noexcept { return T(Low); }
   };
 
 }
-
+#endif
 #endif // header

@@ -8,7 +8,6 @@
 #define JASEL_FUNDAMENTAL_V3_STRONG_WRAPPER_HPP
 
 #include <experimental/fundamental/v3/strong/underlying_type.hpp>
-#include <experimental/fundamental/v3/strong/initializer_tags.hpp>
 
 namespace std
 {
@@ -20,22 +19,14 @@ inline  namespace fundamental_v3
     //! wrapper wraps an underlying type providing access to the underlying value via the underlying function
     //!
     //! @tparam UT the underlying type
-    //! @tparam Default the default constructor policy, defaults to default_initialized
 
-    template <class UT, class Default = default_initialized_t>
+    template <class UT>
     struct wrapper
     {
       //! the underlying type reflected type
       using underlying_t = UT;
 
-      constexpr wrapper() noexcept : wrapper(Default{}) {}
-
-      //! default initialize the underlying value
-      explicit constexpr wrapper(default_initialized_t) noexcept : value() {}
-      //! zero initialize the underlying value
-      explicit constexpr wrapper(zero_initialized_t) noexcept : value{} {}
-      //! not initialize the underlying value
-      explicit constexpr wrapper(uninitialized_t) noexcept {}
+      constexpr wrapper() noexcept = default;
 
       //! explicit conversion from the underlying type
       explicit constexpr wrapper(underlying_t v): value(v) {}
@@ -57,19 +48,18 @@ inline  namespace fundamental_v3
     };
 
     //! underlying_type specialization for wrapper
-    template <class UT, class Default>
-    struct underlying_type<wrapper<UT, Default>>
+    template <class UT>
+    struct underlying_type<wrapper<UT>>
     { typedef UT type; };
 
     //! public_wrapper is a wrapper that provides implicit conversion to the underlying type
     //!
     //! @tparam UT the underlying type
-    //! @tparam Default the default constructor policy, defaults to default_initialized
-    template <class UT, class Default = default_initialized_t>
+    template <class UT>
     struct public_wrapper
-    : wrapper<UT, Default>
+    : wrapper<UT>
     {
-      using base_type = wrapper<UT, Default>;
+      using base_type = wrapper<UT>;
       using typename base_type::underlying_t;
       using base_type::base_type;
       using base_type::underlying;
@@ -86,12 +76,11 @@ inline  namespace fundamental_v3
     //! protected_wrapper is a wrapper that provides explicit conversion to the underlying type
     //!
     //! @tparam UT the underlying type
-    //! @tparam Default the default constructor policy, defaults to default_initialized
-    template <class UT, class Default = default_initialized_t>
+    template <class UT>
     struct protected_wrapper
-    : wrapper<UT, Default>
+    : wrapper<UT>
     {
-      using base_type = wrapper<UT, Default>;
+      using base_type = wrapper<UT>;
       using typename base_type::underlying_t;
       using base_type::base_type;
       using base_type::underlying;
@@ -108,12 +97,11 @@ inline  namespace fundamental_v3
     //! private_wrapper is a wrapper that provides no conversion to the underlying type
     //!
     //! @tparam UT the underlying type
-    //! @tparam Default the default constructor policy, defaults to default_initialized
-    template <class UT, class Default = default_initialized_t>
+    template <class UT>
     struct private_wrapper
-    : wrapper<UT, Default>
+    : wrapper<UT>
     {
-      using base_type = wrapper<UT, Default>;
+      using base_type = wrapper<UT>;
       using base_type::wrapper;
       using base_type::underlying;
 
