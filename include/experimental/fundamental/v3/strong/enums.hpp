@@ -7,6 +7,8 @@
 #ifndef JASEL_FUNDAMENTAL_V3_STRONG_STRONG_ENUMS_HPP
 #define JASEL_FUNDAMENTAL_V3_STRONG_STRONG_ENUMS_HPP
 
+#if __cplusplus >= 201402L
+
 #include <experimental/fundamental/v3/strong/wrapper.hpp>
 #include <experimental/fundamental/v3/strong/underlying_type.hpp>
 #include <experimental/optional.hpp>
@@ -66,7 +68,6 @@ inline namespace fundamental_v3
 
       typedef E enum_type;
 
-      // fixme: Why do we need this default constructor
       constexpr enum_wrapper() noexcept = default;
       constexpr enum_wrapper(enum_type v) noexcept : base_type(UT(v)) {}
 
@@ -156,4 +157,5 @@ inline namespace fundamental_v3
 }
 }
 
+#endif
 #endif // header

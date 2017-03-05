@@ -12,7 +12,7 @@
 #include <experimental/fundamental/v3/strong/tagged.hpp>
 #include <experimental/fundamental/v3/strong/underlying_type.hpp>
 
-//#include <limits>
+#include <limits>
 
 namespace std
 {
@@ -141,8 +141,8 @@ inline namespace fundamental_v3
 }
 }
 
-  //template <class Tag, class UT>
-  //struct numeric_limits<experimental::strong_int<Tag,UT>> : numeric_limits<UT> {  };
+  template <class Tag, class UT>
+  struct numeric_limits<experimental::strong_int<Tag,UT>> : numeric_limits<UT> {  };
 
 
 }

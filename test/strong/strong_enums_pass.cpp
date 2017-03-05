@@ -5,6 +5,8 @@
 
 // <experimental/strong_enums.hpp>
 
+#if __cplusplus >= 201402L
+
 #include <experimental/strong_enums.hpp>
 
 #include <boost/detail/lightweight_test.hpp>
@@ -201,3 +203,9 @@ int main()
   return ::boost::report_errors();
 }
 
+#else
+int main()
+{
+    return 0;
+}
+#endif
