@@ -57,7 +57,7 @@ inline namespace fundamental_v3
            ;
     }
     template <class T>
-    int popcount(T x) noexcept
+    constexpr int popcount(T x) noexcept
     {
       return __builtin_popcount(x);
     }
@@ -143,12 +143,11 @@ inline namespace fundamental_v3
         friend class bit_mask<N,T>;
         bit_mask<N,T>& ref_;
         T pos_;
-        constexpr reference() noexcept;
         constexpr reference(bit_mask<N,T>& ref, T pos) noexcept
           : ref_(ref), pos_(pos)
         { }
       public:
-        //~reference() noexcept        { }
+        constexpr reference() noexcept = delete;
 
         //! assignment from bool
         constexpr reference& operator=(bool x) noexcept
@@ -182,6 +181,8 @@ inline namespace fundamental_v3
           return ref_.flip(pos_);
         }
       };
+
+#if 0
       //! @par Effects: Constructs an object of class \c bit_mask<>, initializing all
       //! bits to zero.
       //! @par Throws: Nothing
@@ -189,6 +190,10 @@ inline namespace fundamental_v3
           : bits(0)
       {
       }
+#endif
+      //! bit_mask is a POD
+      constexpr bit_mask() noexcept = default;
+
       //! @par Effects: Constructs an object of class \c bit_mask<>, initializing the
       //! \c pos bit position to \c 1 and the others to \c 0.
       //! @par Requires:  pos <= N
@@ -283,6 +288,7 @@ inline namespace fundamental_v3
       constexpr bit_mask& operator^=(const bit_mask& rhs) noexcept
       {
         bits ^= rhs.bits;
+        bits &= bit_ops::up_to<N,T>();
         return *this;
       }
 
@@ -294,6 +300,7 @@ inline namespace fundamental_v3
       constexpr bit_mask& operator<<=(size_t pos) noexcept
       {
         bits <<= pos;
+        bits &= bit_ops::up_to<N,T>();
         return *this;
       }
 
@@ -306,6 +313,7 @@ inline namespace fundamental_v3
       constexpr bit_mask& operator>>=(size_t pos) noexcept
       {
         bits >>= pos;
+        bits &= bit_ops::up_to<N,T>();
         return *this;
       }
 
@@ -404,6 +412,7 @@ inline namespace fundamental_v3
       {
         check(flipping);
         bits ^= bit_ops::single<T>(flipping);
+        bits &= bit_ops::up_to<N,T>();
 
         return *this;
       }
