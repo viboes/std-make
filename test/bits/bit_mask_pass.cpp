@@ -3,7 +3,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-// <experimental/ordinal_set.hpp>
+// <experimental/bit_mask.hpp>
 
 #include <experimental/bit_mask.hpp>
 
@@ -23,13 +23,17 @@ int main()
 
   {// Default Constructor
     BitMask bm;
+    (void)bm;
+  }
+  {// Default Constructor
+    BitMask bm{};
     BOOST_TEST( 0 == bm.count() );
     BOOST_TEST( bm.none() );
     BOOST_TEST(! bm[UInt{1}]);
     BOOST_TEST(! bm[UInt{2}]);
   }
   {// Default Constructor
-    constexpr BitMask bm;
+    constexpr BitMask bm{};
     static_assert(0 == bm.count(), "");
     static_assert( bm.none(), "" );
     static_assert(! bm[UInt{1}], "");
@@ -48,14 +52,14 @@ int main()
     static_assert(bm[UInt{2}]==true, "");
   }
   { // operator [T]
-    BitMask bm;
+    BitMask bm{};
     bm[UInt{1}]=true;
     BOOST_TEST( 1 == bm.count() );
     BOOST_TEST( bm.any() );
     BOOST_TEST(bm[UInt{1}]);
   }
   { // set
-    BitMask bm;
+    BitMask bm{};
     bm.set();
     BOOST_TEST_EQ( 0xf , int(bm.to_integer()) );
     BOOST_TEST_EQ( 4 , std::experimental::bit_ops::popcount(0xf0) );
@@ -67,7 +71,7 @@ int main()
     BOOST_TEST(bm[UInt{3}]);
   }
   { // set
-    BitMask bm;
+    BitMask bm{};
     bm.set(UInt{1});
     BOOST_TEST( 1 == bm.count() );
     BOOST_TEST( bm.any() );
@@ -77,7 +81,7 @@ int main()
     BOOST_TEST(! bm[UInt{3}]);
   }
   { // set
-    BitMask bm;
+    BitMask bm{};
     bm.set(UInt{1});
     bm.set(UInt{1}, false);
     BOOST_TEST( 0 == bm.count() );
@@ -87,8 +91,15 @@ int main()
     BOOST_TEST(! bm[UInt{2}]);
     BOOST_TEST(! bm[UInt{3}]);
   }
+  { // set
+    BitMask bm{};
+    try {
+      bm.set(UInt{4});
+      BOOST_TEST(false);
+    } catch(...) {}
+  }
   { // reset
-    BitMask bm;
+    BitMask bm{};
     bm.set(UInt{1});
     bm.set(UInt{3});
     bm.reset();
@@ -100,7 +111,7 @@ int main()
     BOOST_TEST(! bm[UInt{3}]);
   }
   { // reset
-    BitMask bm;
+    BitMask bm{};
     bm.set(UInt{1});
     bm.set(UInt{3});
     bm.reset(UInt{1});
@@ -111,8 +122,15 @@ int main()
     BOOST_TEST(! bm[UInt{2}]);
     BOOST_TEST( bm[UInt{3}]);
   }
+  { // set
+    BitMask bm{};
+    try {
+      bm.reset(UInt{4});
+      BOOST_TEST(false);
+    } catch(...) {}
+  }
   { // flip
-    BitMask bm;
+    BitMask bm{};
     bm.flip();
     BOOST_TEST( bm.all() );
     BOOST_TEST( bm[UInt{0}] );
@@ -120,18 +138,33 @@ int main()
     BOOST_TEST( bm[UInt{2}] );
     BOOST_TEST( bm[UInt{3}] );
   }
+  { // flip
+    BitMask bm{};
+    bm.flip(UInt{1});
+    BOOST_TEST( 1 == bm.count() );
+    BOOST_TEST(! bm[UInt{0}] );
+    BOOST_TEST( bm[UInt{1}] );
+    BOOST_TEST(! bm[UInt{2}] );
+    BOOST_TEST(! bm[UInt{3}] );
+  }
+  { // flip
+    BitMask bm{};
+    bm.flip(UInt{1});
+    bm.flip(UInt{1});
+    BOOST_TEST( 0 == bm.count() );
+  }
   { // to_ulong
-    BitMask bm;
+    BitMask bm{};
     auto x = bm.to_ulong();
     BOOST_TEST( 0 == x);
   }
   { // to_ulong
-    constexpr BitMask bm;
+    constexpr BitMask bm{};
     constexpr auto x = bm.to_ulong();
     static_assert( 0 == x, "");
   }
   { // to_ulong
-    BitMask bm;
+    BitMask bm{};
     bm.set(UInt{1});
     auto x = bm.to_ulong();
     BOOST_TEST( 2 == x);
@@ -142,7 +175,7 @@ int main()
     static_assert( 2 == x, "");
   }
   { // operator~
-    BitMask bm;
+    BitMask bm{};
     auto bm2 = ~bm;
     BOOST_TEST( bm.none() );
     BOOST_TEST( bm2.all() );
@@ -156,7 +189,7 @@ int main()
     BOOST_TEST( bm2[UInt{3}]);
   }
   { // operator~
-    constexpr BitMask bm;
+    constexpr BitMask bm{};
     constexpr auto bm2 = ~bm;
     static_assert( bm.none() , "");
     static_assert( bm2.all() , "");
@@ -169,29 +202,94 @@ int main()
     static_assert( bm2[UInt{2}], "");
     static_assert( bm2[UInt{3}], "");
   }
+  { // operator&
+    BitMask bm1(std::experimental::pos_tag_t{}, UInt{1});
+    BitMask bm2(std::experimental::pos_tag_t{}, UInt{2});
+    auto bm = bm1 & bm2;
+    BOOST_TEST( bm.none() );
+    BOOST_TEST(! bm[UInt{0}]);
+    BOOST_TEST(! bm[UInt{1}]);
+    BOOST_TEST(! bm[UInt{2}]);
+    BOOST_TEST(! bm[UInt{3}]);
+  }
+  { // operator|
+    BitMask bm1(std::experimental::pos_tag_t{}, UInt{1});
+    BitMask bm2(std::experimental::pos_tag_t{}, UInt{2});
+    auto bm = bm1 | bm2;
+    BOOST_TEST( 2 == bm.count() );
+    BOOST_TEST(! bm[UInt{0}]);
+    BOOST_TEST( bm[UInt{1}]);
+    BOOST_TEST( bm[UInt{2}]);
+    BOOST_TEST(! bm[UInt{3}]);
+  }
+  { // operator^
+    BitMask bm1(std::experimental::pos_tag_t{}, UInt{1});
+    BitMask bm2(std::experimental::pos_tag_t{}, UInt{2});
+    auto bm = bm1 ^ bm2;
+    BOOST_TEST( 2 == bm.count() );
+    BOOST_TEST(! bm[UInt{0}]);
+    BOOST_TEST( bm[UInt{1}]);
+    BOOST_TEST( bm[UInt{2}]);
+    BOOST_TEST(! bm[UInt{3}]);
+  }
+  { // operator^
+    BitMask bm1(std::experimental::pos_tag_t{}, UInt{1});
+    BitMask bm2(std::experimental::pos_tag_t{}, UInt{1});
+    auto bm = bm1 ^ bm2;
+    BOOST_TEST( 0 == bm.count() );
+  }
+  { // operator<<
+    BitMask bm1(std::experimental::pos_tag_t{}, UInt{1});
+    auto bm = bm1 << 1;
+    BOOST_TEST( 1 == bm.count() );
+    BOOST_TEST(! bm[UInt{0}]);
+    BOOST_TEST(! bm[UInt{1}]);
+    BOOST_TEST( bm[UInt{2}]);
+    BOOST_TEST(! bm[UInt{3}]);
+  }
+  { // operator<<
+    BitMask bm1(std::experimental::pos_tag_t{}, UInt{1});
+    auto bm = bm1 << 4;
+    BOOST_TEST( 0 == bm.count() );
+  }
+  { // operator>>
+    BitMask bm1(std::experimental::pos_tag_t{}, UInt{1});
+    auto bm = bm1 >> 1;
+    BOOST_TEST( 1 == bm.count() );
+    BOOST_TEST( bm[UInt{0}]);
+    BOOST_TEST(! bm[UInt{1}]);
+    BOOST_TEST(! bm[UInt{2}]);
+    BOOST_TEST(! bm[UInt{3}]);
+  }
+  { // operator>>
+    BitMask bm1(std::experimental::pos_tag_t{}, UInt{1});
+    auto bm = bm1 >> 4;
+    BOOST_TEST( 0 == bm.count() );
+  }
+
   { // operator==
-    BitMask bm1;
-    BitMask bm2;
+    BitMask bm1{};
+    BitMask bm2{};
     BOOST_TEST( bm1 == bm2 );
   }
   { // operator==
-    constexpr BitMask bm1;
-    constexpr BitMask bm2;
+    constexpr BitMask bm1{};
+    constexpr BitMask bm2{};
     static_assert( bm1 == bm2 , "");
   }
   { // operator!=
-    BitMask bm1;
+    BitMask bm1{};
     bm1.set(UInt{1});
-    BitMask bm2;
+    BitMask bm2{};
     BOOST_TEST( bm1 != bm2 );
   }
   { // operator!=
     constexpr BitMask bm1(std::experimental::pos_tag_t{}, UInt{1});
-    constexpr BitMask bm2;
+    constexpr BitMask bm2{};
     static_assert( bm1 != bm2 , "");
   }
   { // explicit CopyConstructor
-    BitMask bm1;
+    BitMask bm1{};
     bm1.set(UInt{1});
     BitMask bm2{bm1};
     BOOST_TEST( bm1 == bm2 );
@@ -202,7 +300,7 @@ int main()
     static_assert( bm1 == bm2 , "");
   }
   { // implicit CopyConstructor
-    BitMask bm1;
+    BitMask bm1{};
     bm1.set(UInt{1});
     BitMask bm2=bm1;
     BOOST_TEST( bm1 == bm2 );
@@ -213,9 +311,9 @@ int main()
     static_assert( bm1 == bm2 , "");
   }
   { // operator=
-    BitMask bm1;
+    BitMask bm1{};
     bm1.set(UInt{1});
-    BitMask bm2;
+    BitMask bm2{};
     bm2=bm1;
     BOOST_TEST( bm1 == bm2 );
   }
