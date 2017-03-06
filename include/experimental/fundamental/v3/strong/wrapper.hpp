@@ -31,16 +31,9 @@ inline  namespace fundamental_v3
       //! explicit conversion from the underlying type
       explicit constexpr wrapper(underlying_t v): value(v) {}
 
-      //!@{
       //! underlying value access
-#if __cplusplus >= 201402L
-      constexpr
-#endif
-      underlying_t& underlying() noexcept
+      constexpr underlying_t underlying() const noexcept
       { return value; }
-      constexpr underlying_t const& underlying() const noexcept
-      { return value; }
-      //!@}
 
     protected:
       //! the wrapped value
@@ -64,13 +57,8 @@ inline  namespace fundamental_v3
       using base_type::base_type;
       using base_type::underlying;
 
-#if __cplusplus >= 201402L
-      constexpr
-#endif
-      operator UT&() noexcept
-      { return underlying();}
-      constexpr operator UT const&() const noexcept
-      { return underlying();}
+      constexpr operator UT () const noexcept
+      { return this->value;}
     };
 
     //! protected_wrapper is a wrapper that provides explicit conversion to the underlying type
@@ -85,13 +73,8 @@ inline  namespace fundamental_v3
       using base_type::base_type;
       using base_type::underlying;
 
-#if __cplusplus >= 201402L
-      constexpr
-#endif
-      explicit operator UT&() noexcept
-      { return underlying();}
-      explicit constexpr operator UT const&() const noexcept
-      { return underlying();}
+      explicit constexpr operator UT () const noexcept
+      { return this->value;}
     };
 
     //! private_wrapper is a wrapper that provides no conversion to the underlying type
@@ -105,8 +88,7 @@ inline  namespace fundamental_v3
       using base_type::wrapper;
       using base_type::underlying;
 
-      operator UT&() = delete;
-      operator UT const&() const = delete;
+      operator UT () const = delete;
     };
 
 }

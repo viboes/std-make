@@ -25,10 +25,6 @@ inline  namespace fundamental_v3
     auto underlying(T const& v) -> decltype(v.underlying())
     { return v.underlying(); }
 
-    template <class T>
-    auto underlying(T & v) -> decltype(v.underlying())
-    { return v.underlying();}
-
 }
 }
 }
