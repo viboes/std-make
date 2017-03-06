@@ -18,8 +18,11 @@ inline  namespace fundamental_v3
 
     template <class E>
     struct underlying_type
-    //: std::underlying_type<E>
+    : std::underlying_type<E>
     {};
+
+    template <class E>
+    using underlying_type_t = typename underlying_type<E>::type;
 
     template <class T>
     auto underlying(T const& v) -> decltype(v.underlying())
