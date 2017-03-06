@@ -23,40 +23,40 @@ inline namespace fundamental_v3
   // By default it should checks if x is in the range of the underlying type
   // This function must be specialized for C++98 enums which have a more specific range
   template <class E, class Int>
-  constexpr bool is_valid_enum(Int x) {return true;}
+  constexpr bool is_valid_enum(Int x) { return true; }
 
   // This function must be specialized for each enum
   template <class E>
-  constexpr bool is_enumerator(E x) {return false;}
+  constexpr bool is_enumerator(E x) { return false; }
 
   template <class E, class Int>
-  constexpr bool is_valid_enumerator(Int x) {return is_valid_enum<E>(x) && is_enumerator(E(x));}
+  constexpr bool is_valid_enumerator(Int x) { return is_valid_enum<E>(x) && is_enumerator(E(x)); }
 
 
   template <class E, class Int>
-  constexpr E enum_cast(Int x) {return static_cast<E>(x);}
+  constexpr E enum_cast(Int x) { return static_cast<E>(x); }
 
   struct bad_enum_cast : std::logic_error {
       bad_enum_cast() : std::logic_error("Bad enum cast") {}
   };
 
   template <class E, class Int>
-  constexpr E to_valid_enum(Int x) { if (is_valid_enum<E>(x)) return enum_cast<E>(x); else throw bad_enum_cast();}
+  constexpr E to_valid_enum(Int x) { if (is_valid_enum<E>(x)) return enum_cast<E>(x); else throw bad_enum_cast(); }
 
   template <class E, class Int>
-  constexpr E to_valid_enum_or(Int x, E other) { if (is_valid_enum<E>(x)) return enum_cast<E>(x); else return other;}
+  constexpr E to_valid_enum_or(Int x, E other) { if (is_valid_enum<E>(x)) return enum_cast<E>(x); else return other; }
 
   template <class E, class Int>
-  constexpr E to_enumerator(Int x) { if (is_valid_enumerator<E>(x)) return enum_cast<E>(x); else throw bad_enum_cast();}
+  constexpr E to_enumerator(Int x) { if (is_valid_enumerator<E>(x)) return enum_cast<E>(x); else throw bad_enum_cast(); }
 
   template <class E, class Int>
-  constexpr E to_enumerator_or(Int x, E other) { if (is_valid_enumerator<E>(x)) return enum_cast<E>(x); else return other;}
+  constexpr E to_enumerator_or(Int x, E other) { if (is_valid_enumerator<E>(x)) return enum_cast<E>(x); else return other; }
 
   template <class E, class Int>
-  constexpr optional<E> try_to_enumerator(Int x) { if (is_valid_enumerator<E>(x)) return enum_cast<E>(x); else return nullopt;}
+  constexpr optional<E> try_to_enumerator(Int x) { if (is_valid_enumerator<E>(x)) return enum_cast<E>(x); else return nullopt; }
 
   template <class E, class Int>
-  constexpr optional<E> try_to_valid_enum(Int x) { if (is_valid_enum<E>(x)) return enum_cast<E>(x); else return nullopt;}
+  constexpr optional<E> try_to_valid_enum(Int x) { if (is_valid_enum<E>(x)) return enum_cast<E>(x); else return nullopt; }
 
 
 
@@ -79,13 +79,13 @@ inline namespace fundamental_v3
 
   //! strong_enum ensures that static_cast is not allowed between two strong_enums
   //! Note that static_cast of two C++11 enum class is allowed as they are integral types.
-  //! strong_enumt behaves almost as an C++11 enum class: ut.
+  //! strong_enum behaves almost as a C++11 enum class E: UT
   //! However there are some syntactical issues.
   //! In C++98, if you want scoped enums you should wrap the enum in a struct
   //! struct SE {
   //!     enum type { E0, E1, E2 };
   //! };
-  //! typedef strong_enum<SE> SSE
+  //! typedef strong_enum<SE::type, uint8_t> SSE
 
   template <class E, class UT=typename underlying_type<E>::type>
   struct strong_enum final : enum_wrapper<E, UT>
@@ -113,8 +113,9 @@ inline namespace fundamental_v3
       using base_type::base_type;
       using underlying_t = typename base_type::underlying_t;
 
+      // safe_enum is not safe if the default value 0 is not one of the enumerators
+      //constexpr safe_enum() noexcept = default;
       explicit safe_enum(underlying_t v): base_type(UT(to_valid_enum<E>(v))) {}
-      //constexpr safe_enum() noexcept : safe_enum(0) {};
 
       friend constexpr bool operator==(safe_enum x, safe_enum y) noexcept { return x.value == y.value; }
       friend constexpr bool operator!=(safe_enum x, safe_enum y) noexcept { return x.value != y.value; }
@@ -128,7 +129,7 @@ inline namespace fundamental_v3
   template <class E, class UT>
   struct underlying_type<safe_enum<E,UT>> { typedef UT type; };
 
-  // ordinal_enum is a strong_enum that checks the validity of the values of the enum using is_enumerator
+  // ordinal_enum is a strong enum that checks the validity of the values of the enum using is_enumerator
   // is_enumerator is specialized for ordinal enums
   template <class E, class UT=typename underlying_type<E>::type>
   struct ordinal_enum final: enum_wrapper<E,UT>
@@ -137,7 +138,7 @@ inline namespace fundamental_v3
       using base_type::base_type;
       using underlying_t = typename  base_type::underlying_t;
 
-      // ordinal_enum is not safe if the default value is not one of the enumerators
+      // ordinal_enum is not ordinal if the default value 0 is not one of the enumerators
       constexpr ordinal_enum() noexcept = default;
       explicit ordinal_enum(underlying_t v): base_type(UT(to_enumerator<E>(v))) {}
 
