@@ -13,6 +13,7 @@
 #include <experimental/fundamental/v3/strong/underlying_type.hpp>
 #include <experimental/optional.hpp>
 #include <exception>
+#include <functional>
 
 namespace std
 {
@@ -58,7 +59,24 @@ inline namespace fundamental_v3
   template <class E, class Int>
   constexpr optional<E> try_to_valid_enum(Int x) { if (is_valid_enum<E>(x)) return enum_cast<E>(x); else return nullopt; }
 
+  // This template must be specialized for enum wrappers
 
+  template <class E>
+  typename enable_if<is_enum<E>::value, E>::type to_enum(E v)
+  { return v; }
+
+  template <class T>
+  auto to_enum(T v) -> decltype(v.to_enum())
+  { return v.to_enum(); }
+
+  template <class E>
+  struct native_enum_type
+  {
+    using type = decltype(to_enum(declval<E>()));
+  };
+
+  template <class E>
+  using native_enum_type_t = typename native_enum_type<E>::type;
 
   template <class E, class UT=typename underlying_type<E>::type>
   struct enum_wrapper : protected_wrapper<UT>
@@ -71,8 +89,7 @@ inline namespace fundamental_v3
       constexpr enum_wrapper() noexcept = default;
       constexpr enum_wrapper(enum_type v) noexcept : base_type(UT(v)) {}
 
-      enum_type enum_value() const noexcept { return enum_type(this->value); }
-      enum_type get() const noexcept { return enum_type(this->value); }
+      enum_type to_enum() const noexcept { return enum_type(this->value); }
       explicit operator enum_type() const noexcept { return enum_type(this->value); }
 
   };
@@ -156,6 +173,16 @@ inline namespace fundamental_v3
 
 }
 }
+
+  template <class E, class UT>
+  struct hash<experimental::strong_enum<E,UT>>
+    : experimental::wrapped_hash<experimental::strong_enum<E,UT>> {};
+  template <class E, class UT>
+  struct hash<experimental::safe_enum<E,UT>>
+    : experimental::wrapped_hash<experimental::safe_enum<E,UT>> {};
+  template <class E, class UT>
+  struct hash<experimental::ordinal_enum<E,UT>>
+    : experimental::wrapped_hash<experimental::ordinal_enum<E,UT>> {};
 }
 
 #endif

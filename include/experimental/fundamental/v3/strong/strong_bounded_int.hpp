@@ -14,7 +14,7 @@
 
 #include <stdexcept>
 #include <limits>
-
+#include <functional>
 
 namespace std
 {
@@ -159,6 +159,9 @@ inline namespace fundamental_v3
       friend constexpr bool operator>=(strong_bounded_int x, strong_bounded_int y)  noexcept { return x.value >= y.value; }
   };
 
+  template <class Tag, class UT, UT Low, UT High>
+  struct underlying_type<strong_bounded_int<Tag,UT,Low,High>> { using type = UT; };
+
   static_assert(std::is_pod<strong_bounded_int<bool,int,0,3>>::value, "");
   static_assert(std::is_trivially_default_constructible<strong_bounded_int<bool,int,0,3>>::value, "");
   static_assert(std::is_trivially_copyable<strong_bounded_int<bool,int,0,3>>::value, "");
@@ -168,6 +171,10 @@ inline namespace fundamental_v3
 
 }
 }
+
+  template <class Tag, class UT, UT Low, UT High>
+  struct hash<experimental::strong_bounded_int<Tag,UT,Low,High>>
+    : experimental::wrapped_hash<experimental::strong_bounded_int<Tag,UT,Low,High>> {};
 
   template <class Tag, class UT, UT Low, UT High>
   struct numeric_limits<experimental::strong_bounded_int<Tag,UT,Low,High>> : numeric_limits<UT> {

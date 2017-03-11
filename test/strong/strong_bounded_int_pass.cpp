@@ -222,6 +222,21 @@ int main()
     Frame oc2{2};
     BOOST_TEST( oc1>=oc2 );
   }
+  // swap
+  {
+    Frame oc1{1};
+    Frame oc2{2};
+    using std::swap;
+    swap(oc1,oc2);
+    BOOST_TEST(oc1.underlying()==2);
+    BOOST_TEST(oc2.underlying()==1);
+  }
+
+  // hash
+  {
+    Frame oc1{1};
+    BOOST_TEST(std::hash<Frame>{}(oc1)==std::hash<int>{}(1));
+  }
 #endif
   return ::boost::report_errors();
 }

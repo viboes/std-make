@@ -8,6 +8,7 @@
 #define JASEL_FUNDAMENTAL_V3_STRONG_WRAPPER_HPP
 
 #include <experimental/fundamental/v3/strong/underlying_type.hpp>
+#include <functional>
 
 namespace std
 {
@@ -91,6 +92,16 @@ inline  namespace fundamental_v3
       operator UT () const = delete;
     };
 
+    template <class W>
+    struct wrapped_hash  {
+      using argument_type = W;
+      using UT = typename underlying_type<W>::type ;
+      using result_type = std::size_t;
+      result_type operator()(argument_type const& s) const
+      {
+          return std::hash<UT>{}(s.underlying());
+      }
+    };
 }
 }
 }

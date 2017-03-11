@@ -8,9 +8,9 @@
 #define JASEL_FUNDAMENTAL_V3_STRONG_STRONG_BOOL_HPP
 
 #include <experimental/fundamental/v3/strong/tagged.hpp>
-#include <experimental/fundamental/v3/strong/only_when.hpp>
 #include <experimental/fundamental/v3/strong/underlying_type.hpp>
 #include <type_traits>
+#include <functional>
 
 namespace std
 {
@@ -72,8 +72,14 @@ inline namespace fundamental_v3
   template <class Tag, class Bool>
   struct underlying_type<strong_bool<Tag, Bool>> { using type = Bool; };
 
+
 }
 }
+
+  template <class Tag, class UT>
+  struct hash<experimental::strong_bool<Tag,UT>> :
+    experimental::wrapped_hash<experimental::strong_bool<Tag,UT>> {};
+
 }
 
 #endif // header

@@ -8,7 +8,7 @@
 #if __cplusplus >= 201402L
 
 #include <experimental/strong_enums.hpp>
-
+#include <utility>
 #include <boost/detail/lightweight_test.hpp>
 
 namespace stdex = std::experimental;
@@ -118,8 +118,14 @@ int main()
   }
   {
       ES es = ES();
-      E e = es.enum_value();
+      E e = es.to_enum();
       BOOST_TEST(e==0);
+  }
+  {
+      ES es = ES();
+      E e = stdex::to_enum(es);
+      E e2 = stdex::to_enum(e);
+      BOOST_TEST(e2==0);
   }
   // default construct
   {
@@ -127,19 +133,19 @@ int main()
       f(ES());
       (void)es;
       //not initialized
-      //E e = es.get();
+      //E e = es.to_enum();
       //BOOST_TEST(e==E(0));
   }
   {
       ES es{};
       f(ES{});
-      E e = es.get();
+      E e = es.to_enum();
       BOOST_TEST(e==E(0));
   }
   {
       ES es= ES();
       f(ES{});
-      E e = es.get();
+      E e = es.to_enum();
       BOOST_TEST(e==E(0));
   }
   // default construct
@@ -148,20 +154,20 @@ int main()
       f(SSE());
       (void)es;
       //not initialized
-      //SE::type e = es.get();
+      //SE::type e = es.to_enum();
       //BOOST_TEST(e==SE::type(0));
   }
   // constructs from  Enum
   {
       ES es = E1;
       f(E1);
-      BOOST_TEST(es.get()==E1);
+      BOOST_TEST(es.to_enum()==E1);
   }
   // assignment from  Enum
   {
       ES es = E1;
       es = E2;
-      BOOST_TEST(es.get()==E2);
+      BOOST_TEST(es.to_enum()==E2);
   }
   // implicit conversion to int or Enum fails
   {
@@ -173,14 +179,14 @@ int main()
   {
       ES es = E1;
       ES es2 = es;
-      BOOST_TEST(es2.get()==E1);
+      BOOST_TEST(es2.to_enum()==E1);
   }
   // copy assignment
   {
       ES es = E1;
       ES es2;
       es2 = es;
-      BOOST_TEST(es2.get()==E1);
+      BOOST_TEST(es2.to_enum()==E1);
   }
   // constructor from short fails
   {
@@ -198,6 +204,26 @@ int main()
   // constructor from int fails
   {
       //ES es = 1;
+  }
+
+  // swap
+  {
+    ES es1 = E1;
+    ES es2 = E2;
+    using std::swap;
+    swap(es1,es2);
+    BOOST_TEST(es1.to_enum()==E2);
+    BOOST_TEST(es2.to_enum()==E1);
+  }
+
+  // hash
+  {
+    ES es1 = E1;
+
+    //auto h = std::hash<stdex::strong_enum<E,std::int8_t>>{};
+    //auto h1 = std::hash<E>{}(E1);
+    //auto h2 = std::hash<ES>{}(es1);
+    BOOST_TEST(std::hash<ES>{}(es1)==std::hash<E>{}(E1));
   }
 
   return ::boost::report_errors();

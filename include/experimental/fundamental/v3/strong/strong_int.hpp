@@ -13,6 +13,7 @@
 #include <experimental/fundamental/v3/strong/underlying_type.hpp>
 
 #include <limits>
+#include <functional>
 
 namespace std
 {
@@ -122,6 +123,8 @@ inline namespace fundamental_v3
       friend constexpr bool operator>=(strong_int x, strong_int y)  noexcept { return x.value >= y.value; }
   };
 
+  // fixme do we need swap?
+
   template <class Tag, class UT>
   constexpr strong_int<Tag, UT> make_strong_int(UT x)
   {
@@ -140,6 +143,10 @@ inline namespace fundamental_v3
 
 }
 }
+
+  template <class Tag, class UT>
+  struct hash<experimental::strong_int<Tag,UT>>
+    : experimental::wrapped_hash<experimental::strong_int<Tag, UT>> {};
 
   template <class Tag, class UT>
   struct numeric_limits<experimental::strong_int<Tag,UT>> : numeric_limits<UT> {  };
