@@ -31,8 +31,29 @@
 #include <string>
 #include <limits>
 
-/// todo: mixed operations between masks of different sizes
-/// The bits not represented are as if they were set to 0
+
+// todo: Extract bits algorithms in an explicit file
+
+// todo: Add explicit conversions from bit_mask of different sizes
+
+// todo: mixed operations between masks of different sizes
+// The bits not represented are as if they were set to 0
+
+// todo see bitset2::bitset2 (https://github.com/ClaasBontus/bitset2) as a generalization of bit_mask a std::bitset.
+
+// todo: Add P0125R0: is_subset_of and is_superset_of (is_proper_subset_of and is_proper_superset_of)
+
+// todo: Add n2050 iteration functions:
+// size_type find_first() const;
+// size_type find_next(size_type pos) const;
+// size_type find_last() const;
+// size_type find_prev(size_type pos) const;
+// size_type find_first_not() const;
+// size_type find_next_not(size_type pos) const;
+// size_type find_last_not() const;
+// size_type find_prev_not(size_type pos) const;
+
+// todo: Quiz of an interface as if it was a map<size_t, bool> at least for const iteration.
 
 namespace std
 {
@@ -124,8 +145,10 @@ inline namespace fundamental_v3
       static constexpr unsigned int digits = std::numeric_limits<T>::digits;
 
       T bits;
+      // fixme: shouldn't we provide a function that checks the validity of a position?
       constexpr void check(size_t testing) const
       {
+        // fixme: use assert here
         if (testing >=  N) throw std::out_of_range("bit_mask");
       }
     public:
@@ -182,6 +205,11 @@ inline namespace fundamental_v3
         }
       };
 
+      //fixme: If we want bit_mask to be a POD this constructor should be default
+      // The user will need to use explicit zero-initialization.
+      // bit_mask<5> bm {}
+      // This has the advantage that it behaves like the underlying unsigned integer type
+      // However std::bitset provides it.
 #if 0
       //! @par Effects: Constructs an object of class \c bit_mask<>, initializing all
       //! bits to zero.
@@ -196,11 +224,11 @@ inline namespace fundamental_v3
 
       //! @par Effects: Constructs an object of class \c bit_mask<>, initializing the
       //! \c pos bit position to \c 1 and the others to \c 0.
-      //! @par Requires:  pos <= N
+      //! @par Pre-condition:  pos <= N
       explicit constexpr bit_mask(pos_tag_t, size_t pos)
-        : bits(bit_ops::single<T>(pos))
+        : bits(bit_ops::single<T>(pos) & bit_ops::up_to<N,T>())
       {
-        check(pos);
+        //check(pos); // ??
       }
 
       //! @par Effects: Constructs an object of class \c bit_mask<>, initializing the
@@ -222,6 +250,8 @@ inline namespace fundamental_v3
         : bits(val & bit_ops::up_to<N,T>())
       {
       }
+
+      // todo implement this
       //#if defined(__GNUC__) &&  (__GNUC__ < 4 || ( __GNUC__ == 4 && __GNUC_MINOR__ < 4 ))
       #if 1
       #else
@@ -329,8 +359,8 @@ inline namespace fundamental_v3
         return N;
       }
 
-      //! @par Requires:  \c pos shall be valid.
-      //! @par Throws:  std::invalid_argument if @c pos i sout of range.
+      //! @par Pre-condition:  \c pos shall be valid.
+      //! @par Throws:  std::out_of_range if @c pos i sout of range.
       //! @par Returns:   \c true if the bit at the associated position of \c e in \c *this has the value one,
       //! otherwise \c false.
       constexpr bool operator[](size_t pos) const
@@ -339,8 +369,8 @@ inline namespace fundamental_v3
         return bits & bit_ops::single<T>(pos);
       }
 
-      //! @par Requires:  \c pos shall be valid.
-      //! @par Throws:  std::invalid_argument if @c e does not have a valid position.
+      //! @par Pre-condition:  \c pos shall be valid.
+      //! @par Throws:  std::out_of_range if @c e does not have a valid position.
       //! @par Returns:   An object of type \c bit_mask<N,T>::reference such that
       //! <tt>(*this)[pos] == this->test(pos)</tt>, and such that <tt>(*this)[pos] = val</tt> is
       //! equivalent to <tt>this->set(pos, val)</tt>.
@@ -363,7 +393,7 @@ inline namespace fundamental_v3
         return *this;
       }
 
-      //! @par Throws:  @c std::invalid_argument if @c setting does have a invalid bit position.
+      //! @par Throws:  @c std::out_of_range if @c setting does have a invalid bit position.
       //! @par Effects: Stores a new value in the bit at the position associated to \c setting in \c *this.
       //! If \c value is nonzero, the stored value is one, otherwise it is zero.
       //! @par Returns:   \c *this.
@@ -384,7 +414,7 @@ inline namespace fundamental_v3
         return *this;
       }
 
-      //! @par Throws:  @c std::invalid_argument if \c resetting does not correspond to a valid position.
+      //! @par Throws:  @c std::out_of_range if \c resetting does not correspond to a valid position.
       //! @par Effects: Resets the bit at the position associated to \c resetting in \c *this.
       //! @par Returns:   \c *this.
 
@@ -405,7 +435,7 @@ inline namespace fundamental_v3
         return *this;
       }
 
-      //! @par Throws:  std::invalid_argument if \c flipping does not correspond to a valid position.
+      //! @par Throws:  std::out_of_range if \c flipping does not correspond to a valid position.
       //! @par Effects: Toggles the bit at position associated to \c pos in \c *this.
       //! @par Returns:   \c *this.
       constexpr bit_mask& flip(size_t flipping)
@@ -466,7 +496,7 @@ inline namespace fundamental_v3
       }
 
       //! @par Requires:  \c testing is valid
-      //! @par Throws:  out_of_range if the associated position of \c testing does not correspond to a valid bit position.
+      //! @par Throws:  std::out_of_range if the associated position of \c testing does not correspond to a valid bit position.
       //! @par Returns:   \c true if the bit at position \c pos in \c *this has the value one.
       constexpr bool test(size_t testing) const
       {
