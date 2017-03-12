@@ -52,31 +52,77 @@ inline namespace fundamental_v3
   */
 
   template <class Domain, class UT>
+  struct domain_values {
+    static constexpr UT zero()  noexcept
+        { return UT(0); }
+    static constexpr UT min()  noexcept
+        { return numeric_limits<UT>::min(); }
+    static constexpr UT max()  noexcept
+        { return numeric_limits<UT>::max(); }
+  };
+
+  template <class DomainFrom, class DomainTo>
+  struct is_domain_convertible : is_same<DomainFrom, DomainTo> {};
+
+  template <class Domain>
+  struct strict_domain {
+
+    template <class From, class To>
+    struct is_convertible
+        : is_same<From, To> {};
+
+    template <class T>
+    T convert(Domain, T const& r) { return r; }
+
+  };
+
+  template <class Domain>
+  struct domain_traits : strict_domain<Domain> {};
+
+  template <class Domain, class UT>
   struct strong_counter final : private_tagged<Domain, UT>
   {
       using base_type = private_tagged<Domain, UT>;
       using base_type::base_type;
 
       // constructors
+      strong_counter() = default;
+      strong_counter(strong_counter const&) = default;
       // todo add mixed conversions for strong_counter
+      template <class UT2>
+      explicit strong_counter(UT2 const& r
+          , typename enable_if<domain_traits<Domain>::template is_convertible<UT2, UT>::value>::type* = nullptr
+          )
+          : base_type(UT(r))
+      {}
+      template <class UT2>
+      explicit strong_counter(UT2 const& r
+          , typename enable_if<! domain_traits<Domain>::template is_convertible<UT2, UT>::value>::type* = nullptr
+          ) = delete;
+
+      template <class Domain2, class UT2>
+      strong_counter(strong_counter<Domain2, UT2> const& other
+          , typename enable_if<
+              is_domain_convertible<Domain2, Domain>::value
+            && domain_traits<Domain>::template is_convertible<UT2, UT>::value
+          >::type* = nullptr
+          )
+          : base_type(domain_traits<Domain>::template convert<UT>(Domain2{}, other.count()))
+      {}
 
       // assignment
+      strong_counter& operator=(strong_counter const&) = default;
 
       constexpr UT count() const noexcept
           { return this->underlying(); }
 
-#if 0
       // special counter values
       static constexpr strong_counter zero()  noexcept
-          // fixme, these should depend on the Domain
-          { return strong_counter{Domain::zero<UT>()}; }
+          { return strong_counter{domain_values<Domain, UT>::zero()}; }
       static constexpr strong_counter min()  noexcept
-          // fixme, these should depend on the Domain
-          { return strong_counter{Domain::min<UT>()}; }
+          { return strong_counter{domain_values<Domain, UT>::min()}; }
       static constexpr strong_counter max()  noexcept
-          // fixme, these should depend on the Domain
-          { return strong_counter{Domain::max<UT>()}; }
-#endif
+          { return strong_counter{domain_values<Domain, UT>::max()}; }
 
       // additive operators
       friend constexpr strong_counter operator+(strong_counter x)  noexcept
@@ -152,7 +198,6 @@ inline namespace fundamental_v3
   static_assert(std::is_trivially_copyable<strong_counter<bool,int>>::value, "");
   static_assert(std::is_standard_layout<strong_counter<bool,int>>::value, "");
   static_assert(std::is_trivial<strong_counter<bool,int>>::value, "");
-
 }
 }
 

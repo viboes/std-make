@@ -21,11 +21,11 @@ OrangeCount add(OrangeCount x, OrangeCount y){
 }
 
 struct X {
-    operator int() { return true; }
+    constexpr operator int() const { return 42; }
 };
 
 struct Y {
-    explicit operator int() { return true; }
+    explicit constexpr operator int() const { return 3; }
 };
 #endif
 
@@ -44,9 +44,11 @@ int main()
   {
       OrangeCount oc2{1};
       BOOST_TEST(oc2 == OrangeCount{1});
-      short s=1;
-      OrangeCount oc3 {s};
-      BOOST_TEST(oc2 == OrangeCount{1});
+      //short s=1;
+      //OrangeCount oc3 {s};
+      //BOOST_TEST(oc3 == OrangeCount{1});
+      OrangeCount oc3 {1};
+      //OrangeCount oc32 = s; // error
 
       //OrangeCount oc4 {1.0};      // error narrowing conversion
 
@@ -65,11 +67,8 @@ int main()
 
       {
           //OrangeCount es {Y{}};        // error
-    #ifdef JASEL_CONVERTIBLE_DELETED
-          //OrangeCount es {X{}};        // error
-    #else
-          OrangeCount es {X{}};        // ok, but shouldn't this be forbiden also?
-    #endif
+        //OrangeCount es {X{}};        // ok, but shouldn't this be forbiden also?
+        //OrangeCount esx = X{};        // ERROR
       }
       { // uninitialize default constructor
         OrangeCountDC oc;
@@ -93,11 +92,13 @@ int main()
         OrangeCount oc{1};
         BOOST_TEST(oc == OrangeCount{1});
       }
+#if 1
       { // constructor from implicitly convertible to UT
         short s=1;
-        OrangeCount oc{s};
+        OrangeCount oc{int(s)};
         BOOST_TEST(oc == OrangeCount{1});
       }
+#endif
       { // copy constructor
         OrangeCount oc1{1};
         OrangeCount oc2{oc1};
