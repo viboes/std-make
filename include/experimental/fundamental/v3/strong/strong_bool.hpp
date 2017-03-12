@@ -22,7 +22,7 @@ inline namespace fundamental_v3
   /**
   `strong_bool` is a strongly type that wraps a bool and behaves like an `bool`
   The main goal is to be able to define strong bools that don't mix between them.
-  The single conversion is to the underlying bool type.
+  The single conversion is the explicit conversion to the underlying bool type.
 
   Note that this is not a safe bool, it just forbids the conversions between
   different strong bools types.

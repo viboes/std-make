@@ -25,7 +25,7 @@ inline namespace fundamental_v3
   /**
   `strong_int` is a strongly type tagged by the tag @c Tag that wraps an integral type @c UT and behaves like an @c UT
   The main goal is to be able to define strong integers that don't mix between them.
-  The single allowed conversion is to the underlying integer type.
+  No conversion to the underlying integer type is provided.
 
   Note that this is not a safe int, it just forbids the conversions between
   different strong integers types.

@@ -45,7 +45,7 @@ int main()
 
       //EngineStarted es6 =true;       // error
       //EngineStarted es6 =cr;       // error
-      //EngineStarted es7 {cr};       // fixme: how can we forbid this provising explicit conversion to bool?
+      //EngineStarted es7 {cr};       // fixme: how can we forbid this providing explicit conversion to bool? clang compile this while gcc don't.
 
       //bool b = cr;                  // error - implicit conversion required
 

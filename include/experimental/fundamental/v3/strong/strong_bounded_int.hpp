@@ -29,7 +29,7 @@ inline namespace fundamental_v3
   /**
   `strong_bounded_int` is a strongly type that wraps an integral type  @c UT and behaves like an  @c UT
   The main goal is to be able to define strong bounded integers that don't mix between them and that have a reduced set of values.
-  The single conversion is to the underlying integer type.
+  No conversion to the underlying integer type is provided.
 
   Note that this is not a safe int, it just forbids the conversions between
   different strong bounded integers types.
