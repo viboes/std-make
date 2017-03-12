@@ -72,11 +72,7 @@ int main()
 
       {
           //OrangeCount es {Y{}};        // error
-    #ifdef JASEL_CONVERTIBLE_DELETED
-          //OrangeCount es {X{}};        // error
-    #else
           OrangeCount es {X{}};        // ok, but shouldn't this be forbiden also?
-    #endif
       }
       { // uninitialize default constructor
         OrangeCountDC oc;
