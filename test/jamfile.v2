@@ -255,6 +255,8 @@ test-suite strong
       [ run strong/strong_bool_pass.cpp  ]
       [ run strong/strong_ints_pass.cpp  ]
       [ run strong/strong_bounded_int_pass.cpp  ]
+      [ run strong/strong_counter_pass.cpp  ]
+      [ run strong/strong_id_pass.cpp  ]
     ;
 
 

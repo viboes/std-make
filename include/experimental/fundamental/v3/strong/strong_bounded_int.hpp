@@ -9,7 +9,7 @@
 
 #if __cplusplus >= 201402L
 
-#include <experimental/fundamental/v3/strong/wrapper.hpp>
+#include <experimental/fundamental/v3/strong/tagged.hpp>
 #include <experimental/fundamental/v3/strong/underlying_type.hpp>
 
 #include <stdexcept>
@@ -45,14 +45,11 @@ inline namespace fundamental_v3
   </code>
   */
   template <class Tag, class UT, UT Low, UT High>
-  struct strong_bounded_int final : protected_wrapper<UT>
+  struct strong_bounded_int final : private_tagged<Tag, UT>
   {
-      using base_type = protected_wrapper<UT>;
+      using base_type = private_tagged<Tag, UT>;
       using base_type::base_type;
       using base_type::underlying;
-
-      using tag_type = Tag;
-      using underlying_t = UT;
 
       enum bounds : UT { low=Low, high=High };
 

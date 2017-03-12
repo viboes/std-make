@@ -43,7 +43,9 @@ int main()
       EngineStarted es {true};        // ok
       CrewReady     cr {false};       // ok
 
-      //EngineStarted es6 {cr};       // error
+      //EngineStarted es6 =true;       // error
+      //EngineStarted es6 =cr;       // error
+      //EngineStarted es7 {cr};       // fixme: how can we forbid this provising explicit conversion to bool?
 
       //bool b = cr;                  // error - implicit conversion required
 

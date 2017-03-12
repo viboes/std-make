@@ -53,23 +53,30 @@ typedef stdex::strong_enum<E, std::int8_t> ES;
 typedef stdex::strong_enum<SE::type, std::int8_t> SSE;
 typedef stdex::ordinal_enum<E, std::int8_t> OE;
 
-static_assert(! std::is_pod<EC>::value, "");
-static_assert(! std::is_trivially_default_constructible<EC>::value, "");
+static_assert(std::is_pod<EC>::value, "");
+static_assert(std::is_trivially_default_constructible<EC>::value, "");
 static_assert(std::is_trivially_copyable<EC>::value, "");
 static_assert(std::is_standard_layout<EC>::value, "");
-static_assert(! std::is_trivial<EC>::value, "");
+static_assert(std::is_trivial<EC>::value, "");
+static_assert(std::is_trivially_destructible<EC>::value, "");
+static_assert(std::is_nothrow_default_constructible<EC>::value, "");
 
 static_assert(std::is_pod<ES>::value, "");
 static_assert(std::is_trivially_default_constructible<ES>::value, "");
 static_assert(std::is_trivially_copyable<ES>::value, "");
 static_assert(std::is_standard_layout<ES>::value, "");
 static_assert(std::is_trivial<ES>::value, "");
+static_assert(std::is_trivially_destructible<ES>::value, "");
+static_assert(std::is_nothrow_default_constructible<ES>::value, "");
 
 static_assert(std::is_pod<OE>::value, "");
 static_assert(std::is_trivially_default_constructible<OE>::value, "");
 static_assert(std::is_trivially_copyable<OE>::value, "");
 static_assert(std::is_standard_layout<OE>::value, "");
 static_assert(std::is_trivial<OE>::value, "");
+static_assert(std::is_trivially_destructible<OE>::value, "");
+static_assert(std::is_nothrow_default_constructible<OE>::value, "");
+
 void f(ES) {}
 void f(SSE) {}
 

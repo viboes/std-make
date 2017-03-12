@@ -79,9 +79,9 @@ inline namespace fundamental_v3
   using native_enum_type_t = typename native_enum_type<E>::type;
 
   template <class E, class UT=typename underlying_type<E>::type>
-  struct enum_wrapper : protected_wrapper<UT>
+  struct enum_wrapper : private_wrapper<UT>
   {
-      using base_type = protected_wrapper<UT>;
+      using base_type = private_wrapper<UT>;
       using base_type::base_type;
 
       typedef E enum_type;
@@ -131,7 +131,9 @@ inline namespace fundamental_v3
       using underlying_t = typename base_type::underlying_t;
 
       // safe_enum is not safe if the default value 0 is not one of the enumerators
-      //constexpr safe_enum() noexcept = default;
+      // the question is, should the class invariant be valid for uninitialized instances.
+      // This has relation of applicability of invariant of moved objects.
+      constexpr safe_enum() noexcept = default;
       explicit safe_enum(underlying_t v): base_type(UT(to_valid_enum<E>(v))) {}
 
       friend constexpr bool operator==(safe_enum x, safe_enum y) noexcept { return x.value == y.value; }
@@ -156,6 +158,8 @@ inline namespace fundamental_v3
       using underlying_t = typename  base_type::underlying_t;
 
       // ordinal_enum is not ordinal if the default value 0 is not one of the enumerators
+      // the question is, should the class invariant be valid for uninitialized instances.
+      // This has relation of applicability of invariant of moved objects.
       constexpr ordinal_enum() noexcept = default;
       explicit ordinal_enum(underlying_t v): base_type(UT(to_enumerator<E>(v))) {}
 

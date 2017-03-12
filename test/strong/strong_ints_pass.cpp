@@ -53,9 +53,16 @@ int main()
       AppelCount ac1{1};
       OrangeCount oc5 {oc2};
       BOOST_TEST(oc5 == OrangeCount{1});
+
+      //AppelCount ac2=oc2; // error
       //AppelCount ac2{oc2}; // error
+      AppelCount ac2{oc2.underlying()};
+      BOOST_TEST(ac2 == AppelCount{1});
 
       //int i = oc2; // error
+      //int i{oc2}; // error
+      int i{oc2.underlying()};
+      BOOST_TEST(i == 1);
 
       auto oc6 = add(oc2, oc3);
       BOOST_TEST(oc6 == OrangeCount{2});

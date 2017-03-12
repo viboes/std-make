@@ -42,9 +42,9 @@ inline namespace fundamental_v3
   */
 
   template <class Tag, class UT>
-  struct strong_int final : protected_tagged<Tag, UT>
+  struct strong_int final : private_tagged<Tag, UT>
   {
-      using base_type = protected_tagged<Tag, UT>;
+      using base_type = private_tagged<Tag, UT>;
       using base_type::base_type;
 
       // additive operators

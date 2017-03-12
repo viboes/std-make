@@ -45,6 +45,7 @@ inline namespace fundamental_v3
 
       // copy constructor/assignment default
       constexpr strong_bool() noexcept = default;
+
       constexpr explicit strong_bool (int) = delete;
       constexpr explicit strong_bool (double) = delete;
       constexpr explicit strong_bool (void*) = delete;
