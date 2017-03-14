@@ -14,6 +14,7 @@
 
 #include <limits>
 #include <functional>
+#include <type_traits>
 
 namespace std
 {
@@ -44,6 +45,8 @@ inline namespace fundamental_v3
   template <class Tag, class UT>
   struct strong_int final : private_tagged<Tag, UT>
   {
+      static_assert(is_integral<UT>::value, "UT must be integral");
+
       using base_type = private_tagged<Tag, UT>;
       using base_type::base_type;
 

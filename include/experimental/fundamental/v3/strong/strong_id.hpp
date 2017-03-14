@@ -42,7 +42,7 @@ inline namespace fundamental_v3
 
       // copy constructor/assignment default
       constexpr strong_id() noexcept = default;
-      //constexpr explicit strong_id (void*) = delete;
+
 
       //!@{
       //! relational operators
