@@ -67,47 +67,77 @@ inline namespace fundamental_v3
   template <class Domain>
   struct strict_domain {
 
-    template <class From, class To>
-    struct is_convertible
-        : is_same<From, To> {};
-
     template <class T>
-    T convert(Domain, T const& r) { return r; }
+    T convert_to(Domain, T const& r) { return r; }
 
   };
 
+
   template <class Domain>
-  struct domain_traits : strict_domain<Domain> {};
+  struct domain_conversion_traits : strict_domain<Domain> {};
+
+  template <class D, class T, class F>
+  auto convert_to(F const& r)
+  -> decltype(domain_conversion_traits<D>::template convert_to<T>(D{}, r))
+  {
+    return domain_conversion_traits<D>::template convert_to<T>(D{}, r);
+  }
+
+  template <class Domain, class From, class To>
+  struct is_explicitly_convertible_for_domain
+  {
+      template<class T>
+      static void f(T);
+
+      template<class D, class F, class T>
+      static constexpr auto test(int) ->
+      decltype(f(
+          static_cast<T>(
+              std::experimental::convert_to<Domain, T>(std::declval<D>(), std::declval<F>())
+           )
+            )
+          , true) {
+          return true;
+      }
+
+      template<class D, class F, class T>
+      static constexpr auto test(...) -> bool {
+          return false;
+      }
+
+      static bool const value = test<Domain,From,To>(0);
+  };
 
   template <class Domain, class UT>
   struct strong_counter final : private_tagged<Domain, UT>
   {
+      static_assert(is_integral<UT>::value, "UT must be integral");
+
       using base_type = private_tagged<Domain, UT>;
       using base_type::base_type;
 
       // constructors
       strong_counter() = default;
       strong_counter(strong_counter const&) = default;
-      // todo add mixed conversions for strong_counter
       template <class UT2>
       explicit strong_counter(UT2 const& r
-          , typename enable_if<domain_traits<Domain>::template is_convertible<UT2, UT>::value>::type* = nullptr
+          , typename enable_if<is_explicitly_convertible_for_domain<Domain, UT2, UT>::value>::type* = nullptr
           )
           : base_type(UT(r))
       {}
       template <class UT2>
       explicit strong_counter(UT2 const& r
-          , typename enable_if<! domain_traits<Domain>::template is_convertible<UT2, UT>::value>::type* = nullptr
+          , typename enable_if<! is_explicitly_convertible_for_domain<Domain, UT2, UT>::value>::type* = nullptr
           ) = delete;
 
       template <class Domain2, class UT2>
       strong_counter(strong_counter<Domain2, UT2> const& other
           , typename enable_if<
-              is_domain_convertible<Domain2, Domain>::value
-            && domain_traits<Domain>::template is_convertible<UT2, UT>::value
+                is_domain_convertible<Domain2, Domain>::value
+              && is_explicitly_convertible_for_domain<Domain, UT2, UT>::value
           >::type* = nullptr
           )
-          : base_type(domain_traits<Domain>::template convert<UT>(Domain2{}, other.count()))
+            : base_type(std::experimental::convert_to<Domain,UT>(other.count()))
       {}
 
       // assignment
@@ -126,62 +156,67 @@ inline namespace fundamental_v3
 
       // additive operators
       friend constexpr strong_counter operator+(strong_counter x)  noexcept
-      { return x; }
+          { return x; }
       friend constexpr strong_counter operator+(strong_counter x, strong_counter y)  noexcept
-      { return strong_counter(x.value + y.value); }
+          { return strong_counter(x.value + y.value); }
       constexpr strong_counter& operator+=(strong_counter y)  noexcept
-      { this->value += y.value; return *this; }
+          { this->value += y.value; return *this; }
       constexpr strong_counter operator++()  noexcept
-      { return strong_counter(++this->value); }
+          { return strong_counter(++this->value); }
       constexpr strong_counter operator++(int)  noexcept
-      { return strong_counter(this->value++); }
+          { return strong_counter(this->value++); }
 
       friend constexpr strong_counter operator-(strong_counter x)  noexcept
-      { return strong_counter(-x.value); }
+          { return strong_counter(-x.value); }
       friend constexpr strong_counter operator-(strong_counter x, strong_counter y)  noexcept
-      { return strong_counter(x.value - y.value); }
+          { return strong_counter(x.value - y.value); }
       constexpr strong_counter& operator-=(strong_counter y)  noexcept
-      { this->value -= y.value; return *this; }
+          { this->value -= y.value; return *this; }
       constexpr strong_counter operator--()  noexcept
-      { return strong_counter(--this->value); }
+          { return strong_counter(--this->value); }
       constexpr strong_counter operator--(int)  noexcept
-      { return strong_counter(this->value--); }
+          { return strong_counter(this->value--); }
 
       //  Multiplicative operators
       friend constexpr strong_counter operator*(strong_counter x, UT y)  noexcept
-      { return strong_counter(x.value * y); }
+          { return strong_counter(x.value * y); }
       friend constexpr strong_counter operator*(UT x, strong_counter y)  noexcept
-      { return strong_counter(x * y.value); }
+          { return strong_counter(x * y.value); }
       constexpr strong_counter& operator*=(UT y)  noexcept
-      { this->value *= y; return *this; }
+          { this->value *= y; return *this; }
 
       friend constexpr UT operator/(strong_counter x, strong_counter y)  noexcept
-      { return x.value / y.value; }
+          { return x.value / y.value; }
       friend constexpr strong_counter operator/(strong_counter x, UT y)  noexcept
-      { return strong_counter(x.value / y); }
+          { return strong_counter(x.value / y); }
       constexpr strong_counter& operator/=(UT y)  noexcept
-      { this->value /= y; return *this; }
+          { this->value /= y; return *this; }
 
       friend constexpr strong_counter operator%(strong_counter x, strong_counter y)  noexcept
-      { return strong_counter(x.value % y.value); }
+          { return strong_counter(x.value % y.value); }
       friend constexpr strong_counter operator%(strong_counter x, UT y)  noexcept
-      { return strong_counter(x.value % y); }
+          { return strong_counter(x.value % y); }
       constexpr strong_counter& operator%=(strong_counter y)  noexcept
-      { this->value %= y.value; return *this; }
+          { this->value %= y.value; return *this; }
       constexpr strong_counter& operator%=(UT y)  noexcept
-      { this->value %= y; return *this; }
+          { this->value %= y; return *this; }
 
       // relational operators
-      friend constexpr bool operator==(strong_counter x, strong_counter y)  noexcept { return x.value == y.value; }
-      friend constexpr bool operator!=(strong_counter x, strong_counter y)  noexcept { return x.value != y.value; }
-      friend constexpr bool operator<(strong_counter x, strong_counter y)  noexcept { return x.value < y.value; }
-      friend constexpr bool operator>(strong_counter x, strong_counter y)  noexcept { return x.value > y.value; }
-      friend constexpr bool operator<=(strong_counter x, strong_counter y)  noexcept { return x.value <= y.value; }
-      friend constexpr bool operator>=(strong_counter x, strong_counter y)  noexcept { return x.value >= y.value; }
+      friend constexpr bool operator==(strong_counter x, strong_counter y)  noexcept
+           { return x.value == y.value; }
+      friend constexpr bool operator!=(strong_counter x, strong_counter y)  noexcept
+          { return x.value != y.value; }
+      friend constexpr bool operator<(strong_counter x, strong_counter y)  noexcept
+          { return x.value < y.value; }
+      friend constexpr bool operator>(strong_counter x, strong_counter y)  noexcept
+          { return x.value > y.value; }
+      friend constexpr bool operator<=(strong_counter x, strong_counter y)  noexcept
+          { return x.value <= y.value; }
+      friend constexpr bool operator>=(strong_counter x, strong_counter y)  noexcept
+          { return x.value >= y.value; }
   };
 
   // todo add mixed arithmetic for strong_counter
-  // fixme do we need swap?
 
   template <class Domain, class UT>
   constexpr strong_counter<Domain, UT> make_strong_counter(UT x)
@@ -191,7 +226,8 @@ inline namespace fundamental_v3
 
   //! underlying_type specialization for strong_counter
   template <class Domain, class UT>
-  struct underlying_type<strong_counter<Domain,UT>> { using type = UT; };
+  struct underlying_type<strong_counter<Domain,UT>>
+  { using type = UT; };
 
   static_assert(std::is_pod<strong_counter<bool,int>>::value, "");
   static_assert(std::is_trivially_default_constructible<strong_counter<bool,int>>::value, "");
