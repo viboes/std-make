@@ -158,6 +158,42 @@ int main()
     os2=os1;
     BOOST_TEST( os1 == os2 );
   }
+  { // operator[] const
+    const OSet os(Indx{1});
+    auto x = os[Indx{1}];
+    BOOST_TEST( x );
+  }
+  { // operator[] const
+    const OSet os(Indx{1});
+    auto x =  ! os[Indx{1}];
+    BOOST_TEST( ! x );
+  }
+  { // operator[] reference::flip()
+    OSet os{};
+    os.set(Indx{1});
+    auto x = os[Indx{1}];
+    auto y = x.flip();
+    BOOST_TEST( ! y );
+  }
+  { // operator[] reference::flip()
+    OSet os{};
+    os.set(Indx{1});
+    auto x = os[Indx{1}].flip();
+    BOOST_TEST( ! x );
+  }
+  { // operator[] reference::operator~
+    OSet os{};
+    os.set(Indx{1});
+    auto x = os[Indx{1}];
+    auto y = ~x;
+    BOOST_TEST( ! y );
+  }
+  { // operator[] reference::operator~
+    OSet os{};
+    os.set(Indx{1});
+    auto x = ~os[Indx{1}];
+    BOOST_TEST( ! x );
+  }
 #endif
   return ::boost::report_errors();
 }

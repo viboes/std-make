@@ -187,9 +187,9 @@ inline namespace fundamental_v3
         }
 
         //! flip the bit
-        constexpr bool operator~() const noexcept
+        constexpr bool operator~() noexcept
         {
-          return ref_.flip(pos_);
+          return ! ref_.test(pos_);
         }
 
         //! implicit conversion to bool
@@ -199,9 +199,10 @@ inline namespace fundamental_v3
         }
 
         //! flip the bit
-        constexpr reference flip() const noexcept
+        constexpr reference flip()  noexcept
         {
-          return ref_.flip(pos_);
+          ref_.flip(pos_);
+          return *this;
         }
       };
 
@@ -228,7 +229,7 @@ inline namespace fundamental_v3
       explicit constexpr bit_mask(pos_tag_t, size_t pos)
         : bits(bit_ops::single<T>(pos) & bit_ops::up_to<N,T>())
       {
-        //check(pos); // ??
+        //JASEL_EXPECTS(valid_position(pos));
       }
 
       //! @par Effects: Constructs an object of class \c bit_mask<>, initializing the
@@ -365,7 +366,7 @@ inline namespace fundamental_v3
       //! otherwise \c false.
       constexpr bool operator[](size_t pos) const
       {
-        //check(pos);
+        //JASEL_EXPECTS(valid_position(pos));
         return bits & bit_ops::single<T>(pos);
       }
 
@@ -380,7 +381,7 @@ inline namespace fundamental_v3
 
       constexpr reference operator[](size_t pos)
       {
-        //check(pos);
+        //JASEL_EXPECTS(valid_position(pos));
         return reference(*this, pos);
       }
       //! @par Effects: Sets all bits in \c *this.

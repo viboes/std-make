@@ -102,7 +102,7 @@ inline namespace fundamental_v3
         //! flip the bit
         bool operator~() const noexcept
         {
-          return ref_.flip(pos_);
+          return ! ref_.test(pos_);
         }
 
         //! implicit conversion to bool
@@ -112,9 +112,10 @@ inline namespace fundamental_v3
         }
 
         //! flip the bit
-        reference flip() const noexcept
+        reference flip() noexcept
         {
-          return ref_.flip(pos_);
+          ref_.flip(pos_);
+          return *this;
         }
       };
       //! @Effects Constructs an object of class \c ordinal_set<>, initializing all

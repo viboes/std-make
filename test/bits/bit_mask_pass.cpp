@@ -317,6 +317,42 @@ int main()
     bm2=bm1;
     BOOST_TEST( bm1 == bm2 );
   }
+  { // operator[] const
+    const BitMask bm{std::experimental::pos_tag_t{}, UInt{1}};
+    auto x = bm[1];
+    BOOST_TEST( x );
+  }
+  { // operator[] const
+    const BitMask bm{std::experimental::pos_tag_t{}, UInt{1}};
+    auto x =  ! bm[1];
+    BOOST_TEST( ! x );
+  }
+  { // operator[] reference::flip()
+    BitMask bm{};
+    bm.set(UInt{1});
+    auto x = bm[1];
+    auto y = x.flip();
+    BOOST_TEST( ! y );
+  }
+  { // operator[] reference::flip()
+    BitMask bm{};
+    bm.set(UInt{1});
+    auto x = bm[1].flip();
+    BOOST_TEST( ! x );
+  }
+  { // operator[] reference::operator~
+    BitMask bm{};
+    bm.set(UInt{1});
+    auto x = bm[1];
+    auto y = ~x;
+    BOOST_TEST( ! y );
+  }
+  { // operator[] reference::operator~
+    BitMask bm{};
+    bm.set(UInt{1});
+    auto x = ~bm[1];
+    BOOST_TEST( ! x );
+  }
 
 #endif
   return ::boost::report_errors();
