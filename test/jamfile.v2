@@ -220,6 +220,7 @@ test-suite monad
 test-suite frames
     : 
       [ run ../example/chrono/frame_types_pass.cpp  ]
+      [ run ../example/chrono/day_types_pass.cpp  ]
     ;
 
 test-suite mem_usage
