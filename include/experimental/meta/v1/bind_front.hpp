@@ -21,7 +21,7 @@ namespace meta
 {
 inline namespace v1
 {
-  // transforms a template class into a type_constructor that adds the parameter at the end
+  // transforms a class template into a type_constructor that adds the parameter at the end
 
   template <template <class ...> class TC, class... Ts>
   struct bind_front
