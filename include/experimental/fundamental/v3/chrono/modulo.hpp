@@ -11,6 +11,8 @@
 #include <experimental/fundamental/v2/config.hpp>
 
 #include <ratio>
+#include <chrono>
+#include <limits>
 
 namespace std
 {
@@ -21,9 +23,17 @@ inline  namespace fundamental_v3
 
 namespace chrono
 {
+//  modulo is a trivially copyable class type.
+//  modulo is a standard-layout class type.
+//  modulo is a literal class type.
+
+  //!  modulo is a trivially copyable class type if Rep it is.
+  //!  modulo is a standard-layout class type if Rep it is.
+  //!  modulo is a literal class type if Rep it is.
   template <class SubDuration, class Duration, class Rep>
   struct modulo final
   {
+      //using period = SubDuration;
       using sub_duration = SubDuration;
       using duration = Duration;
       using rep = Rep;
@@ -34,91 +44,73 @@ namespace chrono
 
       Rep m_value;
 
-      explicit modulo() {}
-      explicit modulo(Rep v) : m_value(v) {}
+      constexpr explicit modulo() {}
+      constexpr explicit modulo(Rep v) : m_value(v) {}
 
       template <class Rep2>
-      modulo(modulo<SubDuration, Duration, Rep2> const& v) : m_value(v.m_value) {}
+      constexpr modulo(modulo<SubDuration, Duration, Rep2> const& v) : m_value(v.m_value) {}
 
-      explicit modulo(sub_duration v) : m_value(v.count() % period) {}
+      constexpr explicit modulo(sub_duration v) : m_value(v.count() % period) {}
 
-      constexpr explicit operator sub_duration() {return sub_duration(this->m_value); }
-      constexpr sub_duration get_duration() {return sub_duration(this->m_value); }
+      constexpr explicit operator sub_duration() { return sub_duration(this->m_value); }
+      constexpr sub_duration to_duration() { return sub_duration(this->m_value); }
 
       constexpr explicit operator Rep() const noexcept {return m_value;}
       constexpr Rep value() const noexcept {return m_value;}
+      constexpr Rep count() const noexcept {return m_value;}
 
       bool valid() const { return m_value >= 0 && m_value < period; }
 
       template <class OSTREAM>
       friend OSTREAM& operator<<(OSTREAM& os, modulo const& m) {
-          os << uintmax_t(m.m_value);
+          os << uintmax_t(m.count());
           return os;
       }
 
+      constexpr modulo operator+() noexcept {return *this;}
+      constexpr modulo operator-() noexcept {return modulo(-m_value);}
+
       constexpr modulo& operator++() noexcept {if(++m_value == period) m_value=0; return *this;}
       constexpr modulo operator++(int) noexcept {auto tmp(*this); ++(*this); return tmp;}
+
+      constexpr modulo& operator--() noexcept { if (m_value == 0) m_value=period; else --m_value; return *this;}
+      constexpr modulo operator--(int) noexcept {auto tmp(*this); --(*this); return tmp;}
+
       constexpr modulo& operator+=(const sub_duration& d) noexcept {*this = *this + d; return *this;}
+      constexpr modulo& operator-=(const sub_duration& d) noexcept {*this = *this - d; return *this;}
 
+      friend constexpr bool operator==(const modulo& x, const modulo& y) noexcept { return x.count() == y.count(); }
+      friend constexpr bool operator!=(const modulo& x, const modulo& y) noexcept { return x.count() != y.count(); }
+      friend constexpr bool operator< (const modulo& x, const modulo& y) noexcept { return x.count() < y.count(); }
+      friend constexpr bool operator> (const modulo& x, const modulo& y) noexcept { return x.count() > y.count(); }
+      friend constexpr bool operator<=(const modulo& x, const modulo& y) noexcept { return x.count() <= y.count(); }
+      friend constexpr bool operator>=(const modulo& x, const modulo& y) noexcept { return x.count() >= y.count(); }
 
-      friend constexpr bool operator==(const modulo& x, const modulo& y) noexcept { return x.m_value == y.m_value; }
-      friend constexpr bool operator!=(const modulo& x, const modulo& y) noexcept { return x.m_value != y.m_value; }
-      friend constexpr bool operator< (const modulo& x, const modulo& y) noexcept { return x.m_value < y.m_value; }
-      friend constexpr bool operator> (const modulo& x, const modulo& y) noexcept { return x.m_value > y.m_value; }
-      friend constexpr bool operator<=(const modulo& x, const modulo& y) noexcept { return x.m_value <= y.m_value; }
-      friend constexpr bool operator>=(const modulo& x, const modulo& y) noexcept { return x.m_value >= y.m_value; }
-
-      friend constexpr modulo  operator+(const modulo&  x, const sub_duration& y) noexcept { return modulo(x.m_value + y.count()); }
+      friend constexpr modulo  operator+(const modulo&  x, const sub_duration& y) noexcept { return modulo(x.count() + y.count()); }
       friend constexpr modulo  operator+(const sub_duration& x,  const modulo& y) noexcept { return y + x; }
+      friend constexpr modulo  operator-(const modulo&  x, const sub_duration& y) noexcept { return modulo(x.count() - y.count()); }
+      friend constexpr sub_duration operator-(const modulo& x,  const modulo& y) noexcept { return x.count() - y.count(); }
 
+      //@ @par Returns: modulo{0}.
+      static constexpr modulo min() noexcept
+      {
+        return modulo(0);
+      }
+      //@ @par Returns: modulo{numeric_limits<Rep>::max()}.
+      static constexpr modulo max() noexcept
+      {
+        return modulo(period-1);
+      }
   };
 
-
-  /**
-  It is not clear yet if the following overloads have a sens
-
-  xfn + sfn -> xsfn
-  sfn + xfn -> xsfn
-
-  bfn + sfn -> bsfn
-  sfn + bfn -> bsfn
-
-  */
-
-  // requires D1 is a subduration of D3
-  // The representation should be big enough to represent all the possible values
-  // that depend on modulo::period
-  template <class D1, class D2, class D3, class R1, class R2>
-  constexpr
-      modulo< D1, D3, common_type_t<R1, R2>>
-      operator+(modulo<D1, D2, R1> x, modulo<D2, D3, R2> y)
+  template <class ModuloTo, class ModuloFrom>
+  ModuloTo to_modulo(ModuloFrom m)
   {
-      return modulo< D1, D3, common_type_t<R1, R2>> {D1(x) + D2(y)};
+      return ModuloTo(
+          std::chrono::duration_cast<typename ModuloTo::sub_duration>(m.to_duration())
+          );
   }
 
-  template <class D1, class D2,class D3, class R1, class R2>
-  constexpr
-      modulo< D1, D3, common_type_t<R1, R2>>
-      operator+(modulo<D2, D3, R2> x, modulo<D1, D2, R1> y)
-  {
-      return y + x;
-  }
-
-  template <class SD2, class D2, class R2, class SD1, class D1, class R1>
-  modulo<SD2, D2, R2> modulo_cast2(modulo<SD1, D1, R1> m)
-  {
-      using rat = ratio_divide<typename SD1::period, typename SD2::period>;
-      return modulo<SD2, D2, R2>( (m.value() * rat::num / rat::den) % modulo<SD2, D2, R2>::period );
-  }
-
-  template <class M2, class M1>
-  M2 modulo_cast(M1 m)
-  {
-      using SD2 = typename M2::sub_duration;
-      using D2 = typename M2::duration;
-      using R2 = typename M2::rep;
-      return modulo_cast2<SD2, D2, R2>( m );
-  }
 }
 
 

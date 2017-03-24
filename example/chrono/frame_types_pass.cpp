@@ -27,58 +27,54 @@ using symbol_number     = stdex::chrono::modulo<symbols,   slots,      uint8_t>;
 using biframe_number    = stdex::chrono::modulo<frames,    biframes,   uint8_t>; //2
 
 
-
 using x_subframe_number = stdex::chrono::modulo<subframes, x_frames, uint16_t>; // 10240
+using bi_subframe_number = stdex::chrono::modulo<subframes, biframes, uint8_t>; // 20
+using bi_symbol_number = stdex::chrono::modulo<symbols, bislots, uint8_t>;      // 14
 
 x_subframe_number make_x_subframe_number(frame_number fn, subframe_number sfn) {
-       return x_subframe_number(fn+sfn) ;
+       return x_subframe_number(fn.to_duration()+sfn.to_duration()) ;
 }
-
-frame_number to_frame_number(x_subframe_number xsfn) {
-    return frame_number(std::chrono::duration_cast<frames>(subframes(xsfn)));
-}
-
-subframe_number to_subframe_number(x_subframe_number xsfn) {
-    return subframe_number(subframes(xsfn));
-}
-
-using bi_subframe_number = stdex::chrono::modulo<subframes, biframes, uint8_t>; // 2
 
 bi_subframe_number make_bi_subframe_number(biframe_number fn, subframe_number sfn) {
-       return bi_subframe_number(subframes(fn+sfn)) ;
+       return bi_subframe_number(fn.to_duration()+sfn.to_duration()) ;
 }
 
-biframe_number to_frame_number(bi_subframe_number bsfn) {
-    return biframe_number(std::chrono::duration_cast<biframes>(subframes(bsfn)));
+bi_symbol_number make_bi_subframe_number(slot_number sn, symbol_number syn) {
+       return bi_symbol_number(sn.to_duration() + syn.to_duration()) ;
 }
 
-subframe_number to_subframe_number(bi_subframe_number bsfn) {
-    return subframe_number(subframes(bsfn));
+template <class ModuloFrom>
+frame_number to_frame_number(ModuloFrom m)
+{
+    return stdex::chrono::to_modulo<frame_number>(m);
+}
+
+template <class ModuloFrom>
+subframe_number to_subframe_number(ModuloFrom m)
+{
+    return stdex::chrono::to_modulo<subframe_number>(m);
+}
+
+template <class ModuloFrom>
+slot_number to_slot_number(ModuloFrom m)
+{
+    return stdex::chrono::to_modulo<slot_number>(m);
+}
+
+template <class ModuloFrom>
+symbol_number to_symbol_number(ModuloFrom m)
+{
+    return stdex::chrono::to_modulo<slot_number>(m);
 }
 
 struct x_subframe_numbers {
     frame_number fn;
     subframe_number sfn;
-    x_subframe_numbers() {}
+    x_subframe_numbers() = default;
     x_subframe_numbers(frame_number fn, subframe_number sfn) : fn(fn), sfn(sfn) {}
-    explicit operator x_subframe_number() { return make_x_subframe_number(fn, sfn); }
+    operator x_subframe_number() { return make_x_subframe_number(fn, sfn); }
     //explicit operator bi_subframe_number() { return make_bi_subframe_number(fn, sfn); }
 };
-
-
-using bi_symbol_number = stdex::chrono::modulo<symbols, bislots, uint8_t>; // 2
-
-bi_symbol_number make_bi_subframe_number(slot_number sn, symbol_number syn) {
-       return bi_symbol_number(symbols(sn + syn)) ;
-}
-
-slot_number to_slot_number(bi_symbol_number bsn) {
-    return slot_number(std::chrono::duration_cast<slots>(symbols(bsn)));
-}
-
-symbol_number to_symbol_number(bi_symbol_number bsn) {
-    return symbol_number(symbols(bsn));
-}
 
 #include <boost/detail/lightweight_test.hpp>
 #include <iostream>
@@ -113,17 +109,17 @@ int main()
           std::cout << "x = " << x << "\n";
       }
       {
-          auto x = fn + sfn;
+          auto x = make_x_subframe_number( fn, sfn );
           std::cout << "x = " << x << "\n";
       }
 
       {
-          x_subframe_number x { fn + sfn };
+          x_subframe_number x = make_x_subframe_number( fn, sfn );
           std::cout << "x = " << x << "\n";
       }
 
       {
-          auto x = fn.get_duration() + sfn.get_duration();
+          auto x = fn.to_duration() + sfn.to_duration();
           std::cout << "x = " << x.count() << "\n";
       }
 
@@ -137,17 +133,17 @@ int main()
 
   std::cout << "==================\n";
 
-  x_subframe_number  x2 { fn + sfn};
-  bi_subframe_number bsfn2 = stdex::chrono::modulo_cast<bi_subframe_number>(x2) ;
+  x_subframe_number  x2 =make_x_subframe_number( fn, sfn );
+  bi_subframe_number bsfn2 = stdex::chrono::to_modulo<bi_subframe_number>(x2) ;
       std::cout << "bsfn2= " << bsfn2 << "\n";
 
-  biframe_number bfn2 = stdex::chrono::modulo_cast<biframe_number>(x2) ;
+  biframe_number bfn2 = stdex::chrono::to_modulo<biframe_number>(x2) ;
   std::cout << "bfn2= " << bfn2 << "\n";
 
-  x_subframe_number x3 = stdex::chrono::modulo_cast<x_subframe_number>(bfn2) ;
+  x_subframe_number x3 = stdex::chrono::to_modulo<x_subframe_number>(bfn2) ;
   std::cout << "x3= " << x3 << "\n";
 
-  x_subframe_number x4 = stdex::chrono::modulo_cast<x_subframe_number>(bsfn2) ;
+  x_subframe_number x4 = stdex::chrono::to_modulo<x_subframe_number>(bsfn2) ;
   std::cout << "x4= " << x4 << "\n";
 
 
