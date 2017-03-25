@@ -61,47 +61,121 @@ inline namespace fundamental_v3
         { return numeric_limits<UT>::max(); }
   };
 
-  template <class DomainFrom, class DomainTo>
-  struct is_domain_convertible : is_same<DomainFrom, DomainTo> {};
-
   template <class Domain>
-  struct strict_domain {
-
+  struct strict_copy_domain
+  {
     template <class T>
-    T convert_to(Domain, T const& r) { return r; }
-
+    T inter_domain_convert(Domain, T const& r) { return r; }
+    template <class T>
+    T inter_domain_cast(Domain, T const& r) { return r; }
+    template <class T>
+    T intra_domain_convert(T const& r) { return r; }
   };
 
+  struct explicit_conversion_domain
+  {
+    template <class T, class D, class U>
+    T inter_domain_convert(D, U const& u) { return T{u}; }
+    template <class T, class D, class U>
+    T inter_domain_cast(D, U const& u) { return T{u}; }
+    template <class T, class U>
+    T intra_domain_convert(U const& u) { return T{u}; }
+  };
+
+  struct implicit_conversion_domain
+  {
+    template <class T, class D, class U>
+    T inter_domain_convert(D, U const& u) { return u; }
+    template <class T, class D, class U>
+    T inter_domain_cast(D, U const& u) { return u; }
+    template <class T, class D, class U>
+    T intra_domain_convert(U const& u) { return u; }
+  };
 
   template <class Domain>
-  struct domain_conversion_traits : strict_domain<Domain> {};
+  struct domain_converter : strict_copy_domain<Domain> {};
 
-  template <class D, class T, class F>
-  auto convert_to(F const& r)
-  -> decltype(domain_conversion_traits<D>::template convert_to<T>(D{}, r))
+  template <class DT, class T, class F, class DF=DT>
+  auto inter_domain_convert(DF, F const& r)
+  -> decltype(domain_converter<DT>::template inter_domain_convert<T>(DF{}, r))
   {
-    return domain_conversion_traits<D>::template convert_to<T>(D{}, r);
+    return domain_converter<DT>::template inter_domain_convert<T>(DF{}, r);
   }
 
+  template <class DT, class T, class F, class DF=DT>
+  auto inter_domain_cast(DF, F const& r)
+  -> decltype(domain_converter<DT>::template inter_domain_cast<T>(DF{}, r))
+  {
+    return domain_converter<DT>::template inter_domain_cast<T>(DF{}, r);
+  }
+
+  template <class D, class T, class F>
+  auto intra_domain_convert(F const& r)
+  -> decltype(domain_converter<D>::template intra_domain_convert<T>(r))
+  {
+    return domain_converter<D>::template intra_domain_convert<T>(r);
+  }
+
+  template <class Domain, class From, class To, class DomainFrom=Domain>
+  struct is_inter_domain_convertible
+  {
+      template<class T>
+      static void f(T);
+
+      template<class D, class F, class T, class D2>
+      static constexpr auto test(int) ->
+      decltype(f(static_cast<T>(inter_domain_convert<D, T>(std::declval<D2>(), std::declval<F>()))), true)
+      {
+          return true;
+      }
+
+      template<class D, class F, class T, class D2>
+      static constexpr auto test(...) -> bool
+      {
+          return false;
+      }
+
+      static bool const value = test<Domain,From,To, DomainFrom>(0);
+  };
+
+  template <class Domain, class From, class To, class DomainFrom=Domain>
+  struct is_inter_domain_cast
+  {
+      template<class T>
+      static void f(T);
+
+      template<class D, class F, class T, class D2>
+      static constexpr auto test(int) ->
+      decltype(f(static_cast<T>(inter_domain_cast<D, T>(std::declval<D2>(), std::declval<F>()))), true)
+      {
+          return true;
+      }
+
+      template<class D, class F, class T, class D2>
+      static constexpr auto test(...) -> bool
+      {
+          return false;
+      }
+
+      static bool const value = test<Domain,From,To, DomainFrom>(0);
+  };
+
   template <class Domain, class From, class To>
-  struct is_explicitly_convertible_for_domain
+  struct is_intra_domain_convertible
   {
       template<class T>
       static void f(T);
 
       template<class D, class F, class T>
       static constexpr auto test(int) ->
-      decltype(f(
-          static_cast<T>(
-              std::experimental::convert_to<Domain, T>(std::declval<D>(), std::declval<F>())
-           )
-            )
-          , true) {
+      decltype(f(static_cast<T>(intra_domain_convert<D, T>(std::declval<F>()))), true)
+      {
           return true;
       }
 
       template<class D, class F, class T>
-      static constexpr auto test(...) -> bool {
+      static constexpr auto test(...) -> bool
+      {
           return false;
       }
 
@@ -121,27 +195,29 @@ inline namespace fundamental_v3
       strong_counter(strong_counter const&) = default;
       template <class UT2>
       explicit strong_counter(UT2 const& r
-          , typename enable_if<is_explicitly_convertible_for_domain<Domain, UT2, UT>::value>::type* = nullptr
+          , typename enable_if<is_intra_domain_convertible<Domain, UT2, UT>::value>::type* = nullptr
           )
-          : base_type(UT(r))
+          : base_type(intra_domain_convert<Domain, UT>(r))
       {}
       template <class UT2>
       explicit strong_counter(UT2 const& r
-          , typename enable_if<! is_explicitly_convertible_for_domain<Domain, UT2, UT>::value>::type* = nullptr
+          , typename enable_if<! is_intra_domain_convertible<Domain, UT2, UT>::value>::type* = nullptr
           ) = delete;
 
       template <class Domain2, class UT2>
       strong_counter(strong_counter<Domain2, UT2> const& other
           , typename enable_if<
-                is_domain_convertible<Domain2, Domain>::value
-              && is_explicitly_convertible_for_domain<Domain, UT2, UT>::value
+              is_inter_domain_convertible<Domain, UT2, UT, Domain2>::value
           >::type* = nullptr
           )
-            : base_type(std::experimental::convert_to<Domain,UT>(other.count()))
+            : base_type(inter_domain_convert<Domain,UT>(Domain2{}, other.count()))
       {}
 
       // assignment
       strong_counter& operator=(strong_counter const&) = default;
+
+      // todo add assignment from strong_counter<Domain, UT2>
+      // todo add assignment from strong_counter<Domain2, UT2>
 
       constexpr UT count() const noexcept
           { return this->underlying(); }
@@ -158,20 +234,20 @@ inline namespace fundamental_v3
       friend constexpr strong_counter operator+(strong_counter x)  noexcept
           { return x; }
       friend constexpr strong_counter operator+(strong_counter x, strong_counter y)  noexcept
-          { return strong_counter(x.value + y.value); }
+          { return strong_counter(x.count() + y.count()); }
       constexpr strong_counter& operator+=(strong_counter y)  noexcept
-          { this->value += y.value; return *this; }
+          { this->value += y.count(); return *this; }
       constexpr strong_counter operator++()  noexcept
           { return strong_counter(++this->value); }
       constexpr strong_counter operator++(int)  noexcept
           { return strong_counter(this->value++); }
 
       friend constexpr strong_counter operator-(strong_counter x)  noexcept
-          { return strong_counter(-x.value); }
+          { return strong_counter(-x.count()); }
       friend constexpr strong_counter operator-(strong_counter x, strong_counter y)  noexcept
-          { return strong_counter(x.value - y.value); }
+          { return strong_counter(x.count() - y.count()); }
       constexpr strong_counter& operator-=(strong_counter y)  noexcept
-          { this->value -= y.value; return *this; }
+          { this->value -= y.count(); return *this; }
       constexpr strong_counter operator--()  noexcept
           { return strong_counter(--this->value); }
       constexpr strong_counter operator--(int)  noexcept
@@ -179,44 +255,58 @@ inline namespace fundamental_v3
 
       //  Multiplicative operators
       friend constexpr strong_counter operator*(strong_counter x, UT y)  noexcept
-          { return strong_counter(x.value * y); }
+          { return strong_counter(x.count() * y); }
       friend constexpr strong_counter operator*(UT x, strong_counter y)  noexcept
-          { return strong_counter(x * y.value); }
+          { return strong_counter(x * y.count()); }
       constexpr strong_counter& operator*=(UT y)  noexcept
           { this->value *= y; return *this; }
 
       friend constexpr UT operator/(strong_counter x, strong_counter y)  noexcept
-          { return x.value / y.value; }
+          { return x.count() / y.count(); }
       friend constexpr strong_counter operator/(strong_counter x, UT y)  noexcept
-          { return strong_counter(x.value / y); }
+          { return strong_counter(x.count() / y); }
       constexpr strong_counter& operator/=(UT y)  noexcept
           { this->value /= y; return *this; }
 
       friend constexpr strong_counter operator%(strong_counter x, strong_counter y)  noexcept
-          { return strong_counter(x.value % y.value); }
+          { return strong_counter(x.count() % y.count()); }
       friend constexpr strong_counter operator%(strong_counter x, UT y)  noexcept
-          { return strong_counter(x.value % y); }
+          { return strong_counter(x.count() % y); }
       constexpr strong_counter& operator%=(strong_counter y)  noexcept
-          { this->value %= y.value; return *this; }
+          { this->value %= y.count(); return *this; }
       constexpr strong_counter& operator%=(UT y)  noexcept
           { this->value %= y; return *this; }
 
+      // todo add mixed arithmetic for strong_counter
+
       // relational operators
       friend constexpr bool operator==(strong_counter x, strong_counter y)  noexcept
-           { return x.value == y.value; }
+           { return x.count() == y.count(); }
       friend constexpr bool operator!=(strong_counter x, strong_counter y)  noexcept
-          { return x.value != y.value; }
+          { return x.count() != y.count(); }
       friend constexpr bool operator<(strong_counter x, strong_counter y)  noexcept
-          { return x.value < y.value; }
+          { return x.count() < y.count(); }
       friend constexpr bool operator>(strong_counter x, strong_counter y)  noexcept
-          { return x.value > y.value; }
+          { return x.count() > y.count(); }
       friend constexpr bool operator<=(strong_counter x, strong_counter y)  noexcept
-          { return x.value <= y.value; }
+          { return x.count() <= y.count(); }
       friend constexpr bool operator>=(strong_counter x, strong_counter y)  noexcept
-          { return x.value >= y.value; }
+          { return x.count() >= y.count(); }
+
+      // todo add mixed relational operators for strong_counter
+
   };
 
-  // todo add mixed arithmetic for strong_counter
+
+  // strong_counter_cast
+
+  template <class DomainTo, class RepTo, class DomainFrom, class RepFrom>
+  constexpr strong_counter<DomainTo, RepTo> strong_counter_cast(strong_counter<DomainFrom, RepFrom> const& sc)
+  {
+    return strong_counter<DomainTo, RepTo>(inter_domain_cast<DomainTo, RepTo>(DomainFrom{}, sc.count()));
+  }
+
+  // todo see what floor, round, ceil, abs could mean for strong_counter
 
   template <class Domain, class UT>
   constexpr strong_counter<Domain, UT> make_strong_counter(UT x)
