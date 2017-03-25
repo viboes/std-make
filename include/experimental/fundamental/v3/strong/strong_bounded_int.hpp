@@ -45,6 +45,11 @@ inline namespace fundamental_v3
 
   </code>
   */
+  // todo rename to strong_bounded_integer
+  // todo make use of domain instead of tags
+  //    Should this type be just a representation for an quantity?
+  //    and use it in quantity<Domain, bounded_integer<>>
+
   template <class Tag, class UT, UT Low, UT High>
   struct strong_bounded_int final : private_tagged<Tag, UT>
   {
