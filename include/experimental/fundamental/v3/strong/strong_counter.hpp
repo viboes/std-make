@@ -187,8 +187,8 @@ inline namespace fundamental_v3
   template <class Domain, class UT>
   struct strong_counter final : private_tagged<Domain, UT>
   {
-    // fixme do we need this restriction. While we could need it for counters
-      static_assert(is_integral<UT>::value, "UT must be integral");
+      // fixme do we need this restriction. While we could need it for counters
+      //static_assert(is_integral<UT>::value, "UT must be integral");
       using domain = Domain;
       using rep = UT;
 
@@ -229,9 +229,6 @@ inline namespace fundamental_v3
       // assignment
       strong_counter& operator=(strong_counter const&) = default;
       strong_counter& operator=(strong_counter &&) = default;
-
-      // todo add assignment from strong_counter<Domain, UT2>
-      // todo add assignment from strong_counter<Domain2, UT2>
 
       constexpr UT count() const noexcept
           { return this->underlying(); }
