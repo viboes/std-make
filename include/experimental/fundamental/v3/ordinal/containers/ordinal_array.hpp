@@ -355,8 +355,10 @@ inline namespace fundamental_v3
         return arg.elems;
     }
 #endif
+
 }}
 
+// todo add specialization for tuple-like type
 #if 0
 
     template <class T, typename O>

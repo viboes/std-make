@@ -32,23 +32,23 @@ inline namespace fundamental_v3
 {
 
     #ifndef JASEL_DOXYGEN_INVOKED
-    namespace enums_detail {
-        // enum_iterator is an iterator over an enum  that
-        // is bounded only by the limits of the enum.
+    namespace ordinal_detail {
+        // ordinal_iterator is an iterator over an ordinal  that
+        // is bounded only by the limits of the ordinal.
         //
         // This is useful for implementing the ordinal_range<E>()
         // function.
         //
-        // @Note
+        // @par Note:
         // The use of this iterator and ordinal_range<E>() is appreciably less
         // performant than the corresponding hand-written integer
         // loop on many compilers.
 
-        //! enum_iterator is a model of RandomAccessIterator
+        //! ordinal_iterator is a model of RandomAccessIterator
         template<typename T /* , typename Traits=ordinal_range_traits<T> */ >
-        class enum_iterator
+        class ordinal_iterator
             : public boost::iterator_facade<
-                        enum_iterator<T>,
+                        ordinal_iterator<T>,
                         T,
                         boost::random_access_traversal_tag,
                         T,
@@ -56,7 +56,7 @@ inline namespace fundamental_v3
                     >
         {
             typedef boost::iterator_facade<
-                        enum_iterator<T>,
+                        ordinal_iterator<T>,
                         T,
                         boost::random_access_traversal_tag,
                         T,
@@ -67,8 +67,8 @@ inline namespace fundamental_v3
             typedef typename base_t::difference_type difference_type;
             typedef typename base_t::reference reference;
 
-            enum_iterator() : index_(0) {}
-            explicit enum_iterator(int x) : index_(x) {}
+            ordinal_iterator() : index_(0) {}
+            explicit ordinal_iterator(int x) : index_(x) {}
 
         private:
             void increment()
@@ -86,12 +86,12 @@ inline namespace fundamental_v3
                 index_ += offset;
             }
 
-            difference_type distance_to(const enum_iterator& other) const
+            difference_type distance_to(const ordinal_iterator& other) const
             {
                 return other.index_ - index_;
             }
 
-            bool equal(const enum_iterator& other) const
+            bool equal(const ordinal_iterator& other) const
             {
                 return index_ == other.index_;
             }
@@ -104,33 +104,32 @@ inline namespace fundamental_v3
             friend class ::boost::iterator_core_access;
             int index_;
         };
-    } // namespace enums_detail
+    } // namespace ordinal_detail
     #endif
 
 
     /**
-     @TParams
-     @Param{T,set's element ordinal enum}
+     @tparam T set's element ordinal type
 
-     @Requires @c T must be a model of <em>OrdinalEnum</em>.
+     @par Requires: @c T must be a model of <em>OrdinalEnum</em>.
 
      \c ordinal_range is a model of the <em>RandomAccessRange</em> Concept associated to the enumeration \c T.
      */
 
     template<typename T/* , typename Traits=ordinal_range_traits<T> */ >
     class ordinal_range
-        : public boost::iterator_range< enums_detail::enum_iterator<T/*, Traits*/> >
+        : public boost::iterator_range< ordinal_detail::ordinal_iterator<T/*, Traits*/> >
     {
-        typedef enums_detail::enum_iterator<T/*, Traits*/> iterator_t;
+        typedef ordinal_detail::ordinal_iterator<T/*, Traits*/> iterator_t;
         typedef boost::iterator_range<iterator_t> base_t;
     public:
-        //! builds a enum range
+        //! builds a ordinal range
         ordinal_range()
             : base_t(iterator_t(0), iterator_t(ordinal::meta::size<T>::value))
         {
         }
 
-        //! builds a enum sub-range
+        //! builds a ordinal sub-range
         ordinal_range(T first, T last)
             : base_t(iterator_t(ordinal::pos(first)),
                      iterator_t(ordinal::pos(last)+1))
@@ -138,12 +137,12 @@ inline namespace fundamental_v3
         }
     };
 
-    //! function to generate an enum range.
+    //! function to generate an ordinal range.
 
     //! \c make_range allows treating enums as a model of the \e RandomAccessRange Concept.
 
-    //! @Requires \c T is a model of the \e Enumeration Concept.
-    //! @Returns an enum range from @c T'first to @c T'last inclusive.
+    //! @par Requires: \c T is a model of the \e Enumeration Concept.
+    //! @par Returns: an ordinal range from @c T'first to @c T'last inclusive.
     template<typename T /*, typename Traits*/ >
     ordinal_range<T>
     make_range()
@@ -151,15 +150,14 @@ inline namespace fundamental_v3
         return ordinal_range<T/*,Traits*/>();
     }
 
-      //! function to generate an enum sub-range.
+      //! function to generate an ordinal sub-range.
 
       //! \c make_range allows treating enums as a model of the \e RandomAccessRange Concept.
       //! It should be noted that the first and last parameters denoted a closed range.
-      //! @Requires \c T is a model of the \e Enumeration Concept.
-      //! @Params
-      //! @Param{first,first element of the range}
-      //! @Param{last,last element of the range}
-      //! @Returns an enum range from @c first to @c last inclusive.
+      //! @par Requires: \c T is a model of the \e Enumeration Concept.
+      //! @param firstfirst element of the range
+      //! @param lastlast element of the range
+      //! @par Returns: an ordinal range from @c first to @c last inclusive.
 
     template<typename T /*, typename Traits */ >
     ordinal_range<T>

@@ -184,7 +184,7 @@ namespace ordinal {
     struct size<chrono::modulo<D,SD,R>> : integral_constant<size_t, chrono::modulo<D,SD,R>::cardinal> {};
   }
   template <class D, class SD, class R>
-  struct traits<chrono::modulo<D,SD,R>>
+  struct traits<chrono::modulo<D,SD,R>> : ordinal::tag
   {
     using size_type = size_t;
     template <class U>
