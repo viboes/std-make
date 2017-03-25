@@ -30,8 +30,9 @@ inline namespace fundamental_v3
   struct conjunction<B0, B1, B2, Bs...>
           : conditional<B0::value, conjunction<B1, B2, Bs...>, B0>::type {};
 
-  #if __cplusplus >= 201402L
+#if __cplusplus >= 201402L
   template <class ...Bs>
+  //inline C++17
   constexpr bool conjunction_v = conjunction<Bs...>::value;
 #endif
 

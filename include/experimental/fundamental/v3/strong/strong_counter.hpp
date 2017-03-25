@@ -65,31 +65,31 @@ inline namespace fundamental_v3
   struct strict_copy_domain
   {
     template <class T>
-    T inter_domain_convert(Domain, T const& r) { return r; }
+    static T inter_domain_convert(Domain, T const& r) { return r; }
     template <class T>
-    T inter_domain_cast(Domain, T const& r) { return r; }
+    static T inter_domain_cast(Domain, T const& r) { return r; }
     template <class T>
-    T intra_domain_convert(T const& r) { return r; }
+    static T intra_domain_convert(T const& r) { return r; }
   };
 
   struct explicit_conversion_domain
   {
     template <class T, class D, class U>
-    T inter_domain_convert(D, U const& u) { return T{u}; }
+    static T inter_domain_convert(D, U const& u) { return T{u}; }
     template <class T, class D, class U>
-    T inter_domain_cast(D, U const& u) { return T{u}; }
+    static T inter_domain_cast(D, U const& u) { return T{u}; }
     template <class T, class U>
-    T intra_domain_convert(U const& u) { return T{u}; }
+    static T intra_domain_convert(U const& u) { return T{u}; }
   };
 
   struct implicit_conversion_domain
   {
     template <class T, class D, class U>
-    T inter_domain_convert(D, U const& u) { return u; }
+    static T inter_domain_convert(D, U const& u) { return u; }
     template <class T, class D, class U>
-    T inter_domain_cast(D, U const& u) { return u; }
-    template <class T, class D, class U>
-    T intra_domain_convert(U const& u) { return u; }
+    static T inter_domain_cast(D, U const& u) { return u; }
+    template <class T, class U>
+    static T intra_domain_convert(U const& u) { return u; }
   };
 
   template <class Domain>
@@ -182,10 +182,15 @@ inline namespace fundamental_v3
       static bool const value = test<Domain,From,To>(0);
   };
 
+  // fixme wondering if strong_counter should be renamed to strong_quantity, as the representation can be a floating point
+  // Note that strong_counter is not by them self a quantity unit, for that we need a Domain that manage units.
   template <class Domain, class UT>
   struct strong_counter final : private_tagged<Domain, UT>
   {
+    // fixme do we need this restriction. While we could need it for counters
       static_assert(is_integral<UT>::value, "UT must be integral");
+      using domain = Domain;
+      using rep = UT;
 
       using base_type = private_tagged<Domain, UT>;
       using base_type::base_type;
@@ -193,6 +198,11 @@ inline namespace fundamental_v3
       // constructors
       strong_counter() = default;
       strong_counter(strong_counter const&) = default;
+      strong_counter(strong_counter &&) = default;
+
+      //! @par Effects: constructs a strong_counter from its representations
+      //! @par Throws: Anything the copy of the conversion throws.
+      //! @par Remarks This constructor doesn't participates in overload resolution if the representation is not is_intra_domain_convertible
       template <class UT2>
       explicit strong_counter(UT2 const& r
           , typename enable_if<is_intra_domain_convertible<Domain, UT2, UT>::value>::type* = nullptr
@@ -204,6 +214,9 @@ inline namespace fundamental_v3
           , typename enable_if<! is_intra_domain_convertible<Domain, UT2, UT>::value>::type* = nullptr
           ) = delete;
 
+      //! @par Effects: constructs a strong_counter from another strong_counter with a different domain and possibly representation
+      //! @par Throws: Anything the copy of the conversion throws.
+      //! @par Remarks This constructor doesn't participates in overload resolution if the representation is not is_inter_domain_convertible
       template <class Domain2, class UT2>
       strong_counter(strong_counter<Domain2, UT2> const& other
           , typename enable_if<
@@ -215,6 +228,7 @@ inline namespace fundamental_v3
 
       // assignment
       strong_counter& operator=(strong_counter const&) = default;
+      strong_counter& operator=(strong_counter &&) = default;
 
       // todo add assignment from strong_counter<Domain, UT2>
       // todo add assignment from strong_counter<Domain2, UT2>
@@ -300,10 +314,10 @@ inline namespace fundamental_v3
 
   // strong_counter_cast
 
-  template <class DomainTo, class RepTo, class DomainFrom, class RepFrom>
-  constexpr strong_counter<DomainTo, RepTo> strong_counter_cast(strong_counter<DomainFrom, RepFrom> const& sc)
+  template <class ModuloTo, class DomainFrom, class RepFrom>
+  constexpr ModuloTo strong_counter_cast(strong_counter<DomainFrom, RepFrom> const& sc)
   {
-    return strong_counter<DomainTo, RepTo>(inter_domain_cast<DomainTo, RepTo>(DomainFrom{}, sc.count()));
+    return ModuloTo(inter_domain_cast<typename ModuloTo::domain, typename ModuloTo::rep>(DomainFrom{}, sc.count()));
   }
 
   // todo see what floor, round, ceil, abs could mean for strong_counter

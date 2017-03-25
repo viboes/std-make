@@ -162,12 +162,21 @@ namespace chrono
         return modulo(cardinal-1);
       }
   };
-
+  namespace  chrono_detail
+  {
+    template <class T>
+    struct is_modulo : false_type {};
+    template <class D, class SD, class R>
+    struct is_modulo<modulo<D,SD,R>> : true_type{};
+  }
   //! @par Requires modulo<D,SD,R> is more fine grained than ModuloTo
   //! @par Returns The ModuloTo of the duration_cast<typename ModuloTo::duration_t>()
   //! @par Note: The duration cast is needed because the representation
   template <class ModuloTo, class D, class SD, class R>
-  ModuloTo to_modulo(modulo<D,SD,R> m)
+  typename enable_if <
+    chrono_detail::is_modulo<ModuloTo>::value, ModuloTo
+  >::type
+  to_modulo(modulo<D,SD,R> m)
   {
       using duration_to = typename ModuloTo::duration_t;
       return ModuloTo(
