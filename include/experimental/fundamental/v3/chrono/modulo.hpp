@@ -13,6 +13,7 @@
 #include <ratio>
 #include <chrono>
 #include <limits>
+#include <experimental/ordinal.hpp>
 
 namespace std
 {
@@ -23,43 +24,58 @@ inline  namespace fundamental_v3
 
 namespace chrono
 {
-//  modulo is a trivially copyable class type.
-//  modulo is a standard-layout class type.
-//  modulo is a literal class type.
 
+  //! The modulo class breaks a duration, into a "broken" down sub duration.
+  //! The Duration template parameter dictates the precision to which the super Duration is broken down.
+  //! modulo is primarily a splitting tool.
+  //!
+  //! @par Requires: The ratio of the Super duration period and the duration period must be integral
+  //!
+  //! @par Features:
   //!  modulo is a trivially copyable class type if Rep it is.
   //!  modulo is a standard-layout class type if Rep it is.
   //!  modulo is a literal class type if Rep it is.
-  template <class SubDuration, class Duration, class Rep>
-  struct modulo final
+  //!
+  //! @par Examples:
+  //!   using weekday = modulo<days,   weeks,    std::uint8_t>; //7
+
+  template <class Duration, class SuperDuration, class Rep>
+  class modulo final
   {
-      //using period = SubDuration;
-      using sub_duration = SubDuration;
-      using duration = Duration;
+      Rep m_value;
+  public:
+      using period = typename ratio_divide<typename SuperDuration::period, typename Duration::period>::type;
+      static_assert(period::den==1, "SuperDuration must be a multiple of Duration");
+      static const constexpr intmax_t cardinal = period::num;
+
+      using duration_t = Duration;
+      using super_duration_t = SuperDuration;
       using rep = Rep;
 
-      using RatioPeriod = ratio_divide<typename Duration::period, typename SubDuration::period>;
-      static_assert(RatioPeriod::den==1, "Duration must be a multiple of SubDuration");
-      static const constexpr intmax_t period = RatioPeriod::num;
+      explicit modulo() = default;
 
-      Rep m_value;
-
-      constexpr explicit modulo() {}
+      //! @par Effects: constructs a modulo from its representations
       constexpr explicit modulo(Rep v) : m_value(v) {}
 
+      //! @par Requires: is_convertible<Rep2, Rep>
+      //! @par Effects: constructs a modulo converting the representations
       template <class Rep2>
-      constexpr modulo(modulo<SubDuration, Duration, Rep2> const& v) : m_value(v.m_value) {}
+      constexpr modulo(modulo<Duration, SuperDuration, Rep2> const& v) : m_value(v.m_value) {}
 
-      constexpr explicit modulo(sub_duration v) : m_value(v.count() % period) {}
+      //! @par Effects: constructs a modulo doing the modulo of the representation
+      constexpr explicit modulo(duration_t v) : m_value(v.count() % cardinal) {}
 
-      constexpr explicit operator sub_duration() { return sub_duration(this->m_value); }
-      constexpr sub_duration to_duration() { return sub_duration(this->m_value); }
+      //! @par Returns: conversion to duration
+      constexpr explicit operator duration_t() { return duration_t(this->m_value); }
+      constexpr duration_t to_duration() { return duration_t(this->m_value); }
 
+      //! @par Returns: conversion to the representation
       constexpr explicit operator Rep() const noexcept {return m_value;}
       constexpr Rep value() const noexcept {return m_value;}
       constexpr Rep count() const noexcept {return m_value;}
 
-      bool valid() const { return m_value >= 0 && m_value < period; }
+      //! @par Returns: min() <= conut() && conut() <= max()
+      bool valid() const { return m_value >= 0 && m_value < cardinal; }
 
       template <class OSTREAM>
       friend OSTREAM& operator<<(OSTREAM& os, modulo const& m) {
@@ -67,52 +83,123 @@ namespace chrono
           return os;
       }
 
-      constexpr modulo operator+() noexcept {return *this;}
-      constexpr modulo operator-() noexcept {return modulo(-m_value);}
+      //! @par Returns: *this.
+      constexpr modulo operator+() noexcept
+          { return *this; }
+      //! @par Returns: modulo{-Rep(*this)}.
+      constexpr modulo operator-() noexcept
+          { return modulo(-m_value); }
 
-      constexpr modulo& operator++() noexcept {if(++m_value == period) m_value=0; return *this;}
-      constexpr modulo operator++(int) noexcept {auto tmp(*this); ++(*this); return tmp;}
+      //! @par Effects: If m_value < candinal, ++m_value. Otherwise sets m_value to 0.
+      //! @par Returns: *this.
+      constexpr modulo& operator++() noexcept
+          { if (++m_value == cardinal) m_value=0; return *this; }
 
-      constexpr modulo& operator--() noexcept { if (m_value == 0) m_value=period; else --m_value; return *this;}
-      constexpr modulo operator--(int) noexcept {auto tmp(*this); --(*this); return tmp;}
+      //! @par Effects: ++(*this).
+      //! @par Returns: Returns: A copy of *this as it existed on entry to this member function.
+      constexpr modulo operator++(int) noexcept
+          { auto tmp(*this); ++(*this); return tmp; }
 
-      constexpr modulo& operator+=(const sub_duration& d) noexcept {*this = *this + d; return *this;}
-      constexpr modulo& operator-=(const sub_duration& d) noexcept {*this = *this - d; return *this;}
+      //! @par Effects: If m_value > 0, --m_value. Otherwise sets m_value to cardinal.
+      //! @par Returns: *this.
+      constexpr modulo& operator--() noexcept
+          { if (m_value == 0) m_value=cardinal; else --m_value; return *this;}
 
-      friend constexpr bool operator==(const modulo& x, const modulo& y) noexcept { return x.count() == y.count(); }
-      friend constexpr bool operator!=(const modulo& x, const modulo& y) noexcept { return x.count() != y.count(); }
-      friend constexpr bool operator< (const modulo& x, const modulo& y) noexcept { return x.count() < y.count(); }
-      friend constexpr bool operator> (const modulo& x, const modulo& y) noexcept { return x.count() > y.count(); }
-      friend constexpr bool operator<=(const modulo& x, const modulo& y) noexcept { return x.count() <= y.count(); }
-      friend constexpr bool operator>=(const modulo& x, const modulo& y) noexcept { return x.count() >= y.count(); }
+      //! @par Effects: --(*this).
+      //! @par Returns: Returns: A copy of *this as it existed on entry to this member function.
+      constexpr modulo operator--(int) noexcept
+          { auto tmp(*this); --(*this); return tmp; }
 
-      friend constexpr modulo  operator+(const modulo&  x, const sub_duration& y) noexcept { return modulo(x.count() + y.count()); }
-      friend constexpr modulo  operator+(const sub_duration& x,  const modulo& y) noexcept { return y + x; }
-      friend constexpr modulo  operator-(const modulo&  x, const sub_duration& y) noexcept { return modulo(x.count() - y.count()); }
-      friend constexpr sub_duration operator-(const modulo& x,  const modulo& y) noexcept { return x.count() - y.count(); }
+      //! @par Effects: *this = *this + d.
+      //! @par Returns: *this.
+      constexpr modulo& operator+=(const duration_t& d) noexcept
+          { *this = *this + d; return *this; }
+      //! @par Effects: *this = *this - d.
+      //! @par Returns: *this.
+      constexpr modulo& operator-=(const duration_t& d) noexcept
+          { *this = *this - d; return *this; }
+
+      //! @par Returns: Rep{x} == Rep{y}.
+      friend constexpr bool operator==(const modulo& x, const modulo& y) noexcept
+          { return x.count() == y.count(); }
+      //! @par Returns: Rep{x} != Rep{y}.
+      friend constexpr bool operator!=(const modulo& x, const modulo& y) noexcept
+          { return x.count() != y.count(); }
+      //! @par Returns: Rep{x} < Rep{y}.
+      friend constexpr bool operator< (const modulo& x, const modulo& y) noexcept
+          { return x.count() < y.count(); }
+      //! @par Returns: Rep{x} > Rep{y}.
+      friend constexpr bool operator> (const modulo& x, const modulo& y) noexcept
+          { return x.count() > y.count(); }
+      //! @par Returns: Rep{x} <= Rep{y}.
+      friend constexpr bool operator<=(const modulo& x, const modulo& y) noexcept
+          { return x.count() <= y.count(); }
+      //! @par Returns: Rep{x} >= Rep{y}.
+      friend constexpr bool operator>=(const modulo& x, const modulo& y) noexcept
+          { return x.count() >= y.count(); }
+
+      //! @par Returns: A modulo constructed by the addition of the respective representation.
+      friend constexpr modulo  operator+(const modulo&  x, const duration_t& y) noexcept
+          { return modulo(x.count() + y.count()); }
+      //! @par Returns: y + x.
+      friend constexpr modulo  operator+(const duration_t& x,  const modulo& y) noexcept
+          { return y + x; }
+      //! @par Returns: A modulo constructed by the difference of the respective representation.
+      friend constexpr modulo  operator-(const modulo&  x, const duration_t& y) noexcept
+          { return x + -y; }
+      //! @par Returns: The difference in duration_t between the respective durations.
+      friend constexpr duration_t operator-(const modulo& x,  const modulo& y) noexcept
+          { return x.count() - y.count(); }
 
       //@ @par Returns: modulo{0}.
       static constexpr modulo min() noexcept
       {
         return modulo(0);
       }
-      //@ @par Returns: modulo{numeric_limits<Rep>::max()}.
+      //@ @par Returns: modulo{cardinal-1}.
       static constexpr modulo max() noexcept
       {
-        return modulo(period-1);
+        return modulo(cardinal-1);
       }
   };
 
-  template <class ModuloTo, class ModuloFrom>
-  ModuloTo to_modulo(ModuloFrom m)
+  //! @par Requires modulo<D,SD,R> is more fine grained than ModuloTo
+  //! @par Returns The ModuloTo of the duration_cast<typename ModuloTo::duration_t>()
+  //! @par Note: The duration cast is needed because the representation
+  template <class ModuloTo, class D, class SD, class R>
+  ModuloTo to_modulo(modulo<D,SD,R> m)
   {
+      using duration_to = typename ModuloTo::duration_t;
       return ModuloTo(
-          std::chrono::duration_cast<typename ModuloTo::sub_duration>(m.to_duration())
+          std::chrono::duration_cast<duration_to>(m.to_duration())
           );
   }
 
-}
+} //chrono
 
+//! chrono::moduloD,SD,R> is a -n ordinal type that can be used with the ordinal containers
+namespace ordinal {
+  namespace meta {
+    template <class D, class SD, class R>
+    struct size<chrono::modulo<D,SD,R>> : integral_constant<size_t, chrono::modulo<D,SD,R>::cardinal> {};
+  }
+  template <class D, class SD, class R>
+  struct traits<chrono::modulo<D,SD,R>>
+  {
+    using size_type = size_t;
+    template <class U>
+    static constexpr
+    U val(size_type pos)  {
+      return U{static_cast<typename U::rep>(pos)};
+    }
+
+    template <class U>
+    static constexpr
+    size_type pos(U val)    {
+      return static_cast<size_type>(val.count());
+    }
+  };
+} // ordinal
 
 }
 }
