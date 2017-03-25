@@ -86,13 +86,11 @@ namespace meta {
   template <class Ord>
   constexpr decltype(auto) first() noexcept {
     return ordinal::val<Ord>(0);
-    //return ordinal::meta::first<Ord>::value ;
   }
 
   template <class Ord>
   constexpr decltype(auto) last() noexcept {
     return ordinal::val<Ord>(ordinal::meta::size<Ord>::value-1);
-    //return ordinal::meta::last<Ord>::value ;
   }
 
   template <class Ord>
@@ -120,6 +118,8 @@ namespace meta {
   constexpr bool is_ordinal_v = is_ordinal<T>::value ;
 #endif
 
+
+  // todo add specialization for integral types
 }
 }
 }
