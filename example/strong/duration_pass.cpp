@@ -11,7 +11,7 @@
  * We need a specific Domain for durations to state how durations convert between them.
  */
 
-#if 1 || __cplusplus >= 201402L
+#if __cplusplus >= 201402L
 
 #include <experimental/strong_counter.hpp>
 #include <experimental/type_traits.hpp>
@@ -22,6 +22,10 @@
 
 namespace stdex = std::experimental;
 
+// fixme: Shouldn't all the strong_counter domains require most of these conditions (except the Period related)?
+// todo generalize to dimension_1_domain<duration, Period>
+// todo generalize to dimensionless_domain<Tag>
+// fixme Shouldn't those have a Tag parameter to make them strongly typed?
 template<class Period>
 struct duration_domain
 {
@@ -78,13 +82,24 @@ using duration = stdex::strong_counter<duration_domain<Period>, Rep>;
 namespace std {
   template <class P1, class P2>
   struct common_type<duration_domain<P1>, duration_domain<P2>>
-    : common_type<P1,P2>  {};
+  {
+     using CP = typename common_type<std::chrono::duration<int,P1>,std::chrono::duration<int,P2>>::type::period;
+     using type = duration_domain<CP>;
+  };
 
 namespace experimental {
   template <class Period>
   struct domain_converter<duration_domain<Period>> : duration_domain<Period>  {  };
 }
 }
+
+static_assert(std::is_same<
+                  std::common_type<
+                    duration_domain<std::ratio<1,10>>,
+                    duration_domain<std::ratio<1,100>>
+                  >::type
+                , duration_domain<std::ratio<1,100>>
+              >::value, "");
 
 #include <boost/detail/lightweight_test.hpp>
 #include <iostream>

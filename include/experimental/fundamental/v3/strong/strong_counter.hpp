@@ -23,7 +23,7 @@
 
 #include <limits>
 #include <functional>
-#include <type_traits>
+#include <experimental/type_traits.hpp>
 
 namespace std
 {
@@ -51,15 +51,29 @@ inline namespace fundamental_v3
   </code>
   */
 
+  //! The domain_values type defines three common representation: zero, min, max.
+  //! The zero, min, and max functions in strong_counter forward their work to these functions.
+  //! This type can be specialized if the representation Rep requires a specific implementation to return these objects for a specific Domain.
   template <class Domain, class UT>
   struct domain_values {
+    //! par Returns: UT(0)
     static constexpr UT zero()  noexcept
         { return UT(0); }
+    //! par Returns: numeric_limits<UT>::min()
     static constexpr UT min()  noexcept
         { return numeric_limits<UT>::min(); }
+    //! par Returns: numeric_limits<UT>::max()
     static constexpr UT max()  noexcept
         { return numeric_limits<UT>::max(); }
   };
+
+  //! The treat_as_floating_point trait helps determine if a strong_counter can be converted to another strong_counter with a different Doamin.
+  //! Implicit conversions between two strong_counters normally depends on the domain.
+  //! However, implicit conversions can happen on most domains if treat_as_floating_point<Rep>::value == true.
+
+  template <class Domain, class Rep>
+  struct treat_as_floating_point : std::is_floating_point<Rep> {};
+
 
   template <class Domain>
   struct strict_copy_domain
@@ -92,9 +106,20 @@ inline namespace fundamental_v3
     static T intra_domain_convert(U const& u) { return u; }
   };
 
+  //! The domain_converter type defines three conversion functions: inter_domain_convert, inter_domain_cast, intra_domain_convert.
+  //! Some strong_counter conversion functions forward their work to these functions.
+  //! intra_domain_convert is used by the explicit conversion from the representation
+  //! inter_domain_convert is used by the explicit conversion from a strong_counter of another domain
+  //! inter_domain_cast is used by the strong_counter_cast conversion from a strong_counter of another domain
+  //!
+  //! By default these functions just work when an implicit conversion works on the same domain.
+  //! This type can be specialized for a specific domain to define when and how these functions work.
+
   template <class Domain>
   struct domain_converter : strict_copy_domain<Domain> {};
 
+  namespace detail {
+  //! @{ Non-member functions associated to the domain_converter customizable functions
   template <class DT, class T, class F, class DF=DT>
   auto inter_domain_convert(DF, F const& r)
   -> decltype(domain_converter<DT>::template inter_domain_convert<T>(DF{}, r))
@@ -115,6 +140,7 @@ inline namespace fundamental_v3
   {
     return domain_converter<D>::template intra_domain_convert<T>(r);
   }
+  //! @}
 
   template <class Domain, class From, class To, class DomainFrom=Domain>
   struct is_inter_domain_convertible
@@ -181,9 +207,15 @@ inline namespace fundamental_v3
 
       static bool const value = test<Domain,From,To>(0);
   };
+  }
 
-  // fixme wondering if strong_counter should be renamed to strong_quantity, as the representation can be a floating point
-  // Note that strong_counter is not by them self a quantity unit, for that we need a Domain that manage units.
+  // fixme Wondering if strong_counter should be renamed to strong_quantity, as the representation can be a floating point
+  // fixme Should this class be final or not
+  // Note that strong_counter is not by itself a quantity unit, for that we need a Domain that manage units.
+  // This started as a dimensionless strong counter with a Tag
+  // Then I moved to a Domain that is able to manage with dimensionless and dimension-1. However the Tag is mixed on the Domain.
+  // Wondering if we need a Tag parameter for strongly types and one a Dimension parameter to manage with the conversions.
+  // Or maybe we should have quantity<Unit, Rep> and then strong_quantity<Tag, Quantity>.
   template <class Domain, class UT>
   struct strong_counter final : private_tagged<Domain, UT>
   {
@@ -205,13 +237,13 @@ inline namespace fundamental_v3
       //! @par Remarks This constructor doesn't participates in overload resolution if the representation is not is_intra_domain_convertible
       template <class UT2>
       explicit strong_counter(UT2 const& r
-          , typename enable_if<is_intra_domain_convertible<Domain, UT2, UT>::value>::type* = nullptr
+          , typename enable_if<detail::is_intra_domain_convertible<Domain, UT2, UT>::value>::type* = nullptr
           )
-          : base_type(intra_domain_convert<Domain, UT>(r))
+          : base_type(detail::intra_domain_convert<Domain, UT>(r))
       {}
       template <class UT2>
       explicit strong_counter(UT2 const& r
-          , typename enable_if<! is_intra_domain_convertible<Domain, UT2, UT>::value>::type* = nullptr
+          , typename enable_if<! detail::is_intra_domain_convertible<Domain, UT2, UT>::value>::type* = nullptr
           ) = delete;
 
       //! @par Effects: constructs a strong_counter from another strong_counter with a different domain and possibly representation
@@ -219,11 +251,9 @@ inline namespace fundamental_v3
       //! @par Remarks This constructor doesn't participates in overload resolution if the representation is not is_inter_domain_convertible
       template <class Domain2, class UT2>
       strong_counter(strong_counter<Domain2, UT2> const& other
-          , typename enable_if<
-              is_inter_domain_convertible<Domain, UT2, UT, Domain2>::value
-          >::type* = nullptr
+          , typename enable_if<detail::is_inter_domain_convertible<Domain, UT2, UT, Domain2>::value>::type* = nullptr
           )
-            : base_type(inter_domain_convert<Domain,UT>(Domain2{}, other.count()))
+          : base_type(detail::inter_domain_convert<Domain,UT>(Domain2{}, other.count()))
       {}
 
       // assignment
@@ -244,8 +274,6 @@ inline namespace fundamental_v3
       // additive operators
       friend constexpr strong_counter operator+(strong_counter x)  noexcept
           { return x; }
-      friend constexpr strong_counter operator+(strong_counter x, strong_counter y)  noexcept
-          { return strong_counter(x.count() + y.count()); }
       constexpr strong_counter& operator+=(strong_counter y)  noexcept
           { this->value += y.count(); return *this; }
       constexpr strong_counter operator++()  noexcept
@@ -255,8 +283,6 @@ inline namespace fundamental_v3
 
       friend constexpr strong_counter operator-(strong_counter x)  noexcept
           { return strong_counter(-x.count()); }
-      friend constexpr strong_counter operator-(strong_counter x, strong_counter y)  noexcept
-          { return strong_counter(x.count() - y.count()); }
       constexpr strong_counter& operator-=(strong_counter y)  noexcept
           { this->value -= y.count(); return *this; }
       constexpr strong_counter operator--()  noexcept
@@ -265,30 +291,16 @@ inline namespace fundamental_v3
           { return strong_counter(this->value--); }
 
       //  Multiplicative operators
-      friend constexpr strong_counter operator*(strong_counter x, UT y)  noexcept
-          { return strong_counter(x.count() * y); }
-      friend constexpr strong_counter operator*(UT x, strong_counter y)  noexcept
-          { return strong_counter(x * y.count()); }
       constexpr strong_counter& operator*=(UT y)  noexcept
           { this->value *= y; return *this; }
 
-      friend constexpr UT operator/(strong_counter x, strong_counter y)  noexcept
-          { return x.count() / y.count(); }
-      friend constexpr strong_counter operator/(strong_counter x, UT y)  noexcept
-          { return strong_counter(x.count() / y); }
       constexpr strong_counter& operator/=(UT y)  noexcept
           { this->value /= y; return *this; }
 
-      friend constexpr strong_counter operator%(strong_counter x, strong_counter y)  noexcept
-          { return strong_counter(x.count() % y.count()); }
-      friend constexpr strong_counter operator%(strong_counter x, UT y)  noexcept
-          { return strong_counter(x.count() % y); }
       constexpr strong_counter& operator%=(strong_counter y)  noexcept
           { this->value %= y.count(); return *this; }
       constexpr strong_counter& operator%=(UT y)  noexcept
           { this->value %= y; return *this; }
-
-      // todo add mixed arithmetic for strong_counter
 
       // relational operators
       friend constexpr bool operator==(strong_counter x, strong_counter y)  noexcept
@@ -308,16 +320,178 @@ inline namespace fundamental_v3
 
   };
 
+  // mixed arithmetic for strong_counter
+
+  template <class D1, class R1, class D2, class R2>
+  constexpr
+  typename common_type<strong_counter<D1, R1>, strong_counter<D2, R2> >::type
+  operator+(const strong_counter<D1, R1>& x,
+        const strong_counter<D2, R2>& y)
+  {
+    typedef typename common_type<strong_counter<D1, R1>, strong_counter<D2, R2> >::type CD;
+    return CD(CD(x).count() + CD(y).count());
+  }
+
+  template <class D1, class R1, class D2, class R2>
+  constexpr
+  typename common_type<strong_counter<D1, R1>, strong_counter<D2, R2> >::type
+  operator-(const strong_counter<D1, R1>& x,
+        const strong_counter<D2, R2>& y)
+  {
+    typedef typename common_type<strong_counter<D1, R1>, strong_counter<D2, R2> >::type CD;
+    return CD(CD(x).count() - CD(y).count());
+  }
+
+  template <class D1, class R1, class R2>
+  constexpr
+  strong_counter<D1, typename common_type<R1, R2>::type >
+  operator*(const strong_counter<D1, R1>& x,
+        const R2& y)
+  {
+    typedef typename common_type<R1, R2>::type CR;
+    typedef strong_counter<D1, CR> CD;
+    return CD(CD(x).count() * static_cast<CR>(y));
+  }
+
+  template <class D1, class R1, class R2>
+  constexpr
+  strong_counter<D1, typename common_type<R1, R2>::type >
+  operator*(const R2& y, const strong_counter<D1, R1>& x)
+  {
+    return x * y;
+  }
+
+  template <class D1, class R1, class R2>
+  constexpr
+  strong_counter<D1, typename common_type<R1, R2>::type >
+  operator/(const strong_counter<D1, R1>& x,
+        const R2& y)
+  {
+    typedef typename common_type<R1, R2>::type CR;
+    typedef strong_counter<D1, CR> CD;
+    return CD(CD(x).count() / static_cast<CR>(y));
+  }
+
+  template <class D1, class R1, class D2, class R2>
+  constexpr
+  typename common_type<R1, R2>::type
+  operator/(const strong_counter<D1, R1>& x,
+        const strong_counter<D2, R2>& y)
+  {
+    typedef typename common_type<strong_counter<D1, R1>, strong_counter<D2, R2> >::type CD;
+    return CD(x).count() / CD(y).count();
+  }
+
+  template <class D1, class R1, class R2>
+  constexpr
+  strong_counter<D1, typename common_type<R1, R2>::type >
+  operator%(const strong_counter<D1, R1>& x,
+        const R2& y)
+  {
+    typedef typename common_type<R1, R2>::type CR;
+    typedef strong_counter<D1, CR> CD;
+    return CD(CD(x).count() % static_cast<CR>(y));
+  }
+
+  template <class D1, class R1, class D2, class R2>
+  constexpr
+  typename common_type<strong_counter<D1, R1>, strong_counter<D2, R2> >::type
+  operator%(const strong_counter<D1, R1>& x,
+        const strong_counter<D2, R2>& y)
+  {
+    typedef typename common_type<strong_counter<D1, R1>, strong_counter<D2, R2> >::type CD;
+    return CD(CD(x).count() % CD(y).count());
+  }
+
+
+  template <class T>
+  struct is_strong_counter : std::false_type {};
+  template <class D, class R>
+  struct is_strong_counter<strong_counter<D,R>> : std::true_type {};
 
   // strong_counter_cast
 
-  template <class ModuloTo, class DomainFrom, class RepFrom>
-  constexpr ModuloTo strong_counter_cast(strong_counter<DomainFrom, RepFrom> const& sc)
+  //! Converts a strong_counter to a strong_counter of different type StrongCounterTo.
+  //! No implicit conversions are used.
+  //! Multiplications and divisions should be avoided where possible.
+  //! Computations should be done in the widest type available and converted, as if by static_cast, to the result type only when finished.
+  //! The function does not participate in the overload resolution unless StrongCounterTo is an instance of strong_counter.
+  //! Casting between strong_counters that don't lost information (e.g. hours to minutes) can be performed implicitly, no strong_counters_cast is needed.
+
+  template <class StrongCounterTo, class DomainFrom, class RepFrom
+      , class = typename enable_if<
+                  conjunction<
+                    is_strong_counter<StrongCounterTo>
+                  , detail::is_inter_domain_cast<typename StrongCounterTo::domain, RepFrom, typename StrongCounterTo::rep, DomainFrom>
+                  >::value
+                >::type
+  >
+  constexpr StrongCounterTo strong_counter_cast(strong_counter<DomainFrom, RepFrom> const& sc)
   {
-    return ModuloTo(inter_domain_cast<typename ModuloTo::domain, typename ModuloTo::rep>(DomainFrom{}, sc.count()));
+    return StrongCounterTo(detail::inter_domain_cast<typename StrongCounterTo::domain, typename StrongCounterTo::rep>(DomainFrom{}, sc.count()));
   }
 
-  // todo see what floor, round, ceil, abs could mean for strong_counter
+  // Rounding
+
+  //! @par Returns: the greatest strong_counter t representable in To that is less or equal to d.
+  //! The function does not participate in the overload resolution unless To is an instance of strong_counter.
+
+  template <class To, class D, class R
+      , class = typename enable_if<is_strong_counter<To>{}>::type
+  >
+  To strong_counter_floor(const strong_counter<D, R>& d)
+  {
+    To t = strong_counter_cast<To>(d);
+    if (t>d) --t;
+    return t;
+  }
+
+  //! @par Returns: the smallest strong_counter t representable in To that is greater or equal to d.
+  //! The function does not participate in the overload resolution unless To is an instance of strong_counter.
+  template <class To, class D, class R
+      , class = typename enable_if<is_strong_counter<To>{}>::type
+  >
+  To strong_counter_ceil(const strong_counter<D, R>& d)
+  {
+      To t = strong_counter_cast<To>(d);
+      if (t < d)
+          ++t;
+      return t;
+  }
+
+  //! @par Returns: the value t representable in To that is the closest to d.
+  //! If there are two such values, returns the even value (that is, the value t such that t % 2 == 0).
+  //! The function does not participate in the overload resolution unless To is an instance of strong_counter
+  //! and treat_as_floating_point<typename To::rep>{} is false
+  template <class To, class D, class R
+      , class = typename enable_if<is_strong_counter<To>{}
+                && ! treat_as_floating_point<typename To::domain, typename To::rep>{}
+                >::type
+  >
+  To strong_counter_round(const strong_counter<D, R>& d)
+  {
+      To t0 = strong_counter_cast<To>(d);
+      To t1 = t0+ To{1};
+      auto diff0 = d - t0;
+      auto diff1 = t1 - d;
+      if (diff0 == diff1) {
+          if (t0.count() & 1) {
+              return t1;
+          }
+          return t0;
+      } else if (diff0 < diff1) {
+          return t0;
+      }
+      return t1;
+  }
+
+  template <class D, class R
+  , class = std::enable_if_t<
+      strong_counter<D, R>::min() < strong_counter<D, R>::zero()>>
+  constexpr strong_counter<D, R> abs(strong_counter<D, R> d)
+  {
+      return d >= d.zero() ? d : -d;
+  }
 
   template <class Domain, class UT>
   constexpr strong_counter<Domain, UT> make_strong_counter(UT x)
@@ -326,6 +500,7 @@ inline namespace fundamental_v3
   }
 
   //! underlying_type specialization for strong_counter
+  //! Exposes the type named type, which is the underlying representation of two strong_counter
   template <class Domain, class UT>
   struct underlying_type<strong_counter<Domain,UT>>
   { using type = UT; };
@@ -338,6 +513,9 @@ inline namespace fundamental_v3
 }
 }
 
+  //! common_type specialization
+  //! Exposes the type named type, which is the common type of two strong_counter.
+  //! It is a strong_counter with the common type of the domains and the representations.
   template <class Domain1, class UT1, class Domain2, class UT2>
   struct common_type<experimental::strong_counter<Domain1,UT1>, experimental::strong_counter<Domain2,UT2>>
   {
@@ -347,13 +525,15 @@ inline namespace fundamental_v3
           >;
   };
 
+  //! hash specialization
   template <class Domain, class UT>
   struct hash<experimental::strong_counter<Domain,UT>>
     : experimental::wrapped_hash<experimental::strong_counter<Domain, UT>> {};
 
+  // fixme Is strong_counter eally a numeric type?
+  //! numeric_limits specialization
   template <class Domain, class UT>
   struct numeric_limits<experimental::strong_counter<Domain,UT>> : numeric_limits<UT> {  };
-
 
 }
 #endif
