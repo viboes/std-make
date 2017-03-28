@@ -15,6 +15,8 @@ namespace stdex = std::experimental;
 using OrangeCount = stdex::strong_int<class OrangeTag, int>;
 using OrangeCountDC = stdex::strong_int<class OrangeTag, int>;
 using AppelCount = stdex::strong_int<class AppelTag, int>;
+using UOrangeCount = stdex::strong_int<class OrangeTag, unsigned int>;
+using SOrangeCount = stdex::strong_int<class OrangeTag, short>;
 
 OrangeCount add(OrangeCount x, OrangeCount y){
   return x+y;
@@ -128,6 +130,18 @@ int main()
         OrangeCount oc2{2};
         BOOST_TEST(oc1+oc2 == OrangeCount{3});
       }
+      { // operator+(x,y)
+        SOrangeCount oc1{1};
+        SOrangeCount oc2{2};
+        BOOST_TEST(oc1+oc2 == SOrangeCount{3});
+      }
+      { // operator+(x,y)
+        SOrangeCount oc1{1};
+        SOrangeCount oc2{2};
+        SOrangeCount oc = oc1+oc2;
+        BOOST_TEST(oc == SOrangeCount{3});
+      }
+
       { // operator+=(x)
         OrangeCount oc1{1};
         OrangeCount oc2{2};
@@ -152,10 +166,37 @@ int main()
         OrangeCount oc2 = -oc;
         BOOST_TEST(oc2 == OrangeCount{-1});
       }
+      { // operator-(x)
+        UOrangeCount oc{1};
+        UOrangeCount oc2 = -oc;
+        BOOST_TEST(oc2 == UOrangeCount{-1u});
+      }
       { // operator-(x,y)
         OrangeCount oc1{1};
         OrangeCount oc2{2};
         BOOST_TEST(oc1-oc2 == OrangeCount{-1});
+      }
+      { // operator-(x,y)
+        SOrangeCount oc1{1};
+        SOrangeCount oc2{2};
+        BOOST_TEST(oc1-oc2 == SOrangeCount{-1});
+      }
+      { // operator-(x,y)
+        SOrangeCount oc1{1};
+        SOrangeCount oc2{2};
+        SOrangeCount oc = oc1-oc2;
+        BOOST_TEST(oc == SOrangeCount{-1});
+      }
+      { // operator-(x,y)
+        UOrangeCount oc1{3};
+        UOrangeCount oc2{2};
+        BOOST_TEST(oc1-oc2 == UOrangeCount{1});
+      }
+      { // operator-(x,y)
+        UOrangeCount oc1{3};
+        UOrangeCount oc2{2};
+        UOrangeCount oc = oc1-oc2;
+        BOOST_TEST(oc == UOrangeCount{1});
       }
       { // operator-=(x)
         OrangeCount oc1{1};
