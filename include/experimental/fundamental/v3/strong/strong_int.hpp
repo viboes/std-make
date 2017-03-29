@@ -14,7 +14,7 @@
 
 #include <limits>
 #include <functional>
-#include <type_traits>
+#include <experimental/type_traits.hpp>
 
 namespace std
 {
@@ -56,20 +56,20 @@ inline namespace fundamental_v3
 
       template <class UT2
       //fixme  error: constructor cannot be redeclared when using , typename = typename enable_if<>::type
-        , typename enable_if<
-            is_constructible<UT, UT2 const&>::value &&
-            is_convertible<UT2 const&, UT>::value
-            , bool>::type = false
+        , enable_if_t<
+            is_constructible_v<UT, UT2 const&> &&
+            is_convertible_v<UT2 const&, UT>
+            , bool> = false
       >
       strong_int(strong_int<Tag, UT2> const& other)
         : base_type(other.underlying())
       {}
 
       template <class UT2
-        ,  typename = typename enable_if<
-            is_constructible<UT, UT2 const&>::value &&
-            ! is_convertible<UT2 const&, UT>::value
-          >::type
+        ,  typename = enable_if_t<
+            is_constructible_v<UT, UT2 const&> &&
+            ! is_convertible_v<UT2 const&, UT>
+          >
       >
       explicit strong_int(strong_int<Tag, UT2> const& other)
         : base_type(other.underlying())
@@ -101,20 +101,13 @@ inline namespace fundamental_v3
       constexpr strong_int& operator/=(strong_int y)  noexcept
       { this->value /= y.underlying(); return *this; }
 
-      // fixme: Should the % parameter be int? Or both as in std::chrono::duration
       constexpr strong_int& operator%=(strong_int y)  noexcept
       { this->value %= y.underlying(); return *this; }
 
-      friend constexpr strong_int operator&(strong_int x, strong_int y)  noexcept
-      { return strong_int(x.underlying() & y.underlying()); }
       constexpr strong_int& operator&=(strong_int y)  noexcept
       { this->value &= y.underlying(); return *this; }
-      friend constexpr strong_int operator|(strong_int x, strong_int y)  noexcept
-      { return strong_int(x.underlying() | y.underlying()); }
       constexpr strong_int& operator|=(strong_int y)  noexcept
       { this->value |= y.underlying(); return *this; }
-      friend constexpr strong_int operator^(strong_int x, strong_int y)  noexcept
-      { return strong_int(x.underlying() ^ y.underlying()); }
       constexpr strong_int& operator^=(strong_int y)  noexcept
       { this->value ^= y.underlying(); return *this; }
 
@@ -122,18 +115,18 @@ inline namespace fundamental_v3
       // This doesn't mean that we cannot have more specialized types
 
       // Bitwise logic operators
-      // fixme: Should the << parameter be strong_int?
-      constexpr strong_int& operator<<=(int y)  noexcept
-      { this->value <<= y; return *this; }
-      constexpr strong_int& operator>>=(int y)  noexcept
-      { this->value >>= y; return *this; }
+      // fixme: Should the << parameter be int?
+      constexpr strong_int& operator<<=(strong_int y)  noexcept
+      { this->value <<= y.value; return *this; }
+      constexpr strong_int& operator>>=(strong_int y)  noexcept
+      { this->value >>= y.value; return *this; }
 
   };
 
-  template <class Tag, class UT>
-  constexpr strong_int<Tag, UT> make_strong_int(UT x)
+  template <class Tag, class R>
+  constexpr strong_int<Tag, R> make_strong_int(R x)
   {
-    return strong_int<Tag, UT>(x);
+    return strong_int<Tag, R>(x);
   }
 
   // additive operators
@@ -143,107 +136,115 @@ inline namespace fundamental_v3
     return x;
   }
 
-  template <class Tag, class R>
-  constexpr auto operator+(strong_int<Tag,R> x, strong_int<Tag,R> y)  noexcept -> strong_int<Tag, decltype(x.underlying() + y.underlying())>
+  template <class Tag, class R1, class R2>
+  constexpr auto operator+(strong_int<Tag,R1> x, strong_int<Tag,R2> y)  noexcept -> decltype(make_strong_int<Tag>(x.underlying() + y.underlying()))
   {
     return make_strong_int<Tag>(x.underlying() + y.underlying());
   }
 
   template <class Tag, class R>
-  constexpr auto operator-(strong_int<Tag,R> x)  noexcept -> strong_int<Tag, decltype(-x.underlying())>
+  constexpr auto operator-(strong_int<Tag,R> x)  noexcept -> decltype(make_strong_int<Tag>(-x.underlying()))
   {
     return make_strong_int<Tag>(-x.underlying());
   }
 
-  template <class Tag, class R>
-  constexpr strong_int<Tag,R> operator-(strong_int<Tag,R> x, strong_int<Tag,R> y)  noexcept
+  template <class Tag, class R1, class R2>
+  constexpr auto operator-(strong_int<Tag,R1> x, strong_int<Tag,R2> y)  noexcept -> decltype(make_strong_int<Tag>(x.underlying() - y.underlying()))
   {
-    return strong_int<Tag,R>(x.underlying() - y.underlying());
+    return make_strong_int<Tag>(x.underlying() - y.underlying());
   }
 
   //  Multiplicative operators
-  template <class Tag, class R>
-  constexpr strong_int<Tag,R> operator*(strong_int<Tag,R> x, strong_int<Tag,R> y)  noexcept
+  template <class Tag, class R1, class R2>
+  constexpr auto operator*(strong_int<Tag,R1> x, strong_int<Tag,R2> y)  noexcept -> decltype(make_strong_int<Tag>(x.underlying() * y.underlying()))
   {
-    return strong_int<Tag,R>(x.underlying() * y.underlying());
+    return make_strong_int<Tag>(x.underlying() * y.underlying());
   }
 
-  template <class Tag, class R>
-  constexpr strong_int<Tag,R> operator/(strong_int<Tag,R> x, strong_int<Tag,R> y)  noexcept
+  template <class Tag, class R1, class R2>
+  constexpr auto operator/(strong_int<Tag,R1> x, strong_int<Tag,R2> y)  noexcept -> decltype(make_strong_int<Tag>(x.underlying() / y.underlying()))
   {
-    return strong_int<Tag,R>(x.underlying() / y.underlying());
+    return make_strong_int<Tag>(x.underlying() / y.underlying());
   }
 
-  template <class Tag, class R>
-  constexpr strong_int<Tag,R> operator%(strong_int<Tag,R> x, strong_int<Tag,R> y)  noexcept
+  template <class Tag, class R1, class R2>
+  constexpr auto operator%(strong_int<Tag,R1> x, strong_int<Tag,R2> y)  noexcept -> decltype(make_strong_int<Tag>(x.underlying() * y.underlying()))
   {
-    return strong_int<Tag,R>(x.underlying() % y.underlying());
+    return make_strong_int<Tag>(x.underlying() % y.underlying());
   }
+
 
   // Bitwise logic operators
+
   template <class Tag, class R>
   constexpr strong_int<Tag,R> operator~(strong_int<Tag,R> x)  noexcept
   {
     return strong_int<Tag,R>(~x.underlying());
   }
 
-  template <class Tag, class R>
-  constexpr strong_int<Tag,R> operator<<(strong_int<Tag,R> x, int y)  noexcept
+  template <class Tag, class R1, class R2>
+  constexpr auto operator&(strong_int<Tag,R1> x, strong_int<Tag,R2> y)  noexcept -> decltype(make_strong_int<Tag>(x.underlying() & y.underlying()))
   {
-    return strong_int<Tag,R>(x.underlying() << y);
+    return make_strong_int<Tag>(x.underlying() & y.underlying());
   }
 
-  template <class Tag, class R>
-  constexpr strong_int<Tag,R> operator>>(strong_int<Tag,R> x, int y)  noexcept
+  template <class Tag, class R1, class R2>
+  constexpr auto operator|(strong_int<Tag,R1> x, strong_int<Tag,R2> y)  noexcept -> decltype(make_strong_int<Tag>(x.underlying() | y.underlying()))
   {
-    return strong_int<Tag,R>(x.underlying() >> y);
+    return make_strong_int<Tag>(x.underlying() | y.underlying());
+  }
+
+  template <class Tag, class R1, class R2>
+  constexpr auto operator^(strong_int<Tag,R1> x, strong_int<Tag,R2> y)  noexcept -> decltype(make_strong_int<Tag>(x.underlying() ^ y.underlying()))
+  {
+    return make_strong_int<Tag>(x.underlying() ^ y.underlying());
+  }
+
+  template <class Tag, class R1, class R2>
+  constexpr auto operator<<(strong_int<Tag,R1> x, strong_int<Tag,R2> y)  noexcept -> decltype(make_strong_int<Tag>(x.underlying() << y.underlying()))
+  {
+    return make_strong_int<Tag>(x.underlying() << y.underlying());
+  }
+
+  template <class Tag, class R1, class R2>
+  constexpr auto operator>>(strong_int<Tag,R1> x, strong_int<Tag,R2> y)  noexcept -> decltype(make_strong_int<Tag>(x.underlying() >> y.underlying()))
+  {
+    return make_strong_int<Tag>(x.underlying() >> y);
   }
 
   // relational operators
-  template <class Tag, class R1, class R2
-    , typename = typename enable_if<is_convertible<R2,R1>::value>::type
-  >
-  constexpr bool operator==(strong_int<Tag,R1> x, strong_int<Tag,R2> y)  noexcept
+  template <class Tag, class R1, class R2>
+  constexpr auto operator==(strong_int<Tag,R1> x, strong_int<Tag,R2> y)  noexcept -> decltype(x.underlying() == y.underlying())
   {
     return x.underlying() == y.underlying();
   }
 
-  template <class Tag, class R1, class R2
-    , typename = typename enable_if<is_convertible<R2,R1>::value>::type
-  >
-  constexpr bool operator!=(strong_int<Tag,R1> x, strong_int<Tag,R2> y)  noexcept
+  template <class Tag, class R1, class R2>
+  constexpr auto operator!=(strong_int<Tag,R1> x, strong_int<Tag,R2> y)  noexcept -> decltype(x.underlying() != y.underlying())
   {
     return x.underlying() != y.underlying();
   }
 
-  template <class Tag, class R1, class R2
-    , typename = typename enable_if<is_convertible<R2,R1>::value>::type
-  >
-  constexpr bool operator<(strong_int<Tag,R1> x, strong_int<Tag,R2> y)  noexcept
+  template <class Tag, class R1, class R2>
+  constexpr auto operator<(strong_int<Tag,R1> x, strong_int<Tag,R2> y)  noexcept -> decltype(x.underlying() < y.underlying())
   {
     return x.underlying() < y.underlying();
   }
 
-  template <class Tag, class R1, class R2
-    , typename = typename enable_if<is_convertible<R2,R1>::value>::type
-  >
-  constexpr bool operator>(strong_int<Tag,R1> x, strong_int<Tag,R2> y)  noexcept
+  template <class Tag, class R1, class R2>
+  constexpr auto operator>(strong_int<Tag,R1> x, strong_int<Tag,R2> y)  noexcept -> decltype(x.underlying() > y.underlying())
   {
     return x.underlying() > y.underlying();
   }
 
-  template <class Tag, class R1, class R2
-    , typename = typename enable_if<is_convertible<R2,R1>::value>::type
-  >
-  constexpr bool operator<=(strong_int<Tag,R1> x, strong_int<Tag,R2> y)  noexcept
+  template <class Tag, class R1, class R2>
+  constexpr auto operator<=(strong_int<Tag,R1> x, strong_int<Tag,R2> y)  noexcept -> decltype(x.underlying() <= y.underlying())
   {
     return x.underlying() <= y.underlying();
   }
 
-  template <class Tag, class R1, class R2
-    , typename = typename enable_if<is_convertible<R2,R1>::value>::type
-  >
-  constexpr bool operator>=(strong_int<Tag,R1> x, strong_int<Tag,R2> y)  noexcept
+  template <class Tag, class R1, class R2>
+  constexpr auto operator>=(strong_int<Tag,R1> x, strong_int<Tag,R2> y)  noexcept -> decltype(x.underlying() >= y.underlying())
   {
     return x.underlying() >= y.underlying();
   }

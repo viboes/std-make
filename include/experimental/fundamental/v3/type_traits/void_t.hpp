@@ -6,17 +6,15 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef JASEL_V3_FUNDAMENTALTYPE_TRAITS_VOID_T_HPP
-#define JASEL_V3_FUNDAMENTALTYPE_TRAITS_VOID_T_HPP
+#ifndef JASEL_V3_FUNDAMENTAL_TYPE_TRAITS_VOID_T_HPP
+#define JASEL_V3_FUNDAMENTAL_TYPE_TRAITS_VOID_T_HPP
 
 #include <type_traits>
 #include <experimental/meta.hpp>
 
 namespace std {
   namespace experimental {
-#if __cplusplus > 201402L
-    using std::void_t;
-#else
+#if __cplusplus <= 201402L
     using std::experimental::meta::void_t;
 #endif
   }

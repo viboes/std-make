@@ -6,8 +6,8 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef JASEL_V3_FUNDAMENTALTYPE_TRAITS_CONJUNCTION_HPP
-#define JASEL_V3_FUNDAMENTALTYPE_TRAITS_CONJUNCTION_HPP
+#ifndef JASEL_V3_FUNDAMENTAL_TYPE_TRAITS_CONJUNCTION_HPP
+#define JASEL_V3_FUNDAMENTAL_TYPE_TRAITS_CONJUNCTION_HPP
 
 #include <type_traits>
 
@@ -17,6 +17,8 @@ namespace experimental
 {
 inline namespace fundamental_v3
 {
+//#if __cplusplus <= 201402L
+
   // conjunction
   template<class...> struct conjunction;
   template<> struct conjunction<> : true_type {};
@@ -35,7 +37,7 @@ inline namespace fundamental_v3
   //inline C++17
   constexpr bool conjunction_v = conjunction<Bs...>::value;
 #endif
-
+//#endif
 }
 }
 }

@@ -6,8 +6,8 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef JASEL_V3_FUNDAMENTALTYPE_TRAITS_NEGATION_HPP
-#define JASEL_V3_FUNDAMENTALTYPE_TRAITS_NEGATION_HPP
+#ifndef JASEL_V3_FUNDAMENTAL_TYPE_TRAITS_NEGATION_HPP
+#define JASEL_V3_FUNDAMENTAL_TYPE_TRAITS_NEGATION_HPP
 
 #include <type_traits>
 
@@ -17,6 +17,7 @@ namespace experimental
 {
 inline namespace fundamental_v3
 {
+//#if __cplusplus <= 201402L
   // negation
   template<class B>
   struct negation : std::integral_constant<bool, !B::value> { };
@@ -26,6 +27,7 @@ inline namespace fundamental_v3
   //inline C++17
   constexpr bool negation_v = negation<B>::value;
 #endif
+//#endif
 
 }
 }
