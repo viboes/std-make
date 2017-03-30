@@ -188,23 +188,21 @@ namespace chrono
 
 //! chrono::moduloD,SD,R> is a -n ordinal type that can be used with the ordinal containers
 namespace ordinal {
-  namespace meta {
-    template <class D, class SD, class R>
-    struct size<chrono::modulo<D,SD,R>> : integral_constant<size_t, chrono::modulo<D,SD,R>::cardinal> {};
-  }
   template <class D, class SD, class R>
   struct traits<chrono::modulo<D,SD,R>> : ordinal::tag
   {
     using size_type = size_t;
-    template <class U>
+    using size = integral_constant<size_t, chrono::modulo<D,SD,R>::cardinal>;
+
+    //template <class U>
     static constexpr
-    U val(size_type pos)  {
-      return U{static_cast<typename U::rep>(pos)};
+    chrono::modulo<D,SD,R> val(size_type pos)  {
+      return chrono::modulo<D,SD,R>{static_cast<typename chrono::modulo<D,SD,R>::rep>(pos)};
     }
 
-    template <class U>
+    //template <class U>
     static constexpr
-    size_type pos(U val)    {
+    size_type pos(chrono::modulo<D,SD,R> val)    {
       return static_cast<size_type>(val.count());
     }
   };

@@ -26,24 +26,22 @@ namespace experimental
 inline namespace fundamental_v3
 {
   namespace ordinal {
-    namespace meta {
-      template <std::intmax_t F, std::intmax_t L, class T>
-      struct size<Bounded<F,L,T>> : integral_constant<size_t, Bounded<F,L,T>::Size> {};
-    }
     template <std::intmax_t F1, std::intmax_t L1, class T1>
     struct traits<Bounded<F1,L1, T1>>
     {
       using size_type = size_t;
-      template <class U>
+      using size = integral_constant<size_t, Bounded<F1,L1,T1>::Size>;
+
+      //template <class U>
       static constexpr
-      U val(size_type pos)  {
-        return U{static_cast<typename U::underlying_type>(U::First+pos)};
+      Bounded<F1,L1, T1> val(size_type pos)  {
+        return Bounded<F1,L1, T1>{static_cast<typename Bounded<F1,L1, T1>::underlying_type>(Bounded<F1,L1, T1>::First+pos)};
       }
 
-      template <class U>
+      //template <class U>
       static constexpr
-      size_t pos(U && val)    {
-        return val.value-decay_t<U>::First;
+      size_t pos(Bounded<F1,L1, T1> val)  {
+        return val.value-Bounded<F1,L1, T1>::First;
       }
     };
   }

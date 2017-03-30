@@ -22,8 +22,6 @@ inline namespace fundamental_v3
   namespace ordinal {
     namespace meta {
       template <>
-      struct size<Bool> : integral_constant<size_t, 2> {};
-      template <>
       struct pos<Bool, Bool::False> : integral_constant<size_t, 0> {};
       template <>
       struct pos<Bool, Bool::True> : integral_constant<size_t, 1> {};
@@ -36,7 +34,7 @@ inline namespace fundamental_v3
     struct traits<Bool>
     {
       using size_type = size_t;
-      template <class U>
+      using size = integral_constant<size_type, 2>;
       static constexpr
       Bool val(size_type pos)  {
         switch (pos) {
@@ -45,9 +43,8 @@ inline namespace fundamental_v3
         }
       }
 
-      template <class U>
       static constexpr
-      size_t pos(U && val)    {
+      size_t pos(Bool val)    {
         switch (val) {
         case Bool::False: return 0;
         default:  return 1;
