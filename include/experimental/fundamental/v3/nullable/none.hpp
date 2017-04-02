@@ -28,13 +28,17 @@ inline namespace fundamental_v3
     struct tag {};
 
     template <class T, class Enabler=void>
-      struct traits : traits<T, meta::when<true>> {};
+      struct traits
+#if ! defined JASEL_DOXYGEN_INVOKED
+    : traits<T, meta::when<true>> {}
+#endif
+    ;
 
     // Default specialization
     template <typename T, bool condition>
     struct traits<T, meta::when<condition>>
     {
-#if __cplusplus >= 201402L
+#if __cplusplus >= 201402L || defined JASEL_DOXYGEN_INVOKED
       static
       auto none()  = delete;
 

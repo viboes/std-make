@@ -31,6 +31,10 @@ inline namespace fundamental_v3
 namespace ordinal {
     struct tag {};
 
+#if defined JASEL_DOXYGEN_INVOKED
+    template <class T, class Enabler=void>
+      struct traits;
+#else
     template <class T, class Enabler=void>
       struct traits : traits<T, meta::when<true>> {};
 
@@ -51,7 +55,7 @@ namespace ordinal {
 
 #endif
     };
-
+#endif
     // Trivial trait that makes use of explicit conversion
     // valid for all the signed integral builtins
     template <typename T>

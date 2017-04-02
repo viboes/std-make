@@ -7,7 +7,7 @@
 #ifndef JASEL_FUNDAMENTAL_V3_STRONG_STRONG_INT_HPP
 #define JASEL_FUNDAMENTAL_V3_STRONG_STRONG_INT_HPP
 
-#if __cplusplus >= 201402L
+#if __cplusplus >= 201402L || defined JASEL_DOXYGEN_INVOKED
 
 #include <experimental/fundamental/v3/strong/tagged.hpp>
 #include <experimental/fundamental/v3/strong/underlying_type.hpp>

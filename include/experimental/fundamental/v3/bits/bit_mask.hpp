@@ -10,7 +10,7 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-/*!
+/*
  \file
  \brief
  The header \c <experimental/bit_mask.hpp> defines a class template \c bit_mask<T, N> for managing bit set as std::bitset,
@@ -115,7 +115,8 @@ inline namespace fundamental_v3
     /**
       @tparam N the number of significant bits on the storage
       @tparam T the storage type
-      @par Requires:  @c N must be @c T must be a model of <em>unsigned Integral</em> type.
+      @par Requires:
+        @c N must be @c T must be a model of <em>unsigned Integral</em> type.
 
      The class template @c bit_mask<N,T> describes an object that can store a sequence
      consisting of a fixed number of bits, given by @c N.
@@ -212,9 +213,9 @@ inline namespace fundamental_v3
       // This has the advantage that it behaves like the underlying unsigned integer type
       // However std::bitset provides it.
 #if 0
-      //! @par Effects: Constructs an object of class \c bit_mask<>, initializing all
+      //! @par Effects:<br> Constructs an object of class \c bit_mask<>, initializing all
       //! bits to zero.
-      //! @par Throws: Nothing
+      //! @par Throws:<br> Nothing
       constexpr bit_mask() noexcept
           : bits(0)
       {
@@ -223,29 +224,35 @@ inline namespace fundamental_v3
       //! bit_mask is a POD
       constexpr bit_mask() noexcept = default;
 
-      //! @par Effects: Constructs an object of class \c bit_mask<>, initializing the
-      //! \c pos bit position to \c 1 and the others to \c 0.
-      //! @par Pre-condition:  pos <= N
+      //! @par Effects:
+      //!   Constructs an object of class \c bit_mask<>, initializing the
+      //!   \c pos bit position to \c 1 and the others to \c 0.
+      //! @par Pre-condition:
+      //!   @code pos <= N @endcode
       explicit constexpr bit_mask(pos_tag_t, size_t pos)
         : bits(bit_ops::single<T>(pos) & bit_ops::up_to<N,T>())
       {
         //JASEL_EXPECTS(valid_position(pos));
       }
 
-      //! @par Effects: Constructs an object of class \c bit_mask<>, initializing the
-      //! all bit position to \c val.
-      //! @par Throws: Nothing
+      //! @par Effects:
+      //!   Constructs an object of class \c bit_mask<>, initializing the
+      //!   all bit position to \c val.
+      //! @par Throws:
+      //!   Nothing
       explicit constexpr bit_mask(fill_tag_t, bool val) noexcept
         : bits(val?bit_ops::up_to<N,T>():0)
       {
       }
 
-      //! @par Effects: Constructs an object of class \c bit_mask<>, initializing the
-      //! first \c M bit positions to the corresponding bit values in \c val.
-      //! \c M is the smaller of \c N and the number of bits in the value
-      //! representation of \c unsigned \c long \c long. If \c M<N, the remaining bit
-      //! positions are initialized to zero.
-      //! @par Throws: Nothing
+      //! @par Effects:
+      //!   Constructs an object of class \c bit_mask<>, initializing the
+      //!   first \c M bit positions to the corresponding bit values in \c val.
+      //!   \c M is the smaller of \c N and the number of bits in the value
+      //!   representation of \c unsigned \c long \c long. If \c M<N, the remaining bit
+      //!   positions are initialized to zero.
+      //! @par Throws:
+      //!   Nothing
 
       explicit constexpr bit_mask(mask_tag_t, T val) noexcept
         : bits(val & bit_ops::up_to<N,T>())
@@ -257,9 +264,9 @@ inline namespace fundamental_v3
       #if 1
       #else
 
-      //! @par Requires:  <tt>pos <= str.size()</tt>.
-      //! @par Throws:  std::out_of_range if <tt>pos > str.size()</tt>.
-      //! @par Effects: Determines the effective length \c rlen of the initializing
+      //! @par Requires:<br>  <tt>pos <= str.size()</tt>.
+      //! @par Throws:<br>  std::out_of_range if <tt>pos > str.size()</tt>.
+      //! @par Effects:<br> Determines the effective length \c rlen of the initializing
       //! string as the smaller of \c n and <tt>str.size()-pos</tt>.
       //! The function then throws \c std::invalid_argument if any of the \c rlen
       //! characters in \c str beginning at position pos is other than zero or one.
@@ -267,7 +274,7 @@ inline namespace fundamental_v3
       //! Otherwise, the function constructs an object of class \c bit_mask<N,T>,
       //! initializing the first \c M bit positions to values determined from the
       //! corresponding characters in the string \c str. \c M is the smaller of \c N and
-      //! \c rlen.\n
+      //! \c rlen.<br>
       //! An element of the constructed string has value zero if the
       //! corresponding character in \c str, beginning at position \c pos, is \c 0 zero.
       //! Otherwise, the element has the value 1. Character position \c pos+M-1
@@ -283,7 +290,7 @@ inline namespace fundamental_v3
         : bits(str, pos, n, zero, one)
       {}
 
-      //! @par Effects: Constructs an object of class bit_mask<N> as if by bit_mask(string(str)).
+      //! @par Effects:<br> Constructs an object of class bit_mask<N> as if by bit_mask(string(str)).
       template <class charT>
         explicit bit_mask(const charT* str,
                           typename std::basic_string<charT>::size_type n = std::basic_string<charT>::npos,
@@ -292,30 +299,39 @@ inline namespace fundamental_v3
       {}
       #endif
 
-      //! @par Effects: Clears each bit in \c *this for which the corresponding bit in
-      //! \c rhs is clear, and leaves all other bits unchanged.
-      //! @par Returns:   \c *this.
-      //! @par Throws: Nothing
+      //! @par Effects:
+      //!   Clears each bit in \c *this for which the corresponding bit in
+      //!   \c rhs is clear, and leaves all other bits unchanged.
+      //! @par Returns:
+      //!   \c *this.
+      //! @par Throws:
+      //!   Nothing
       constexpr bit_mask& operator&=(const bit_mask& rhs) noexcept
       {
         bits &= rhs.bits;
         return *this;
       }
 
-      //! @par Effects: Sets each bit in \c *this for which the corresponding bit in
-      //! \c rhs is set, and leaves all other bits unchanged.
-      //! @par Returns:   \c *this.
-      //! @par Throws: Nothing
+      //! @par Effects:
+      //!   Sets each bit in \c *this for which the corresponding bit in
+      //!   \c rhs is set, and leaves all other bits unchanged.
+      //! @par Returns:
+      //!   \c *this.
+      //! @par Throws:
+      //!   Nothing
       constexpr bit_mask& operator|=(const bit_mask& rhs) noexcept
       {
         bits |= rhs.bits;
         return *this;
       }
 
-      //! @par Effects: Toggles each bit in \c *this for which the corresponding bit in
-      //! \c rhs is set, and leaves all other bits unchanged.
-      //! @par Returns:   \c *this.
-      //! @par Throws: Nothing
+      //! @par Effects:
+      //!   Toggles each bit in \c *this for which the corresponding bit in
+      //!   \c rhs is set, and leaves all other bits unchanged.
+      //! @par Returns:
+      //!   \c *this.
+      //! @par Throws:
+      //!   Nothing
       constexpr bit_mask& operator^=(const bit_mask& rhs) noexcept
       {
         bits ^= rhs.bits;
@@ -323,11 +339,14 @@ inline namespace fundamental_v3
         return *this;
       }
 
-      //! @par Effects: Replaces each bit at position \c I in \c *this with a value determined as follows:
-      //! - If \c I<pos, the new value is zero;
-      //! - If \c I>=pos, the new value is the previous value of the bit at position \c I-pos.
-      //! @par Returns:   \c *this.
-      //! @par Throws: Nothing
+      //! @par Effects:
+      //!   Replaces each bit at position \c I in \c *this with a value determined as follows:
+      //!   - If \c I<pos, the new value is zero;
+      //!   - If \c I>=pos, the new value is the previous value of the bit at position \c I-pos.
+      //! @par Returns:
+      //!   \c *this.
+      //! @par Throws:
+      //!   Nothing
       constexpr bit_mask& operator<<=(size_t pos) noexcept
       {
         bits <<= pos;
@@ -335,11 +354,14 @@ inline namespace fundamental_v3
         return *this;
       }
 
-      //! @par Effects: Replaces each bit at position \c I in \c *this with a value determined as follows:
-      //! - If \c pos>=N-I, the new value is zero;
-      //! - If \c pos<N-I, the new value is the previous value of the bit at position \c I+pos.
-      //! @par Returns:   \c *this.
-      //! @par Throws: Nothing
+      //! @par Effects:
+      //!   Replaces each bit at position \c I in \c *this with a value determined as follows:
+      //!   - If \c pos>=N-I, the new value is zero;
+      //!   - If \c pos<N-I, the new value is the previous value of the bit at position \c I+pos.
+      //! @par Returns:
+      //!   \c *this.
+      //! @par Throws:
+      //!   Nothing
 
       constexpr bit_mask& operator>>=(size_t pos) noexcept
       {
@@ -348,21 +370,26 @@ inline namespace fundamental_v3
         return *this;
       }
 
-      //! @par Returns:   A count of the number of bits set in \c *this.
+      //! @par Returns:
+      //!   A count of the number of bits set in \c *this.
       constexpr std::size_t count() const noexcept
       {
         return __builtin_popcount(bits);
       }
 
-      //! @par Returns:   \c static_size.
+      //! @par Returns:
+      //!   \c static_size.
       constexpr std::size_t size() const noexcept
       {
         return N;
       }
 
-      //! @par Pre-condition:  \c pos shall be valid.
-      //! @par Throws:  std::out_of_range if @c pos i sout of range.
-      //! @par Returns:   \c true if the bit at the associated position of \c e in \c *this has the value one,
+      //! @par Pre-condition:
+      //!   \c pos shall be valid.
+      //! @par Throws:
+      //!   std::out_of_range if @c pos i sout of range.
+      //! @par Returns:
+      //!   \c true if the bit at the associated position of \c e in \c *this has the value one,
       //! otherwise \c false.
       constexpr bool operator[](size_t pos) const
       {
@@ -370,23 +397,30 @@ inline namespace fundamental_v3
         return bits & bit_ops::single<T>(pos);
       }
 
-      //! @par Pre-condition:  \c pos shall be valid.
-      //! @par Throws:  std::out_of_range if @c e does not have a valid position.
-      //! @par Returns:   An object of type \c bit_mask<N,T>::reference such that
-      //! <tt>(*this)[pos] == this->test(pos)</tt>, and such that <tt>(*this)[pos] = val</tt> is
+      //! @par Pre-condition:
+      //!   \c pos shall be valid.
+      //! @par Throws:
+      //!   std::out_of_range if @c e does not have a valid position.
+      //! @par Returns:
+      //!   An object of type \c bit_mask<N,T>::reference such that
+      //!   <tt>(*this)[pos] == this->test(pos)</tt>, and such that <tt>(*this)[pos] = val</tt> is
       //! equivalent to <tt>this->set(pos, val)</tt>.
-      //! @Note For the purpose of determining the presence of a data race,
-      //! any access or update through the resulting reference potentially
-      //! accesses or modifies, respectively, the entire underlying  bitset.
+      //! @par Note:
+      //!   For the purpose of determining the presence of a data race,
+      //!   any access or update through the resulting reference potentially
+      //!   accesses or modifies, respectively, the entire underlying  bitset.
 
       constexpr reference operator[](size_t pos)
       {
         //JASEL_EXPECTS(valid_position(pos));
         return reference(*this, pos);
       }
-      //! @par Effects: Sets all bits in \c *this.
-      //! @par Returns:   \c *this.
-      //! @par Throws: Nothing
+      //! @par Effects:
+      //!   Sets all bits in \c *this.
+      //! @par Returns:
+      //!   \c *this.
+      //! @par Throws:
+      //!   Nothing
 
       constexpr bit_mask& set() noexcept
       {
@@ -394,10 +428,13 @@ inline namespace fundamental_v3
         return *this;
       }
 
-      //! @par Throws:  @c std::out_of_range if @c setting does have a invalid bit position.
-      //! @par Effects: Stores a new value in the bit at the position associated to \c setting in \c *this.
-      //! If \c value is nonzero, the stored value is one, otherwise it is zero.
-      //! @par Returns:   \c *this.
+      //! @par Effects:
+      //!   Stores a new value in the bit at the position associated to \c setting in \c *this.
+      //!   If \c value is nonzero, the stored value is one, otherwise it is zero.
+      //! @par Returns:
+      //!   \c *this.
+      //! @par Throws:
+      //!   @c std::out_of_range if @c setting does have a invalid bit position.
       constexpr bit_mask& set(size_t setting, bool value = true)
       {
         check(setting);
@@ -406,18 +443,24 @@ inline namespace fundamental_v3
         return *this;
       }
 
-      //! @par Effects: Resets all bits in \c *this.
-      //! @par Returns:   \c *this.
-      //! @par Throws: Nothing
+      //! @par Effects:<br>
+      //!   Resets all bits in \c *this.
+      //! @par Returns:
+      //!   \c *this.
+      //! @par Throws:
+      //!   Nothing
       constexpr bit_mask& reset() noexcept
       {
         bits = T(0);
         return *this;
       }
 
-      //! @par Throws:  @c std::out_of_range if \c resetting does not correspond to a valid position.
-      //! @par Effects: Resets the bit at the position associated to \c resetting in \c *this.
-      //! @par Returns:   \c *this.
+      //! @par Throws:
+      //!   @c std::out_of_range if \c resetting does not correspond to a valid position.
+      //! @par Effects:
+      //!   Resets the bit at the position associated to \c resetting in \c *this.
+      //! @par Returns:
+      //!   \c *this.
 
       constexpr bit_mask& reset(size_t resetting)
       {
@@ -426,9 +469,12 @@ inline namespace fundamental_v3
         return *this;
       }
 
-      //! @par Effects: Toggles all bits in \c *this.
-      //! @par Returns:   \c *this.
-      //! @par Throws: Nothing
+      //! @par Effects:
+      //!   Toggles all bits in \c *this.
+      //! @par Returns:
+      //!   \c *this.
+      //! @par Throws:
+      //!   Nothing
       constexpr bit_mask& flip() noexcept
       {
         bits = ~bits;
@@ -436,9 +482,12 @@ inline namespace fundamental_v3
         return *this;
       }
 
-      //! @par Throws:  std::out_of_range if \c flipping does not correspond to a valid position.
-      //! @par Effects: Toggles the bit at position associated to \c pos in \c *this.
-      //! @par Returns:   \c *this.
+      //! @par Throws:
+      //!   std::out_of_range if \c flipping does not correspond to a valid position.
+      //! @par Effects:
+      //!   Toggles the bit at position associated to \c pos in \c *this.
+      //! @par Returns:
+      //!   \c *this.
       constexpr bit_mask& flip(size_t flipping)
       {
         check(flipping);
@@ -449,17 +498,19 @@ inline namespace fundamental_v3
       }
 
       //! \c <tt>T</tt> conversion
-      //! @par Returns:   \c x.
-
+      //! @par Returns:
+      //!   \c x.
       constexpr T to_integer() const noexcept
       {
         return bits;
       }
 
       //! \c <tt>unsigned long</tt> conversion
-      //! @par Throws:  @c std::overflow_error if the integral value \c x corresponding to the
-      //! bits in \c *this cannot be represented as type <<tt>unsigned long</tt>.
-      //! @par Returns:   \c x.
+      //! @par Returns:
+      //!   \c x.
+      //! @par Throws:
+      //!   @c std::overflow_error if the integral value \c x corresponding to the
+      //!   bits in \c *this cannot be represented as type <<tt>unsigned long</tt>.
 
       constexpr unsigned long to_ulong() const noexcept
       {
@@ -467,67 +518,72 @@ inline namespace fundamental_v3
       }
 
       //! \c <tt>unsigned long long</tt> conversion
-      //! @par Returns:   \c x.
+      //! @par Returns:
+      //! \c x.
       constexpr unsigned long long to_ullong() const noexcept
       {
         return (unsigned long long)(bits);
       }
-#ifdef JASEL_DOXYGEN_INVOKED
+#if 0
 
-      //! @par Effects: Constructs a string object of the appropriate type and
+      //! @par Effects:<br> Constructs a string object of the appropriate type and
       //! initializes it to a string of length \c N characters. Each character is
       //! determined by the value of its corresponding bit position in \c *this.
       //! Character position \c N-1 corresponds to bit position zero.
       //! Subsequent decreasing character positions correspond to increasing
       //! bit positions. Bit value zero becomes the character zero, bit value
       //! one becomes the character one.
-      //! @par Returns:   The created object.
+      //! @par Returns:<br>   The created object.
       template <class charT = char,
         class traits = std::char_traits<charT>,
         class Allocator = std::allocator<charT> >
         std::basic_string<charT, traits, Allocator>
       to_string(charT zero = charT('0'), charT one = charT('1')) const;
 #endif
-      //! @par Effects: Constructs an object @c x of class @c bit_mask<N,T> and initializes it with @c *this.
-      //! @par Returns:   \c x.flip().
-      //! @par Throws: Nothing
+
+      //! @par Effects:
+      //!   Constructs an object @c x of class @c bit_mask<N,T> and initializes it with @c *this.
+      //! @par Returns:
+      //!   \c x.flip().
       constexpr bit_mask operator~() const noexcept
       {
         return bit_mask(*this).flip();
       }
 
-      //! @par Requires:  \c testing is valid
-      //! @par Throws:  std::out_of_range if the associated position of \c testing does not correspond to a valid bit position.
-      //! @par Returns:   \c true if the bit at position \c pos in \c *this has the value one.
+      //! @par Returns:
+      //!   \c true if the bit at position \c pos in \c *this has the value one.
+      //! @par Throws:
+      //!   std::out_of_range if the associated position of \c testing does not correspond to a valid bit position.
       constexpr bool test(size_t testing) const
       {
         check(testing);
         return bits & bit_ops::single<T>(testing);
       }
 
-      //! @par Returns:   <tt>count() == size()</tt>
-      //! @par Throws: Nothing
+      //! @par Returns:
+      //!   <tt>count() == size()</tt>
       constexpr bool all() const noexcept
       {
         return bits == bit_ops::up_to<N,T>();
       }
 
-      //! @par Returns:   <tt>count() != 0</tt>
-      //! @par Throws: Nothing
+      //! @par Returns:
+      //!   <tt>count() != 0</tt>
       constexpr bool any() const noexcept
       {
         return bits != 0;
       }
 
-      //! @par Returns:   <tt>count() == 0</tt>
-      //! @par Throws: Nothing
+      //! @par Returns:
+      //!   <tt>count() == 0</tt>
       constexpr bool none() const noexcept
       {
         return bits == 0;
       }
 
-      //! @par Returns:   <tt>bit_mask<N,T>(*this) <<= pos</tt>.
-      //! @par Throws: Nothing
+      //! @par Returns:
+      //!   <tt>bit_mask<N,T>(*this) <<= pos</tt>.
+      //! @par Throws:<br> Nothing
       constexpr bit_mask operator<<(std::size_t pos) const noexcept
       {
         bit_mask r = *this;
@@ -535,8 +591,9 @@ inline namespace fundamental_v3
         return r;
       }
 
-      //! @par Returns:   <tt>bit_mask<N,T>(*this) >>= pos</tt>.
-      //! @par Throws: Nothing
+      //! @par Returns:
+      //!   <tt>bit_mask<N,T>(*this) >>= pos</tt>.
+      //! @par Throws:<br> Nothing
       constexpr bit_mask operator>>(std::size_t pos) const noexcept
       {
         bit_mask r = *this;
@@ -544,32 +601,29 @@ inline namespace fundamental_v3
         return r;
       }
 
-      //! @par Returns:   A nonzero value if the value of each bit in \c *this equals the
-      //! value of the corresponding bit in \c rhs.
-      //! @par Throws: Nothing
+      //! @par Returns:
+      //!   A nonzero value if the value of each bit in \c *this equals the
+      //!   value of the corresponding bit in \c rhs.
       constexpr bool operator==(const bit_mask& rhs) const noexcept
       {
         return bits == rhs.bits;
       }
 
-      //! @par Returns:   A nonzero value if <tt>!(*this == rhs)</tt>.
-      //! @par Throws: Nothing
+      //! @par Returns:
+      //!   A nonzero value if <tt>!(*this == rhs)</tt>.
       constexpr bool operator!=(const bit_mask& rhs) const noexcept
       {
         return bits != rhs.bits;
       }
     private:
 
-
-
     };
 
     // bit_mask operators:
 
     //! Intersection
-
-    //! @par Returns:   <tt>bit_mask<N,T>(lhs) &= rhs</tt>.
-    //! @par Throws: Nothing
+    //! @par Returns:<br>   <tt>bit_mask<N,T>(lhs) &= rhs</tt>.
+    //! @par Throws:<br> Nothing
     template <size_t N, typename T>
     constexpr bit_mask<N,T> operator&(const bit_mask<N,T>& x, const bit_mask<N,T>& y) noexcept
     {
@@ -579,9 +633,8 @@ inline namespace fundamental_v3
     }
 
     //! Union
-
-    //! @par Returns:   <tt>bit_mask<N,T>>(lhs) |= rhs</tt>.
-    //! @par Throws: Nothing
+    //! @par Returns:<br>   <tt>bit_mask<N,T>>(lhs) |= rhs</tt>.
+    //! @par Throws:<br> Nothing
     template <size_t N, typename T >
     constexpr bit_mask<N,T> operator|(const bit_mask<N,T>& x, const bit_mask<N,T>& y) noexcept
     {
@@ -591,9 +644,8 @@ inline namespace fundamental_v3
     }
 
     //! Exclusive union
-
-    //! @par Returns:   <tt>bit_mask<N,T>(lhs) ^= rhs</tt>.
-    //! @par Throws: Nothing
+    //! @par Returns:<br>   <tt>bit_mask<N,T>(lhs) ^= rhs</tt>.
+    //! @par Throws:<br> Nothing
     template <size_t N, typename T >
     constexpr bit_mask<N,T> operator^(const bit_mask<N,T>& x, const bit_mask<N,T>& y) noexcept
     {
@@ -603,21 +655,20 @@ inline namespace fundamental_v3
     }
 
     //! A formatted input function.
-
-    //! @par Effects: Extracts up to \c N characters from is. Stores these characters
+    //! @par Effects:<br> Extracts up to \c N characters from is. Stores these characters
     //! in a temporary object \c str of type <tt>basic_string<charT, traits></tt>, then
     //! evaluates the expression <tt>x = bit_mask<N,T>(str)</tt>. Characters are extracted
     //! and stored until any of the following occurs:
     //! - \c N characters have been extracted and stored;
     //! - end-of-file occurs on the input sequence;
     //! - the next input character is neither \c is.widen('0') nor \c is.widen('1')
-    //! (in which case the input character is not extracted).\n
+    //! (in which case the input character is not extracted).<br>
     //! If no characters are stored in \c str, calls \c is.setstate(ios_base::failbit)
     //! (which may throw <tt>ios_- base::failure</tt>).
     //!
     //! @param is the input stream
     //! @param x the \c bit_mask
-    //! @par Returns:   \c is.
+    //! @par Returns:<br>   \c is.
 
     template <class charT, class traits, size_t N, typename T >
     std::basic_istream<charT, traits>&
@@ -630,11 +681,10 @@ inline namespace fundamental_v3
     }
 
     //! A formatted output function.
-
     //!
     //! @param os the output stream
     //! @param x the \c bit_mask
-    //! @par Returns:   the result of the following expression
+    //! @par Returns:<br>   the result of the following expression
     //! @code
     //! os << x.template to_string<charT,traits,allocator<charT> >(
     //!         use_facet<ctype<charT> >(os.getloc()).widen('0'),
@@ -660,15 +710,14 @@ inline namespace fundamental_v3
 }} // experimental::fundamental_v3
 
   //! bit_mask hash template specialization
-
   template <size_t N, typename T >
   struct hash<experimental::bit_mask<N,T> >
   : public std::unary_function<experimental::bit_mask<N,T>, std::size_t>
   {
     //! \details The template specialization meets the requirements of class template \c hash.
     //!
-    //! @param es, the @c bit_mask}
-    //! @par Returns:   the hash associated to the underlying bitset.
+    //! @param es the @c bit_mask
+    //! @par Returns:<br>   the hash associated to the underlying bitset.
     constexpr std::size_t operator()(const experimental::bit_mask<N,T>& es) const
     {
       return hash<T>(es.to_integer());

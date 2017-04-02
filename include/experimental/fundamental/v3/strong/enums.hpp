@@ -7,7 +7,7 @@
 #ifndef JASEL_FUNDAMENTAL_V3_STRONG_STRONG_ENUMS_HPP
 #define JASEL_FUNDAMENTAL_V3_STRONG_STRONG_ENUMS_HPP
 
-#if __cplusplus >= 201402L
+#if __cplusplus >= 201402L || defined JASEL_DOXYGEN_INVOKED
 
 #include <experimental/fundamental/v3/strong/wrapper.hpp>
 #include <experimental/fundamental/v3/strong/underlying_type.hpp>

@@ -5,7 +5,7 @@
 // (See accompanying file // LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 //////////////////////////////////////////////////////////////////////////////
-#if __cplusplus >= 201402L
+#if __cplusplus >= 201402L || defined JASEL_DOXYGEN_INVOKED
 
 #ifndef JASEL_FUNDAMENTAL_V3_NULLABLE_VISIT_HPP
 #define JASEL_FUNDAMENTAL_V3_NULLABLE_VISIT_HPP
@@ -54,7 +54,11 @@ namespace detail
     template <size_t I>
     using alternative = tuple_element<I, meta::types<none_type_t<N>, value_type_t<N>>>;
 
-    template <size_t I, class ST, class= std::enable_if_t< I < size::value > >
+    template <size_t I, class ST
+#if ! defined JASEL_DOXYGEN_INVOKED
+    , class= std::enable_if_t< I < size::value >
+#endif
+    >
       static constexpr decltype(auto) get(ST&& st) noexcept
       {
         return detail::nullable_get<I>::get(forward<ST>(st));

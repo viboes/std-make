@@ -8,6 +8,7 @@
 #define JASEL_FUNDAMENTAL_V3_STRONG_STRONG_COUNTER_HPP
 
 /**
+ * @file
  * strong_counter<Domain, Rep> is a generalization of std::chrono::duration<Rep, Period>
  *
  * Where Domain is a tag class that has a conversion function between Domains
@@ -16,7 +17,7 @@
  *
  * In addition to the underlying() function it provides the count() member function.
  */
-#if __cplusplus >= 201402L
+#if __cplusplus >= 201402L || defined JASEL_DOXYGEN_INVOKED
 
 #include <experimental/fundamental/v3/strong/tagged.hpp>
 #include <experimental/fundamental/v3/strong/underlying_type.hpp>
@@ -118,6 +119,8 @@ inline namespace fundamental_v3
   template <class Domain>
   struct domain_converter : strict_copy_domain<Domain> {};
 
+#if !defined JASEL_DOXYGEN_INVOKED
+
   namespace detail {
   //! @{ Non-member functions associated to the domain_converter customizable functions
   template <class DT, class T, class F, class DF=DT>
@@ -208,6 +211,7 @@ inline namespace fundamental_v3
       static bool const value = test<Domain,From,To>(0);
   };
   }
+#endif
 
   // fixme Wondering if strong_counter should be renamed to strong_quantity, as the representation can be a floating point
   // fixme Should this class be final or not
@@ -232,26 +236,32 @@ inline namespace fundamental_v3
       strong_counter(strong_counter const&) = default;
       strong_counter(strong_counter &&) = default;
 
-      //! @par Effects: constructs a strong_counter from its representations
-      //! @par Throws: Anything the copy of the conversion throws.
-      //! @par Remarks This constructor doesn't participates in overload resolution if the representation is not is_intra_domain_convertible
+      //! @par Effects:<br> Constructs a strong_counter from its representations
+      //! @par Throws:<br> Anything the copy of the conversion throws.
+      //! @par Remarks:<br> This constructor doesn't participates in overload resolution if the representation is not is_intra_domain_convertible
       template <class UT2>
       explicit strong_counter(UT2 const& r
+#if !defined JASEL_DOXYGEN_INVOKED
           , typename enable_if<detail::is_intra_domain_convertible<Domain, UT2, UT>::value>::type* = nullptr
+#endif
           )
           : base_type(detail::intra_domain_convert<Domain, UT>(r))
       {}
       template <class UT2>
       explicit strong_counter(UT2 const& r
+#if !defined JASEL_DOXYGEN_INVOKED
           , typename enable_if<! detail::is_intra_domain_convertible<Domain, UT2, UT>::value>::type* = nullptr
+#endif
           ) = delete;
 
-      //! @par Effects: constructs a strong_counter from another strong_counter with a different domain and possibly representation
-      //! @par Throws: Anything the copy of the conversion throws.
-      //! @par Remarks This constructor doesn't participates in overload resolution if the representation is not is_inter_domain_convertible
+      //! @par Effects:<br> Constructs a strong_counter from another strong_counter with a different domain and possibly representation
+      //! @par Throws:<br>  Anything the copy of the conversion throws.
+      //! @par Remarks:<br> This constructor doesn't participates in overload resolution if the representation is not is_inter_domain_convertible
       template <class Domain2, class UT2>
       strong_counter(strong_counter<Domain2, UT2> const& other
+#if !defined JASEL_DOXYGEN_INVOKED
           , typename enable_if<detail::is_inter_domain_convertible<Domain, UT2, UT, Domain2>::value>::type* = nullptr
+#endif
           )
           : base_type(detail::inter_domain_convert<Domain,UT>(Domain2{}, other.count()))
       {}
@@ -419,12 +429,14 @@ inline namespace fundamental_v3
   //! Casting between strong_counters that don't lost information (e.g. hours to minutes) can be performed implicitly, no strong_counters_cast is needed.
 
   template <class StrongCounterTo, class DomainFrom, class RepFrom
+#if !defined JASEL_DOXYGEN_INVOKED
       , class = typename enable_if<
                   conjunction<
                     is_strong_counter<StrongCounterTo>
                   , detail::is_inter_domain_cast<typename StrongCounterTo::domain, RepFrom, typename StrongCounterTo::rep, DomainFrom>
                   >::value
                 >::type
+#endif
   >
   constexpr StrongCounterTo strong_counter_cast(strong_counter<DomainFrom, RepFrom> const& sc)
   {
@@ -433,7 +445,7 @@ inline namespace fundamental_v3
 
   // Rounding
 
-  //! @par Returns: the greatest strong_counter t representable in To that is less or equal to d.
+  //! @par Returns:<br> the greatest strong_counter t representable in To that is less or equal to d.
   //! The function does not participate in the overload resolution unless To is an instance of strong_counter.
 
   template <class To, class D, class R
@@ -446,7 +458,7 @@ inline namespace fundamental_v3
     return t;
   }
 
-  //! @par Returns: the smallest strong_counter t representable in To that is greater or equal to d.
+  //! @par Returns:<br> the smallest strong_counter t representable in To that is greater or equal to d.
   //! The function does not participate in the overload resolution unless To is an instance of strong_counter.
   template <class To, class D, class R
       , class = typename enable_if<is_strong_counter<To>{}>::type
@@ -459,7 +471,7 @@ inline namespace fundamental_v3
       return t;
   }
 
-  //! @par Returns: the value t representable in To that is the closest to d.
+  //! @par Returns:<br> the value t representable in To that is the closest to d.
   //! If there are two such values, returns the even value (that is, the value t such that t % 2 == 0).
   //! The function does not participate in the overload resolution unless To is an instance of strong_counter
   //! and treat_as_floating_point<typename To::rep>{} is false

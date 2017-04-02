@@ -5,7 +5,7 @@
 // (See accompanying file // LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 //////////////////////////////////////////////////////////////////////////////
-#if __cplusplus >= 201402L
+#if __cplusplus >= 201402L || defined JASEL_DOXYGEN_INVOKED
 
 #ifndef JASEL_FUNDAMENTAL_V3_NULLABLE_BIND_HPP
 #define JASEL_FUNDAMENTAL_V3_NULLABLE_BIND_HPP

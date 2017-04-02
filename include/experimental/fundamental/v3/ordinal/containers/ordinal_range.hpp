@@ -11,7 +11,7 @@
 /*!
  \file
  \brief
- The header \c <experimental/ordinal_range.hpp> defines a class template \c ordinal_range for viewing an enumerations as a range.
+ The header \c <experimental/ordinal_range.hpp> defines a class template \c ordinal_range for viewing an ordinal as a range.
  */
 
 #ifndef JASEL_FUNDAMENTAL_V3_ORDINAL_ORDINAL_RANGE_HPP
@@ -111,9 +111,9 @@ inline namespace fundamental_v3
     /**
      @tparam T set's element ordinal type
 
-     @par Requires: @c T must be a model of <em>OrdinalEnum</em>.
+     @par Requires: @c T must be a model of <em>Ordinal</em>.
 
-     \c ordinal_range is a model of the <em>RandomAccessRange</em> Concept associated to the enumeration \c T.
+     \c ordinal_range is a model of the <em>RandomAccessRange</em> Concept associated to the ordinal \c T.
      */
 
     template<typename T/* , typename Traits=ordinal_range_traits<T> */ >
@@ -138,10 +138,9 @@ inline namespace fundamental_v3
     };
 
     //! function to generate an ordinal range.
+    //! \c make_range allows treating ordinals as a model of the \e RandomAccessRange Concept.
 
-    //! \c make_range allows treating enums as a model of the \e RandomAccessRange Concept.
-
-    //! @par Requires: \c T is a model of the \e Enumeration Concept.
+    //! @par Requires:<br> \c T is a model of the \e Ordinal Concept.
     //! @par Returns: an ordinal range from @c T'first to @c T'last inclusive.
     template<typename T /*, typename Traits*/ >
     ordinal_range<T>
@@ -150,14 +149,13 @@ inline namespace fundamental_v3
         return ordinal_range<T/*,Traits*/>();
     }
 
-      //! function to generate an ordinal sub-range.
-
-      //! \c make_range allows treating enums as a model of the \e RandomAccessRange Concept.
-      //! It should be noted that the first and last parameters denoted a closed range.
-      //! @par Requires: \c T is a model of the \e Enumeration Concept.
-      //! @param firstfirst element of the range
-      //! @param lastlast element of the range
-      //! @par Returns: an ordinal range from @c first to @c last inclusive.
+    //! function to generate an ordinal sub-range.
+    //! \c make_range allows treating ordinal as a model of the \e RandomAccessRange Concept.
+    //! It should be noted that the first and last parameters denoted a closed range.
+    //! @par Requires: \c T is a model of the \e Ordinal Concept.
+    //! @param first element of the range
+    //! @param last element of the range
+    //! @par Returns: an ordinal range from @c first to @c last inclusive.
 
     template<typename T /*, typename Traits */ >
     ordinal_range<T>

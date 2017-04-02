@@ -14,7 +14,10 @@ namespace stdex = std::experimental;
 using EngineStarted = stdex::strict_bool<class EngineStartedTag>;
 using CrewReady     = stdex::strict_bool<class CrewReadyTag>;
 
-void set_status(EngineStarted started, CrewReady ready){
+void set_status(EngineStarted started, CrewReady ready)
+{
+  (void)started;
+  (void)ready;
 }
 
 struct X {

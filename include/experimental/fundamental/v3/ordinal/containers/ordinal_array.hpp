@@ -34,8 +34,11 @@ namespace experimental
 {
 inline namespace fundamental_v3
 {
+    /** @file
+       \brief
+        The header \c <experimental/ordinal_array.hpp> defines a class template \c ordinal_array for viewing an enumerations as a range.
 
-    /*!
+
     An \c ordinal_array supports random access iterators. An instance of \c ordinal_array<T, O>
     stores as many elements of type \c T as literals are on the ordinal \c O,
     so that <tt>size() == meta::size<O>::value</tt> is an invariant.
@@ -69,12 +72,12 @@ inline namespace fundamental_v3
 
 
 
-    @Note The member variable elems is shown for exposition only, to emphasize
+    @par Note:<br> The member variable elems is shown for exposition only, to emphasize
     that ordinal_array is a class aggregate. The name elems is not part of
     ordinal_array's interface.
-    @TParams
-    @Param{T,array's element type}
-    @Param{O,array's index ordinal}
+
+    @tparam T array's element type
+    @tparam O array's index ordinal
   */
 
     template<class T, typename O>
@@ -85,35 +88,32 @@ inline namespace fundamental_v3
 
       public:
         // type definitions
-        typedef T              value_type;
-        typedef T*             iterator;
-        typedef const T*       const_iterator;
-        typedef T&             reference;
-        typedef const T&       const_reference;
-        typedef value_type*                           pointer;
-        typedef const value_type*                     const_pointer;
-        typedef O             key_type;
-        typedef std::size_t    size_type;
-        typedef std::ptrdiff_t difference_type;
-        static const std::size_t static_size = ordinal::meta::size<O>::value;
+        typedef T                 value_type;
+        typedef T*                iterator;
+        typedef const T*          const_iterator;
+        typedef T&                reference;
+        typedef const T&          const_reference;
+        typedef value_type*       pointer;
+        typedef const value_type* const_pointer;
+        typedef O                 key_type;
+        typedef std::size_t       size_type;
+        typedef std::ptrdiff_t    difference_type;
+        static const std::size_t  static_size = ordinal::meta::size<O>::value;
         //ordinal_array() {}
 
         // iterator support
-        //! @Returns iterator for the first element
-        //! @Throws Nothing
+        //! @par Returns:<br> iterator for the first element
+        //! @par Throws:<br> Nothing
         JASEL_MUTABLE_CONSTEXPR iterator        begin() noexcept     { return elems; }
 
-        //! @Returns const iterator for the first element
-        //! @Throws Nothing
+        //! @par Returns:<br> const iterator for the first element
         constexpr const_iterator  begin() const noexcept { return elems; }
         constexpr const_iterator cbegin() const noexcept { return elems; }
 
-        //! @Returns iterator for position after the last element
-        //! @Throws Nothing
+        //! @par Returns:<br> iterator for position after the last element
         JASEL_MUTABLE_CONSTEXPR iterator        end() noexcept      { return elems+static_size; }
 
-        //! @Returns const iterator for position after the last element
-        //! @Throws Nothing
+        //! @par Returns:<br> const iterator for position after the last element
         constexpr const_iterator  end() const noexcept { return elems+static_size; }
         constexpr const_iterator cend() const noexcept { return elems+static_size; }
 
@@ -121,7 +121,7 @@ inline namespace fundamental_v3
         typedef std::reverse_iterator<iterator> reverse_iterator;
         typedef std::reverse_iterator<const_iterator> const_reverse_iterator;
 
-        //! @Returns reverse iterator for the first element of reverse iteration
+        //! @par Returns:<br> reverse iterator for the first element of reverse iteration
         JASEL_MUTABLE_CONSTEXPR reverse_iterator rbegin() noexcept {
           return reverse_iterator(end());
         }
@@ -132,7 +132,7 @@ inline namespace fundamental_v3
             return const_reverse_iterator(end());
         }
 
-        //! @Returns reverse iterator for position after the last element in reverse iteration
+        //! @par Returns:<br> reverse iterator for position after the last element in reverse iteration
         JASEL_MUTABLE_CONSTEXPR reverse_iterator rend() noexcept {
           return reverse_iterator(begin());
         }
@@ -144,9 +144,9 @@ inline namespace fundamental_v3
         }
 
         // operator[]
-        //! @Requires <tt>k'pos < static_size</tt>
-        //! @Returns reference to the element with key @c k
-        //! @Throws Nothing.
+        //! @par Requires:<br> <tt>k'pos < static_size</tt>
+        //! @par Returns:<br> reference to the element with key @c k
+        //! @par Throws:<br> Nothing.
         JASEL_MUTABLE_CONSTEXPR reference operator[](key_type k)
         {
             size_type i = ordinal::pos(k);
@@ -154,9 +154,9 @@ inline namespace fundamental_v3
             return elems[i];
         }
 
-        //! @Requires <tt>k'pos < static_size</tt>
-        //! @Returns constant reference to the element with key k
-        //! @Throws Nothing.
+        //! @par Requires:<br> <tt>k'pos < static_size</tt>
+        //! @par Returns:<br> constant reference to the element with key k
+        //! @par Throws:<br> Nothing.
         JASEL_CXX14_CONSTEXPR const_reference operator[](key_type k) const
         {
             assert( ordinal::pos(k) < static_size && "out of range" );
@@ -164,8 +164,8 @@ inline namespace fundamental_v3
         }
 
         // at() with range check
-        //! @Returns element with key k
-        //! @Throws std::range_error if i >= static_size
+        //! @par Returns:<br> element with key k
+        //! @par Throws:<br> std::range_error if i >= static_size
         JASEL_MUTABLE_CONSTEXPR reference at(key_type k)
         {
           return elems[rangecheck(k)];
@@ -176,57 +176,57 @@ inline namespace fundamental_v3
         }
 
         // front() and back()
-        //! @Returns reference to the first element
-        //! @Throws Nothing
+        //! @par Returns:<br> reference to the first element
+        //! @par Throws:<br> Nothing
         JASEL_MUTABLE_CONSTEXPR reference front() noexcept
         {
             return elems[0];
         }
 
-        //! @Returns const reference to the first element
-        //! @Throws Nothing
+        //! @par Returns:<br> const reference to the first element
+        //! @par Throws:<br> Nothing
         constexpr const_reference front() const noexcept
         {
             return elems[0];
         }
 
-        //! @Returns reference to the last element
-        //! @Throws Nothing
+        //! @par Returns:<br> reference to the last element
+        //! @par Throws:<br> Nothing
         JASEL_MUTABLE_CONSTEXPR reference back() noexcept
         {
             return elems[static_size-1];
         }
 
-        //! @Returns const reference to the last element
-        //! @Throws Nothing
+        //! @par Returns:<br> const reference to the last element
+        //! @par Throws:<br> Nothing
         constexpr const_reference back() const noexcept
         {
             return elems[static_size-1];
         }
 
         // size is constant
-        //! @Returns linear in meta::size<O>::value.
+        //! @par Returns:<br> linear in meta::size<O>::value.
         constexpr size_type size() const noexcept
         {
           return static_size;
         }
-        //! @Returns false
-        //! @Throws Nothing
+        //! @par Returns:<br> false
+        //! @par Throws:<br> Nothing
         constexpr  bool empty() const noexcept
         {
           return false;
         }
 
-        //! @Returns linear in meta::size<O>::value.
+        //! @par Returns:<br> linear in meta::size<O>::value.
         constexpr size_type max_size() const noexcept
         {
           return static_size;
         }
 
 
-        /*! @Effects <tt>swap_ranges(begin(), end(), y.begin())</tt>
-            @Throws Nothing unless one of the element-wise swap calls throws an exception.
-            Note: Unlike the @c swap function for other containers, @c ordinal_array::swap
+        /*! @par Effects:<br> <tt>swap_ranges(begin(), end(), y.begin())</tt>
+            @par Throws:<br> Nothing unless one of the element-wise swap calls throws an exception.
+            @par Note:<br> Unlike the @c swap function for other containers, @c ordinal_array::swap
             takes linear time, may exit via an exception, and does not cause
             iterators to become associated with the other container.
          */
@@ -237,17 +237,17 @@ inline namespace fundamental_v3
         }
 
         //! direct access to data (read-only)
-
-        //! @Returns elems.
+        //! @par Returns:<br> elems.
         constexpr const T* data() const {
           return elems;
         }
-        //! @Returns elems.
+        //! @par Returns:<br> elems.
         constexpr T* data() {
           return elems;
         }
 
         //! use @c ordinal_array as C-array (direct read/write access to data)
+        //! @par Returns:<br> elems.
         T* c_array() {
           return elems;
         }
@@ -259,14 +259,13 @@ inline namespace fundamental_v3
             return *this;
         }
 
-        //! A synonym for fill
-        //! assign one value to all elements
-        //! @Effects <tt>std::fill_n(begin(), static_size, value)</tt>
+        //! A synonym for fill - Assigns one value to all elements
+        //! @par Effects:<br> <tt>std::fill_n(begin(), static_size, value)</tt>
         void assign (const T& value) {
           fill ( value );
         }
 
-        //! @Effects <tt>fill_n(begin(), static_size, u)</tt>
+        //! @par Effects:<br> <tt>fill_n(begin(), static_size, u)</tt>
         void fill   (const T& value)
         {
             std::fill_n(begin(),size(),value);
@@ -287,40 +286,40 @@ inline namespace fundamental_v3
 
 
     // comparisons
-    //! @Returns <tt>std::equal(x.begin(), x.end(), y.begin())</tt>
+    //! @par Returns:<br> <tt>std::equal(x.begin(), x.end(), y.begin())</tt>
     template<class T, typename O>
     bool operator== (const ordinal_array<T,O>& x, const ordinal_array<T,O>& y)
     {
         return std::equal(x.begin(), x.end(), y.begin());
     }
 
-    //! @Returns <tt>std::lexicographical_compare(x.begin(), x.end(), y.begin(), y.end())</tt>
+    //! @par Returns:<br> <tt>std::lexicographical_compare(x.begin(), x.end(), y.begin(), y.end())</tt>
     template<class T, typename O>
     bool operator< (const ordinal_array<T,O>& x, const ordinal_array<T,O>& y)
     {
         return std::lexicographical_compare(x.begin(),x.end(),y.begin(),y.end());
     }
 
-    //! @Returns <tt>!(x == y)</tt>
+    //! @par Returns:<br> <tt>!(x == y)</tt>
     template<class T, typename O>
     bool operator!= (const ordinal_array<T,O>& x, const ordinal_array<T,O>& y)
     {
         return !(x==y);
     }
 
-    //! @Returns <tt>y < x</tt>
+    //! @par Returns:<br> <tt>y < x</tt>
     template<class T, typename O>
     bool operator> (const ordinal_array<T,O>& x, const ordinal_array<T,O>& y)
     {
         return y<x;
     }
-    //! @Returns <tt>!(y<x)</tt>
+    //! @par Returns:<br> <tt>!(y<x)</tt>
     template<class T, typename O>
     bool operator<= (const ordinal_array<T,O>& x, const ordinal_array<T,O>& y)
     {
         return !(y<x);
     }
-    //! @Returns <tt>!(x<y)</tt>
+    //! @par Returns:<br> <tt>!(x<y)</tt>
     template<class T, typename O>
     bool operator>= (const ordinal_array<T,O>& x, const ordinal_array<T,O>& y)
     {
@@ -329,11 +328,11 @@ inline namespace fundamental_v3
 
     //! ordinal_array's swap
 
-    //! <b>@Effects</b> As
+    //! @par Effects:<br> As
     //! \code
     //!  x.swap(y);
     //! \endcode
-    //! <b>Complexity:</b> linear in \c meta::size<O>::value.
+    //! @par Complexity:<br> linear in \c meta::size<O>::value.
 
     template<class T, typename O>
     inline void swap (ordinal_array<T,O>& x, ordinal_array<T,O>& y)

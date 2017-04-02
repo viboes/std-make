@@ -15,6 +15,8 @@ using EngineStarted = stdex::strong_bool<class EngineStartedTag>;
 using CrewReady     = stdex::strong_bool<class CrewReadyTag>;
 
 void set_status(EngineStarted started, CrewReady ready){
+  (void)started;
+  (void)ready;
 }
 
 struct X {

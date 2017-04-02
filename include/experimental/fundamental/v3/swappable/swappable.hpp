@@ -9,7 +9,7 @@
 #ifndef JASEL_FUNDAMENTAL_V3_SWAPPABLE_SWAPPABLE_HPP
 #define JASEL_FUNDAMENTAL_V3_SWAPPABLE_SWAPPABLE_HPP
 
-#if __cplusplus >= 201402L and defined JASEL_SUPPORT_SWAPPABLE
+#if (__cplusplus >= 201402L && defined JASEL_SUPPORT_SWAPPABLE) || defined JASEL_DOXYGEN_INVOKED
 
 ///////////////////////////////////////////////////////////////////////////////////////
 ///
@@ -30,10 +30,12 @@
 /// Otherwise it is not defined
 ///
 /// is_adl_swappable<T,U> is true if the expression to swap(a,b) is a valid expression when evaluated in the following context:
+/// @code
 /// template <class T>
 /// void swap(T&, T&) = delete;
 /// template <class T, size_t N>
 /// void swap(T(&)[N], T(&)[N]) = delete;
+/// @endcode
 ///
 /// std::experimental::swappable::traits<T,U> is specialized for types for which the expression
 /// swap(t, u) is a valid when evaluated in the following context:
@@ -66,7 +68,11 @@ inline namespace fundamental_v3
 namespace swappable {
 
   template <class R, class S, class Enabler=void>
-    struct traits : traits<R, S, meta::when<true>> {};
+    struct traits
+#if ! defined JASEL_DOXYGEN_INVOKED
+        : traits<R, S, meta::when<true>> {}
+#endif
+        ;
 
   // Default failing specialization
   template <typename R, typename S, bool condition>
@@ -163,8 +169,12 @@ namespace swappable {
       }
     }
 #else
-  // overload for swappable by trait: extension
+  //! overload for swappable by trait: extension
+  //! @par Effects:<br> Forward to swappable::traits
   template <class T, class U>
+#if defined JASEL_DOXYGEN_INVOKED
+  void swap(T&& x, U&& y);
+#else
   enable_if_t<
     is_trait_swappable_v<T,U>
   >
@@ -172,9 +182,14 @@ namespace swappable {
       JASEL_NOEXCEPT_RETURN(
           traits<meta::uncvref_t<T>, meta::uncvref_t<U>>::swap(forward<T>(x),forward<U>(y))
        )
+#endif
 
-  // overload for move swappable: std
+  //! overload for swappable: std
+  //! @par Equivalent to:<br> y = ::std::exchange(x, ::std::move(y))
   template <class T>
+#if defined JASEL_DOXYGEN_INVOKED
+void swap(T& x, T& y);
+#else
    enable_if_t<
      not is_trait_swappable_v<T>
      and is_move_constructible<T>::value
@@ -184,6 +199,7 @@ namespace swappable {
      JASEL_NOEXCEPT_RETURN(
          (void)(y = ::std::exchange(x, ::std::move(y)))
      )
+#endif
 
   template <typename R, typename S>
   struct traits<R, S, meta::when<
@@ -219,7 +235,11 @@ namespace swappable {
 
 namespace swap_detail {
   template <class T, class U=T, typename = void>
-    struct is_swappable : is_swappable<T,U, meta::when<true>> {};
+    struct is_swappable
+#if ! defined JASEL_DOXYGEN_INVOKED
+        : is_swappable<T,U, meta::when<true>> {}
+#endif
+        ;
   template <class T, class U, bool B>
     struct is_swappable<T, U, meta::when<B>> : false_type {};
 

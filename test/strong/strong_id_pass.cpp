@@ -15,6 +15,8 @@ using EngineId = stdex::strong_id<class EngineIdTag>;
 using BoardId     = stdex::strong_id<class BoardIdTag>;
 
 void set_ids(EngineId engine, BoardId board){
+  (void)engine;
+  (void)board;
 }
 
 struct X {
