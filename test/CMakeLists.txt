@@ -1,0 +1,76 @@
+#=============================================================================
+# Setup unit tests
+#=============================================================================
+add_custom_target(tests COMMENT "Build all the unit tests.")
+
+
+function(jasel_add_module module)
+    add_custom_target(${module}
+        COMMENT "Build unit tests for the ${module} module.")
+    add_dependencies(tests ${module})
+endfunction()
+
+function(jasel_add_standalone_test test source)
+    # We compile each unit test with the possible combinations of options
+    # found in boost/jasel/detail/config.hpp.
+    #
+    # For lack of a better solution, we currently create different targets
+    # for each configuration.
+    # xxx  - JASEL_XXX
+    add_custom_target(${test})
+
+    macro(helper suffix)
+        add_executable(${test}-${suffix} ${source})
+        add_test(test.${test}-${suffix} ${test}-${suffix})
+        add_dependencies(${test} ${test}-${suffix})
+
+
+        foreach(def IN ITEMS ${ARGN})
+            set_property(TARGET ${test}-${suffix}
+                         APPEND PROPERTY COMPILE_DEFINITIONS ${def})
+        endforeach()
+    endmacro()
+    helper(normal)
+    #helper(xxx-yyyy JASEL_XXX                             JASEL_YYY)
+endfunction()
+
+function(jasel_add_tests module dir)
+    if(NOT TARGET ${module})
+        jasel_add_module(${module})
+    endif()
+
+    foreach(test IN ITEMS ${ARGN})
+        jasel_add_standalone_test(${module}.${test} ${dir}/${test}.cpp)
+        add_dependencies(${module} ${module}.${test})
+    endforeach()
+endfunction()
+
+jasel_add_tests(
+    strong strong
+    ######
+    strict_bool_pass
+    strong_bool_pass
+    strong_bounded_int_pass
+    strong_counter_pass
+    strong_enums_pass
+    strong_id_pass
+    strong_ints_pass
+)
+
+jasel_add_tests(
+    ordinal ordinal
+    ######
+    ordinal_pass
+)
+
+jasel_add_tests(
+    ordinal.array ordinal/container/ordinal_array
+    ######
+    ordinal_array_pass
+)
+
+jasel_add_tests(
+    ordinal.range ordinal/container/ordinal_range
+    ######
+    ordinal_range_pass
+)

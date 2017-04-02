@@ -1,0 +1,162 @@
+# Copyright Louis Dionne 2013-2016
+# Distributed under the Boost Software License, Version 1.0.
+# (See accompanying file LICENSE.md or copy at http://boost.org/LICENSE_1_0.txt)
+
+PROJECT_NAME            = "Jasel"
+PROJECT_BRIEF           = "Just A Standard Experimental Library"
+PROJECT_LOGO            =
+PROJECT_NUMBER          = @Jasel_VERSION_STRING@
+
+STRIP_FROM_PATH         = @Jasel_SOURCE_DIR@/include
+BUILTIN_STL_SUPPORT     = NO # Allows us to document std:: classes ourselves
+STRIP_FROM_INC_PATH     = @Jasel_SOURCE_DIR@/include
+ALIASES                 =
+ENABLED_SECTIONS        =
+QUIET                   = YES
+
+# Resources
+OUTPUT_DIRECTORY        =
+INPUT                   = \
+                          @Jasel_SOURCE_DIR@/include/experimental/fundamental/v3/swappable \
+                          @Jasel_SOURCE_DIR@/include/experimental/fundamental/v3/nullable \
+                          @Jasel_SOURCE_DIR@/include/experimental/fundamental/v3/ordinal \
+                          @Jasel_SOURCE_DIR@/include/experimental/fundamental/v3/strong \
+                          @Jasel_SOURCE_DIR@/include/experimental/fundamental/v3/bits \
+                          @Jasel_SOURCE_DIR@/include/experimental/fundamental/v3/chrono
+
+                          #@Jasel_SOURCE_DIR@/doc/tutorial.hpp
+
+
+FILE_PATTERNS           = *.hpp *.md
+RECURSIVE               = YES
+EXCLUDE                 = @Jasel_SOURCE_DIR@/include/experimental/fundamental/v3/optionals/optionals.hpp \
+                          @Jasel_SOURCE_DIR@/include/experimental/fundamental/v3/expected/expected.hpp \
+                          @Jasel_SOURCE_DIR@/include/experimental/fundamental/v3/std/std_tuple.hpp \
+                          @Jasel_SOURCE_DIR@/include/experimental/fundamental/v2
+                          
+EXCLUDE_PATTERNS        = *.erb*
+EXAMPLE_PATH            = @Jasel_SOURCE_DIR@/test
+EXAMPLE_RECURSIVE       = YES
+WARN_IF_UNDOCUMENTED    = NO
+
+SHOW_GROUPED_MEMB_INC   = YES
+BRIEF_MEMBER_DESC       = YES
+REPEAT_BRIEF            = YES
+ALWAYS_DETAILED_SEC     = NO
+INLINE_INHERITED_MEMB   = NO
+JAVADOC_AUTOBRIEF       = NO
+QT_AUTOBRIEF            = YES
+MULTILINE_CPP_IS_BRIEF  = YES
+INHERIT_DOCS            = NO
+SEPARATE_MEMBER_PAGES   = NO
+DISTRIBUTE_GROUP_DOC    = YES
+SUBGROUPING             = NO
+INLINE_GROUPED_CLASSES  = NO
+INLINE_SIMPLE_STRUCTS   = NO
+
+# Generated formats
+GENERATE_HTML           = YES
+GENERATE_LATEX          = NO
+
+
+GENERATE_TODOLIST       = YES
+GENERATE_TESTLIST       = YES
+GENERATE_BUGLIST        = YES
+GENERATE_DEPRECATEDLIST = YES
+SHOW_USED_FILES         = NO
+SHOW_FILES              = YES
+SHOW_NAMESPACES         = YES
+LAYOUT_FILE             = @Jasel_SOURCE_DIR@/doc/DoxygenLayout.xml
+
+#@Jasel_SOURCE_DIR@/doc/layout.xml
+
+CLASS_DIAGRAMS          = YES
+HAVE_DOT                = NO
+
+HIDE_UNDOC_RELATIONS    = NO
+HIDE_UNDOC_MEMBERS      = NO
+HIDE_UNDOC_CLASSES      = NO
+HIDE_FRIEND_COMPOUNDS   = NO
+HIDE_IN_BODY_DOCS       = YES
+INTERNAL_DOCS           = YES
+HIDE_SCOPE_NAMES        = NO
+SHOW_INCLUDE_FILES      = NO
+FORCE_LOCAL_INCLUDES    = NO
+INLINE_INFO             = NO
+SORT_MEMBER_DOCS        = NO
+SORT_BRIEF_DOCS         = NO
+SORT_MEMBERS_CTORS_1ST  = NO
+SORT_GROUP_NAMES        = NO
+SORT_BY_SCOPE_NAME      = NO
+
+
+ALPHABETICAL_INDEX      = YES
+COLS_IN_ALPHA_INDEX     = 1
+
+# Preprocessing
+ENABLE_PREPROCESSING    = YES
+MACRO_EXPANSION         = YES
+EXPAND_ONLY_PREDEF      = NO
+SEARCH_INCLUDES         = YES
+INCLUDE_PATH            = @Jasel_SOURCE_DIR@/include
+INCLUDE_FILE_PATTERNS   =
+PREDEFINED              =  \
+              JASEL_MUTABLE_CONSTEXPR=constexpr \
+              JASEL_CXX14_CONSTEXPR=constexpr \
+              "JASEL_NOEXCEPT_RETURN(X)=noexcept(see_below);" \
+              "JASEL_DECLTYPE_RETURN_NOEXCEPT(X)=noexcept(see_below) -> see_below ;" \
+              JASEL_DOXYGEN_INVOKED
+
+SKIP_FUNCTION_MACROS    = NO
+
+# Source browsing
+SOURCE_BROWSER          = YES
+INLINE_SOURCES          = NO
+STRIP_CODE_COMMENTS     = NO
+REFERENCED_BY_RELATION  = YES
+REFERENCES_RELATION     = YES
+REFERENCES_LINK_SOURCE  = YES
+USE_HTAGS               = NO
+VERBATIM_HEADERS        = NO
+# CLANG_ASSISTED_PARSING  = NO
+# CLANG_OPTIONS           =
+
+# HTML output
+HTML_OUTPUT             = @CMAKE_CURRENT_BINARY_DIR@/html
+HTML_FILE_EXTENSION     = .html
+HTML_HEADER             =
+#@Jasel_SOURCE_DIR@/doc/header.html
+HTML_FOOTER             =
+#@Jasel_SOURCE_DIR@/doc/footer.html
+HTML_EXTRA_STYLESHEET   =
+HTML_EXTRA_FILES        =
+#@Jasel_SOURCE_DIR@/doc/js/chart.js \
+#                          @Jasel_SOURCE_DIR@/doc/js/hana.js \
+#                          @Jasel_SOURCE_DIR@/doc/js/highcharts-data.js \
+#                          @Jasel_SOURCE_DIR@/doc/js/highcharts-exporting.js \
+#                          @Jasel_SOURCE_DIR@/doc/js/highcharts.js
+
+HTML_COLORSTYLE_HUE     = 75  # 0 - 359
+HTML_COLORSTYLE_SAT     = 100 # 0 - 255
+HTML_COLORSTYLE_GAMMA   = 80
+HTML_TIMESTAMP          = NO
+HTML_DYNAMIC_SECTIONS   = YES
+HTML_INDEX_NUM_ENTRIES  = 0 # Fully expand trees in the Indexes by default
+DISABLE_INDEX           = NO
+GENERATE_TREEVIEW       = YES
+TREEVIEW_WIDTH          = 270
+EXT_LINKS_IN_WINDOW     = NO
+FORMULA_FONTSIZE        = 10
+FORMULA_TRANSPARENT     = YES
+SEARCHENGINE            = YES
+
+# Mathjax (HTML only)
+USE_MATHJAX             = NO
+MATHJAX_FORMAT          = HTML-CSS
+MATHJAX_RELPATH         = https://cdn.mathjax.org/mathjax/latest
+MATHJAX_EXTENSIONS      =
+MATHJAX_CODEFILE        = @Jasel_SOURCE_DIR@/doc/js/mathjax-config.js
+
+EXTENSION_MAPPING      = mod=c++ tpp=c++ dox=c++
+EXTRACT_ALL            = YES
+MULTILINE_CPP_IS_BRIEF = NO
