@@ -8,7 +8,7 @@
 
 #ifndef JASEL_V1_META_IN_PLACE_HPP
 #define JASEL_V1_META_IN_PLACE_HPP
-
+#error
 #if defined  JASEL_STD_EXPERIMENTAL_FACTORIES_USE_OPTIONAL
 #include <optional.hpp>
 #else

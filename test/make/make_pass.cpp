@@ -16,7 +16,7 @@
 #include <experimental/make.hpp>
 //#include <experimental/nullable.hpp>
 #include <experimental/meta.hpp>
-#include <experimental/fundamental/v2/in_place.hpp>
+#include <experimental/fundamental/v3/in_place.hpp>
 
 #include <memory>
 #include <algorithm>
@@ -67,7 +67,7 @@ namespace std
 template <class Tag>
 void xx(Tag&& ) {
   namespace stde = std::experimental;
-  static_assert(std::is_same<Tag, stde::in_place_t>::value, "b");
+  static_assert(std::is_same<Tag, stde::in_place_t const&>::value, "b");
 }
 
 void accept_in_place_t(std::experimental::in_place_t) {
@@ -85,6 +85,7 @@ constexpr nullopt_t2 nullopt2{nullopt_t2::init{}};
 
 void accept_nullopt_t2(nullopt_t2) {
 }
+
 
 
 int main()

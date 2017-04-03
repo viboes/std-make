@@ -45,6 +45,7 @@ function(jasel_add_tests module dir)
     endforeach()
 endfunction()
 
+
 jasel_add_tests(
     strong strong
     ######
@@ -74,3 +75,29 @@ jasel_add_tests(
     ######
     ordinal_range_pass
 )
+
+jasel_add_tests(
+    bits bits
+    ######
+    bit_mask_pass
+)
+
+
+jasel_add_tests(
+    factory make
+    ######
+    make_pass
+    make_std_array_pass
+    make_std_future_pass
+    make_std_pair_pass
+    make_std_shared_future_pass
+    make_std_shared_ptr_pass
+    make_std_tuple_pass
+    make_std_unique_ptr_pass
+)
+    #make_std_optional_pass
+    #make_std_expected_pass
+    #make_boost_optional_pass
+    #make_boost_expected_pass
+
+
