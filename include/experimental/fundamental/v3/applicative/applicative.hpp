@@ -9,7 +9,7 @@
 #ifndef JASEL_FUNDAMENTAL_V3_APPLICATIVE_APPLICATIVE_HPP
 #define JASEL_FUNDAMENTAL_V3_APPLICATIVE_APPLICATIVE_HPP
 
-#if __cplusplus >= 201402L
+#if __cplusplus >= 201402L || defined JASEL_DOXYGEN_INVOKED
 
 ///////////////////////////////////////////////////////////////////////////////////////
 ///
@@ -42,7 +42,11 @@ namespace applicative
   struct tag{};
 
   template <class A, class Enabler=void>
-    struct traits : traits<A, meta::when<true>> {};
+    struct traits
+#if ! defined JASEL_DOXYGEN_INVOKED
+    : traits<A, meta::when<true>> {}
+#endif
+        ;
 
   // Default failing specialization
   template <typename Ap, bool condition>
@@ -74,7 +78,11 @@ namespace applicative
 }
 
   template <class T>
-    struct is_applicative : is_base_of<applicative::tag, applicative::traits<T>> {};
+    struct is_applicative
+#if ! defined JASEL_DOXYGEN_INVOKED
+        : is_base_of<applicative::tag, applicative::traits<T>> {}
+#endif
+        ;
   template <class T>
     struct is_applicative<const T> : is_applicative<T> {};
   template <class T>

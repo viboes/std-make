@@ -31,9 +31,9 @@ int main()
       using T = std::pair<int,int>;
       T p = {0,1};
 
-      static_assert(stde::detail::has_tuple_like_size_access<T>::value, "Hrr");
-      static_assert(stde::detail::has_tuple_like_element_access<0,T>::value, "Hrr");
-      static_assert(stde::detail::has_tuple_like_get_access<0,T>::value, "Hrr");
+      static_assert(stde::product_type_detail::has_tuple_like_size_access<T>::value, "Hrr");
+      static_assert(stde::product_type_detail::has_tuple_like_element_access<0,T>::value, "Hrr");
+      static_assert(stde::product_type_detail::has_tuple_like_get_access<0,T>::value, "Hrr");
       static_assert(stde::has_tuple_like_access<T>::value, "Hrr");
 
       static_assert(2 == stde::product_type::size<T>::value, "Hrr");

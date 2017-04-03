@@ -22,7 +22,8 @@ inline  namespace fundamental_v3
 {
 namespace product_type
 {
-namespace detail {
+#if ! defined JASEL_DOXYGEN_INVOKED
+namespace product_type_detail {
   template <std::size_t I, std::size_t N>
   struct stream_insert_impl {
 
@@ -40,15 +41,19 @@ namespace detail {
 
   };
 }
+#endif
+
   template <class Char, class Traits, class PT
+#if ! defined JASEL_DOXYGEN_INVOKED
   , class = enable_if_t<
       is_product_type_v<meta::uncvref_t<PT>>
     >
+#endif
   >
   constexpr void stream_insert(basic_ostream<Char, Traits>& os, PT const& pt)
   {
     os << '{';
-    detail::stream_insert_impl<0, product_type::size<PT>::value >::apply(os, pt);
+    product_type_detail::stream_insert_impl<0, product_type::size<PT>::value >::apply(os, pt);
     os << '}';
   }
 

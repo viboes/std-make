@@ -15,7 +15,7 @@
 
 namespace std
 {
-#if __cplusplus <= 201103L
+#if __cplusplus <= 201103L || defined JASEL_DOXYGEN_INVOKED
   template <int = 0, int..., class T>
     unique_ptr<typename decay<T>::type> make_unique(T&& x)
   {

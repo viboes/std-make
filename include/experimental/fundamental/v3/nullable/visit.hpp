@@ -26,6 +26,7 @@ inline  namespace fundamental_v3
 {
 namespace nullable
 {
+#if ! defined JASEL_DOXYGEN_INVOKED
 namespace detail
 {
   template <size_t I>
@@ -47,6 +48,9 @@ namespace detail
     }
   };
 }
+#endif
+
+//! struct mapping a Nullable to a SumType
   template <class N>
   struct as_sum_type : sum_type::tag {
     using size = integral_constant<size_t, 2>;

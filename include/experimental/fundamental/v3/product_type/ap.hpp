@@ -24,7 +24,8 @@ inline  namespace fundamental_v3
 {
 namespace product_type
 {
-  namespace detail {
+#if ! defined JASEL_DOXYGEN_INVOKED
+  namespace product_type_detail {
 
     template <class TC, class F, class ProductType, std::size_t... I>
     constexpr decltype(auto) ap_impl( F&& f, ProductType&& pt, index_sequence<I...> )
@@ -42,15 +43,15 @@ namespace product_type
       );
     }
 
-  } // namespace detail
-
+  } // namespace product_type_detail
+#endif
   /**
    * Invoke the Callable object contained in f for each one of the product type elements and return the result wrapped using a ProductType.
    *
-   * @par f is a product type having the Callable object to be invoked on each product type element as the single element
-   * @par pt product type whose elements to be used as arguments to f
+   * @param f is a product type having the Callable object to be invoked on each product type element as the single element
+   * @param pt product type whose elements to be used as arguments to f
    *
-   * @pre
+   * @par Requires:
    * - DProductType is a model of ProductType.
    * - DF is a model of is a model of ProductType having only one element satisfying
    *   Callable<product_type::element_t<I, DProductType>>...
@@ -59,55 +60,67 @@ namespace product_type
    */
 
   template <class F, class ProductType
+#if ! defined JASEL_DOXYGEN_INVOKED
   // todo add constraint on F
   , class = enable_if_t< is_product_type_v<meta::uncvref_t<ProductType>> >
+#endif
   >
   constexpr decltype(auto) ap(F&& f, ProductType&& pt)
   {
-      return detail::ap_impl<type_constructor_t<meta::uncvref_t<ProductType>>>(
+      return product_type_detail::ap_impl<type_constructor_t<meta::uncvref_t<ProductType>>>(
           forward<F>(f), forward<ProductType>(pt),
           product_type::element_sequence_for<ProductType>{});
   }
 
   template <class TC, class F, class ProductType
+#if ! defined JASEL_DOXYGEN_INVOKED
   // todo add constraint on F
   , class = enable_if_t< is_product_type_v<meta::uncvref_t<ProductType>> >
+#endif
   >
   constexpr decltype(auto) ap(F&& f, ProductType&& pt)
   {
-      return detail::ap_impl<TC>(
+      return product_type_detail::ap_impl<TC>(
           forward<F>(f), forward<ProductType>(pt),
           product_type::element_sequence_for<ProductType>{});
   }
 
   template <class F, class ProductType
+#if ! defined JASEL_DOXYGEN_INVOKED
   // todo add constraint on F
   , class = enable_if_t< is_product_type_v<meta::uncvref_t<ProductType>> >
+#endif
   >
   constexpr decltype(auto) p_ap(F&& f, ProductType&& pt)
   {
-      return detail::p_ap_impl<type_constructor_t<meta::uncvref_t<ProductType>>>(
+      return product_type_detail::p_ap_impl<type_constructor_t<meta::uncvref_t<ProductType>>>(
           forward<F>(f), forward<ProductType>(pt),
           product_type::element_sequence_for<ProductType>{});
   }
 
   template <class TC, class F, class ProductType
+#if ! defined JASEL_DOXYGEN_INVOKED
   // todo add constraint on F
   , class = enable_if_t< is_product_type_v<meta::uncvref_t<ProductType>> >
+#endif
   >
   constexpr decltype(auto) p_ap(F&& f, ProductType&& pt)
   {
-      return detail::p_ap_impl<TC>(
+      return product_type_detail::p_ap_impl<TC>(
           forward<F>(f), forward<ProductType>(pt),
           product_type::element_sequence_for<ProductType>{});
   }
+
+  //! struct mapping a product_type to a N-Applicative.
   struct as_n_applicative : n_applicative::tag
   {
+    //! forwards to product_type::ap
     template <class F, class T>
       static constexpr auto ap(F&& f, T&& x)
       {
         return product_type::ap(forward<F>(f), forward<T>(x));
       }
+    //! forwards to factory::make<PT>
     template <class PT, class ...Ts>
       static auto pure(Ts&& ...xs)
       {
@@ -115,13 +128,16 @@ namespace product_type
       }
   };
 
+  //! struct mapping a product_type to a P-Applicative.
   struct as_p_applicative : p_applicative::tag
   {
+    //! forwards to product_type::p_ap
     template <class F, class T>
       static constexpr auto ap(F&& f, T&& x)
       {
         return product_type::p_ap(forward<F>(f), forward<T>(x));
       }
+    //! forwards to factory::make<PT>
     template <class PT, class ...Ts>
       static auto pure(Ts&& ...xs)
       {

@@ -12,7 +12,7 @@
 #if (__cplusplus >= 201402L && defined JASEL_SUPPORT_SWAPPABLE) || defined JASEL_DOXYGEN_INVOKED
 
 ///////////////////////////////////////////////////////////////////////////////////////
-///
+/// @file
 /// In these definitions, let t denote an expression of type T, and let u denote an expression of type U.
 /// An object t is swappable with an object u if and only if:
 ///
@@ -53,20 +53,25 @@ namespace experimental
 inline namespace fundamental_v3
 {
 
+  //! Trait stating if the expressions swappable::swap(t,t), swappable::swap(u,u), swappable::swap(t,u), swappable::swap(u,t) are well formed.
   template <class T, class U=T>
     struct is_swappable;
 
+  //! alias variable for is_swappable
   template <class T, class U=T>
     constexpr bool is_swappable_v = is_swappable<T,U>::value;
 
+  //! Trait stating if the types are swappable and the expression doesn't throws.
   template<typename T, typename U = T>
     struct is_nothrow_swappable;
 
+  //! alias variable for is_nothrow_swappable
   template <class T, class U=T>
     constexpr bool is_nothrow_swappable_v = is_nothrow_swappable<T,U>::value;
 
 namespace swappable {
 
+  //! customization for swap
   template <class R, class S, class Enabler=void>
     struct traits
 #if ! defined JASEL_DOXYGEN_INVOKED
@@ -74,7 +79,7 @@ namespace swappable {
 #endif
         ;
 
-  // Default failing specialization
+  // Default failing swappable::traits specialization
   template <typename R, typename S, bool condition>
   struct traits<R, S, meta::when<condition>>
   {
@@ -82,6 +87,7 @@ namespace swappable {
         static auto swap(T& x, U& y) =delete;
   };
 }
+#if ! defined JASEL_DOXYGEN_INVOKED
 namespace adl_swappable {
 
   template <class T> void swap(T&, T&) = delete;
@@ -103,18 +109,29 @@ namespace adl_swappable {
         swap(std::forward<T>(t), std::forward<U>(u))
       )
 }
+#endif
 
 namespace swappable {
+  //! alias variable stating if swap if found by ADL
   template <class T, class U=T>
-    constexpr bool is_adl_swappable_v = adl_swappable::is_adl_swappable<T,U>::value;
+    constexpr bool is_adl_swappable_v
+#if ! defined JASEL_DOXYGEN_INVOKED
+      = adl_swappable::is_adl_swappable<T,U>::value
+#endif
+      ;
 
+  //! trait stating swap(a,b) if found by traits specialization
   template <class T, class U=T, typename = void>
     struct is_trait_swappable
+#if ! defined JASEL_DOXYGEN_INVOKED
       : false_type {};
   template <class T, class U>
     struct is_trait_swappable<T, U, void_t< decltype( traits<T, U>::swap(declval<T>(),declval<U>()) ) > >
-      : true_type {};
+      : true_type {}
+#endif
+  ;
 
+  //! alias variable for is_trait_swappable
   template <class T, class U=T>
     constexpr bool is_trait_swappable_v = is_trait_swappable<T,U>::value;
 
@@ -170,7 +187,12 @@ namespace swappable {
     }
 #else
   //! overload for swappable by trait: extension
-  //! @par Effects:<br> Forward to swappable::traits
+  //! @par Effects:
+  //!   Forward to swappable::traits
+  //! @par Remark:
+  //!   This function will not participate in overload resolution if
+  //!   - not is_trait_swappable
+
   template <class T, class U>
 #if defined JASEL_DOXYGEN_INVOKED
   void swap(T&& x, U&& y);
@@ -185,7 +207,13 @@ namespace swappable {
 #endif
 
   //! overload for swappable: std
-  //! @par Equivalent to:<br> y = ::std::exchange(x, ::std::move(y))
+  //! @par Equivalent to:
+  //!   @code y = ::std::exchange(x, ::std::move(y)) @endcode
+  //! @par Remark:
+  //!   This function will not participate in overload resolution if
+  //!   - is_trait_swappable or
+  //!   - not is_move_constructible or
+  //!   - not is_move_assignable
   template <class T>
 #if defined JASEL_DOXYGEN_INVOKED
 void swap(T& x, T& y);
@@ -201,6 +229,7 @@ void swap(T& x, T& y);
      )
 #endif
 
+  //! traits specialization for is_adl_swappable
   template <typename R, typename S>
   struct traits<R, S, meta::when<
    is_adl_swappable_v<R,S>
@@ -213,6 +242,7 @@ void swap(T& x, T& y);
        )
   };
 
+   //! traits specialization for not is_adl_swappable
   template <class R, std::size_t M>
   struct traits<R[M], R[M], meta::when<
     not is_adl_swappable_v<R[M],R[M]>
@@ -233,6 +263,7 @@ void swap(T& x, T& y);
 #endif
 }
 
+#if ! defined JASEL_DOXYGEN_INVOKED
 namespace swap_detail {
   template <class T, class U=T, typename = void>
     struct is_swappable
@@ -260,24 +291,33 @@ namespace swap_detail {
     >: true_type {};
 
 }
+#endif
 
   template <class T, class U>
-    struct is_swappable : integral_constant<bool,
+    struct is_swappable
+#if ! defined JASEL_DOXYGEN_INVOKED
+        : integral_constant<bool,
          swap_detail::is_swappable<T>::value
       && swap_detail::is_swappable<U>::value
       && swap_detail::is_swappable<T,U>::value
       && swap_detail::is_swappable<U,T>::value
     >
-    {};
+    {}
+#endif
+    ;
 
   template <class T, class U>
-    struct is_nothrow_swappable : integral_constant<bool,
+    struct is_nothrow_swappable
+#if ! defined JASEL_DOXYGEN_INVOKED
+        : integral_constant<bool,
          swap_detail::is_nothrow_swappable<T>::value
       && swap_detail::is_nothrow_swappable<U>::value
       && swap_detail::is_nothrow_swappable<T,U>::value
       && swap_detail::is_nothrow_swappable<U,T>::value
     >
-    {};
+    {}
+#endif
+    ;
 
 }}
 }

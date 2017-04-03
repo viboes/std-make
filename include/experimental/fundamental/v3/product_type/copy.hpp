@@ -23,6 +23,7 @@ inline  namespace fundamental_v3
 
 namespace product_type
 {
+#if ! defined JASEL_DOXYGEN_INVOKED
   namespace product_type_detail {
 
     template <class PT1, class PT2, size_t... I>
@@ -53,18 +54,21 @@ namespace product_type
     {};
 
   } // namespace detail
+#endif
 
   /**
    * Copy a product type pt1 into a product type pt2 having the same elements as the product type arg.
    *
-   * @par pt1 a rvalue to a product type
-   * @par pt2 a lvalue to a product type
+   * @param pt1 a rvalue to a product type
+   * @param pt2 a lvalue to a product type
    *
-   * @pre The parameters must be a model of ProductType, the size be the same and is_assignable_v<Ti&, Ui&&> == true for all i.
+   * @par Requires
+   *  The parameters must be a model of ProductType, the size be the same and is_assignable_v<Ti&, Ui&&> == true for all i.
    */
 
 #if 1
   template <class PT1, class PT2
+#if ! defined JASEL_DOXYGEN_INVOKED
   , class = enable_if_t<
         product_type_detail::have_same_size<
           PT2, meta::uncvref_t<PT1>,
@@ -76,6 +80,7 @@ namespace product_type
           product_type::element_sequence_for<PT2>
         >::value
     >
+#endif
   >
   PT2& copy(PT1&& pt1, PT2& pt2)
   {

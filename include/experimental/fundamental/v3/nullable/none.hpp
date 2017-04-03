@@ -202,7 +202,11 @@ inline namespace fundamental_v3
   // T{none<T>()}
 
   template <class T>
-  struct is_nullable : is_base_of<nullable::tag, nullable::traits<T>> {};
+  struct is_nullable
+#if ! defined JASEL_DOXYGEN_INVOKED
+      : is_base_of<nullable::tag, nullable::traits<T>> {}
+#endif
+      ;
   template <class T>
   struct is_nullable<const T> : is_nullable<T> {};
   template <class T>
@@ -210,23 +214,35 @@ inline namespace fundamental_v3
   template <class T>
   struct is_nullable<const volatile T> : is_nullable<T> {};
 
-#if __cplusplus >= 201402L
+#if __cplusplus >= 201402L || defined JASEL_DOXYGEN_INVOKED
   template <class T>
   constexpr bool is_nullable_v = is_nullable<T>::value ;
 #endif
 
   template <class T>
-  struct is_nullable<T*> : true_type {};
+  struct is_nullable<T*>
+#if ! defined JASEL_DOXYGEN_INVOKED
+  : true_type {}
+#endif
+  ;
 
   // todo: implement this traits
   template <class T>
-  struct is_strict_weakly_ordered : false_type {};
+  struct is_strict_weakly_ordered
+#if ! defined JASEL_DOXYGEN_INVOKED
+      : false_type {}
+#endif
+      ;
 
   template <class T>
-  struct is_strict_weakly_ordered_nullable : conjunction<
+  struct is_strict_weakly_ordered_nullable
+#if ! defined JASEL_DOXYGEN_INVOKED
+      : conjunction<
     is_strict_weakly_ordered<T>
   , is_nullable<T>
-  > {};
+  > {}
+#endif
+      ;
 
   namespace nullable {
 

@@ -23,7 +23,8 @@ inline  namespace fundamental_v3
 {
 namespace product_type
 {
-  namespace detail {
+#if ! defined JASEL_DOXYGEN_INVOKED
+  namespace product_type_detail {
 #if defined JASEL_HAS_FOLD_EXPRESSIONS
 
     template <class T, size_t ... ids>
@@ -52,21 +53,26 @@ namespace product_type
   };
 #endif
   }
+#endif
 
   template <class T>
     constexpr void swap(T& x, T& y)
     {
 #if defined JASEL_HAS_FOLD_EXPRESSIONS
-      detail::swap_impl(x, y, product_type::element_sequence_for<T>{});
+      product_type_detail::swap_impl(x, y, product_type::element_sequence_for<T>{});
 #else
-      detail::swap_impl<product_type::size_v<T>>::template apply(x, y);
+      product_type_detail::swap_impl<product_type::size_v<T>>::template apply(x, y);
 #endif
     }
 
   template <class T, std::size_t N>
+#if ! defined JASEL_DOXYGEN_INVOKED
   enable_if_t<
     ::std::experimental::is_swappable_v<T>
   >
+#else
+  void
+#endif
     swap(T (&t)[N], T (&u)[N])
       noexcept(::std::experimental::is_nothrow_swappable_v<T>)
     {

@@ -24,7 +24,8 @@ inline  namespace fundamental_v3
 {
 namespace product_type
 {
-  namespace detail {
+#if ! defined JASEL_DOXYGEN_INVOKED
+  namespace product_type_detail {
 
     template <class F, class State, class ProductType>
     constexpr decltype(auto) fold_left_index_impl( ProductType&& pt, State&& state, F&& f, index_sequence<> )
@@ -43,7 +44,8 @@ namespace product_type
           );
     }
 
-  } // namespace detail
+  } // namespace product_type_detail
+#endif
 
   /**
    * Left-fold of a structure using a binary operation and an optional initial reduction state.
@@ -59,16 +61,19 @@ namespace product_type
    */
 
   template <class F, class State, class ProductType
+#if ! defined JASEL_DOXYGEN_INVOKED
   // todo add constraint on F
   , class = enable_if_t< is_product_type_v<meta::uncvref_t<ProductType>> >
+#endif
   >
   constexpr decltype(auto) fold_left_index(ProductType&& pt, State&& state, F&& f)
   {
-    return detail::fold_left_index_impl(forward<ProductType>(pt), forward<State>(state), forward<F>(f),
+    return product_type_detail::fold_left_index_impl(forward<ProductType>(pt), forward<State>(state), forward<F>(f),
         product_type::element_sequence_for<ProductType>{});
   }
 
   template <class F, class ProductType
+#if ! defined JASEL_DOXYGEN_INVOKED
   // todo add constraint on F
   , class = enable_if_t<
               product_type::friendly_type_trait<
@@ -76,11 +81,12 @@ namespace product_type
                 product_type::not_empty
               >::value
       >
+#endif
   >
   constexpr decltype(auto) fold_left_index(ProductType&& pt, F&& f)
   {
-    return detail::fold_left_index_impl(forward<ProductType>(pt), product_type::get<0>(forward<ProductType>(pt)), forward<F>(f),
-          detail::drop_front_t<product_type::element_sequence_for<ProductType>>{});
+    return product_type_detail::fold_left_index_impl(forward<ProductType>(pt), product_type::get<0>(forward<ProductType>(pt)), forward<F>(f),
+          product_type_detail::drop_front_t<product_type::element_sequence_for<ProductType>>{});
   }
 
 }

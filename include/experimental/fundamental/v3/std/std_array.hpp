@@ -17,9 +17,10 @@
 
 namespace std
 {
+#if ! defined JASEL_DOXYGEN_INVOKED
 #if ! defined JASEL_HAS_MAKE_ARRAY
 
-  namespace details {
+  namespace std_details {
     template<class> struct is_ref_wrapper : false_type {};
     template<class T> struct is_ref_wrapper<reference_wrapper<T>> : true_type {};
 
@@ -39,9 +40,10 @@ namespace std
   }
 
   template < class D = void, class... Types>
-  constexpr details::return_type<D, Types...> make_array(Types&&... t) {
+  constexpr std_details::return_type<D, Types...> make_array(Types&&... t) {
     return {{forward<Types>(t)... }};
   }
+#endif
 #endif
 
 namespace experimental
@@ -69,7 +71,7 @@ namespace type_constructible {
     }
   };
 }
-#if __cplusplus >= 201402L
+#if __cplusplus >= 201402L || defined JASEL_DOXYGEN_INVOKED
 
   namespace functor {
     template <>

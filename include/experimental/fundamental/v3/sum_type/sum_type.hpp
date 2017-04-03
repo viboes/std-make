@@ -9,7 +9,8 @@
 #ifndef JASEL_FUNDAMENTAL_V3_SUM_TYPE_PRODUCT_TYPE_HPP
 #define JASEL_FUNDAMENTAL_V3_SUM_TYPE_PRODUCT_TYPE_HPP
 #define YAFPL_X1
-#if __cplusplus >= 201402L
+#if __cplusplus >= 201402L || defined JASEL_DOXYGEN_INVOKED
+
 
 ///////////////////////////////////////////////////////////////////////////////////////
 ///
@@ -67,6 +68,7 @@ inline namespace fundamental_v3
     return v(x);
   }
 
+#if ! defined JASEL_DOXYGEN_INVOKED
 namespace detail
 {
 
@@ -147,16 +149,25 @@ namespace detail
 
 
 }
+#endif
 
   template <class T>
-  struct has_variant_like_access : conjunction<
+  struct has_variant_like_access
+#if ! defined JASEL_DOXYGEN_INVOKED
+      : conjunction<
     detail::has_variant_like_size_access<T>,
     detail::has_variant_like_alternative_get_access<T, detail::has_variant_like_size_access<T>::value>
-    > {};
+    > {}
+#endif
+      ;
 
 namespace sum_type {
     template <class ST, class Enabler=void>
-    struct traits : traits<ST, meta::when<true>> {};
+    struct traits
+#if ! defined JASEL_DOXYGEN_INVOKED
+        : traits<ST, meta::when<true>> {}
+#endif
+        ;
 
     // Default failing specialization
     template <class  ST, bool condition>
@@ -226,7 +237,11 @@ namespace sum_type {
     template <size_t I, class T> struct alternative<I, const volatile T> { using type = const volatile alternative_t<I, T>; };
 
     template <class ST>
-    struct empty : integral_constant<bool, 0 == sum_type::size_v<ST>> {};
+    struct empty
+#if ! defined JASEL_DOXYGEN_INVOKED
+        : integral_constant<bool, 0 == sum_type::size_v<ST>> {}
+#endif
+        ;
     template <class ST>
     constexpr size_t empty_v = empty<ST>::value;
     template <class ST>
@@ -257,6 +272,7 @@ namespace sum_type {
     template <class ST>
     using alternative_sequence_for = make_index_sequence<sum_type::size_v<meta::uncvref_t<ST>>>;
 
+#if ! defined JASEL_DOXYGEN_INVOKED
     namespace detail {
       template <class ST, class Ids>
       struct alternatives;
@@ -266,14 +282,23 @@ namespace sum_type {
         using type = meta::types<sum_type::alternative_t<I, ST>...>;
       };
     }
+#endif
     template <class ST>
-    struct alternatives : detail::alternatives<meta::uncvref_t<ST>, sum_type::alternative_sequence_for<ST>> {};
+    struct alternatives
+#if ! defined JASEL_DOXYGEN_INVOKED
+        : detail::alternatives<meta::uncvref_t<ST>, sum_type::alternative_sequence_for<ST>> {}
+#endif
+        ;
 
   }
 
   // fixme redefine it as we did for has_variant_like_access
   template <class T>
-  struct is_sum_type : is_base_of<sum_type::tag, sum_type::traits<T>> {};
+  struct is_sum_type
+#if ! defined JASEL_DOXYGEN_INVOKED
+      : is_base_of<sum_type::tag, sum_type::traits<T>> {}
+#endif
+      ;
   template <class T>
   struct is_sum_type<const T> : is_sum_type<T> {};
   template <class T>
@@ -285,9 +310,17 @@ namespace sum_type {
 
   namespace sum_type {
     template <class ST, template <class> class Trait, bool B = is_sum_type_v<ST> >
-    struct friendly_type_trait : false_type {};
+    struct friendly_type_trait
+#if ! defined JASEL_DOXYGEN_INVOKED
+        : false_type {}
+#endif
+        ;
     template <class ST, template <class> class Trait>
-    struct friendly_type_trait<ST, Trait, true> : Trait<ST> {};
+    struct friendly_type_trait<ST, Trait, true>
+#if ! defined JASEL_DOXYGEN_INVOKED
+    : Trait<ST> {}
+#endif
+    ;
   }
 
 }}

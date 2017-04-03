@@ -17,7 +17,7 @@ namespace experimental
 inline namespace fundamental_v3
 {
 namespace type_constructible {
-
+#if ! defined JASEL_DOXYGEN_INVOKED
 namespace detail_maker
 {
 
@@ -57,21 +57,36 @@ namespace detail_maker
     }
   };
 }
-
+#endif
   template <class T>
+#if ! defined JASEL_DOXYGEN_INVOKED
   typename enable_if<
       ! is_type_constructor<T>::value
       , detail_maker::maker_t<T>
-    >::type maker() { return detail_maker::maker_t<T>{}; }
+    >::type
+#else
+    decltype(auto)
+#endif
+    maker() { return detail_maker::maker_t<T>{}; }
 
   template <class TC>
+#if ! defined JASEL_DOXYGEN_INVOKED
   typename enable_if<
       is_type_constructor<TC>::value
       , detail_maker::maker_tc<TC>
-    >::type maker() { return detail_maker::maker_tc<TC>{}; }
+    >::type
+#else
+    auto
+#endif
+    maker() { return detail_maker::maker_tc<TC>{}; }
 
   template <template <class ...> class TC>
-  detail_maker::maker_tmpl<TC> maker() { return detail_maker::maker_tmpl<TC>{}; }
+#if ! defined JASEL_DOXYGEN_INVOKED
+  detail_maker::maker_tmpl<TC>
+#else
+    auto
+#endif
+  maker() { return detail_maker::maker_tmpl<TC>{}; }
 }
 using type_constructible::maker;
 

@@ -30,7 +30,11 @@ inline namespace fundamental_v3
   using NoneType = meta::eval<none_type<T>>;
 
   template <class T >
-  struct none_type<T*> : enable_if<is_object<T>::value, nullptr_t>  {};
+  struct none_type<T*>
+#if ! defined JASEL_DOXYGEN_INVOKED
+  : enable_if<is_object<T>::value, nullptr_t>  {}
+#endif
+  ;
   template <class I>
   struct none_type<I const> : none_type<typename decay<I>::type> { };
   template <class I>
@@ -38,8 +42,8 @@ inline namespace fundamental_v3
   template <class I>
   struct none_type<I const volatile> : none_type<typename decay<I>::type> { };
 
-
-  namespace detail {
+#if ! defined JASEL_DOXYGEN_INVOKED
+  namespace nullable_detail {
     template< class, class = void >
     struct has_none_type_member : false_type { };
     template< class T >
@@ -49,10 +53,14 @@ inline namespace fundamental_v3
     struct none_type;
     template <class T >
     struct none_type<T, true_type>: meta::id<typename T::none_type> {};
-
   }
+#endif
   template <class T >
-  struct none_type<T> : detail::none_type<T, detail::has_none_type_member<T>> {};
+  struct none_type<T>
+#if ! defined JASEL_DOXYGEN_INVOKED
+  : nullable_detail::none_type<T, nullable_detail::has_none_type_member<T>> {}
+#endif
+  ;
 
 //  // customization point defaults to nested type
 //  struct none_type<T>

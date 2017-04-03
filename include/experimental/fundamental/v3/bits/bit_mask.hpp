@@ -61,12 +61,14 @@ namespace experimental
 {
 inline namespace fundamental_v3
 {
-  struct pos_tag_t {};
-  struct fill_tag_t {};
-  struct mask_tag_t {};
+  struct pos_tag_t {}; //! tag used when passing the position to set in the constructor
+  struct fill_tag_t {}; //! tag used when passing a value to fill in the constructor
+  struct mask_tag_t {}; //! tag used when passing a mask to set in the constructor
 
   namespace bit_ops
   {
+    //! @par Returns
+    //!   The bits in x rotated to the left s times
     template <class T>
     constexpr T rotl(T x, unsigned int s) noexcept
     {
@@ -77,12 +79,19 @@ inline namespace fundamental_v3
            : (x << m) | (x >> (N - m))
            ;
     }
+
+    //! @par Returns
+    //!   The number of bits set to 1 in x
     template <class T>
     constexpr int popcount(T x) noexcept
     {
       return __builtin_popcount(x);
     }
 
+    //! @par Requires:
+    //!   N <= sizeof(T) * CHAR_BIT
+    //! @par Returns
+    //!   A mask with all the bits set to 1 up to the bit N
     template <size_t N, class T=unsigned>
     constexpr T up_to() noexcept
     {
@@ -90,6 +99,10 @@ inline namespace fundamental_v3
           T(-1) : (T(1) << N) - 1;
     }
 
+    //! @par Pre-condition:
+    //!   n <= sizeof(T) * CHAR_BIT
+    //! @par Returns
+    //!   A mask with all the bits set to 1 up to the bit n
     template <class T=unsigned>
     constexpr T up_to(size_t n) noexcept
     {
@@ -97,6 +110,10 @@ inline namespace fundamental_v3
           T(-1) : (T(1) << n) - 1;
     }
 
+    //! @par Requires:
+    //!   S < sizeof(T) * CHAR_BIT
+    //! @par Returns
+    //!   A mask with the bit S set to 1
     template <size_t S, class T=unsigned>
     constexpr T single() noexcept
     {
@@ -104,6 +121,10 @@ inline namespace fundamental_v3
       constexpr unsigned int m = S % N;
       return (T(1) << m);
     }
+    //! @par Pre-condition:
+    //!   s < sizeof(T) * CHAR_BIT
+    //! @par Returns
+    //!   A mask with the bit s set to 1
     template <class T>
     constexpr T single(size_t s) noexcept
     {
@@ -124,8 +145,8 @@ inline namespace fundamental_v3
      Each bit represents either the value zero (reset) or one (set). To toggle
      a bit is to change the value zero to one, or the value one to zero. Each
      bit has a non-negative position @c pos. When converting between an object of
-     class @c bit_mask<N,T> and a value of some integral type, bit position pos
-     corresponds to the bit value 1<<pos. The integral value corresponding to
+     class @c bit_mask<N,T> and a value of some integral type, bit position @c pos
+     corresponds to the bit value @c 1<<pos. The integral value corresponding to
      two or more bits is the sum of their bit values.
 
      The functions described in this section can report three kinds of errors,
@@ -221,7 +242,10 @@ inline namespace fundamental_v3
       {
       }
 #endif
-      //! bit_mask is a POD
+      //! @par Effects:
+      //!   Construct an uninitialized bit_mask
+      //! @par Remark:
+      //!   Unlike std::bitset, bit_mask is a POD
       constexpr bit_mask() noexcept = default;
 
       //! @par Effects:

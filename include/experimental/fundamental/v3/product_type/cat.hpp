@@ -26,16 +26,18 @@ namespace product_type
   /**
    * Constructs a tuple that is a concatenation of all product type in args.
    *
-   * @par args  zero or more product_type to concatenate
+   * @param pts  zero or more product_type to concatenate
    *
-   * @pre All the parameter must be a model of ProductType
+   * @par Requires:
+   *  All the parameter must be a model of ProductType
    */
-
   template <class ...ProductTypes
+#if ! defined JASEL_DOXYGEN_INVOKED
 #if defined JASEL_HAS_FOLD_EXPRESSIONS
   , class = enable_if_t< (is_product_type_v<meta::uncvref_t<ProductTypes>> && ...) >
 #else
   // todo Add for C++14
+#endif
 #endif
   >
   constexpr decltype(auto) cat(ProductTypes&& ...pts)

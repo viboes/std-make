@@ -22,7 +22,8 @@ inline  namespace fundamental_v3
 
 namespace product_type
 {
-  namespace detail {
+#if ! defined JASEL_DOXYGEN_INVOKED
+  namespace product_type_detail {
 
     template <class ProductType, std::size_t... I>
     constexpr decltype(auto) to_tuple_impl( ProductType&& pt, index_sequence<I...> )
@@ -30,22 +31,26 @@ namespace product_type
       return make_tuple(product_type::get<I>(forward<ProductType>(pt))...);
     }
 
-  } // namespace detail
+  } // namespace product_type_detail
+#endif
 
   /**
    * Constructs a tuple having the same elements as the product type arg.
    *
-   * @par arg  a product_type
+   * @param pt  a product_type
    *
-   * @pre The parameter must be a model of ProductType
+   * @par Requires:
+   *    The parameter must be a model of ProductType
    */
 
   template <class ProductType
+#if ! defined JASEL_DOXYGEN_INVOKED
   , class = enable_if_t< is_product_type_v<meta::uncvref_t<ProductType>>  >
+#endif
   >
   constexpr decltype(auto) to_tuple(ProductType&& pt)
   {
-      return detail::to_tuple_impl(forward<ProductType>(pt),
+      return product_type_detail::to_tuple_impl(forward<ProductType>(pt),
           product_type::element_sequence_for<ProductType>{});
   }
 
@@ -65,7 +70,7 @@ namespace product_type
   >
   constexpr decltype(auto) select_to_tuple(ProductType&& pt)
   {
-      return detail::to_tuple_impl(forward<ProductType>(pt),
+      return product_type_detail::to_tuple_impl(forward<ProductType>(pt),
           IndexSequence{});
   }
 
@@ -117,7 +122,7 @@ namespace product_type
   >
   constexpr decltype(auto) slice_to_tuple(ProductType&& pt)
   {
-      return detail::to_tuple_impl(forward<ProductType>(pt),
+      return product_type_detail::to_tuple_impl(forward<ProductType>(pt),
           make_slice_integer_sequence<size_t, I, J, ProductType>{});
   }
 
@@ -152,12 +157,13 @@ namespace product_type
   constexpr decltype(auto) project_to_tuple(ProductType&& pt)
   {
       using PT = meta::uncvref_t<PT2>;
-      return detail::to_tuple_impl(forward<ProductType>(pt),
+      return product_type_detail::to_tuple_impl(forward<ProductType>(pt),
           make_projected_integer_sequence<IndexPred, product_type::element_sequence_for<PT>>{}{});
   }
 
 
 
+#if ! defined JASEL_DOXYGEN_INVOKED
 
   /**
    * Constructs a tuple having the same elements as the product type pt projecting the index satisfying the TypePred.
@@ -166,21 +172,25 @@ namespace product_type
    *
    * @pre The parameter must be a model of ProductType
    */
-namespace detail {
+namespace product_type_detail {
   template <class TypePred, typename PT>
   struct TypeToIndexPred {
     template <class T, T Index>
     constexpr bool const value =  TypePred<product_type::element_t<Index,PT>>::value;
   };
 }
+#endif
+
   template <class TypePred, class PT2
+#if ! defined JASEL_DOXYGEN_INVOKED
   , class = enable_if_t< is_product_type_v<meta::uncvref_t<PT2>>  >
+#endif
   >
   constexpr decltype(auto) filter_to_tuple(PT2&& pt)
   {
       using PT = meta::uncvref_t<PT2>;
-      return detail::to_tuple_impl(forward<ProductType>(pt),
-          make_project_index_sequence<detail::TypeToIndexPred<TypePred, PT>, product_type::element_sequence_for<PT>>{});
+      return product_type_detail::to_tuple_impl(forward<ProductType>(pt),
+          make_project_index_sequence<product_type_detail::TypeToIndexPred<TypePred, PT>, product_type::element_sequence_for<PT>>{});
   }
 #endif
 

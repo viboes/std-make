@@ -151,7 +151,11 @@ namespace meta {
 
   // fixme check for the real operations size/val/pos
   template <class T>
-  struct is_ordinal : is_base_of<ordinal::tag, ordinal::traits<T>> {};
+  struct is_ordinal
+#if ! defined JASEL_DOXYGEN_INVOKED
+     : is_base_of<ordinal::tag, ordinal::traits<T>> {}
+#endif
+      ;
   template <class T>
   struct is_ordinal<const T> : is_ordinal<T> {};
   template <class T>

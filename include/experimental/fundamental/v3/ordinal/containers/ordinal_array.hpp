@@ -13,7 +13,7 @@
 /*!
 \file
 \brief
-The header \c <ordinal/containers/ordinal_array.hpp> defines a class template for storing
+The header \c <experimantal/ordinal_array.hpp> defines a class template for storing
 sequences of objects fixed by the size of the enumeration.
 We can say that
 \c ordinal_array is the counterpart of \c std::array when the index are ordinal types.

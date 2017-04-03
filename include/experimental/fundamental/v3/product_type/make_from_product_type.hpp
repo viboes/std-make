@@ -22,7 +22,8 @@ inline  namespace fundamental_v3
 
 namespace product_type
 {
-  namespace detail {
+#if ! defined JASEL_DOXYGEN_INVOKED
+  namespace product_type_detail {
 
     template <class T, class ProductType, std::size_t... I>
     constexpr decltype(auto) make_from_product_type_impl( ProductType&& pt, index_sequence<I...> )
@@ -30,24 +31,23 @@ namespace product_type
       return T(product_type::get<I>(forward<ProductType>(pt))...);
     }
 
-  } // namespace detail
-
+  } // namespace product_type_detail
+#endif
   /**
    * Constructs a type T using the product type elements as forward parameters to the constructor
    * .
-   *
-   * @par arg a product_type
-   *
-   * @pre The parameter `ProductType` must be a model of /ProductType/. The parameter
-   * T must be CopyConstructible from the ProductType element types.
+   * @par Requires:
+   *  The parameter `ProductType` must be a model of /ProductType/.
+   *  The parameter T must be CopyConstructible from the ProductType element types.
    */
-
   template <class T, class ProductType
+#if ! defined JASEL_DOXYGEN_INVOKED
   , class = enable_if_t< is_product_type_v<meta::uncvref_t<ProductType>>  >
+#endif
   >
   constexpr decltype(auto) make_from(ProductType&& pt)
   {
-      return detail::make_from_product_type_impl<T>(forward<ProductType>(pt),
+      return product_type_detail::make_from_product_type_impl<T>(forward<ProductType>(pt),
           product_type::element_sequence_for<ProductType>{});
   }
 

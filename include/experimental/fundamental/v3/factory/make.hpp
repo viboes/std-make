@@ -22,7 +22,7 @@ inline namespace fundamental_v3
   template <class T>
     struct is_type_constructible;
 
-#if __cplusplus >= 201402L
+#if __cplusplus >= 201402L || defined JASEL_DOXYGEN_INVOKED
   template <class T>
     constexpr bool is_type_constructible_v = is_type_constructible<T>::value;
 #endif
@@ -41,9 +41,12 @@ namespace type_constructible
       return T(std::forward<Xs>(xs)...);
     }
   };
-
   template <class T, class Enabler=void>
-    struct traits : traits<T, meta::when<true>> {};
+    struct traits
+#if ! defined JASEL_DOXYGEN_INVOKED
+        : traits<T, meta::when<true>> {}
+#endif
+        ;
 
   // Default specialization
   template <typename T, bool condition>
@@ -113,7 +116,11 @@ namespace type_constructible
 using type_constructible::make;
 
 template <class T>
-struct is_type_constructible : is_base_of<type_constructible::tag, type_constructible::traits<T>> {};
+struct is_type_constructible
+#if ! defined JASEL_DOXYGEN_INVOKED
+    : is_base_of<type_constructible::tag, type_constructible::traits<T>> {}
+#endif
+    ;
 template <class T>
 struct is_type_constructible<const T> : is_type_constructible<T> {};
 template <class T>

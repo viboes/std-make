@@ -23,19 +23,14 @@ namespace experimental
 {
 inline namespace fundamental_v3
 {
-
-  template <class T>
-  struct check;
-
-
-
 namespace sum_type
 {
 
     //using meta::types;
     using meta::id;
 
-    namespace detail
+#if ! defined JASEL_DOXYGEN_INVOKED
+    namespace sum_type_detail
     {
       /**
        * Result: The result type of the overload
@@ -244,11 +239,16 @@ namespace sum_type
       };
       template <class ...Fs>
       using deduced_result_type_t = typename deduced_result_type<Fs...>::type;
-    } // detail
+    } // sum_type_detail
+#endif
 
     // explicit result type
-    template <class R, class ST, class F1, class F2, class... Fs, typename enable_if<
-      ! detail::is_tuple<ST>::value, int>::type = 0>
+    template <class R, class ST, class F1, class F2, class... Fs
+#if ! defined JASEL_DOXYGEN_INVOKED
+    , typename enable_if<
+      ! sum_type_detail::is_tuple<ST>::value, int>::type = 0
+#endif
+      >
     decltype(auto) match(ST const& that, F1 && f1, F2 && f2, Fs &&... fs)
     {
 #if ! defined YAFPL_X1
@@ -257,8 +257,12 @@ namespace sum_type
       return sum_type::visit(overload(forward<F1>(f1), forward<F2>(f2), forward<Fs>(fs)...), that);
 #endif
     }
-    template <class R, class ST, class F1, class... Fs, typename enable_if<
-      ! detail::is_tuple<ST>::value, int>::type = 0>
+    template <class R, class ST, class F1, class... Fs
+#if ! defined JASEL_DOXYGEN_INVOKED
+    , typename enable_if<
+      ! sum_type_detail::is_tuple<ST>::value, int>::type = 0
+#endif
+      >
     decltype(auto) match(ST & that, F1 && f1, Fs &&... fs)
     {
 #if ! defined YAFPL_X1
@@ -275,35 +279,47 @@ namespace sum_type
       return apply(
           [&](auto && ... args) -> decltype(auto)
           {
-            return detail::apply_impl<R>(overload(forward<Fs>(fcts)...), forward<decltype(args)>(args)...);
+            return sum_type_detail::apply_impl<R>(overload(forward<Fs>(fcts)...), forward<decltype(args)>(args)...);
           },
           those);
     }
 
     // result type deduced the nested typedef result_type of all functions
-    template <class ST, class F1, class F2, class... Fs, typename enable_if<
-      ! detail::is_tuple<ST>::value
-      && detail::have_result_type_member<F1>::value, int>::type = 0>
+    template <class ST, class F1, class F2, class... Fs
+#if ! defined JASEL_DOXYGEN_INVOKED
+    , typename enable_if<
+      ! sum_type_detail::is_tuple<ST>::value
+      && sum_type_detail::have_result_type_member<F1>::value, int>::type = 0
+#endif
+      >
     decltype(auto) match(ST const& that, F1 && f1, F2 && f2, Fs &&... fs)
     {
-      using R = detail::deduced_result_type_t<decay_t<F1>, decay_t<F2>, decay_t<Fs>...>;
+      using R = sum_type_detail::deduced_result_type_t<decay_t<F1>, decay_t<F2>, decay_t<Fs>...>;
       return match<R>(that, forward<F1>(f1), forward<F2>(f2), forward<Fs>(fs)...);
     }
-    template <class ST, class F1, class F2, class... Fs, typename enable_if<
-      ! detail::is_tuple<ST>::value
-      && detail::have_result_type_member<F1>::value, int>::type = 0>
+    template <class ST, class F1, class F2, class... Fs
+#if ! defined JASEL_DOXYGEN_INVOKED
+    , typename enable_if<
+      ! sum_type_detail::is_tuple<ST>::value
+      && sum_type_detail::have_result_type_member<F1>::value, int>::type = 0
+#endif
+      >
     decltype(auto) match(ST& that, F1 && f1, F2 && f2, Fs &&... fs)
     {
-      using R = detail::deduced_result_type_t<decay_t<F1>, decay_t<F2>, decay_t<Fs>...>;
+      using R = sum_type_detail::deduced_result_type_t<decay_t<F1>, decay_t<F2>, decay_t<Fs>...>;
       return match<R>(that, forward<F1>(f1), forward<F2>(f2), forward<Fs>(fs)...);
     }
 
     // result type deduced the nested typedef result_type of all functions on a product of sum types
-    template <class... STs, class F, class... Fs, typename enable_if<
-      detail::have_result_type_member<F>::value, int>::type = 0>
+    template <class... STs, class F, class... Fs
+#if ! defined JASEL_DOXYGEN_INVOKED
+    , typename enable_if<
+      sum_type_detail::have_result_type_member<F>::value, int>::type = 0
+#endif
+      >
     decltype(auto) match(tuple<STs...> const& those, F && f, Fs &&... fs)
     {
-      using R = detail::deduced_result_type_t<decay_t<F>, decay_t<Fs>...>;
+      using R = sum_type_detail::deduced_result_type_t<decay_t<F>, decay_t<Fs>...>;
       return match<R>(those, forward<F>(f), forward<Fs>(fs)...);
     }
 }

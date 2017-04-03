@@ -25,7 +25,8 @@ inline  namespace fundamental_v3
 
 namespace product_type
 {
-  namespace detail {
+#if ! defined JASEL_DOXYGEN_INVOKED
+  namespace product_type_detail {
 
     template <class F, class ProductType, std::size_t... I>
     constexpr decltype(auto) apply_impl( F&& f, ProductType&& pt, index_sequence<I...> )
@@ -33,15 +34,16 @@ namespace product_type
       return JASEL_INVOKE(std::forward<F>(f), product_type::get<I>(forward<ProductType>(pt))...);
     }
 
-  } // namespace detail
+  } // namespace product_type_detail
+#endif
 
   /**
    * Invoke the Callable object f with a product_type of the arguments.
    *
-   * @par f Callable object to be invoked
-   * @par pt product type whose elements to be used as arguments to f
+   * @param f Callable object to be invoked
+   * @param pt product type whose elements to be used as arguments to f
    *
-   * @pre
+   * @par Requires:
    * - DF is a model of Callable<product_type::element_t<I, DProductType>... > and
    * - DProductType is a model of ProductType.
    *
@@ -49,12 +51,14 @@ namespace product_type
    */
 
   template <class F, class ProductType
+#if ! defined JASEL_DOXYGEN_INVOKED
   // todo add constraint on F
   , class = enable_if_t< is_product_type_v<meta::uncvref_t<ProductType>> >
+#endif
   >
   constexpr decltype(auto) apply(F&& f, ProductType&& pt)
   {
-      return detail::apply_impl(forward<F>(f), forward<ProductType>(pt),
+      return product_type_detail::apply_impl(forward<F>(f), forward<ProductType>(pt),
           product_type::element_sequence_for<ProductType>{});
   }
 

@@ -71,7 +71,7 @@ namespace nullable
   };
 }
 
-#if __cplusplus >= 201402L
+#if __cplusplus >= 201402L  || defined JASEL_DOXYGEN_INVOKED
 
 namespace functor {
 template <>

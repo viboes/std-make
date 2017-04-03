@@ -21,7 +21,7 @@ inline  namespace fundamental_v3
 {
 namespace product_type
 {
-
+#if ! defined JASEL_DOXYGEN_INVOKED
   namespace detail {
 
     template <class F, class ProductType, std::size_t... I>
@@ -33,14 +33,14 @@ namespace product_type
     }
 
   } // namespace detail
-
+#endif
   /**
    * Invoke the Callable object f for each one of the product type elements discarding the result.
    *
-   * @par f Callable object to be invoked on each product type element
-   * @par pt product type whose elements to be used as arguments to f
+   * @param pt product type whose elements to be used as arguments to f
+   * @param f Callable object to be invoked on each product type element
    *
-   * @pre
+   * @par Requires:
    * - DProductType is a model of ProductType.
    * - DF is a model of Callable<product_type::element_t<I, DProductType>>...  and
    *
@@ -48,8 +48,10 @@ namespace product_type
    */
 
   template <class F, class ProductType
+#if ! defined JASEL_DOXYGEN_INVOKED
   // todo add constraint on F
   , class = enable_if_t< is_product_type_v<meta::uncvref_t<ProductType>> >
+#endif
   >
   constexpr void for_each(ProductType&& pt, F&& f)
   {

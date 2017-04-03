@@ -39,7 +39,7 @@ inline namespace fundamental_v3
   template <>
   struct type_constructor<meta::quote<pair>> : meta::id<pair_tc> {};
 
-#if __cplusplus >= 201402L
+#if __cplusplus >= 201402L || defined JASEL_DOXYGEN_INVOKED
 
   namespace n_functor {
     template <>

@@ -9,10 +9,10 @@
 #ifndef JASEL_FUNDAMENTAL_V3_PRODUCT_TYPE_PRODUCT_TYPE_HPP
 #define JASEL_FUNDAMENTAL_V3_PRODUCT_TYPE_PRODUCT_TYPE_HPP
 
-#if __cplusplus >= 201402L
+#if __cplusplus >= 201402L || defined JASEL_DOXYGEN_INVOKED
 
 ///////////////////////////////////////////////////////////////////////////////////////
-///
+/// @file
 /// A type PT is a model of a ProductType if given variable pt of type PT
 ///
 ///   product_type::size<PT>::value
@@ -38,8 +38,8 @@ namespace experimental
 {
 inline namespace fundamental_v3
 {
-
-namespace detail
+#if ! defined JASEL_DOXYGEN_INVOKED
+namespace product_type_detail
 {
 
   template <class T>
@@ -78,13 +78,17 @@ namespace detail
       struct no { char a[2]; };
 
       template <size_t I, class U>
-          static yes test(remove_reference_t<decltype(detail::get_adl::xget<I>(declval<U>()))>*);
+          static yes test(remove_reference_t<decltype(product_type_detail::get_adl::xget<I>(declval<U>()))>*);
       template <size_t I, class U>
           static no test(...);
       static constexpr bool value = sizeof(test<N,T>(nullptr)) == sizeof(yes);
   };
   template <size_t I, size_t N, class T>
-  struct has_tuple_like_get_access<I, T [N]> : false_type {};
+  struct has_tuple_like_get_access<I, T [N]>
+#if ! defined JASEL_DOXYGEN_INVOKED
+  : false_type {}
+#endif
+  ;
 
   template <class T, class  Indexes>
   struct has_tuple_like_element_get_access_aux;
@@ -112,24 +116,40 @@ namespace detail
   struct has_tuple_like_element_get_access<T, false>: false_type {};
 
 }
-
+#endif
   template <class T>
-  struct has_tuple_like_access : integral_constant<bool,
-    detail::has_tuple_like_size_access<T>::value &&
-    detail::has_tuple_like_element_get_access<T, detail::has_tuple_like_size_access<T>::value>::value
-    > {};
+  struct has_tuple_like_access
+#if ! defined JASEL_DOXYGEN_INVOKED
+      : integral_constant<bool,
+    product_type_detail::has_tuple_like_size_access<T>::value &&
+    product_type_detail::has_tuple_like_element_get_access<T, product_type_detail::has_tuple_like_size_access<T>::value>::value
+    > {}
+#endif
+      ;
 
   template <size_t N, class T>
-  struct has_tuple_like_access<T [N]> : false_type {};
+  struct has_tuple_like_access<T [N]>
+#if ! defined JASEL_DOXYGEN_INVOKED
+  : false_type {}
+#endif
+  ;
   template <size_t N, class T>
-  struct has_tuple_like_access<T (&)[N]> : false_type {};
+  struct has_tuple_like_access<T (&)[N]>
+#if ! defined JASEL_DOXYGEN_INVOKED
+  : false_type {}
+#endif
+  ;
 
 
 
   namespace product_type {
 
     template <class PT, class Enabler=void>
-    struct traits : traits<PT, meta::when<true>> {};
+    struct traits
+#if ! defined JASEL_DOXYGEN_INVOKED
+        : traits<PT, meta::when<true>> {}
+#endif
+        ;
 
     // Default failing specialization
     template <class  PT, bool condition>
@@ -154,7 +174,7 @@ namespace detail
       template <size_t I, class PT2, class= std::enable_if_t< I < size::value > >
         static constexpr decltype(auto) get(PT2&& pt) noexcept
         {
-          return detail::get_adl::xget<I>(forward<PT2>(pt));
+          return product_type_detail::get_adl::xget<I>(forward<PT2>(pt));
         }
     };
 
@@ -225,7 +245,11 @@ namespace detail
 
   // fixme redefine it as we did for has_tuple_like_access
   template <class T>
-  struct is_product_type : is_base_of<product_type::tag, product_type::traits<T>> {};
+  struct is_product_type
+#if ! defined JASEL_DOXYGEN_INVOKED
+      : is_base_of<product_type::tag, product_type::traits<T>> {}
+#endif
+      ;
   template <class T>
   struct is_product_type<const T> : is_product_type<T> {};
   template <class T>
@@ -241,9 +265,17 @@ namespace detail
 
   namespace product_type {
     template <class PT, template <class> class Trait, bool B = is_product_type_v<PT> >
-    struct friendly_type_trait : false_type {};
+    struct friendly_type_trait
+#if ! defined JASEL_DOXYGEN_INVOKED
+        : false_type {}
+#endif
+        ;
     template <class PT, template <class> class Trait>
-    struct friendly_type_trait<PT, Trait, true> : Trait<PT> {};
+    struct friendly_type_trait<PT, Trait, true>
+#if ! defined JASEL_DOXYGEN_INVOKED
+    : Trait<PT> {}
+#endif
+    ;
   }
 
 }}

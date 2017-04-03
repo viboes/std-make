@@ -9,7 +9,7 @@
 #ifndef JASEL_FUNDAMENTAL_V3_MONAD_MONAD_HPP
 #define JASEL_FUNDAMENTAL_V3_MONAD_MONAD_HPP
 
-#if __cplusplus >= 201402L
+#if __cplusplus >= 201402L || defined JASEL_DOXYGEN_INVOKED
 
 ///////////////////////////////////////////////////////////////////////////////////////
 ///
@@ -42,7 +42,11 @@ namespace monad
   struct tag{};
 
   template <class M, class Enabler=void>
-    struct traits : traits<M, meta::when<true>> {};
+    struct traits
+#if  ! defined JASEL_DOXYGEN_INVOKED
+        : traits<M, meta::when<true>> {}
+#endif
+        ;
 
   // Default failing specialization
   template <typename MM, bool condition>
@@ -63,7 +67,11 @@ namespace monad
 }
 
   template <class T>
-    struct is_monad : is_base_of<monad::tag, monad::traits<T>> {};
+    struct is_monad
+#if ! defined JASEL_DOXYGEN_INVOKED
+        : is_base_of<monad::tag, monad::traits<T>> {}
+#endif
+        ;
   template <class T>
     struct is_monad<const T> : is_monad<T> {};
   template <class T>

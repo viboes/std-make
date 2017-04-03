@@ -9,7 +9,7 @@
 #ifndef JASEL_FUNDAMENTAL_V3_FUNCTOR_FUNCTOR_HPP
 #define JASEL_FUNDAMENTAL_V3_FUNCTOR_FUNCTOR_HPP
 
-#if __cplusplus >= 201402L
+#if __cplusplus >= 201402L || defined JASEL_DOXYGEN_INVOKED
 
 ///////////////////////////////////////////////////////////////////////////////////////
 ///
@@ -39,7 +39,11 @@ namespace functor
   struct tag{};
 
   template <class F, class Enabler=void>
-    struct traits : traits<F, meta::when<true>> {};
+    struct traits
+#if  ! defined JASEL_DOXYGEN_INVOKED
+        : traits<F, meta::when<true>> {}
+#endif
+        ;
 
   // Default failing specialization
   template <typename U, bool condition>
@@ -65,7 +69,11 @@ namespace functor
 }
 
   template <class T>
-    struct is_functor : is_base_of<functor::tag, functor::traits<T>> {};
+    struct is_functor
+#if ! defined JASEL_DOXYGEN_INVOKED
+        : is_base_of<functor::tag, functor::traits<T>> {}
+#endif
+        ;
   template <class T>
     struct is_functor<const T> : is_functor<T> {};
   template <class T>

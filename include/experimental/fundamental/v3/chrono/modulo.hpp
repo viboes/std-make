@@ -195,8 +195,8 @@ namespace chrono
 
 } //chrono
 
-//! chrono::moduloD,SD,R> is a -n ordinal type that can be used with the ordinal containers
 namespace ordinal {
+  //! chrono::moduloD,SD,R> is a -n ordinal type that can be used with the ordinal containers
   template <class D, class SD, class R>
   struct traits<chrono::modulo<D,SD,R>> : ordinal::tag
   {
