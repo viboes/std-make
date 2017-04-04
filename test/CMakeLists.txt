@@ -69,7 +69,7 @@ jasel_add_tests(
     #make_boost_expected_pass
     #make_boost_optional_pass
     make_std_array_pass
-    #make_std_expected_pass
+    make_std_expected_pass
     make_std_future_pass
     #make_std_optional_pass
     make_std_pair_pass
