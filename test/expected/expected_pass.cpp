@@ -18,7 +18,7 @@ namespace stde = std::experimental;
 struct NoDefaultConstructible
 {
   NoDefaultConstructible() = delete;
-  NoDefaultConstructible(int i)  {};
+  NoDefaultConstructible(int )  {};
 };
 
 struct NoCopyConstructible

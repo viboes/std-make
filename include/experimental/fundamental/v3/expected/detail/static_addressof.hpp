@@ -6,8 +6,9 @@
 #ifndef JASEL_EXPERIMENTAL_V3_EXPECTED_DETAIL_STATIC_ADDRESSOF_HPP
 #define JASEL_EXPERIMENTAL_V3_EXPECTED_DETAIL_STATIC_ADDRESSOF_HPP
 
-#include <boost/expected/config.hpp>
-#include <boost/expected/detail/requires.hpp>
+//#include <boost/expected/config.hpp>
+//#include <boost/expected/detail/requires.hpp>
+#include <experimental/fundamental/v3/expected/detail/requires.hpp>
 
 #ifdef BOOST_EXPECTED_USE_BOOST_HPP
 #include <boost/type_traits.hpp>
@@ -48,14 +49,14 @@ struct has_overloaded_addressof
 
 template <typename T>
 BOOST_CONSTEXPR T* static_addressof(T& ref,
-    BOOST_EXPECTED_REQUIRES(!has_overloaded_addressof<T>::value))
+    JASEL_REQUIRES(!has_overloaded_addressof<T>::value))
 {
   return &ref;
 }
 
 template <typename T>
 BOOST_CONSTEXPR T* static_addressof(T& ref,
-    BOOST_EXPECTED_REQUIRES(has_overloaded_addressof<T>::value))
+    JASEL_REQUIRES(has_overloaded_addressof<T>::value))
 {
   return std::addressof(ref);
 }

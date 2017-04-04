@@ -162,7 +162,7 @@ inline namespace fundamental_v3
 
   template <class T>
   constexpr
-  std::nullptr_t deref_none(T* ptr) noexcept {
+  std::nullptr_t deref_none(T*) noexcept {
     return nullptr ;
   }
 

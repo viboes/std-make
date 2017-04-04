@@ -133,7 +133,7 @@ union trivial_expected_storage
   value_type &val() { return _val; }
 #endif
 
-  BOOST_EXPECTED_0_REQUIRES(
+  JASEL_0_REQUIRES(
         is_default_constructible<value_type>::value
   )
   BOOST_CONSTEXPR trivial_expected_storage()
@@ -238,7 +238,7 @@ union no_trivial_expected_storage
   BOOST_CONSTEXPR no_trivial_expected_storage(only_set_initialized_t)
   : dummy(0)
   {}
-  BOOST_EXPECTED_0_REQUIRES(
+  JASEL_0_REQUIRES(
         is_default_constructible<value_type>::value
   )
   BOOST_CONSTEXPR no_trivial_expected_storage()
@@ -333,7 +333,7 @@ struct trivial_expected_base
   bool has_value;
   trivial_expected_storage<T, E> storage;
 
-  BOOST_EXPECTED_0_REQUIRES(
+  JASEL_0_REQUIRES(
         is_default_constructible<value_type>::value
   )
   BOOST_CONSTEXPR trivial_expected_base()
@@ -404,7 +404,7 @@ struct trivial_expected_base
   error_type& contained_err() { return storage.err(); }
 #endif
 
-//  BOOST_EXPECTED_0_REQUIRES(
+//  JASEL_0_REQUIRES(
 //        is_copy_constructible<value_type>::value &&
 //        is_copy_constructible<error_type>::value
 //  )
@@ -425,7 +425,7 @@ struct trivial_expected_base
       has_value = rhs.has_value;
     }
 
-//  BOOST_EXPECTED_0_REQUIRES(
+//  JASEL_0_REQUIRES(
 //      is_move_constructible<value_type>::value &&
 //      is_move_constructible<error_type>::value
 //  )
@@ -497,7 +497,7 @@ struct trivial_expected_base<void, E, AreCopyConstructible, AreMoveConstructible
   error_type& contained_err() { return storage.err(); }
 #endif
 
-//  BOOST_EXPECTED_0_REQUIRES(
+//  JASEL_0_REQUIRES(
 //        is_copy_constructible<error_type>::value
 //  )
   trivial_expected_base(const trivial_expected_base& rhs)
@@ -515,7 +515,7 @@ struct trivial_expected_base<void, E, AreCopyConstructible, AreMoveConstructible
       has_value = rhs.has_value;
     }
 
-//  BOOST_EXPECTED_0_REQUIRES(
+//  JASEL_0_REQUIRES(
 //      is_move_constructible<error_type>::value
 //  )
   trivial_expected_base(trivial_expected_base&& rhs
@@ -546,7 +546,7 @@ struct no_trivial_expected_base
   bool has_value;
   no_trivial_expected_storage<T, E> storage;
 
-  BOOST_EXPECTED_0_REQUIRES(
+  JASEL_0_REQUIRES(
         is_default_constructible<value_type>::value
   )
   BOOST_CONSTEXPR no_trivial_expected_base()
@@ -670,7 +670,7 @@ struct no_trivial_expected_base<T, E, false, AreMoveConstructible>
   bool has_value;
   no_trivial_expected_storage<T, E> storage;
 
-  BOOST_EXPECTED_0_REQUIRES(
+  JASEL_0_REQUIRES(
         is_default_constructible<value_type>::value
   )
   BOOST_CONSTEXPR no_trivial_expected_base()
@@ -778,7 +778,7 @@ struct no_trivial_expected_base<T, E, AreCopyConstructible, false>
   bool has_value;
   no_trivial_expected_storage<T, E> storage;
 
-  BOOST_EXPECTED_0_REQUIRES(
+  JASEL_0_REQUIRES(
         is_default_constructible<value_type>::value
   )
   BOOST_CONSTEXPR no_trivial_expected_base()
@@ -886,7 +886,7 @@ struct no_trivial_expected_base<T, E, false, false>
   bool has_value;
   no_trivial_expected_storage<T, E> storage;
 
-  BOOST_EXPECTED_0_REQUIRES(
+  JASEL_0_REQUIRES(
         is_default_constructible<value_type>::value
   )
   BOOST_CONSTEXPR no_trivial_expected_base()
@@ -1322,7 +1322,7 @@ public:
 
   // Constructors/Destructors/Assignments
 
-  BOOST_EXPECTED_0_REQUIRES(
+  JASEL_0_REQUIRES(
       is_default_constructible<value_type>::value
   )
   BOOST_CONSTEXPR expected()
@@ -1332,7 +1332,7 @@ public:
   : base_type()
   {}
 
-  BOOST_EXPECTED_0_REQUIRES(
+  JASEL_0_REQUIRES(
       is_copy_constructible<value_type>::value
   )
   BOOST_CONSTEXPR expected(const value_type& v)
@@ -1342,7 +1342,7 @@ public:
   : base_type(v)
   {}
 
-  BOOST_EXPECTED_0_REQUIRES(
+  JASEL_0_REQUIRES(
     is_move_constructible<value_type>::value
   )
   BOOST_CONSTEXPR expected(value_type&& v  )
@@ -1355,7 +1355,7 @@ public:
   expected(const expected& rhs) = default;
   expected(expected&& rhs) = default;
 
-  BOOST_EXPECTED_0_REQUIRES(
+  JASEL_0_REQUIRES(
       is_copy_constructible<error_type>::value
   )
   expected(unexpected_type<error_type> const& e)
@@ -1364,7 +1364,7 @@ public:
       )
   : base_type(e)
   {}
-  BOOST_EXPECTED_0_REQUIRES(is_move_constructible<error_type>::value)
+  JASEL_0_REQUIRES(is_move_constructible<error_type>::value)
   expected(unexpected_type<error_type> && e)
       BOOST_NOEXCEPT_IF(
         is_nothrow_move_constructible<error_type>::value
@@ -1373,7 +1373,7 @@ public:
   {}
 
   template <class Err
-    , BOOST_EXPECTED_T_REQUIRES(is_constructible<error_type, Err>::value)
+    , JASEL_T_REQUIRES(is_constructible<error_type, Err>::value)
   >
   expected(unexpected_type<Err> const& e)
       BOOST_NOEXCEPT_IF((
@@ -1382,7 +1382,7 @@ public:
   : base_type(e)
   {}
   template <class Err
-    //, BOOST_EXPECTED_T_REQUIRES(is_constructible<error_type, Err&&>::value)
+    //, JASEL_T_REQUIRES(is_constructible<error_type, Err&&>::value)
   >
   expected(unexpected_type<Err> && e
   )
@@ -1394,7 +1394,7 @@ public:
 
   template <class... Args
 #if !defined BOOST_EXPECTED_NO_CXX11_FUNCTION_TEMPLATE_DEFAULT_ARGS
-  , BOOST_EXPECTED_T_REQUIRES(is_constructible<error_type, Args&...>::value)
+  , JASEL_T_REQUIRES(is_constructible<error_type, Args&...>::value)
 #endif
   >
   expected(unexpect_t, Args&&... args
@@ -1408,7 +1408,7 @@ public:
 
   template <class... Args
 #if !defined BOOST_EXPECTED_NO_CXX11_FUNCTION_TEMPLATE_DEFAULT_ARGS
-    , BOOST_EXPECTED_T_REQUIRES(is_constructible<value_type, typename decay<Args>::type...>::value)
+    , JASEL_T_REQUIRES(is_constructible<value_type, typename decay<Args>::type...>::value)
 #endif
     >
   BOOST_CONSTEXPR explicit expected(in_place_t, Args&&... args)
@@ -1417,7 +1417,7 @@ public:
 
   template <class U, class... Args
 #if !defined BOOST_EXPECTED_NO_CXX11_FUNCTION_TEMPLATE_DEFAULT_ARGS
-    , BOOST_EXPECTED_T_REQUIRES(is_constructible<value_type, initializer_list<U>>::value)
+    , JASEL_T_REQUIRES(is_constructible<value_type, initializer_list<U>>::value)
 #endif
     >
   BOOST_CONSTEXPR explicit expected(in_place_t, initializer_list<U> il, Args&&... args)
@@ -1426,7 +1426,7 @@ public:
 
   template <class... Args
 #if !defined BOOST_EXPECTED_NO_CXX11_FUNCTION_TEMPLATE_DEFAULT_ARGS
-    , BOOST_EXPECTED_T_REQUIRES(is_constructible<value_type, Args&...>::value)
+    , JASEL_T_REQUIRES(is_constructible<value_type, Args&...>::value)
 #endif
     >
   BOOST_CONSTEXPR explicit expected(expect_t, Args&&... args)
@@ -1435,7 +1435,7 @@ public:
 
   template <class U, class... Args
 #if !defined BOOST_EXPECTED_NO_CXX11_FUNCTION_TEMPLATE_DEFAULT_ARGS
-    , BOOST_EXPECTED_T_REQUIRES(is_constructible<value_type, initializer_list<U>>::value)
+    , JASEL_T_REQUIRES(is_constructible<value_type, initializer_list<U>>::value)
 #endif
     >
   BOOST_CONSTEXPR explicit expected(expect_t, initializer_list<U> il, Args&&... args)
@@ -1457,14 +1457,14 @@ public:
     return *this;
   }
 
-  template <class U, BOOST_EXPECTED_T_REQUIRES(is_same<typename decay<U>::type, value_type>::value)>
+  template <class U, JASEL_T_REQUIRES(is_same<typename decay<U>::type, value_type>::value)>
   expected& operator=(U const& value)
   {
     this_type(value).swap(*this);
     return *this;
   }
 
-  template <class U, BOOST_EXPECTED_T_REQUIRES(is_same<typename decay<U>::type, value_type>::value)>
+  template <class U, JASEL_T_REQUIRES(is_same<typename decay<U>::type, value_type>::value)>
   expected& operator=(U&& value)
   {
     this_type(move(value)).swap(*this);
@@ -1473,7 +1473,7 @@ public:
 
   template <class... Args
 #if !defined BOOST_EXPECTED_NO_CXX11_FUNCTION_TEMPLATE_DEFAULT_ARGS
-    , BOOST_EXPECTED_T_REQUIRES(is_constructible<value_type, Args&...>::value)
+    , JASEL_T_REQUIRES(is_constructible<value_type, Args&...>::value)
 #endif
     >
   void emplace(Args&&... args)
@@ -1483,7 +1483,7 @@ public:
 
     template <class U, class... Args
 #if !defined BOOST_EXPECTED_NO_CXX11_FUNCTION_TEMPLATE_DEFAULT_ARGS
-      , BOOST_EXPECTED_T_REQUIRES(is_constructible<value_type, initializer_list<U>, Args&...>::value)
+      , JASEL_T_REQUIRES(is_constructible<value_type, initializer_list<U>, Args&...>::value)
 #endif
       >
     void emplace(initializer_list<U> il, Args&&... args)
@@ -1821,7 +1821,7 @@ public:
   template <typename F>
   typename rebind<void>::type
   map(F&& f,
-    BOOST_EXPECTED_REQUIRES(is_same<typename result_of<F(value_type)>::type, void>::value))
+    JASEL_REQUIRES(is_same<typename result_of<F(value_type)>::type, void>::value))
   {
 #if ! defined BOOST_NO_CXX14_CONSTEXPR
     if(valid())
@@ -1841,7 +1841,7 @@ public:
   template <typename F>
   typename rebind<typename result_of<F(value_type)>::type>::type
   map(F&& f,
-    BOOST_EXPECTED_REQUIRES(!is_same<typename result_of<F(value_type)>::type, void>::value))
+    JASEL_REQUIRES(!is_same<typename result_of<F(value_type)>::type, void>::value))
   {
 #if ! defined BOOST_NO_CXX14_CONSTEXPR
     if(valid())
@@ -1861,7 +1861,7 @@ public:
 //  template <typename F>
 //  typename rebind<void>::type
 //  bind(F&& f,
-//    BOOST_EXPECTED_REQUIRES(is_same<typename result_of<F(value_type)>::type, void>::value))
+//    JASEL_REQUIRES(is_same<typename result_of<F(value_type)>::type, void>::value))
 //  {
 //#if ! defined BOOST_NO_CXX14_CONSTEXPR
 //    if(valid())
@@ -1881,7 +1881,7 @@ public:
 //  template <typename F>
 //  typename rebind<typename result_of<F(value_type)>::type>::type
 //  bind(F&& f,
-//    BOOST_EXPECTED_REQUIRES(!is_same<typename result_of<F(value_type)>::type, void>::value
+//    JASEL_REQUIRES(!is_same<typename result_of<F(value_type)>::type, void>::value
 //        && !is_expected<typename result_of<F(value_type)>::type>::value
 //        ))
 //  {
@@ -1903,7 +1903,7 @@ public:
   template <typename F>
   typename result_of<F(value_type)>::type
   bind(F&& f,
-    BOOST_EXPECTED_REQUIRES(is_expected<typename result_of<F(value_type)>::type>::value
+    JASEL_REQUIRES(is_expected<typename result_of<F(value_type)>::type>::value
         )
     )
   {
@@ -1924,7 +1924,7 @@ public:
   template <typename F>
   typename rebind<void>::type
   then(F&& f,
-    BOOST_EXPECTED_REQUIRES(is_same<typename result_of<F(expected)>::type, void>::value))
+    JASEL_REQUIRES(is_same<typename result_of<F(expected)>::type, void>::value))
   {
     //typedef typename rebind<void>::type result_type;
     return catch_all_etype_void(forward<F>(f));
@@ -1933,7 +1933,7 @@ public:
   template <typename F>
   typename rebind<typename result_of<F(expected)>::type>::type
   then(F&& f,
-    BOOST_EXPECTED_REQUIRES(!is_same<typename result_of<F(expected)>::type, void>::value
+    JASEL_REQUIRES(!is_same<typename result_of<F(expected)>::type, void>::value
         && !is_expected<typename result_of<F(expected)>::type>::value
         ))
   {
@@ -1945,7 +1945,7 @@ public:
   template <typename F>
   typename result_of<F(expected)>::type
   then(F&& f,
-    BOOST_EXPECTED_REQUIRES(is_expected<typename result_of<F(expected)>::type>::value)
+    JASEL_REQUIRES(is_expected<typename result_of<F(expected)>::type>::value)
     )
   {
     return catch_all_etype_type(forward<F>(f));
@@ -1955,7 +1955,7 @@ public:
   template <typename F>
   this_type
   catch_error(F&& f,
-    BOOST_EXPECTED_REQUIRES(is_same<typename result_of<F(error_type)>::type, value_type>::value))
+    JASEL_REQUIRES(is_same<typename result_of<F(error_type)>::type, value_type>::value))
   {
 #if ! defined BOOST_NO_CXX14_CONSTEXPR
     if(!valid())
@@ -1973,7 +1973,7 @@ public:
 
   template <typename F>
   this_type catch_error(F&& f,
-    BOOST_EXPECTED_REQUIRES(is_same<typename result_of<F(error_type)>::type, this_type>::value))
+    JASEL_REQUIRES(is_same<typename result_of<F(error_type)>::type, this_type>::value))
   {
 #if ! defined BOOST_NO_CXX14_CONSTEXPR
     if(!valid())
@@ -1991,7 +1991,7 @@ public:
 
   template <typename F>
   this_type catch_error(F&& f,
-    BOOST_EXPECTED_REQUIRES(is_same<typename result_of<F(error_type)>::type, unexpected_type<error_type>>::value))
+    JASEL_REQUIRES(is_same<typename result_of<F(error_type)>::type, unexpected_type<error_type>>::value))
   {
 #if ! defined BOOST_NO_CXX14_CONSTEXPR
     if(!valid())
@@ -2009,7 +2009,7 @@ public:
 
   template <typename Ex, typename F>
   this_type catch_exception(F&& f,
-    BOOST_EXPECTED_REQUIRES(
+    JASEL_REQUIRES(
         is_same<typename result_of<F(Ex &)>::type, this_type>::value
         )) const
   {
@@ -2029,7 +2029,7 @@ public:
 
   template <typename Ex, typename F>
   this_type catch_exception(F&& f,
-    BOOST_EXPECTED_REQUIRES(
+    JASEL_REQUIRES(
         is_same<typename result_of<F(Ex &)>::type, value_type>::value
         )) const
   {
@@ -2149,7 +2149,7 @@ public:
   // Constructors/Destructors/Assignments
 
   expected(const expected& rhs
-    , BOOST_EXPECTED_REQUIRES( is_copy_constructible<error_type>::value)
+    , JASEL_REQUIRES( is_copy_constructible<error_type>::value)
   )
   BOOST_NOEXCEPT_IF(
     is_nothrow_copy_constructible<error_type>::value
@@ -2159,7 +2159,7 @@ public:
   }
 
   expected(expected&& rhs
-    , BOOST_EXPECTED_REQUIRES( is_move_constructible<error_type>::value)
+    , JASEL_REQUIRES( is_move_constructible<error_type>::value)
   )
   BOOST_NOEXCEPT_IF(
     is_nothrow_move_constructible<error_type>::value
@@ -2175,7 +2175,7 @@ public:
   : base_type(in_place)
   {}
 
-  BOOST_EXPECTED_0_REQUIRES(is_default_constructible<error_type>::value)
+  JASEL_0_REQUIRES(is_default_constructible<error_type>::value)
   BOOST_CONSTEXPR expected()
       BOOST_NOEXCEPT_IF(
         is_nothrow_default_constructible<error_type>::value
@@ -2184,7 +2184,7 @@ public:
   {}
 
 
-  BOOST_EXPECTED_0_REQUIRES(is_copy_constructible<error_type>::value)
+  JASEL_0_REQUIRES(is_copy_constructible<error_type>::value)
   expected(unexpected_type<error_type> const& e)
   BOOST_NOEXCEPT_IF(
     is_nothrow_copy_constructible<error_type>::value
@@ -2192,7 +2192,7 @@ public:
   : base_type(e)
   {}
 
-  BOOST_EXPECTED_0_REQUIRES(is_move_constructible<error_type>::value)
+  JASEL_0_REQUIRES(is_move_constructible<error_type>::value)
   expected(unexpected_type<error_type> && e
   )
   BOOST_NOEXCEPT_IF(
@@ -2202,7 +2202,7 @@ public:
   {}
 
   template <class Err
-  , BOOST_EXPECTED_T_REQUIRES(is_constructible<error_type, Err>::value)
+  , JASEL_T_REQUIRES(is_constructible<error_type, Err>::value)
   >
   expected(unexpected_type<Err> const& e
   )
@@ -2214,7 +2214,7 @@ public:
 
   template <class Err>
   expected(unexpected_type<Err> && e
-//    , BOOST_EXPECTED_REQUIRES(is_copy_constructible<error_type, Err&&>::value)
+//    , JASEL_REQUIRES(is_copy_constructible<error_type, Err&&>::value)
   )
 //  BOOST_NOEXCEPT_IF(
 //    is_nothrow_constructible<error_type, Err&&>::value
@@ -2224,7 +2224,7 @@ public:
 
   template <class... Args
 #if !defined BOOST_EXPECTED_NO_CXX11_FUNCTION_TEMPLATE_DEFAULT_ARGS
-  , BOOST_EXPECTED_T_REQUIRES(is_constructible<error_type, Args&...>::value)
+  , JASEL_T_REQUIRES(is_constructible<error_type, Args&...>::value)
 #endif
   >
   expected(unexpect_t, Args&&... args
@@ -2439,7 +2439,7 @@ public:
   template <typename F>
   typename rebind<void>::type
   map(F&& f,
-    BOOST_EXPECTED_REQUIRES(is_same<typename result_of<F(value_type)>::type, void>::value))
+    JASEL_REQUIRES(is_same<typename result_of<F(value_type)>::type, void>::value))
   {
 #if ! defined BOOST_NO_CXX14_CONSTEXPR
     if(valid())
@@ -2459,7 +2459,7 @@ public:
   template <typename F>
   typename rebind<typename result_of<F(value_type)>::type>::type
   map(F&& f,
-    BOOST_EXPECTED_REQUIRES(!is_same<typename result_of<F(value_type)>::type, void>::value))
+    JASEL_REQUIRES(!is_same<typename result_of<F(value_type)>::type, void>::value))
   {
 #if ! defined BOOST_NO_CXX14_CONSTEXPR
     if(valid())
@@ -2480,7 +2480,7 @@ public:
 
 //  template <typename F>
 //  BOOST_CONSTEXPR typename rebind<void>::type bind(F&& f,
-//    BOOST_EXPECTED_REQUIRES(is_same<typename result_of<F()>::type, void>::value)) const
+//    JASEL_REQUIRES(is_same<typename result_of<F()>::type, void>::value)) const
 //  {
 //    typedef typename rebind<void>::type result_type;
 //#if ! defined BOOST_NO_CXX14_CONSTEXPR
@@ -2501,7 +2501,7 @@ public:
 //  template <typename F>
 //  typename rebind<typename result_of<F()>::type>::type
 //  bind(F&& f,
-//    BOOST_EXPECTED_REQUIRES( ! is_same<typename result_of<F()>::type, void>::value
+//    JASEL_REQUIRES( ! is_same<typename result_of<F()>::type, void>::value
 //        && ! is_expected<typename result_of<F(value_type)>::type>::value
 //        ) )
 //  {
@@ -2523,7 +2523,7 @@ public:
   template <typename F>
   typename result_of<F()>::type
   bind(F&& f,
-    BOOST_EXPECTED_REQUIRES( is_expected<typename result_of<F(value_type)>::type>::value
+    JASEL_REQUIRES( is_expected<typename result_of<F(value_type)>::type>::value
         ) )
   {
 #if ! defined BOOST_NO_CXX14_CONSTEXPR
@@ -2544,7 +2544,7 @@ public:
   template <typename F>
   typename rebind<void>::type
   then(F&& f,
-    BOOST_EXPECTED_REQUIRES(is_same<typename result_of<F(expected)>::type, void>::value))
+    JASEL_REQUIRES(is_same<typename result_of<F(expected)>::type, void>::value))
   {
     typedef typename rebind<void>::type result_type;
 #if ! defined BOOST_NO_CXX14_CONSTEXPR
@@ -2559,7 +2559,7 @@ public:
   template <typename F>
   typename rebind<typename result_of<F(expected)>::type>::type
   then(F&& f,
-    BOOST_EXPECTED_REQUIRES(!is_expected<typename result_of<F(expected)>::type>::value
+    JASEL_REQUIRES(!is_expected<typename result_of<F(expected)>::type>::value
         ))
   {
     typedef typename rebind<typename result_of<F(expected)>::type>::type result_type;
@@ -2569,7 +2569,7 @@ public:
   template <typename F>
   typename result_of<F(expected)>::type
   then(F&& f,
-    BOOST_EXPECTED_REQUIRES(!is_same<typename result_of<F(expected)>::type, void>::value
+    JASEL_REQUIRES(!is_same<typename result_of<F(expected)>::type, void>::value
         && is_expected<typename result_of<F(expected)>::type>::value
         )
     )
@@ -2581,7 +2581,7 @@ public:
 
   template <typename F>
   this_type catch_error(F&& f,
-    BOOST_EXPECTED_REQUIRES(is_same<typename result_of<F(error_type)>::type, value_type>::value))
+    JASEL_REQUIRES(is_same<typename result_of<F(error_type)>::type, value_type>::value))
   {
 #if ! defined BOOST_NO_CXX14_CONSTEXPR
     if(! valid())
@@ -2599,7 +2599,7 @@ public:
 
   template <typename F>
   this_type catch_error(F&& f,
-      BOOST_EXPECTED_REQUIRES(! is_same<typename result_of<F(error_type)>::type, value_type>::value))
+      JASEL_REQUIRES(! is_same<typename result_of<F(error_type)>::type, value_type>::value))
   {
 #if ! defined BOOST_NO_CXX14_CONSTEXPR
     if(!valid())
@@ -2617,7 +2617,7 @@ public:
 
   template <typename Ex, typename F>
   this_type catch_exception(F&& f,
-    BOOST_EXPECTED_REQUIRES(
+    JASEL_REQUIRES(
         is_same<typename result_of<F(Ex &)>::type, this_type>::value
         )) const
   {
@@ -2637,7 +2637,7 @@ public:
 
   template <typename Ex, typename F>
   this_type catch_exception(F&& f,
-    BOOST_EXPECTED_REQUIRES(
+    JASEL_REQUIRES(
         is_same<typename result_of<F(Ex &)>::type, value_type>::value
         )) const
   {
@@ -2921,7 +2921,7 @@ expected<T, E> make_expected_from_error(U&& u) BOOST_NOEXCEPT
 template <typename F>
 expected<typename result_of<F()>::type, exception_ptr>
 BOOST_FORCEINLINE make_expected_from_call(F funct
-  , BOOST_EXPECTED_REQUIRES( ! is_same<typename result_of<F()>::type, void>::value)
+  , JASEL_REQUIRES( ! is_same<typename result_of<F()>::type, void>::value)
 ) BOOST_NOEXCEPT
 {
   try
@@ -2937,7 +2937,7 @@ BOOST_FORCEINLINE make_expected_from_call(F funct
 template <typename F>
 inline expected<void, exception_ptr>
 make_expected_from_call(F funct
-  , BOOST_EXPECTED_REQUIRES( is_same<typename result_of<F()>::type, void>::value)
+  , JASEL_REQUIRES( is_same<typename result_of<F()>::type, void>::value)
 ) BOOST_NOEXCEPT
 {
   try

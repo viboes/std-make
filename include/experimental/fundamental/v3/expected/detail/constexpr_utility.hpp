@@ -6,7 +6,8 @@
 #ifndef JASEL_EXPERIMENTAL_V3_EXPECTED_DETAIL_CONSTEXPR_UTILITY_HPP
 #define JASEL_EXPERIMENTAL_V3_EXPECTED_DETAIL_CONSTEXPR_UTILITY_HPP
 
-#include <boost/expected/config.hpp>
+//#include <boost/expected/config.hpp>
+#include <experimental/fundamental/v3/expected/config.hpp>
 
 #include <utility>
 #include <type_traits>

@@ -33,12 +33,12 @@ inline namespace fundamental_v3
   public:
     unexpected_type() = delete;
 
-    BOOST_EXPECTED_0_REQUIRES(is_copy_constructible<ErrorType>::value)
+    JASEL_0_REQUIRES(is_copy_constructible<ErrorType>::value)
     BOOST_FORCEINLINE BOOST_CONSTEXPR explicit unexpected_type(ErrorType const& e) :
       error_(e)
     {
     }
-    BOOST_EXPECTED_0_REQUIRES(is_move_constructible<ErrorType>::value)
+    JASEL_0_REQUIRES(is_move_constructible<ErrorType>::value)
     BOOST_FORCEINLINE BOOST_CONSTEXPR explicit unexpected_type(ErrorType&& e) :
       error_(move(e))
     {
