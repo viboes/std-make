@@ -7,7 +7,7 @@
 #ifndef JASEL_EXPERIMENTAL_V3_EXPECTED_CONFIG_HPP
 #define JASEL_EXPERIMENTAL_V3_EXPECTED_CONFIG_HPP
 
-#include <boost/config.hpp>
+#include <experimental/fundamental/v2/config.hpp>
 
 
 #if defined BOOST_NO_CXX11_REF_QUALIFIERS

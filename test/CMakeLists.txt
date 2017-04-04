@@ -90,7 +90,7 @@ jasel_add_tests(
     ######
     functor_pass
     functor_std_array_pass
-    #functor_std_expected_pass
+    functor_std_expected_pass
     #functor_std_optional_pass
     functor_std_pair_pass
     functor_std_shared_ptr_pass
@@ -101,15 +101,15 @@ jasel_add_tests(
 jasel_add_tests(
     monad monad
     ######
-    #monad_std_expected_pass_pass
-    #monad_std_optinal_pass_pass
+    monad_std_expected_pass
+    #monad_std_optinal_pass
 )
 
 jasel_add_tests(
     nullable nullable
     ######
     nullable_pass
-    #nullable_std_expected_pass
+    #nullable_std_optional_pass
     nullable_std_shared_ptr_pass
     nullable_std_unique_ptr_pass
 )
@@ -165,7 +165,7 @@ jasel_add_tests(
     sum_type sum_type
     ######
     sum_type_pass
-    #sum_type_std_expected_pass
+    sum_type_std_expected_pass
     #sum_type_std_optional_pass
 )
 

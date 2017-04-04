@@ -8,7 +8,7 @@
 
 #include <experimental/fundamental/v3/expected/config.hpp>
 #include <experimental/fundamental/v3/expected/detail/constexpr_utility.hpp>
-#include <experimental/fundamental/v3/expected/detail/requires.hpp>
+#include <experimental/fundamental/v3/config/requires.hpp>
 
 #ifdef JASEL_EXPECTED_USE_BOOST_HPP
 #include <boost/exception_ptr.hpp>

@@ -11,7 +11,7 @@
 #include <experimental/fundamental/v3/expected/unexpected.hpp>
 #include <experimental/fundamental/v3/expected/detail/static_addressof.hpp>
 #include <experimental/fundamental/v3/expected/detail/constexpr_utility.hpp>
-#include <experimental/fundamental/v3/expected/detail/requires.hpp>
+#include <experimental/fundamental/v3/config/requires.hpp>
 #include <experimental/fundamental/v3/expected/error_traits.hpp>
 #include <experimental/fundamental/v3/expected/bad_expected_access.hpp>
 #include <experimental/fundamental/v3/in_place.hpp>

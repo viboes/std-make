@@ -6,7 +6,6 @@
 #ifndef JASEL_EXPERIMENTAL_V3_EXPECTED_DETAIL_CONSTEXPR_UTILITY_HPP
 #define JASEL_EXPERIMENTAL_V3_EXPECTED_DETAIL_CONSTEXPR_UTILITY_HPP
 
-//#include <boost/expected/config.hpp>
 #include <experimental/fundamental/v3/expected/config.hpp>
 
 #include <utility>
@@ -38,13 +37,13 @@ BOOST_CONSTEXPR typename remove_reference<T>::type&& constexpr_move(T&& t) BOOST
 {
     return static_cast<typename remove_reference<T>::type&&>(t);
 }
-
+#if 0
 template<class T> inline
 BOOST_CONSTEXPR T * constexpr_addressof(T& Val)
 {
   return ((T *) &(char&)Val);
 }
-
+#endif
 }}
 } // namespace
 
