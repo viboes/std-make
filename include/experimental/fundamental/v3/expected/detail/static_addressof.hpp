@@ -10,7 +10,7 @@
 //#include <boost/expected/detail/requires.hpp>
 #include <experimental/fundamental/v3/expected/detail/requires.hpp>
 
-#ifdef BOOST_EXPECTED_USE_BOOST_HPP
+#ifdef JASEL_EXPECTED_USE_BOOST_HPP
 #include <boost/type_traits.hpp>
 #include <boost/utility/enable_if.hpp>
 #endif
@@ -25,7 +25,7 @@ inline namespace fundamental_v3
 {
 namespace detail {
 
-#if defined BOOST_EXPECTED_USE_STD_ADDRESSOF
+#if defined JASEL_USE_STD_ADDRESSOF
 
 template <typename T>
 BOOST_CONSTEXPR T* static_addressof(T& ref)

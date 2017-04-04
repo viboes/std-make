@@ -10,7 +10,7 @@
 #include <experimental/fundamental/v3/expected/detail/constexpr_utility.hpp>
 #include <experimental/fundamental/v3/expected/detail/requires.hpp>
 
-#ifdef BOOST_EXPECTED_USE_BOOST_HPP
+#ifdef JASEL_EXPECTED_USE_BOOST_HPP
 #include <boost/exception_ptr.hpp>
 //#include <boost/type_traits.hpp>
 #endif
@@ -43,19 +43,19 @@ inline namespace fundamental_v3
       error_(move(e))
     {
     }
-#if ! defined BOOST_EXPECTED_NO_CXX11_RVALUE_REFERENCE_FOR_THIS
+#if ! defined JASEL_NO_CXX11_RVALUE_REFERENCE_FOR_THIS
 
     BOOST_CONSTEXPR
     BOOST_FORCEINLINE ErrorType const& value() const&
     {
       return error_;
     }
-    BOOST_EXPECTED_CONSTEXPR_IF_MOVE_ACCESSORS
+    JASEL_CONSTEXPR_IF_MOVE_ACCESSORS
     BOOST_FORCEINLINE ErrorType& value() &
     {
       return error_;
     }
-    BOOST_EXPECTED_CONSTEXPR_IF_MOVE_ACCESSORS
+    JASEL_CONSTEXPR_IF_MOVE_ACCESSORS
     BOOST_FORCEINLINE ErrorType&& value() &&
     {
       return constexpr_move(error_);
@@ -79,7 +79,7 @@ inline namespace fundamental_v3
     return unexpected_type<typename decay<E>::type> (forward<E>(ex));
   }
 
-#ifdef BOOST_EXPECTED_USE_BOOST_HPP
+#ifdef JASEL_EXPECTED_USE_BOOST_HPP
   template <>
   struct unexpected_type<boost::exception_ptr>
   {
@@ -189,7 +189,7 @@ inline namespace fundamental_v3
     return x==y;
   }
 
-#ifdef BOOST_EXPECTED_USE_BOOST_HPP
+#ifdef JASEL_EXPECTED_USE_BOOST_HPP
   inline BOOST_CONSTEXPR bool operator<(const unexpected_type<boost::exception_ptr>& x, const unexpected_type<boost::exception_ptr>& y)
   {
     return false;

@@ -12,31 +12,31 @@
 
 #if defined BOOST_NO_CXX11_REF_QUALIFIERS
 #error
-#  define BOOST_EXPECTED_NO_CXX11_RVALUE_REFERENCE_FOR_THIS
+#  define JASEL_NO_CXX11_RVALUE_REFERENCE_FOR_THIS
 #endif
 
 # if __cplusplus < 201400
-#  define BOOST_EXPECTED_NO_CXX11_MOVE_ACCESSORS
+#  define JASEL_NO_CXX11_MOVE_ACCESSORS
 # elif defined __clang__
 #  if (__clang_major__ < 3) || (__clang_major__ == 3) && (__clang_minor__ < 5)
-#   define BOOST_EXPECTED_NO_CXX11_MOVE_ACCESSORS
+#   define JASEL_NO_CXX11_MOVE_ACCESSORS
 #  endif
 # elif defined __GNUC__
 #  if (__GNUC__*10000 + __GNUC_MINOR__*100 + __GNUC_PATCHLEVEL__ < 50000)
-#   define BOOST_EXPECTED_NO_CXX11_MOVE_ACCESSORS
+#   define JASEL_NO_CXX11_MOVE_ACCESSORS
 #  endif
 # elif defined _MSC_VER
 #  if _MSC_VER < 1900 // VS14
-#   define BOOST_EXPECTED_NO_CXX11_MOVE_ACCESSORS
+#   define JASEL_NO_CXX11_MOVE_ACCESSORS
 #  endif
 # else
-#  define BOOST_EXPECTED_NO_CXX11_MOVE_ACCESSORS
+#  define JASEL_NO_CXX11_MOVE_ACCESSORS
 # endif
 
-# if defined BOOST_EXPECTED_NO_CXX11_MOVE_ACCESSORS
-#define BOOST_EXPECTED_CONSTEXPR_IF_MOVE_ACCESSORS
+# if defined JASEL_NO_CXX11_MOVE_ACCESSORS
+#define JASEL_CONSTEXPR_IF_MOVE_ACCESSORS
 #else
-#define BOOST_EXPECTED_CONSTEXPR_IF_MOVE_ACCESSORS BOOST_CONSTEXPR
+#define JASEL_CONSTEXPR_IF_MOVE_ACCESSORS BOOST_CONSTEXPR
 #endif
 
 // ../../../boost/expected/expected.hpp: In instantiation of ‘class boost::expected<int>’:
@@ -45,41 +45,41 @@
 
 #if defined BOOST_NO_CXX11_FUNCTION_TEMPLATE_DEFAULT_ARGS
 #error
-# define BOOST_EXPECTED_NO_CXX11_FUNCTION_TEMPLATE_DEFAULT_ARGS
+# define JASEL_NO_CXX11_FUNCTION_TEMPLATE_DEFAULT_ARGS
 #else
 # if defined __GNUC__ and not defined __clang__
 #  if __GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ < 8) || !defined(__GXX_EXPERIMENTAL_CXX0X__)
 #error
-#   define BOOST_EXPECTED_NO_CXX11_FUNCTION_TEMPLATE_DEFAULT_ARGS
+#   define JASEL_NO_CXX11_FUNCTION_TEMPLATE_DEFAULT_ARGS
 #  endif
 # endif
 #endif
 
 #if defined __GNUC__
 # if (__GNUC__*10000 + __GNUC_MINOR__*100 + __GNUC_PATCHLEVEL__ < 40800) || !defined(__GXX_EXPERIMENTAL_CXX0X__)
-#  define BOOST_EXPECTED_NO_IF_THEN_ELSE
+#  define JASEL_NO_IF_THEN_ELSE
 # endif
 #endif
 
 # if defined __clang__
 #  if (__clang_major__ < 3) || (__clang_major__ == 3) && (__clang_minor__ < 0)
-#   define BOOST_EXPECTED_NO_CXX11_UNRESTRICTED_UNIONS
+#   define JASEL_NO_CXX11_UNRESTRICTED_UNIONS
 #  endif
 # elif defined __GNUC__
 #  if (__GNUC__*10000 + __GNUC_MINOR__*100 + __GNUC_PATCHLEVEL__ < 40600)
-#   define BOOST_EXPECTED_NO_CXX11_UNRESTRICTED_UNIONS
+#   define JASEL_NO_CXX11_UNRESTRICTED_UNIONS
 #  endif
 # elif defined _MSC_VER
 #  if _MSC_VER < 1900 // VS14
-#   define BOOST_EXPECTED_NO_CXX11_UNRESTRICTED_UNIONS
+#   define JASEL_NO_CXX11_UNRESTRICTED_UNIONS
 #  endif
 # else
-#  define BOOST_EXPECTED_NO_CXX11_UNRESTRICTED_UNIONS
+#  define JASEL_NO_CXX11_UNRESTRICTED_UNIONS
 # endif
 
 # if defined BOOST_NO_CXX11_CONSTEXPR
 #error
-#  define BOOST_EXPECTED_USE_STD_ADDRESSOF
+#  define JASEL_USE_STD_ADDRESSOF
 # endif
 
 
