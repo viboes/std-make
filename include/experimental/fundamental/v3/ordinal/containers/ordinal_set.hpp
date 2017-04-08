@@ -489,7 +489,6 @@ inline namespace fundamental_v3
     }
 
     //! A formatted output function.
-
     //! @param os the output stream
     //! @param x the \c ordinal_set
     //!

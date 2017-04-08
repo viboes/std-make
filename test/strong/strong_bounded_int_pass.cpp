@@ -6,6 +6,7 @@
 // <experimental/strong_ints.hpp>
 
 #include <experimental/strong_bounded_int.hpp>
+#include <sstream>
 
 #include <boost/detail/lightweight_test.hpp>
 
@@ -231,7 +232,21 @@ int main()
     BOOST_TEST(oc1.underlying()==2);
     BOOST_TEST(oc2.underlying()==1);
   }
-
+  // operator <<
+  {
+    Frame oc{1};
+      std::stringstream os;
+      os << oc;
+      BOOST_TEST_EQ(os.str(), "1");
+  }
+  // operator >>
+  {
+    Frame oc;
+      std::stringstream s;
+      s << 1;
+      s >> oc;
+      BOOST_TEST_EQ(oc, Frame{1});
+  }
   // hash
   {
     Frame oc1{1};

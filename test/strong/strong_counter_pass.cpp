@@ -6,6 +6,7 @@
 // <experimental/strong_counter.hpp>
 
 #include <experimental/strong_counter.hpp>
+#include <sstream>
 
 #include <boost/detail/lightweight_test.hpp>
 #if  __cplusplus >= 201402L
@@ -270,7 +271,21 @@ int main()
         BOOST_TEST(oc1.underlying()==2);
         BOOST_TEST(oc2.underlying()==1);
       }
-
+      // operator <<
+      {
+          OrangeCount oc{1};
+          std::stringstream os;
+          os << oc;
+          BOOST_TEST_EQ(os.str(), "1");
+      }
+      // operator >>
+      {
+          OrangeCount oc;
+          std::stringstream s;
+          s << 1;
+          s >> oc;
+          BOOST_TEST_EQ(oc, OrangeCount{1});
+      }
       // hash
       {
         OrangeCount oc1{1};

@@ -6,6 +6,7 @@
 // <experimental/strong_ints.hpp>
 
 #include <experimental/strong_ints.hpp>
+#include <sstream>
 
 #include <boost/detail/lightweight_test.hpp>
 #if  __cplusplus >= 201402L
@@ -17,6 +18,7 @@ using OrangeCountDC = stdex::strong_int<class OrangeTag, int>;
 using AppelCount = stdex::strong_int<class AppelTag, int>;
 using UOrangeCount = stdex::strong_int<class OrangeTag, unsigned int>;
 using SOrangeCount = stdex::strong_int<class OrangeTag, short>;
+using COrangeCount = stdex::strong_int<class OrangeTag, char>;
 
 OrangeCount add(OrangeCount x, OrangeCount y){
   return x+y;
@@ -307,6 +309,35 @@ int main()
       {
         OrangeCount oc1{1};
         BOOST_TEST(std::hash<OrangeCount>{}(oc1)==std::hash<int>{}(1));
+      }
+      // operator <<
+      {
+          OrangeCount oc{1};
+          std::stringstream os;
+          os << oc;
+          BOOST_TEST_EQ(os.str(), "1");
+      }
+      // operator >>
+      {
+          OrangeCount oc;
+          std::stringstream s;
+          s << 1;
+          s >> oc;
+          BOOST_TEST_EQ(oc, OrangeCount{1});
+      }
+      {
+          SOrangeCount oc;
+          std::stringstream s;
+          s << 1;
+          s >> oc;
+          BOOST_TEST_EQ(oc, SOrangeCount{1});
+      }
+      {
+          COrangeCount oc;
+          std::stringstream s;
+          s << COrangeCount{5};
+          s >> oc;
+          BOOST_TEST_EQ(oc, COrangeCount{5});
       }
   }
 #endif

@@ -9,6 +9,9 @@
 
 #include <experimental/strong_enums.hpp>
 #include <utility>
+#include <sstream>
+#include <iostream>
+
 #include <boost/detail/lightweight_test.hpp>
 
 namespace stdex = std::experimental;
@@ -19,6 +22,9 @@ enum E { E0=1, E1, E2 };
 struct SE {
     enum type { E0=2, E1, E2 };
 };
+enum class byte : unsigned char {};
+enum class Other  {A,B,C};
+
 namespace std
 {
 namespace experimental
@@ -222,7 +228,23 @@ int main()
     BOOST_TEST(es1.to_enum()==E2);
     BOOST_TEST(es2.to_enum()==E1);
   }
-
+  // operator <<
+  {
+      ES oc{E1};
+      std::stringstream os;
+      os << int(oc.to_enum());  // We need to convert to int to have a printable characters type, but we can not do it directly.
+      BOOST_TEST_EQ(os.str(), "2");
+  }
+  // operator >>
+  {
+      ES oc;
+      std::stringstream s;
+      s << ES{E1};
+      s >> oc;
+      BOOST_TEST_EQ(oc.underlying(), 2);
+      BOOST_TEST_EQ(oc.to_enum(), E1);
+      BOOST_TEST_EQ(oc, ES{E1});
+  }
   // hash
   {
     ES es1 = E1;
@@ -231,6 +253,11 @@ int main()
     //auto h1 = std::hash<E>{}(E1);
     //auto h2 = std::hash<ES>{}(es1);
     BOOST_TEST(std::hash<ES>{}(es1)==std::hash<E>{}(E1));
+  }
+  {
+    //Other o {1};
+    //byte b {1};
+    //std::cout << b << "\n";
   }
 
   return ::boost::report_errors();

@@ -14,6 +14,7 @@
 #include <experimental/optional.hpp>
 #include <exception>
 #include <functional>
+#include <iosfwd>
 
 namespace std
 {
@@ -119,6 +120,40 @@ inline namespace fundamental_v3
 
   };
 
+  // stream operators
+
+  //! strong_enum input function.
+  //! @par Effects:<br> Extracts a T from is and stores it in the passes x.
+  //! @param is the input stream
+  //! @param x the \c strong_enum
+  //! @par Returns:<br> \c is.
+
+  template <class CharT, class Traits, class E, class T >
+  std::basic_istream<CharT, Traits>&
+  operator>>(std::basic_istream<CharT, Traits>& is, strong_enum<E, T>& x)
+  {
+    T v;
+    is >> v;
+    x = strong_enum<E, T>(v);
+    return is;
+  }
+
+  //! strong_enum output function.
+  //! @param os the output stream
+  //! @param x the \c strong_enum
+  //!
+  //! @par Returns:<br> the result of the following expression
+  //! @code
+  //! os << bool(x.undelying())
+  //! @endcode
+
+  template <class CharT, class Traits, class E, class T >
+  std::basic_ostream<CharT, Traits>&
+  operator<<(std::basic_ostream<CharT, Traits>& os, const strong_enum<E, T>& x)
+  {
+    return os << x.underlying();
+  }
+
   template <class E, class UT>
   struct underlying_type<strong_enum<E,UT>> { typedef UT type; };
 
@@ -144,6 +179,40 @@ inline namespace fundamental_v3
       friend constexpr bool operator>=(safe_enum x, safe_enum y) noexcept { return x.value >= y.value; }
 
   };
+
+  // stream operators
+
+  //! safe_enum input function.
+  //! @par Effects:<br> Extracts a T from is and stores it in the passes x.
+  //! @param is the input stream
+  //! @param x the \c safe_enum
+  //! @par Returns:<br> \c is.
+
+  template <class CharT, class Traits, class E, class T >
+  std::basic_istream<CharT, Traits>&
+  operator>>(std::basic_istream<CharT, Traits>& is, safe_enum<E, T>& x)
+  {
+    T v;
+    is >> v;
+    x = safe_enum<E, T>(v);
+    return is;
+  }
+
+  //! safe_enum output function.
+  //! @param os the output stream
+  //! @param x the \c safe_enum
+  //!
+  //! @par Returns:<br> the result of the following expression
+  //! @code
+  //! os << bool(x.undelying())
+  //! @endcode
+
+  template <class CharT, class Traits, class E, class T >
+  std::basic_ostream<CharT, Traits>&
+  operator<<(std::basic_ostream<CharT, Traits>& os, const safe_enum<E, T>& x)
+  {
+    return os << int(x.to_enum());
+  }
 
   template <class E, class UT>
   struct underlying_type<safe_enum<E,UT>> { typedef UT type; };
@@ -171,6 +240,41 @@ inline namespace fundamental_v3
       friend constexpr bool operator>=(ordinal_enum x, ordinal_enum y) noexcept { return x.value >= y.value; }
 
   };
+
+  // stream operators
+  // fixme enums don't define the stream operators
+  //! ordinal_enum input function.
+  //! @par Effects:<br> Extracts a T from is and stores it in the passes x.
+  //! @param is the input stream
+  //! @param x the \c safe_enum
+  //! @par Returns:<br> \c is.
+
+  template <class CharT, class Traits, class E, class T >
+  std::basic_istream<CharT, Traits>&
+  operator>>(std::basic_istream<CharT, Traits>& is, ordinal_enum<E, T>& x)
+  {
+    T v;
+    is >> v;
+    x = ordinal_enum<E, T>(v);
+    return is;
+  }
+
+  //! ordinal_enum output function.
+  //! @param os the output stream
+  //! @param x the \c ordinal_enum
+  //!
+  //! @par Returns:<br> the result of the following expression
+  //! @code
+  //! os << +x.undelying()
+  //! @endcode
+
+  template <class CharT, class Traits, class E, class T >
+  std::basic_ostream<CharT, Traits>&
+  operator<<(std::basic_ostream<CharT, Traits>& os, const ordinal_enum<E, T>& x)
+  {
+    return os << +x.to_undelying();
+  }
+
   template <class E, class UT>
   struct underlying_type<ordinal_enum<E,UT>> { typedef UT type; };
 

@@ -6,6 +6,7 @@
 // <experimental/strong_id.hpp>
 
 #include <experimental/strong_id.hpp>
+#include <sstream>
 
 #include <boost/detail/lightweight_test.hpp>
 
@@ -67,7 +68,21 @@ int main()
       BOOST_TEST(es2 != es1);
       //BOOST_TEST(cr < es1); // error
   }
-
+  // operator <<
+  {
+      EngineId oc{1};
+      std::stringstream os;
+      os << oc;
+      BOOST_TEST_EQ(os.str(), "1");
+  }
+  // operator >>
+  {
+      EngineId oc;
+      std::stringstream s;
+      s << 1;
+      s >> oc;
+      BOOST_TEST_EQ(oc, EngineId{1});
+  }
   return ::boost::report_errors();
 }
 

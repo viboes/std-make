@@ -16,6 +16,7 @@
 #include <limits>
 #include <functional>
 #include <type_traits>
+#include <iosfwd>
 
 namespace std
 {
@@ -174,6 +175,39 @@ inline namespace fundamental_v3
   static_assert(std::is_standard_layout<strong_bounded_int<bool,int,0,3>>::value, "");
   static_assert(std::is_trivial<strong_bounded_int<bool,int,0,3>>::value, "");
 
+  // stream operators
+
+  //! input function.
+  //! @par Effects:<br> Extracts a T from is and stores it in the passes x.
+  //! @param is the input stream
+  //! @param x the \c strong_bool
+  //! @par Returns:<br> \c is.
+
+  template <class CharT, class Traits, class Tag, class T, T Low, T High >
+  std::basic_istream<CharT, Traits>&
+  operator>>(std::basic_istream<CharT, Traits>& is, strong_bounded_int<Tag, T, Low, High>& x)
+  {
+    T v;
+    is >> v;
+    x = strong_bounded_int<Tag, T, Low, High>(v);
+    return is;
+  }
+
+  //! output function.
+  //! @param os the output stream
+  //! @param x the \c strong_bool
+  //!
+  //! @par Returns:<br> the result of the following expression
+  //! @code
+  //! os << x.undelying()
+  //! @endcode
+
+  template <class CharT, class Traits, class Tag, class T, T Low, T High >
+  std::basic_ostream<CharT, Traits>&
+  operator<<(std::basic_ostream<CharT, Traits>& os, const strong_bounded_int<Tag, T, Low, High>& x)
+  {
+    return os << x.underlying();
+  }
 
 }
 }

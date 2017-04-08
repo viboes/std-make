@@ -11,6 +11,7 @@
 #include <experimental/fundamental/v3/strong/underlying_type.hpp>
 #include <type_traits>
 #include <functional>
+#include <iosfwd>
 
 namespace std
 {
@@ -51,9 +52,16 @@ inline namespace fundamental_v3
       constexpr explicit strict_bool (void*) = delete;
 
       //!@{
-      // todo boolean operators
+      // boolean operators
+      // todo do We need mixed boolean operators
       friend constexpr strict_bool operator&&(strict_bool x, strict_bool y)  noexcept { return strict_bool(x.value && y.value); }
+      //friend constexpr strict_bool operator&&(bool x, strict_bool y)  noexcept { return strict_bool(x && y.value); }
+      //friend constexpr strict_bool operator&&(strict_bool x, bool y)  noexcept { return strict_bool(x.value && y); }
+
       friend constexpr strict_bool operator||(strict_bool x, strict_bool y)  noexcept { return strict_bool(x.value || y.value); }
+      //friend constexpr strict_bool operator||(bool x, strict_bool y)  noexcept { return strict_bool(x || y.value); }
+      //friend constexpr strict_bool operator||(strict_bool x, bool y)  noexcept { return strict_bool(x.value || y); }
+
       friend constexpr strict_bool operator!(strict_bool x)  noexcept { return strict_bool(! x.value); }
       //!@}
 
@@ -62,16 +70,18 @@ inline namespace fundamental_v3
       //!
       //! Forwards to the underlying value
       friend constexpr bool operator==(strict_bool x, strict_bool y)  noexcept { return x.value == y.value; }
-      friend constexpr bool operator==(bool x, strict_bool y)  noexcept { return x == y.value; }
-      friend constexpr bool operator==(strict_bool x, bool y)  noexcept { return x.value == y; }
+      //friend constexpr bool operator==(bool x, strict_bool y)  noexcept { return x == y.value; }
+      //friend constexpr bool operator==(strict_bool x, bool y)  noexcept { return x.value == y; }
 
       friend constexpr bool operator!=(strict_bool x, strict_bool y)  noexcept { return x.value != y.value; }
-      friend constexpr bool operator!=(bool x, strict_bool y)  noexcept { return x != y.value; }
-      friend constexpr bool operator!=(strict_bool x, bool y)  noexcept { return x.value != y; }
+      //friend constexpr bool operator!=(bool x, strict_bool y)  noexcept { return x != y.value; }
+      //friend constexpr bool operator!=(strict_bool x, bool y)  noexcept { return x.value != y; }
+
       friend constexpr bool operator<(strict_bool x, strict_bool y)  noexcept { return x.value < y.value; }
       friend constexpr bool operator>(strict_bool x, strict_bool y)  noexcept { return x.value > y.value; }
       friend constexpr bool operator<=(strict_bool x, strict_bool y)  noexcept { return x.value <= y.value; }
       friend constexpr bool operator>=(strict_bool x, strict_bool y)  noexcept { return x.value >= y.value; }
+      // todo do We need mixed relational operators
       //!@}
   };
 
@@ -84,6 +94,40 @@ inline namespace fundamental_v3
   //! underlying_type specialization for strict_bool
   template <class Tag, class Bool>
   struct underlying_type<strict_bool<Tag, Bool>> { using type = Bool; };
+
+  // stream operators
+
+  //! input function.
+  //! @par Effects:<br> Extracts a T from is and stores it in the passes x.
+  //! @param is the input stream
+  //! @param x the \c strict_bool
+  //! @par Returns:<br> \c is.
+
+  template <class CharT, class Traits, class Tag, class T >
+  std::basic_istream<CharT, Traits>&
+  operator>>(std::basic_istream<CharT, Traits>& is, strict_bool<Tag, T>& x)
+  {
+    T v;
+    is >> v;
+    x = strict_bool<Tag, T>(v);
+    return is;
+  }
+
+  //! output function.
+  //! @param os the output stream
+  //! @param x the \c strict_bool
+  //!
+  //! @par Returns:<br> the result of the following expression
+  //! @code
+  //! os << bool(x.undelying())
+  //! @endcode
+
+  template <class CharT, class Traits, class Tag, class T >
+  std::basic_ostream<CharT, Traits>&
+  operator<<(std::basic_ostream<CharT, Traits>& os, const strict_bool<Tag, T>& x)
+  {
+    return os << bool(x.underlying());
+  }
 
 
 }

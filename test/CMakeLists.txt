@@ -66,7 +66,6 @@ jasel_add_tests(
     factory make
     ######
     make_pass
-    #make_boost_expected_pass
     #make_boost_optional_pass
     make_std_array_pass
     make_std_expected_pass

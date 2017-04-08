@@ -165,13 +165,43 @@ int main()
     {
       duration<int, std::ratio<1,10>> d1 {300};
       duration<int, std::ratio<1,100>> d2  = d1;
+
+      static_assert(
+          std::ratio_divide<std::ratio<1,10>, std::ratio<1,100>>::den == 1
+          , "");
+
+      static_assert(
+          stdex::detail::is_inter_domain_convertible<duration_domain<std::ratio<1,100>>, int, int, duration_domain<std::ratio<1,10>>>::value
+          , "");
+      static_assert(
+          std::ratio_divide<std::ratio<1,100>, std::ratio<1,10>>::den != 1
+          , "");
+
+
+      static_assert(
+          ! stdex::detail::is_inter_domain_convertible<duration_domain<std::ratio<1,10>>, int, int, duration_domain<std::ratio<1,100>>>::value
+          , "ERROR");
+
+#if defined __clang__ && (__clang_major__ < 4)
+      duration<int, std::ratio<1,10>> d3;
+      // fixme: This shouldn't compile - clang-3.9.1 BUG
+      std::cout << "------- \n";
+      d3= d2; // calling move assignment :(
+      std::cout << "------- \n";
+#else
       BOOST_TEST(d1 == d2);
+#endif
       BOOST_TEST_EQ(d2.count() , 3000);
     }
     {
       duration<int, std::ratio<1,100>> d1 {303};
       duration<int, std::ratio<1,10>> d2  = stdex::strong_counter_cast<duration<int, std::ratio<1,10>>>(d1);
+#if defined __clang__ && (__clang_major__ < 4) // clang-3.9.1 BUG
+      // fixme: This should compile
+      //BOOST_TEST(d1 != d2);
+#else
       BOOST_TEST(d1 != d2);
+#endif
       BOOST_TEST(d2.count() == 30);
     }
     {
@@ -197,7 +227,8 @@ int main()
       duration<int, std::ratio<1,10>> d2{1};
       auto d =  d2 + d1;
       BOOST_TEST_EQ(d.count() , 13);
-    }  return ::boost::report_errors();
+    }
+    return ::boost::report_errors();
 }
 
 #else

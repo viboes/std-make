@@ -6,6 +6,7 @@
 // <experimental/strong_bool.hpp>
 
 #include <experimental/strong_bool.hpp>
+#include <sstream>
 
 #include <boost/detail/lightweight_test.hpp>
 
@@ -27,6 +28,7 @@ struct Y {
     explicit operator bool() { return true; }
 };
 
+void f(bool) {}
 
 int main()
 {
@@ -51,11 +53,12 @@ int main()
 
       //bool b = cr;                  // error - implicit conversion required
 
-      bool ans = es && !cr;           // ok - explicit conversion required by the use of &&
+#if 0
+      bool ans = bool(es && !cr);           // ko - explicit conversion required by the use of &&
       BOOST_TEST(ans);
       if (cr)                         // ok - explicit conversion required by the use cr in a if
           std::cout << "True\n";
-
+#endif
       //set_status(true, true);       // error - implicit conversion required
       set_status(EngineStarted{true}, CrewReady{true});        // function call
   }
@@ -71,7 +74,61 @@ int main()
       BOOST_TEST(es2!=es1);
       //BOOST_TEST(cr<es1); // error
   }
+  {
+      EngineStarted es1 {true};
+      EngineStarted es2 {false};
+      EngineStarted es = es1 || es2;
+      BOOST_TEST(es==EngineStarted{true});
+  }
+  {
+      EngineStarted es1 {true};
+      EngineStarted es = es1 || EngineStarted{false};
+      BOOST_TEST(es==EngineStarted{true});
+  }
+  {
+      EngineStarted es2 {false};
+      EngineStarted es = EngineStarted{true} || es2;
+      BOOST_TEST(es==EngineStarted{true});
+  }
+  {
+      EngineStarted es1 {true};
+      EngineStarted es2 {false};
+      EngineStarted es = es1 && es2;
+      BOOST_TEST(es==EngineStarted{false});
+  }
+  {
+      EngineStarted es1 {true};
+      EngineStarted es = ! es1 ;
+      BOOST_TEST(es==EngineStarted{false});
+  }
+  {
+      EngineStarted es {true};
+      if (es) // explicit conversion implied
+        BOOST_TEST(true);
+      else
+        BOOST_TEST(false);
+  }
+  {
+      EngineStarted es {true};
+      f (bool(es)); // explicit conversion required
+  }
 
+  {
+      EngineStarted es {true};
+      std::stringstream os;
+      os << std::boolalpha << es;
+      std::cout << std::boolalpha << true;
+
+      BOOST_TEST_EQ(os.str(), "true");
+  }
+  {
+      EngineStarted es;
+      std::stringstream s;
+      s << std::boolalpha << true;
+      s >> std::boolalpha >> es;
+
+      BOOST_TEST_EQ(bool(es), true);
+  }
   return ::boost::report_errors();
 }
 

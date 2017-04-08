@@ -6,6 +6,7 @@
 // <experimental/strong_bool.hpp>
 
 #include <experimental/strong_bool.hpp>
+#include <sstream>
 
 #include <boost/detail/lightweight_test.hpp>
 
@@ -30,6 +31,8 @@ struct Y {
 
 enum class boolean : bool {};
 enum class byte : unsigned char{};
+
+void f(bool) {}
 
 int main()
 {
@@ -64,9 +67,9 @@ int main()
 
       //bool b = cr;                  // error - implicit conversion required
 
-      bool ans = es==true && ! (cr==true);           // ok - explicit conversion required by the use of &&
+      bool ans = es==EngineStarted{true} && ! (cr==CrewReady{true});           // ok - explicit conversion required by the use of &&
       BOOST_TEST(ans);
-      if (cr==true)                         // ok - explicit conversion required by the use cr in an if
+      if (cr==CrewReady{true})                         // ok - explicit conversion required by the use cr in an if
           std::cout << "True\n";
 
       //set_status(true, true);       // error - implicit conversion required
@@ -78,7 +81,7 @@ int main()
       //EngineStarted es {Y{}};        // error, explicit conversion
       // we can not prevent all the implicit conversions, or can we?
       EngineStarted es {X{}};        // ok, implicit conversion from UDT
-      BOOST_TEST(es==true);
+      BOOST_TEST(es==EngineStarted{true});
   }
   {
       EngineStarted es1 {true};
@@ -91,9 +94,55 @@ int main()
   {
       EngineStarted es1 {true};
       EngineStarted es2 {false};
-      EngineStarted es = es1 || es2; // fails need explicit conversion :(
-      //EngineStarted es = EngineStarted(es1 || es2);
-      BOOST_TEST(es==true);
+      EngineStarted es = es1 || es2;
+      BOOST_TEST(es==EngineStarted{true});
+  }
+  {
+      EngineStarted es1 {true};
+      EngineStarted es = es1 || EngineStarted{false};
+      BOOST_TEST(es==EngineStarted{true});
+  }
+  {
+      EngineStarted es2 {false};
+      EngineStarted es = EngineStarted{true} || es2;
+      BOOST_TEST(es==EngineStarted{true});
+  }
+  {
+      EngineStarted es1 {true};
+      EngineStarted es2 {false};
+      EngineStarted es = es1 && es2;
+      BOOST_TEST(es==EngineStarted{false});
+  }
+  {
+      EngineStarted es1 {true};
+      EngineStarted es = ! es1 ;
+      BOOST_TEST(es==EngineStarted{false});
+  }
+  {
+      EngineStarted es {true};
+      if (es.underlying())
+        BOOST_TEST(true);
+      else
+        BOOST_TEST(false);
+  }
+  {
+      EngineStarted es {true};
+      f (es.underlying());
+  }
+
+  {
+      EngineStarted es {true};
+      std::stringstream os;
+      os << std::boolalpha << es;
+      BOOST_TEST_EQ(os.str(), "true");
+  }
+  {
+      EngineStarted es;
+      std::stringstream s;
+      s << std::boolalpha << true;
+      s >> std::boolalpha >> es;
+
+      BOOST_TEST_EQ(es, EngineStarted{true});
   }
 
   return ::boost::report_errors();

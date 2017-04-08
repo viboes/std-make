@@ -6,7 +6,7 @@
 
 #ifndef JASEL_FUNDAMENTAL_V3_STRONG_STRONG_COUNTER_HPP
 #define JASEL_FUNDAMENTAL_V3_STRONG_STRONG_COUNTER_HPP
-
+//#include <iostream>
 /**
  * @file
  * strong_counter<Domain, Rep> is a generalization of std::chrono::duration<Rep, Period>
@@ -21,6 +21,7 @@
 
 #include <experimental/fundamental/v3/strong/tagged.hpp>
 #include <experimental/fundamental/v3/strong/underlying_type.hpp>
+#include <iosfwd>
 
 #include <limits>
 #include <functional>
@@ -233,8 +234,8 @@ inline namespace fundamental_v3
 
       // constructors
       strong_counter() = default;
-      strong_counter(strong_counter const&) = default;
-      strong_counter(strong_counter &&) = default;
+      strong_counter(strong_counter<Domain, UT> const&) = default;
+      strong_counter(strong_counter<Domain, UT> &&) = default;
 
       //! @par Effects:<br> Constructs a strong_counter from its representations
       //! @par Throws:<br> Anything the copy of the conversion throws.
@@ -246,7 +247,8 @@ inline namespace fundamental_v3
 #endif
           )
           : base_type(detail::intra_domain_convert<Domain, UT>(r))
-      {}
+      {
+      }
       template <class UT2>
       explicit strong_counter(UT2 const& r
 #if !defined JASEL_DOXYGEN_INVOKED
@@ -264,12 +266,28 @@ inline namespace fundamental_v3
 #endif
           )
           : base_type(detail::inter_domain_convert<Domain,UT>(Domain2{}, other.count()))
-      {}
+      {
+      }
 
       // assignment
-      strong_counter& operator=(strong_counter const&) = default;
-      strong_counter& operator=(strong_counter &&) = default;
+#if 1
+      strong_counter& operator=(strong_counter<Domain, UT> const&) = default;
+      strong_counter& operator=(strong_counter<Domain, UT> &&) = default;
+#else
+      strong_counter& operator=(strong_counter<Domain, UT> const& other)
+      {
+        this->value = other.value;
+        std::cout << "strong_counter& operator=(strong_counter<Domain, UT> const&) \n";
+        return *this;
+      }
 
+      strong_counter& operator=(strong_counter<Domain, UT> && other)
+      {
+        this->value = other.value;
+        std::cout << "strong_counter& operator=(strong_counter<Domain, UT> &&) \n";
+        return *this;
+      }
+#endif
       constexpr UT count() const noexcept
           { return this->underlying(); }
 
@@ -517,11 +535,46 @@ inline namespace fundamental_v3
   struct underlying_type<strong_counter<Domain,UT>>
   { using type = UT; };
 
+#if 1
   static_assert(std::is_pod<strong_counter<bool,int>>::value, "");
   static_assert(std::is_trivially_default_constructible<strong_counter<bool,int>>::value, "");
   static_assert(std::is_trivially_copyable<strong_counter<bool,int>>::value, "");
   static_assert(std::is_standard_layout<strong_counter<bool,int>>::value, "");
   static_assert(std::is_trivial<strong_counter<bool,int>>::value, "");
+#endif
+  // stream operators
+
+  //! input function.
+  //! @par Effects:<br> Extracts a T from is and stores it in the passes x.
+  //! @param is the input stream
+  //! @param x the \c strong_int
+  //! @par Returns:<br> \c is.
+
+  template <class CharT, class Traits, class Domain, class T >
+  std::basic_istream<CharT, Traits>&
+  operator>>(std::basic_istream<CharT, Traits>& is, strong_counter<Domain, T>& x)
+  {
+    T v;
+    is >> v;
+    x = strong_counter<Domain, T>(v);
+    return is;
+  }
+
+  //! output function.
+  //! @param os the output stream
+  //! @param x the \c strong_int
+  //!
+  //! @par Returns:<br> the result of the following expression
+  //! @code
+  //! os << x.undelying()
+  //! @endcode
+
+  template <class CharT, class Traits, class Domain, class T >
+  std::basic_ostream<CharT, Traits>&
+  operator<<(std::basic_ostream<CharT, Traits>& os, const strong_counter<Domain, T>& x)
+  {
+    return os << x.underlying();
+  }
 }
 }
 
