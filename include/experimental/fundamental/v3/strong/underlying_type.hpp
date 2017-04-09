@@ -16,6 +16,7 @@ namespace experimental
 inline  namespace fundamental_v3
 {
 
+    //! underlying_type customization point
     template <class E>
     struct underlying_type
     : std::underlying_type<E>
@@ -24,10 +25,19 @@ inline  namespace fundamental_v3
     template <class E>
     using underlying_type_t = typename underlying_type<E>::type;
 
+    //! get access to the underlying_type associated to T
     template <class T>
     auto underlying(T const& v) -> decltype(v.underlying())
-    { return v.underlying(); }
+    {
+      return v.underlying();
+    }
 
+    //! used instead of static_cast
+    template <class U, class T>
+    U underlying_cast(T const& v)
+    {
+      return static_cast<U>(v.underlying());
+    }
 }
 }
 }
