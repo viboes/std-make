@@ -14,6 +14,8 @@ namespace stdex = std::experimental;
 
 using EngineId = stdex::strong_id<class EngineIdTag>;
 using BoardId     = stdex::strong_id<class BoardIdTag>;
+using UEngineId = stdex::strong_id<class EngineIdTag, unsigned int>;
+using UCEngineId = stdex::strong_id<class EngineIdTag, unsigned char>;
 
 void set_ids(EngineId engine, BoardId board){
   (void)engine;
@@ -28,6 +30,11 @@ struct Y {
     explicit operator int() { return 1; }
 };
 
+void f(int) {}
+
+struct S {
+  void foo() {}
+};
 
 int main()
 {
@@ -83,6 +90,34 @@ int main()
       s >> oc;
       BOOST_TEST_EQ(oc, EngineId{1});
   }
+  {
+    //EngineId id {&S::foo}; // this fails as expected
+  }
+  {
+    //EngineId id  {&f}; // this fails as expected
+  }
+  {
+    //double d;
+    //EngineId id  {d}; // this fails as expected
+  }
+  {
+    short s = 1;
+    EngineId id  {s}; // OK
+    BOOST_TEST_EQ(id.underlying(), 1);
+  }
+  {
+    //short s = -1;
+    //UEngineId id  {s}; // this fails as expected - narrowing conversion
+  }
+  {
+    //short s = 1;
+    //UCEngineId id  {s}; // this fails as expected - narrowing conversion
+  }
+  {
+    //char c = 1;
+    //UCEngineId id  {c}; // this fails as expected - narrowing conversion
+  }
+
   return ::boost::report_errors();
 }
 

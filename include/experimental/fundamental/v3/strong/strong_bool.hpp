@@ -61,6 +61,10 @@ inline namespace fundamental_v3
       constexpr explicit strong_bool (int) = delete;
       constexpr explicit strong_bool (double) = delete;
       constexpr explicit strong_bool (void*) = delete;
+      template <class R, class ... Args>
+      constexpr explicit strong_bool (R(*)(Args...)) = delete;
+      template <class C, class R, class ... Args>
+      constexpr explicit strong_bool (R(C::*)(Args...)) = delete;
 
       //!@{
       // boolean operators
@@ -109,6 +113,10 @@ inline namespace fundamental_v3
       constexpr explicit strong_bool (int) = delete;
       constexpr explicit strong_bool (double) = delete;
       constexpr explicit strong_bool (void*) = delete;
+      template <class R, class ... Args>
+      constexpr explicit strong_bool (R(*)(Args...)) = delete;
+      template <class C, class R, class ... Args>
+      constexpr explicit strong_bool (R(C::*)(Args...)) = delete;
 
       //!@{
       // boolean operators

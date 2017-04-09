@@ -35,6 +35,10 @@ struct Y {
 
 void f(bool) {}
 
+struct S {
+  void foo() {}
+};
+
 int main()
 {
 
@@ -238,6 +242,7 @@ int main()
     //UEngineStarted es4 {s};        // error int deleted
 
     //UEngineStarted es5 {1.0};      // error double deleted
+    //UEngineStarted es5 {1.0f};      // error double deleted
 
     // fixme: do we want this to fail
     //unsigned char s;
@@ -258,6 +263,14 @@ int main()
     assert(stdex::ordinal::pred(Bool{true}) == Bool{false});
   }
 #endif
+  {
+    //stdex::boolean b{&S::foo}; // this fails as expected
+    //UEngineStarted es {&S::foo}; // this fails as expected
+  }
+  {
+    //stdex::boolean b{&f}; // this fails as expected
+    //UEngineStarted es {&f}; // this fails as expected
+  }
   return ::boost::report_errors();
 }
 

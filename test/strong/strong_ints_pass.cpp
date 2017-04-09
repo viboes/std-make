@@ -17,6 +17,7 @@ using OrangeCount = stdex::strong_int<class OrangeTag, int>;
 using OrangeCountDC = stdex::strong_int<class OrangeTag, int>;
 using AppelCount = stdex::strong_int<class AppelTag, int>;
 using UOrangeCount = stdex::strong_int<class OrangeTag, unsigned int>;
+using UCOrangeCount = stdex::strong_int<class OrangeTag, unsigned char>;
 using SOrangeCount = stdex::strong_int<class OrangeTag, short>;
 using COrangeCount = stdex::strong_int<class OrangeTag, char>;
 
@@ -338,6 +339,33 @@ int main()
           s << COrangeCount{5};
           s >> oc;
           BOOST_TEST_EQ(oc, COrangeCount{5});
+      }
+      {
+        //OrangeCount id {&S::foo}; // this fails as expected
+      }
+      {
+        //OrangeCount id  {&f}; // this fails as expected
+      }
+      {
+        //double d;
+        //OrangeCount id  {d}; // this fails as expected
+      }
+      {
+        short s = 1;
+        OrangeCount id  {s}; // OK
+        BOOST_TEST_EQ(id.underlying(), 1);
+      }
+      {
+        //short s = -1;
+        //UOrangeCount id  {s}; // this fails as expected - narrowing conversion
+      }
+      {
+        //short s = 1;
+        //UCOrangeCount id  {s}; // this fails as expected - narrowing conversion
+      }
+      {
+        //char c = 1;
+        //UCOrangeCount id  {c}; // this fails as expected - narrowing conversion
       }
   }
 #endif
