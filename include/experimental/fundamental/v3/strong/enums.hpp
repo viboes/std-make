@@ -234,6 +234,8 @@ inline namespace fundamental_v3
 
       friend constexpr bool operator==(ordinal_enum x, ordinal_enum y) noexcept { return x.value == y.value; }
       friend constexpr bool operator!=(ordinal_enum x, ordinal_enum y) noexcept { return x.value != y.value; }
+
+      // Note that ordinal_enum order is based on the underlying type not the position
       friend constexpr bool operator<(ordinal_enum x, ordinal_enum y) noexcept { return x.value < y.value; }
       friend constexpr bool operator<=(ordinal_enum x, ordinal_enum y) noexcept { return x.value <= y.value; }
       friend constexpr bool operator>(ordinal_enum x, ordinal_enum y) noexcept { return x.value > y.value; }
