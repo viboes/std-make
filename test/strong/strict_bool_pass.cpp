@@ -14,6 +14,8 @@ namespace stdex = std::experimental;
 
 using EngineStarted = stdex::strict_bool<class EngineStartedTag>;
 using CrewReady     = stdex::strict_bool<class CrewReadyTag>;
+using UEngineStarted = stdex::strict_bool<class EngineStartedTag, unsigned char>;
+using UCrewReady     = stdex::strict_bool<class CrewReadyTag, unsigned char>;
 
 void set_status(EngineStarted started, CrewReady ready)
 {
@@ -41,7 +43,7 @@ int main()
     //boolean b1 = true;     // error - explicit required
     boolean b2 {true};
     BOOST_TEST(static_cast<bool>(b2) == true);
-
+    //boolean b2 {1}; // fails as expected
   }
   {
     byte b{0xab};
@@ -144,7 +146,11 @@ int main()
 
       BOOST_TEST_EQ(es, EngineStarted{true});
   }
+  {
+//    UEngineStarted es {true};        // ok
+//    UCrewReady     cr {false};       // ok
 
+  }
   return ::boost::report_errors();
 }
 

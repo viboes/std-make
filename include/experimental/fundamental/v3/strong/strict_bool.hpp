@@ -39,13 +39,21 @@ inline namespace fundamental_v3
   </code>
   */
   template <class Tag, class Bool = bool>
-  struct strict_bool final : private_tagged<Tag, Bool>
+  struct strict_bool final : tagged<Tag, Bool>
   {
-      using base_type = private_tagged<Tag, Bool>;
+      using base_type = tagged<Tag, Bool>;
       using base_type::base_type;
 
       // copy constructor/assignment default
       constexpr strict_bool() noexcept = default;
+      // do we want an explicit conversion from Bool?
+      //constexpr explicit strict_bool (Bool) = delete;
+
+      // If Bool is not bool, do we want an explicit conversion from bool?
+      //constexpr strict_bool(bool b) noexcept : base_type(b) {}
+
+      // If Bool is not bool, do we want an explicit conversion to bool?
+      //constexpr explicit operator bool() const { return value; }
 
       constexpr explicit strict_bool (int) = delete;
       constexpr explicit strict_bool (double) = delete;

@@ -11,6 +11,7 @@
 
 #include <experimental/fundamental/v3/strong/tagged.hpp>
 #include <experimental/fundamental/v3/strong/underlying_type.hpp>
+#include <experimental/ordinal.hpp>
 
 #include <stdexcept>
 #include <limits>
@@ -207,6 +208,18 @@ inline namespace fundamental_v3
   operator<<(std::basic_ostream<CharT, Traits>& os, const strong_bounded_int<Tag, T, Low, High>& x)
   {
     return os << x.underlying();
+  }
+
+  namespace ordinal {
+    template <class Tag, class T, T Low, T High >
+    struct traits<strong_bounded_int<Tag, T, Low, High>>
+    {
+      using size_type = size_t;
+      using size = integral_constant<size_type, High-Low+1>;
+      static strong_bounded_int<Tag, T, Low, High> val(size_type p) { return strong_bounded_int<Tag, T, Low, High>{static_cast<T>(p+Low)}; }
+
+      static size_type pos(strong_bounded_int<Tag, T, Low, High> u)  { return static_cast<size_type>(u.underlying()-Low); };
+    };
   }
 
 }

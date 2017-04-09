@@ -7,6 +7,7 @@
 
 #include <experimental/strong_bool.hpp>
 #include <sstream>
+#include <cassert>
 
 #include <boost/detail/lightweight_test.hpp>
 
@@ -14,6 +15,10 @@ namespace stdex = std::experimental;
 
 using EngineStarted = stdex::strong_bool<class EngineStartedTag>;
 using CrewReady     = stdex::strong_bool<class CrewReadyTag>;
+using UEngineStarted = stdex::strong_bool<class EngineStartedTag, unsigned char>;
+using UCrewReady     = stdex::strong_bool<class CrewReadyTag, unsigned char>;
+
+static_assert(sizeof(UEngineStarted)==1, "");
 
 void set_status(EngineStarted started, CrewReady ready){
   (void)started;
@@ -46,19 +51,28 @@ int main()
 
       EngineStarted es {true};        // ok
       CrewReady     cr {false};       // ok
+      BOOST_TEST(es);
+      BOOST_TEST(!cr);
 
       //EngineStarted es6 =true;       // error
       //EngineStarted es6 =cr;       // error
-      //EngineStarted es7 {cr};       // fixme: how can we forbid this providing explicit conversion to bool? clang compile this while gcc don't.
-
       //bool b = cr;                  // error - implicit conversion required
 
-#if 0
-      bool ans = bool(es && !cr);           // ko - explicit conversion required by the use of &&
+#if defined __clang__ && (__clang_major__ < 4)
+        EngineStarted es7 {cr};       // fixme: clang-3.9.0 compile this while gcc and clang-4.0.0 don't.
+#else
+      //EngineStarted es7 {cr};       // ko:no conversion between different strong bools
+
+      bool ans = es && !cr;           // ok - explicit conversion implied by the use of &&
       BOOST_TEST(ans);
-      if (cr)                         // ok - explicit conversion required by the use cr in a if
-          std::cout << "True\n";
+      bool ans2 = es || !cr;           // ok - explicit conversion implied by the use of &&
+      BOOST_TEST(ans2);
 #endif
+      if (cr)                         // ok - explicit conversion implied by the use cr in a if
+        BOOST_TEST(false);
+      else
+        BOOST_TEST(true);
+
       //set_status(true, true);       // error - implicit conversion required
       set_status(EngineStarted{true}, CrewReady{true});        // function call
   }
@@ -86,6 +100,46 @@ int main()
       BOOST_TEST(es==EngineStarted{true});
   }
   {
+      EngineStarted es1 {true};
+      auto b = es1 || false;
+      BOOST_TEST(b==true);
+  }
+  {
+      EngineStarted es1 {false};
+      auto b = es1 || false;
+      BOOST_TEST(b==false);
+  }
+  {
+      EngineStarted es1 {true};
+      auto b = false || es1;
+      BOOST_TEST(b==true);
+  }
+  {
+      EngineStarted es1 {false};
+      auto b = false || es1;
+      BOOST_TEST(b==false);
+  }
+  {
+      EngineStarted es1 {true};
+      auto b = es1 || true;
+      BOOST_TEST(b==true);
+  }
+  {
+      EngineStarted es1 {false};
+      auto b = es1 || true;
+      BOOST_TEST(b==true);
+  }
+  {
+      EngineStarted es1 {true};
+      auto b = true || es1 ;
+      BOOST_TEST(b==true);
+  }
+  {
+      EngineStarted es1 {false};
+      auto b = true || es1 ;
+      BOOST_TEST(b==true);
+  }
+  {
       EngineStarted es2 {false};
       EngineStarted es = EngineStarted{true} || es2;
       BOOST_TEST(es==EngineStarted{true});
@@ -98,12 +152,37 @@ int main()
   }
   {
       EngineStarted es1 {true};
+      auto b = es1 && false;
+      BOOST_TEST(!b);
+  }
+  {
+      EngineStarted es1 {false};
+      auto b = es1 && false;
+      BOOST_TEST(!b);
+  }
+  {
+      EngineStarted es1 {true};
+      auto b = es1 && true;
+      BOOST_TEST(b);
+  }
+  {
+      EngineStarted es1 {false};
+      auto b = es1 && true;
+      BOOST_TEST(!b);
+  }
+  {
+      EngineStarted es1 {true};
       EngineStarted es = ! es1 ;
       BOOST_TEST(es==EngineStarted{false});
   }
   {
+      EngineStarted es1 {false};
+      EngineStarted es = ! es1 ;
+      BOOST_TEST(es==EngineStarted{true});
+  }
+  {
       EngineStarted es {true};
-      if (es) // explicit conversion implied
+      if (es) // explicit conversion implied by the use inside an if condition
         BOOST_TEST(true);
       else
         BOOST_TEST(false);
@@ -129,6 +208,56 @@ int main()
 
       BOOST_TEST_EQ(bool(es), true);
   }
+  {
+    UEngineStarted es {true};        // ok
+    UCrewReady     cr {false};       // ok
+
+    bool b = bool(es);
+    BOOST_TEST_EQ(b, true);
+    BOOST_TEST(!cr);
+
+  }
+  {
+      UEngineStarted es {true};
+      if (es) // explicit conversion implied by the use inside an if condition
+        BOOST_TEST(true);
+      else
+        BOOST_TEST(false);
+  }
+  {
+      UEngineStarted es {true};
+      f (bool(es)); // explicit conversion required
+  }
+  {
+    //UEngineStarted es1 = true;     // error - explicit required
+
+    //UEngineStarted es2 {nullptr};  // error void* deleted
+
+    //UEngineStarted es3 {1};        // error int deleted
+    //short s;
+    //UEngineStarted es4 {s};        // error int deleted
+
+    //UEngineStarted es5 {1.0};      // error double deleted
+
+    // fixme: do we want this to fail
+    //unsigned char s;
+    //UEngineStarted es6 {s};        // error unsigned char deleted
+  }
+#if __cplusplus >= 201402L
+  {
+    using Bool = stdex::boolean;
+    assert(stdex::ordinal::size<Bool>() == 2);
+    assert(stdex::ordinal::traits<Bool>::pos(Bool{false}) == 0);
+    assert(stdex::ordinal::pos(Bool{false}) == 0);
+    assert(stdex::ordinal::pos(Bool{true}) == 1);
+    assert(stdex::ordinal::val<Bool>(0) == Bool{false});
+    assert(stdex::ordinal::val<Bool>(1) == Bool{true});
+    assert(stdex::ordinal::first<Bool>() == Bool{false});
+    assert(stdex::ordinal::last<Bool>() == Bool{true});
+    assert(stdex::ordinal::succ(Bool{false}) == Bool{true});
+    assert(stdex::ordinal::pred(Bool{true}) == Bool{false});
+  }
+#endif
   return ::boost::report_errors();
 }
 

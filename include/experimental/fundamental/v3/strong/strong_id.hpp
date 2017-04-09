@@ -9,6 +9,8 @@
 
 #include <experimental/fundamental/v3/strong/tagged.hpp>
 #include <experimental/fundamental/v3/strong/underlying_type.hpp>
+#include <experimental/ordinal.hpp>
+
 #include <type_traits>
 #include <functional>
 #include <iosfwd>
@@ -102,6 +104,12 @@ inline namespace fundamental_v3
     return os << x.underlying();
   }
 
+#if __cplusplus >= 201402L
+  namespace ordinal {
+    template <class Tag, class T>
+    struct traits<strong_id<Tag, T>> : integral_traits<T>    { };
+  }
+#endif
 }
 }
 

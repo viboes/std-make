@@ -12,7 +12,9 @@
 #include <experimental/fundamental/v3/strong/tagged.hpp>
 #include <experimental/fundamental/v3/strong/underlying_type.hpp>
 #include <experimental/type_traits.hpp>
+#include <experimental/ordinal.hpp>
 
+#include <cstdint>
 #include <limits>
 #include <functional>
 #include <iosfwd>
@@ -299,6 +301,21 @@ inline namespace fundamental_v3
     return os << x.underlying();
   }
 
+  // fixme: Should integer be a strong bool without tag?
+  using integer = strong_int<default_tag, int>;
+  using integer8_t = strong_int<default_tag, int8_t>;
+  using uinteger8_t = strong_int<default_tag, uint8_t>;
+  using integer16_t = strong_int<default_tag, int16_t>;
+  using uinteger16_t = strong_int<default_tag, uint16_t>;
+  using integer32_t = strong_int<default_tag, int32_t>;
+  using uinteger32_t = strong_int<default_tag, uint32_t>;
+  using integer64_t = strong_int<default_tag, int64_t>;
+  using uinteger64_t = strong_int<default_tag, uint64_t>;
+
+  namespace ordinal {
+    template <class Tag, class T>
+    struct traits<strong_int<Tag, T>> : integral_traits<T>    { };
+  }
 }
 }
 

@@ -21,11 +21,12 @@
 
 #include <experimental/fundamental/v3/strong/tagged.hpp>
 #include <experimental/fundamental/v3/strong/underlying_type.hpp>
-#include <iosfwd>
+#include <experimental/ordinal.hpp>
+#include <experimental/type_traits.hpp>
 
+#include <iosfwd>
 #include <limits>
 #include <functional>
-#include <experimental/type_traits.hpp>
 
 namespace std
 {
@@ -574,6 +575,11 @@ inline namespace fundamental_v3
   operator<<(std::basic_ostream<CharT, Traits>& os, const strong_counter<Domain, T>& x)
   {
     return os << x.underlying();
+  }
+
+  namespace ordinal {
+    template <class Tag, class T>
+    struct traits<strong_counter<Tag, T>> : integral_traits<T>    { };
   }
 }
 }
