@@ -16,7 +16,9 @@ namespace experimental
 {
 inline  namespace fundamental_v3
 {
+    struct default_tag {};
 
+    // fixme: should the Tag parameter be the last so that we can have a default tag?
     //! tagged wraps an underlying type providing access to the underlying value with a specific @c Tag.
     //!
     //! The main goal of the tag is to make two tagged types with different tag different types.
@@ -30,7 +32,7 @@ inline  namespace fundamental_v3
     {
       using tag_type = Tag;
       using base_type = wrapper<UT>;
-      using base_type::wrapper;
+      using base_type::base_type;
     };
 
     //! public_tagged is a tagged wrapper that provides implicit conversion to the underlying type
