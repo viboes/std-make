@@ -2,7 +2,6 @@
 // accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 //
-// Based on https://github.com/akrzemi1/explicit/blob/master/include/ak_toolkit/not_null.hpp
 // Copyright (C) 2017 Vicente J. Botet Escriba
 
 #ifndef JASEL_FUNDAMENTAL_V3_CHRONO_MODULO_HPP
