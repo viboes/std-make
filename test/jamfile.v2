@@ -255,8 +255,15 @@ test-suite optionals
     ;
 
 
+test-suite pod
+    : 
+      #[ run pod/optional/optional_pass.cpp  ]
+    ;
+
+
 test-suite strong
     : 
+      [ run strong/byte_pass.cpp  ]
       [ run strong/strong_enums_pass.cpp  ]
       [ run strong/strong_bool_pass.cpp  ]
       [ run strong/strict_bool_pass.cpp  ]
