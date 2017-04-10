@@ -318,9 +318,7 @@ inline namespace fundamental_v3
       template <class charT>
         explicit bit_mask(const charT* str,
                           typename std::basic_string<charT>::size_type n = std::basic_string<charT>::npos,
-                          charT zero = charT('0'), charT one = charT('1'))
-        : bits(str,n, zero, one)
-      {}
+                          charT zero = charT('0'), charT one = charT('1'));
       #endif
 
       //! @par Effects:
