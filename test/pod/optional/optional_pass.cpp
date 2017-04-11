@@ -10,8 +10,6 @@
 
 #include <boost/detail/lightweight_test.hpp>
 
-#if defined JASEL_HAVE_OPTIONAL
-
 namespace stdex = std::experimental;
 
 static_assert(std::is_pod<stdex::pod::optional<int>>::value, "pod::optional<int> is not a POD");
@@ -107,8 +105,6 @@ int main()
     BOOST_TEST (oi2 != stdex::pod::nullopt);
     BOOST_TEST (bool(oi2));
     BOOST_TEST (*oi2 == stdex::pod::nullopt);
-    //BOOST_TEST (!(*oi2));
-    //std::cout << typeid(**oi2).name() << std::endl;
     }
 
     {
@@ -135,10 +131,3 @@ int main()
 
   return ::boost::report_errors();
 }
-
-#else
-int main()
-{
-  return ::boost::report_errors();
-}
-#endif

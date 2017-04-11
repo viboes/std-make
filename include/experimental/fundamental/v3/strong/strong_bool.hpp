@@ -68,9 +68,13 @@ inline namespace fundamental_v3
 
       //!@{
       // boolean operators
+      // fixme do we need these && and || operators?
+      // strong_bool is explicit convertible to bool and so && and || operator will force the conversion to bool
+      // If we don't define them we need to be explicit to convert to strong_bool
+      // If we define them, we need to be explicit to convert to bool.
       // todo do we need mixed boolean operators?
-      // strong_bool is explicit convertible to bool and so && and || operator will force the conversion
-      // If yes, which would be the result
+      // If yes, which would be the result. IMO, it should be bool.
+      // If not, there will be a conversion to bool and the result is bool
       friend constexpr strong_bool operator&&(strong_bool x, strong_bool y)  noexcept { return strong_bool(x.value && y.value); }
       //friend constexpr strong_bool operator&&(bool x, strong_bool y)  noexcept { return strong_bool(x && y.value); }
       //friend constexpr strong_bool operator&&(strong_bool x, bool y)  noexcept { return strong_bool(x.value && y); }

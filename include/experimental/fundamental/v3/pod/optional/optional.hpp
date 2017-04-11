@@ -12,13 +12,17 @@
 #define JASEL_HAVE_OPTIONAL
 #endif
 #else
-// todo define nullopt, in_place, bad_optional_access
-//#define JASEL_HAVE_OPTIONAL
 #endif
 
-#if defined JASEL_HAVE_OPTIONAL || defined JASEL_DOXYGEN_INVOKED
+# include <experimental/fundamental/v2/config.hpp>
 
+#if defined JASEL_HAVE_OPTIONAL
 #include <optional>
+#else
+# include <experimental/fundamental/v3/in_place.hpp>
+# include <experimental/fundamental/v3/optional/nullopt.hpp>
+# include <experimental/fundamental/v3/optional/bad_optional_access.hpp>
+#endif
 #include <functional>
 
 namespace std
@@ -33,6 +37,7 @@ namespace pod
   using std::nullopt;
   using std::in_place_t;
   using std::in_place;
+  using std::bad_optional_access;
 
   template <class T, class Bool=bool>
   class optional
@@ -88,12 +93,12 @@ namespace pod
     {
     }
 
-    /* EXPLICIT */ constexpr optional( T&& value )
+    /* EXPLICIT */ JASEL_CXX14_CONSTEXPR optional( T&& value )
     {
       m_value = move(value);
       m_present =  true;
     }
-    /* EXPLICIT */ constexpr optional( T const& value )
+    /* EXPLICIT */ JASEL_CXX14_CONSTEXPR optional( T const& value )
     {
       m_value = value;
       m_present =  true;
@@ -113,13 +118,13 @@ namespace pod
     /* EXPLICIT */ optional( optional<U, B>&& other );
 #endif
     template< class... Args >
-    constexpr explicit optional( std::in_place_t, Args&&... args )
+    JASEL_CXX14_CONSTEXPR explicit optional( std::in_place_t, Args&&... args )
     {
       m_value = T(forward<Args>(args)...);
       m_present =  true;
     }
     template< class U, class... Args >
-    constexpr explicit optional( std::in_place_t,
+    JASEL_CXX14_CONSTEXPR explicit optional( std::in_place_t,
                                  std::initializer_list<U> ilist,
                                  Args&&... args )
     {
@@ -169,36 +174,36 @@ namespace pod
     }
 
 
-    constexpr const T* operator->() const { return &m_value; }
-    constexpr T* operator->() { return &m_value; }
-    constexpr const T& operator*() const& { return m_value; }
-    constexpr T& operator*() & { return m_value; }
-    constexpr const T&& operator*() const&& { return move(m_value); }
-    constexpr T&& operator*() && { return move(m_value); }
+    JASEL_CXX14_CONSTEXPR const T* operator->() const { return &m_value; }
+    JASEL_CXX14_CONSTEXPR T* operator->() { return &m_value; }
+    JASEL_CXX14_CONSTEXPR const T& operator*() const& { return m_value; }
+    JASEL_CXX14_CONSTEXPR T& operator*() & { return m_value; }
+    JASEL_CXX14_CONSTEXPR const T&& operator*() const&& { return move(m_value); }
+    JASEL_CXX14_CONSTEXPR T&& operator*() && { return move(m_value); }
 
     constexpr bool has_value() const { return bool(m_present); }
     constexpr explicit operator bool() const { return has_value(); }
 
-    constexpr value_type& value() &
+    JASEL_CXX14_CONSTEXPR value_type& value() &
     {
       if (has_value())
         return m_value;
       throw bad_optional_access();
     }
-    constexpr value_type const& value() const&
+    JASEL_CXX14_CONSTEXPR value_type const& value() const&
     {
       if (has_value())
         return m_value;
       throw bad_optional_access();
     }
 
-    constexpr value_type&& value() &&
+    JASEL_CXX14_CONSTEXPR value_type&& value() &&
     {
       if (has_value())
         return m_value;
       throw bad_optional_access();
     }
-    constexpr value_type const&& value() const&&
+    JASEL_CXX14_CONSTEXPR value_type const&& value() const&&
     {
       if (has_value())
         return m_value;
@@ -206,12 +211,12 @@ namespace pod
     }
 
     template< class U >
-    constexpr value_type value_or(U && default_value) const&
+    JASEL_CXX14_CONSTEXPR value_type value_or(U && default_value) const&
     {
       return has_value() ? **this : static_cast<T>(forward<U>(default_value));
     }
     template< class U >
-    constexpr value_type value_or(U && default_value) &&
+    JASEL_CXX14_CONSTEXPR value_type value_or(U && default_value) &&
     {
       return has_value() ? move(**this) : static_cast<T>(forward<U>(default_value));
     }
@@ -466,5 +471,4 @@ namespace std
   };
 }
 
-#endif // C++17
 #endif // header

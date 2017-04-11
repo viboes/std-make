@@ -16,14 +16,16 @@
 
 namespace std
 {
-namespace experimental
-{
-inline namespace fundamental_v3
-{
-  // 20.5.6, In-place construction
-  constexpr struct in_place_t{} in_place{};
+  namespace experimental
+  {
+  inline  namespace fundamental_v3
+  {
+    // 20.5.6, In-place construction
+    constexpr struct in_place_t {} in_place {};
 
-}
-}
+  }
+  }
+  using std::experimental::in_place_t;
+  using std::experimental::in_place;
 }
 #endif // header
