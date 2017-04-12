@@ -12,6 +12,7 @@
 
 namespace stdex = std::experimental;
 
+template <class T> struct show;
 static_assert(std::is_pod<stdex::pod::optional<int>>::value, "pod::optional<int> is not a POD");
 static_assert(sizeof(stdex::pod::optional<char, std::int8_t>) == 2, "sizeof(stdex::pod::optional<char, std::int8_t>)  must be 2");
 static_assert(sizeof(stdex::pod::optional<int, std::int8_t>) == 8, "sizeof(stdex::pod::optional<int, std::int8_t>)  must be 8");
@@ -68,7 +69,7 @@ int main()
       BOOST_TEST (!oi);
   }
   {
-    stdex::pod::optional<int> oi = {}; // no default constructor
+    constexpr stdex::pod::optional<int> oi = {}; // no default constructor
     BOOST_TEST (!oi);
   }
   {
@@ -123,9 +124,9 @@ int main()
     BOOST_TEST (!*oi2);
     }
 
-    stdex::pod::optional<int> oi;
-    auto ooi = stdex::pod::make_optional(oi);
-    static_assert( std::is_same<stdex::pod::optional<stdex::pod::optional<int>>, decltype(ooi)>::value, "");
+    constexpr stdex::pod::optional<int> oi = {};
+    constexpr auto ooi = stdex::pod::make_optional(oi);
+    static_assert( std::is_same<const stdex::pod::optional<stdex::pod::optional<int>>, decltype(ooi)>::value, "");
 
   }
 

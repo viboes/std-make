@@ -20,7 +20,7 @@ namespace std
     {
       struct init
       {};
-      constexpr explicit nullopt_t(init)
+      constexpr explicit nullopt_t(init) noexcept
       {}
     };
     constexpr nullopt_t nullopt

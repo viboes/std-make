@@ -4,6 +4,16 @@
 // (C) Copyright 2013,2014 Vicente J. Botet Escriba
 // (C) Copyright 2013 Pierre Talbot
 
+// todo
+// * add noexcept
+// * fix never empty implementation
+// * remove exception_ptr
+// * adapt to std::optional (c++17)
+
+// pod::expected?
+// expected_view?
+
+
 #ifndef JASEL_EXPERIMENTAL_V3_EXPECTED_EXPECTED_HPP
 #define JASEL_EXPERIMENTAL_V3_EXPECTED_EXPECTED_HPP
 

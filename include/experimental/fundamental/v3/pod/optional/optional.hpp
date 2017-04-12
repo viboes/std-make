@@ -4,6 +4,17 @@
 //
 // Copyright (C) 2017 Vicente J. Botet Escriba
 
+// todo
+// * add view::optional that contains a pointer to a class C and is parameterized by the present data member pointer and
+//    the value data member pointer
+//  template <class C, class T, T C::*Value, class Bool, Bool C::*Present>
+//  class optional_view;
+//
+// * add a optional that has the type of the mask as parameter
+// * what is common to all these classes
+//  If we make abstraction of the storage, all these classes define almost the same interface, except maybe the construction
+//
+
 #ifndef JASEL_FUNDAMENTAL_V3_POD_OPTIONAL_HPP
 #define JASEL_FUNDAMENTAL_V3_POD_OPTIONAL_HPP
 
@@ -49,14 +60,14 @@ namespace pod
     using bool_type = Bool;
     using value_type = T;
 
-    optional() = default; // optional is a POD
+    constexpr optional() = default; // optional is a POD
     //! You should use
     //! pod::optional<T> opt;
     //! opt.construct();
     //! opt = nullopt;
     //! opt.reset();
     // @par Effects Constructs the object that does not contain a value.
-    void construct()
+    void construct()  noexcept
     {
       m_present = false;
     }
@@ -71,7 +82,7 @@ namespace pod
     //! opt1.copy_assign(opt2);
     //! which will copy the value type only if m_present.
     //! Note that copy and assignement will copy all the bytes
-    void copy_assign(optional const& other)
+    void copy_assign(optional const& other) noexcept
     {
       m_present =  other.m_present;
       if (m_present)
@@ -79,7 +90,7 @@ namespace pod
         m_value = other.m_value;
       }
     }
-    void move_assign(optional && other)
+    void move_assign(optional && other) noexcept
     {
       if (m_present)
       {
@@ -88,37 +99,36 @@ namespace pod
       m_present =  other.m_present;
     }
 
-    optional(nullopt_t)
+    constexpr optional(nullopt_t) noexcept
     : m_present{false}
     {
     }
 
-    /* EXPLICIT */ JASEL_CXX14_CONSTEXPR optional( T&& value )
+    constexpr optional( T&& value ) noexcept
+        : m_present ( true ), m_value ( move(value) )
     {
-      m_value = move(value);
-      m_present =  true;
     }
-    /* EXPLICIT */ JASEL_CXX14_CONSTEXPR optional( T const& value )
+    constexpr optional( T const& value ) noexcept
+        : m_present ( true ), m_value ( value )
     {
-      m_value = value;
-      m_present =  true;
     }
 
 #if 0
     template < class U = value_type >
-    /* EXPLICIT */ constexpr optional( U&& value )
+    /* EXPLICIT */ constexpr optional( U&& value ) noexcept
     {
       m_value = move(value);
       m_present =  true;
     }
 
     template < class U, class B >
-    /* EXPLICIT */ optional( const optional<U, B>& other );
+    /* EXPLICIT */ optional( const optional<U, B>& other ) noexcept;
     template < class U, class B >
-    /* EXPLICIT */ optional( optional<U, B>&& other );
+    /* EXPLICIT */ optional( optional<U, B>&& other ) noexcept;
 #endif
+    // fixme: should inplace use {args...} instead of T(args..)
     template< class... Args >
-    JASEL_CXX14_CONSTEXPR explicit optional( std::in_place_t, Args&&... args )
+    JASEL_CXX14_CONSTEXPR explicit optional( std::in_place_t, Args&&... args ) noexcept
     {
       m_value = T(forward<Args>(args)...);
       m_present =  true;
@@ -126,7 +136,7 @@ namespace pod
     template< class U, class... Args >
     JASEL_CXX14_CONSTEXPR explicit optional( std::in_place_t,
                                  std::initializer_list<U> ilist,
-                                 Args&&... args )
+                                 Args&&... args ) noexcept
     {
       m_value = T(ilist, forward<Args>(args)...);
       m_present =  true;
@@ -154,20 +164,20 @@ namespace pod
     }
 
     template <class... Args>
-    void emplace(Args&&... args)
+    void emplace(Args&&... args) noexcept
     {
       m_value = T(std::forward<Args>(args)...);
       m_present = true;
     }
 
     template <class U, class... Args>
-    void emplace(initializer_list<U> il, Args&&... args)
+    void emplace(initializer_list<U> il, Args&&... args) noexcept
     {
       m_value = T(il, std::forward<Args>(args)...);
       m_present = true;
     }
 
-    void swap(optional<T,Bool>& rhs) noexcept(noexcept(swap(declval<Bool&>(), declval<Bool&>())) && noexcept(swap(declval<T&>(), declval<T&>())))
+    void swap(optional<T,Bool>& rhs) noexcept
     {
         swap(m_value, rhs.m_value);
         swap(m_present, rhs.m_present);
@@ -181,8 +191,8 @@ namespace pod
     JASEL_CXX14_CONSTEXPR const T&& operator*() const&& { return move(m_value); }
     JASEL_CXX14_CONSTEXPR T&& operator*() && { return move(m_value); }
 
-    constexpr bool has_value() const { return bool(m_present); }
-    constexpr explicit operator bool() const { return has_value(); }
+    constexpr bool has_value() const noexcept { return bool(m_present); }
+    constexpr explicit operator bool() const noexcept { return has_value(); }
 
     JASEL_CXX14_CONSTEXPR value_type& value() &
     {
@@ -225,7 +235,6 @@ namespace pod
     {
       m_present = false;
     }
-
 
   private:
     bool_type m_present;

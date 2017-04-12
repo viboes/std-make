@@ -5,6 +5,10 @@
 
 // <experimental/optionals.hpp>
 
+// todo
+// * add constexpr tests
+// * add noexcept tests
+
 #include <experimental/optionals.hpp>
 
 #include <boost/detail/lightweight_test.hpp>
@@ -13,7 +17,7 @@ namespace stdex = std::experimental;
 
 struct A
 {
-  A() :
+  constexpr A() :
       v(4)
   {
   }
@@ -40,7 +44,7 @@ int main()
 {
 
   {
-    stdex::optionals<A, B> opt_a_b;
+    constexpr stdex::optionals<A, B> opt_a_b;
     BOOST_TEST(! (opt_a_b.template has_value<0>()));
   }
   {
@@ -50,6 +54,17 @@ int main()
     BOOST_TEST(opt_a == stdex::nullopt);
     BOOST_TEST(stdex::nullopt == opt_a);
     stdex::optional_ref<B> opt_b = stdex::get<1>(opt_a_b);
+    BOOST_TEST(!opt_b);
+  }
+  {
+    constexpr stdex::optionals<A, B> opt_a_b;
+    //fixme
+    //constexpr
+    stdex::optional_ref<const A> opt_a = stdex::get<0>(opt_a_b);
+    BOOST_TEST(!opt_a);
+    BOOST_TEST(opt_a == stdex::nullopt);
+    BOOST_TEST(stdex::nullopt == opt_a);
+    stdex::optional_ref<const B> opt_b = stdex::get<1>(opt_a_b);
     BOOST_TEST(!opt_b);
   }
   {
