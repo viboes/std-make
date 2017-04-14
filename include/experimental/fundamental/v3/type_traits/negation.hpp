@@ -17,7 +17,6 @@ namespace experimental
 {
 inline namespace fundamental_v3
 {
-//#if __cplusplus <= 201402L
   // negation
   template<class B>
   struct negation : std::integral_constant<bool, !B::value> { };
@@ -27,7 +26,6 @@ inline namespace fundamental_v3
   //inline C++17
   constexpr bool negation_v = negation<B>::value;
 #endif
-//#endif
 
 }
 }

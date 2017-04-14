@@ -17,8 +17,6 @@ namespace experimental
 {
 inline namespace fundamental_v3
 {
-//#if __cplusplus <= 201402L
-
   // disjunction
   template<class...> struct disjunction : std::false_type { };
   template<class B1> struct disjunction<B1> : B1 { };
@@ -31,7 +29,6 @@ inline namespace fundamental_v3
   //inline C++17
   constexpr bool disjunction_v = disjunction<Bs...>::value;
 #endif
-//#endif
 
 }
 }
