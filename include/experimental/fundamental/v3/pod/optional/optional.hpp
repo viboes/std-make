@@ -20,14 +20,14 @@
 
 #if defined __clang__
 #if (__clang_major__ >= 4) && (__cplusplus > 201402L)
-#define JASEL_HAVE_OPTIONAL
+#define JASEL_STD_HAVE_OPTIONAL
 #endif
 #else
 #endif
 
 # include <experimental/fundamental/v2/config.hpp>
 
-#if defined JASEL_HAVE_OPTIONAL
+#if defined JASEL_STD_HAVE_OPTIONAL
 #include <optional>
 #else
 # include <experimental/fundamental/v3/in_place.hpp>

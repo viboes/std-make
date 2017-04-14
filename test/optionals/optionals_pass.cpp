@@ -30,13 +30,15 @@ struct B
 void f1(stdex::optionals<A, B> const& opt_a_b)
 {
   BOOST_TEST(! (opt_a_b.template has_value<0>()));
-  stdex::optional_ref<const A> opt_a = stdex::get<0>(opt_a_b);
+  //stdex::optional_ref<0, const A> opt_a = stdex::get<0>(opt_a_b);
+  auto opt_a = stdex::get<0>(opt_a_b);
   BOOST_TEST(!opt_a);
 }
 
 void f2(stdex::optionals<A, B> const& opt_a_b)
 {
-  stdex::optional_ref<const A> opt_a = stdex::get<0>(opt_a_b);
+  //stdex::optional_ref<0, const A> opt_a = stdex::get<0>(opt_a_b);
+  auto opt_a = stdex::get<0>(opt_a_b);
   BOOST_TEST(opt_a->v == 4);
 }
 
@@ -49,27 +51,32 @@ int main()
   }
   {
     stdex::optionals<A, B> opt_a_b;
-    stdex::optional_ref<A> opt_a = stdex::get<0>(opt_a_b);
+    //stdex::optional_ref<A> opt_a = stdex::get<0>(opt_a_b);
+    auto opt_a = stdex::get<0>(opt_a_b);
     BOOST_TEST(!opt_a);
     BOOST_TEST(opt_a == stdex::nullopt);
     BOOST_TEST(stdex::nullopt == opt_a);
-    stdex::optional_ref<B> opt_b = stdex::get<1>(opt_a_b);
+    //stdex::optional_ref<1,B> opt_b = stdex::get<1>(opt_a_b);
+    auto opt_b = stdex::get<1>(opt_a_b);
     BOOST_TEST(!opt_b);
   }
   {
     constexpr stdex::optionals<A, B> opt_a_b;
     //fixme
     //constexpr
-    stdex::optional_ref<const A> opt_a = stdex::get<0>(opt_a_b);
+    //stdex::optional_ref<0, const A> opt_a = stdex::get<0>(opt_a_b);
+    auto opt_a = stdex::get<0>(opt_a_b);
     BOOST_TEST(!opt_a);
     BOOST_TEST(opt_a == stdex::nullopt);
     BOOST_TEST(stdex::nullopt == opt_a);
-    stdex::optional_ref<const B> opt_b = stdex::get<1>(opt_a_b);
+    //stdex::optional_ref<1, const B> opt_b = stdex::get<1>(opt_a_b);
+    auto opt_b = stdex::get<1>(opt_a_b);
     BOOST_TEST(!opt_b);
   }
   {
     stdex::optionals<A, B> opt_a_b;
-    stdex::optional_ref<A> opt_a = stdex::get<0>(opt_a_b);
+    //stdex::optional_ref<0, A> opt_a = stdex::get<0>(opt_a_b);
+    auto opt_a = stdex::get<0>(opt_a_b);
     opt_a = A {};
     BOOST_TEST(opt_a);
     BOOST_TEST(opt_a != stdex::nullopt);
@@ -84,7 +91,8 @@ int main()
   }
   {
     stdex::optionals<int, B> opt_a_b;
-    stdex::optional_ref<int> opt_a = stdex::get<0>(opt_a_b);
+    //stdex::optional_ref<0, int> opt_a = stdex::get<0>(opt_a_b);
+    auto opt_a = stdex::get<0>(opt_a_b);
     opt_a = 1l;
     BOOST_TEST(opt_a);
     BOOST_TEST( (opt_a_b.template has_value<0>()));
@@ -111,7 +119,8 @@ int main()
   }
   {
     stdex::optionals<A, B> opts1;
-    stdex::optional_ref<A> opt_a = stdex::get<0>(opts1);
+    //stdex::optional_ref<0, A> opt_a = stdex::get<0>(opts1);
+    auto opt_a = stdex::get<0>(opts1);
     BOOST_TEST(! (opts1.template has_value<0>()));
     opt_a = A {};
     BOOST_TEST( (opts1.template has_value<0>()));
@@ -134,4 +143,3 @@ int main()
   }
   return ::boost::report_errors();
 }
-

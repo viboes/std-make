@@ -9,6 +9,7 @@
 
 #include <tuple>
 #include <experimental/optional.hpp>
+#include <type_traits>
 # include <experimental/fundamental/v2/config.hpp>
 
 // todo
@@ -57,7 +58,7 @@ namespace detail {
 
 namespace detail {
 
-template <class T>
+template <size_t I, class T>
 struct optional_ref_fact;
 
 }
@@ -66,9 +67,14 @@ struct optional_ref_fact;
 optional_ref is a proxy to a pseudo optional<T> included in optionals<Ts...>
 It behaves like an optional<T> and it is explicitly convertible to optional<T>.
 */
-template <class T>
+
+template <size_t Index, class T>
 class optional_ref {
 public:
+  using index_type = size_t;
+  static constexpr index_type index = Index;
+  using mask_type = size_t;
+  using value_type = const T;
 
   optional_ref(optional_ref const&) = default;
   optional_ref(optional_ref &&) = default;
@@ -230,27 +236,31 @@ public:
     }
 private:
 
-    friend detail::optional_ref_fact<T>;
-    constexpr optional_ref(size_t i, size_t& m, T& r) noexcept
-        : index(i), mask(&m), ref(&r) {}
+    friend detail::optional_ref_fact<Index, T>;
+    constexpr optional_ref(mask_type& m, T& r) noexcept
+        : mask(&m), ref(&r) {}
 
     void set() noexcept
     {
         *mask |= (1 << index);
     }
 
-    size_t index;
-    size_t* mask;
+    mask_type* mask;
     T* ref;
 };
 
-template <class T>
-class optional_ref<const T> {
+template <size_t Index, class T>
+class optional_ref<Index, const T> {
 public:
-  //optional_ref(optional_ref const&) = default;
-  //optional_ref(optional_ref &&) = default;
-  //optional_ref& operator=(optional_ref const&) = default;
-  //optional_ref& operator=(optional_ref &&) = default;
+    using index_type = size_t;
+    static constexpr index_type index = Index;
+    using mask_type = size_t;
+    using value_type = const T;
+
+    //optional_ref(optional_ref const&) = default;
+    //optional_ref(optional_ref &&) = default;
+    //optional_ref& operator=(optional_ref const&) = default;
+    //optional_ref& operator=(optional_ref &&) = default;
 
     constexpr bool has_value() const noexcept
     {
@@ -364,31 +374,29 @@ public:
     }
 private:
 
-    friend detail::optional_ref_fact<T>;
-    constexpr optional_ref(size_t i, size_t const& m, T const& r) noexcept
-        : index(i), mask(&m), ref(&r) {}
+    friend detail::optional_ref_fact<Index, T>;
+    constexpr optional_ref(mask_type const& m, T const& r) noexcept
+        : mask(&m), ref(&r) {}
 
-
-    size_t index;
-    size_t const* mask;
+    mask_type const* mask;
     T const* ref;
 };
 
-template <class T>
-void swap(optional_ref<T>& x, optional_ref<T>& y)
+template <size_t I, class T>
+void swap(optional_ref<I,T>& x, optional_ref<I,T>& y)
 {
     return x.swap(y);
 }
 namespace detail {
-template <class T>
+template <size_t I, class T>
 struct optional_ref_fact {
-    static constexpr optional_ref<T> make(size_t index, size_t& mask, T& ref) noexcept
+    static constexpr optional_ref<I,T> make(size_t& mask, T& ref) noexcept
     {
-        return optional_ref<T>(index, mask, ref);
+        return optional_ref<I, T>(mask, ref);
     };
-    static constexpr optional_ref<const T> make(size_t index, size_t const& mask, T const& ref) noexcept
+    static constexpr optional_ref<I, const T> make(size_t const& mask, T const& ref) noexcept
     {
-        return optional_ref<const T>(index, mask, ref);
+        return optional_ref<I, const T>(mask, ref);
     };
 };
 }
@@ -398,12 +406,10 @@ optionals<Ts..> behaves similarly to tuple<optional<Ts>...>
 get<T> returns a optional_ref<T> that behaves as a proxy.
 */
 template <class ...Ts>
-class optionals: detail::optional_ref_fact<Ts>...
+class optionals
 {
     using Types = tuple<Ts...>;
-
 public:
-
     constexpr optionals() noexcept
       : mask(0)  {}
 
@@ -480,23 +486,23 @@ public:
     }
 
     template <size_t I>
-    JASEL_CXX14_CONSTEXPR optional_ref<typename tuple_element<I, Types>::type> get_opt() noexcept
+    JASEL_CXX14_CONSTEXPR optional_ref<I, typename tuple_element<I, Types>::type> get_opt() noexcept
     {
         using T = typename tuple_element<I, Types>::type;
-        return this->detail::optional_ref_fact<T>::make(I, mask, get_ref<I>());
+        return detail::optional_ref_fact<I, T>::make(mask, get_ref<I>());
     }
     template <size_t I>
-    constexpr optional_ref<const typename tuple_element<I, Types>::type> get_opt() const noexcept
+    constexpr optional_ref<I, const typename tuple_element<I, Types>::type> get_opt() const noexcept
     {
         using T = typename tuple_element<I, Types>::type;
-        return this->detail::optional_ref_fact<T>::make(I, mask, get_ref<I>());
+        return detail::optional_ref_fact<I, T>::make(mask, get_ref<I>());
     }
 
     template <class T>
-    JASEL_CXX14_CONSTEXPR optional_ref<T> get_opt() noexcept
+    JASEL_CXX14_CONSTEXPR optional_ref<detail::index<Types, T>::value, T> get_opt() noexcept
     {        return get_opt<detail::index<Types, T>::value>();    }
     template <class T>
-    constexpr optional_ref<const T> get_opt() const noexcept
+    constexpr optional_ref<detail::index<Types, T>::value, const T> get_opt() const noexcept
     {        return get_opt<detail::index<Types, T>::value>();    }
 
     template <class T>
@@ -505,11 +511,16 @@ public:
         this->template get_opt<T>() = v;
         return *this;
     }
-
     template <class T>
     void reset()
     {
-        this->template get<T>().reset();
+        this->template get_opt<T>().reset();
+    }
+
+    template <size_t I>
+    void reset()
+    {
+        this->template get_opt<I>().reset();
     }
 
 private:
@@ -547,4 +558,5 @@ void swap(optionals<Ts...>& x, optionals<Ts...>& y)
 
 }} // experimental/fundamentals_v3/
 } // std
+
 #endif // header
