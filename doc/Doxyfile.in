@@ -17,23 +17,37 @@ QUIET                   = YES
 # Resources
 OUTPUT_DIRECTORY        =
 INPUT                   = \
-                          @Jasel_SOURCE_DIR@/include/experimental/fundamental/v3/swappable \
-                          @Jasel_SOURCE_DIR@/include/experimental/fundamental/v3/nullable \
-                          @Jasel_SOURCE_DIR@/include/experimental/fundamental/v3/ordinal \
-                          @Jasel_SOURCE_DIR@/include/experimental/fundamental/v3/strong \
+                          @Jasel_SOURCE_DIR@/include/experimental/fundamental/v3/applicative \
                           @Jasel_SOURCE_DIR@/include/experimental/fundamental/v3/bits \
-                          @Jasel_SOURCE_DIR@/include/experimental/fundamental/v3/chrono
+                          @Jasel_SOURCE_DIR@/include/experimental/fundamental/v3/chrono \
+                          @Jasel_SOURCE_DIR@/include/experimental/fundamental/v3/factory \
+                          @Jasel_SOURCE_DIR@/include/experimental/fundamental/v3/functional \
+                          @Jasel_SOURCE_DIR@/include/experimental/fundamental/v3/functor \
+                          @Jasel_SOURCE_DIR@/include/experimental/fundamental/v3/monad \
+                          @Jasel_SOURCE_DIR@/include/experimental/fundamental/v3/nullable \
+                          @Jasel_SOURCE_DIR@/include/experimental/fundamental/v3/optional \
+                          @Jasel_SOURCE_DIR@/include/experimental/fundamental/v3/ordinal \
+                          @Jasel_SOURCE_DIR@/include/experimental/fundamental/v3/pod \
+                          @Jasel_SOURCE_DIR@/include/experimental/fundamental/v3/product_type \
+                          @Jasel_SOURCE_DIR@/include/experimental/fundamental/v3/scoped \
+                          @Jasel_SOURCE_DIR@/include/experimental/fundamental/v3/std \
+                          @Jasel_SOURCE_DIR@/include/experimental/fundamental/v3/strong \
+                          @Jasel_SOURCE_DIR@/include/experimental/fundamental/v3/sum_type \
+                          @Jasel_SOURCE_DIR@/include/experimental/fundamental/v3/swappable \
+                          @Jasel_SOURCE_DIR@/include/experimental/fundamental/v3/type_traits \
+                          @Jasel_SOURCE_DIR@/include/experimental/fundamental/v3/utility
+
+#                          @Jasel_SOURCE_DIR@/include/experimental/fundamental/v3/optionals \
+#                          @Jasel_SOURCE_DIR@/include/experimental/fundamental/v3/expected
 
                           #@Jasel_SOURCE_DIR@/doc/tutorial.hpp
 
 
 FILE_PATTERNS           = *.hpp *.md
 RECURSIVE               = YES
-EXCLUDE                 = @Jasel_SOURCE_DIR@/include/experimental/fundamental/v3/optionals/optionals.hpp \
-                          @Jasel_SOURCE_DIR@/include/experimental/fundamental/v3/expected/expected.hpp \
-                          @Jasel_SOURCE_DIR@/include/experimental/fundamental/v3/std/std_tuple.hpp \
-                          @Jasel_SOURCE_DIR@/include/experimental/fundamental/v2
-                          
+EXCLUDE                 =
+                          # @Jasel_SOURCE_DIR@/include/experimental/fundamental/v2
+
 EXCLUDE_PATTERNS        = *.erb*
 EXAMPLE_PATH            = @Jasel_SOURCE_DIR@/test
 EXAMPLE_RECURSIVE       = YES

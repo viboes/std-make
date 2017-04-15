@@ -29,17 +29,19 @@ namespace experimental
 inline namespace fundamental_v3
 {
 
-  // narrow_cast(): a searchable way to do narrowing casts of values
+  /// a searchable way to do narrowing casts of values
   template <class T, class U>
   inline constexpr T narrow_cast(U&& u) noexcept
   {
       return static_cast<T>(forward<U>(u));
   }
 
+  /// narrowing_error exception
   struct narrowing_error : public exception
   {
   };
 
+#if ! defined JASEL_DOXYGEN_INVOKED
   namespace details
   {
       template <class T, class U>
@@ -48,8 +50,9 @@ inline namespace fundamental_v3
       {
       };
   }
+#endif
 
-  // narrow() : a checked version of narrow_cast() that throws if the cast changed the value
+  /// a checked version of narrow_cast() that throws if the cast changed the value
   template <class T, class U>
   inline T narrow(U u)
   {

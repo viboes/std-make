@@ -21,7 +21,7 @@ namespace experimental
 {
 inline  namespace fundamental_v3
 {
-#if defined JASEL_HAVE_ENUM_CLASS_CONSTRUCTION_FROM_UNDERLYING_TYPE
+#if defined JASEL_HAVE_ENUM_CLASS_CONSTRUCTION_FROM_UNDERLYING_TYPE || defined JASEL_DOXYGEN_INVOKED
     enum class byte : unsigned char {};
 
     template <class IntegerType= unsigned int, typename = enable_if<is_integral<IntegerType>::value>>

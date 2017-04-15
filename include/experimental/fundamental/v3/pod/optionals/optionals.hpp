@@ -46,6 +46,7 @@ inline namespace fundamental_v3
 {
 namespace pod
 {
+#if !  defined JASEL_DOXYGEN_INVOKED
   // fixme: this can be shared. Move it to meta
   // this works only if unique
 namespace detail
@@ -56,14 +57,12 @@ namespace detail
   struct index<std::tuple<T, Ts...>, T> { enum {value = 0}; };
   template <class T, class U, class ...Ts>
   struct index<std::tuple<T, Ts...>, U> { enum {value = 1 + index<std::tuple<Ts...>, U>::value}; };
-}
 
-namespace detail {
-
-template <size_t I, class T>
-struct optional_ref_fact;
+  template <size_t I, class T>
+  struct optional_ref_fact;
 
 }
+#endif
 
 /**
 optional_ref is a proxy to a pseudo optional<T> included in optionals<Ts...>
@@ -104,7 +103,6 @@ public:
         reset();
         return *this;
     }
-
 
     constexpr bool has_value() const noexcept
     {
@@ -239,7 +237,9 @@ public:
     }
 private:
 
+#if !  defined JASEL_DOXYGEN_INVOKED
     friend detail::optional_ref_fact<Index, T>;
+#endif
     constexpr optional_ref(mask_type& m, T& r) noexcept
         : mask(&m), ref(&r) {}
 
@@ -376,7 +376,9 @@ public:
     }
 private:
 
+#if !  defined JASEL_DOXYGEN_INVOKED
     friend detail::optional_ref_fact<Index, T>;
+#endif
     constexpr optional_ref(mask_type const& m, T const& r) noexcept
         : mask(&m), ref(&r) {}
 

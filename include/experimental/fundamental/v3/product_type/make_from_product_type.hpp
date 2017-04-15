@@ -34,10 +34,10 @@ namespace product_type
   } // namespace product_type_detail
 #endif
   /**
-   * Constructs a type T using the product type elements as forward parameters to the constructor
-   * .
+   * Constructs a type T using the product type elements as forward parameters to the constructor.
+   *
    * @par Requires:
-   *  The parameter `ProductType` must be a model of /ProductType/.
+   *  The parameter `ProductType` must be a model of ProductType.
    *  The parameter T must be CopyConstructible from the ProductType element types.
    */
   template <class T, class ProductType

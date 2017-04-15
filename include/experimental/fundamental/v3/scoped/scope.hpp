@@ -21,11 +21,10 @@ namespace std
   {
     inline namespace fundamental_v3
     {
-
+#if ! defined JASEL_DOXYGEN_INVOKED
       // new policy-based exception proof design by Eric Niebler
       namespace detail
       {
-
         struct _on_exit_policy
         {
           bool execute = true;
@@ -78,6 +77,8 @@ namespace std
         };
 #endif
       }
+#endif
+
       template<class EF, class Policy = detail::_on_exit_policy>
       class basic_scope_exit;
 
@@ -85,7 +86,7 @@ namespace std
       //PS: however, we need a real class for template argument deduction
       //PS: and a deduction guide, because the ctors are partially instantiated
 
-#if defined JASEL_HAS_CONSTRUCTOR_GUIDES
+#if defined JASEL_HAS_CONSTRUCTOR_GUIDES || defined JASEL_DOXYGEN_INVOKED
       template<class EF>
       struct scope_exit : basic_scope_exit<EF, detail::_on_exit_policy>
       {
@@ -99,8 +100,8 @@ namespace std
       using scope_exit = basic_scope_exit<EF, detail::_on_exit_policy>;
 #endif
 
-#if defined JASEL_STD_HAS_UNCAUGHT_EXCEPTIONS
-#if defined JASEL_HAS_CONSTRUCTOR_GUIDES
+#if defined JASEL_STD_HAS_UNCAUGHT_EXCEPTIONS  || defined JASEL_DOXYGEN_INVOKED
+#if defined JASEL_HAS_CONSTRUCTOR_GUIDES || defined JASEL_DOXYGEN_INVOKED
       template<class EF>
       struct scope_fail : basic_scope_exit<EF, detail::_on_fail_policy>
       {
@@ -114,7 +115,7 @@ namespace std
 #endif
 
 
-#if defined JASEL_HAS_CONSTRUCTOR_GUIDES
+#if defined JASEL_HAS_CONSTRUCTOR_GUIDES || defined JASEL_DOXYGEN_INVOKED
       template<class EF>
       struct scope_success : basic_scope_exit<EF, detail::_on_success_policy>
       {
@@ -128,6 +129,7 @@ namespace std
 #endif
 #endif
 
+#if ! defined JASEL_DOXYGEN_INVOKED
       namespace detail
       {
         // DETAIL:
@@ -141,9 +143,8 @@ namespace std
           void release() noexcept
           {}
         };
-
       }
-
+#endif
       // Requires: EF is Callable
       // Requires: EF is nothrow MoveConstructible OR CopyConstructible
       template<class EF, class Policy /*= _on_exit_policy*/>
@@ -198,7 +199,7 @@ namespace std
         return detail::_make_guard<detail::_on_exit_policy>(forward<EF>(ef));
       }
 
-#if defined JASEL_STD_HAS_UNCAUGHT_EXCEPTIONS
+#if defined JASEL_STD_HAS_UNCAUGHT_EXCEPTIONS || defined JASEL_DOXYGEN_INVOKED
       template<class EF>
       auto make_scope_fail(EF &&ef)
       noexcept(is_nothrow_constructible<decay_t<EF>, EF>::value)
@@ -215,7 +216,7 @@ namespace std
 #endif
     }}}
 
-#if defined JASEL_HAS_CONSTRUCTOR_GUIDES
+#if defined JASEL_HAS_CONSTRUCTOR_GUIDES && ! defined JASEL_DOXYGEN_INVOKED
 #define JASEL_SCOPE_EXIT(G,F) \
     scope_exit G(F);
 #if defined JASEL_STD_HAS_UNCAUGHT_EXCEPTIONS

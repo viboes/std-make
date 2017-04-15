@@ -19,6 +19,7 @@ namespace std
   {
   inline namespace fundamental_v3
   {
+#if ! defined JASEL_DOXYGEN_INVOKED
     namespace detail
     {
       // todo: move to detail
@@ -31,6 +32,7 @@ namespace std
       >::type
       {};
     }
+#endif
 
     template <typename T>
     class lvalue_ref

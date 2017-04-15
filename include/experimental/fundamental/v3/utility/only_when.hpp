@@ -18,27 +18,28 @@ namespace std
 {
   namespace experimental
   {
-inline  namespace fundamental_v3
+  inline  namespace fundamental_v3
   {
+    template <typename T, template <typename, typename> class TypePred>
+    class only_when
+    {
+      T _val;
+
+    public:
+      template <typename U, JASEL_ENABLE_IF(TypePred<T, U>::value)>
+      only_when (U&& v) : _val(forward<U>(v))
+      {}
+
+      template <typename U, JASEL_ENABLE_IF(!TypePred<T, U>::value)>
+      only_when (U&&) = delete;
+
+      T get() const
+      { return _val;}
+    };
+
+#if ! defined JASEL_DOXYGEN_INVOKED
     namespace detail
     {
-      template <typename T, template <typename, typename> class TypePred>
-      class only_when
-      {
-        T _val;
-
-      public:
-        template <typename U, JASEL_ENABLE_IF(TypePred<T, U>::value)>
-        only_when (U&& v) : _val(forward<U>(v))
-        {}
-
-        template <typename U, JASEL_ENABLE_IF(!TypePred<T, U>::value)>
-        only_when (U&&) = delete;
-
-        T get() const
-        { return _val;}
-      };
-
       template <typename, typename T>
       using _is_signed_integral = typename conditional<
       is_signed<T>::value && is_integral<T>::value,
@@ -84,8 +85,7 @@ inline  namespace fundamental_v3
       >::type
       {};
     }
-
-    using detail::only_when; // this prevents inadvertent ADL
+#endif
     using only_int = only_when<int, detail::_is_int_convertible_but_no_float>;
     template <typename T>
     using only_lvalue = only_when<T&, detail::_is_lvalue_ref_or_wrapper2>;
