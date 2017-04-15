@@ -43,7 +43,7 @@ inline namespace fundamental_v3
   namespace details
   {
       template <class T, class U>
-      struct is_same_signedness
+      struct _is_same_signedness
           : public integral_constant<bool, is_signed<T>::value == is_signed<U>::value>
       {
       };
@@ -55,7 +55,7 @@ inline namespace fundamental_v3
   {
       T t = narrow_cast<T>(u);
       if (static_cast<U>(t) != u) throw narrowing_error();
-      if (!details::is_same_signedness<T, U>::value && ((t < T{}) != (u < U{})))
+      if (!details::_is_same_signedness<T, U>::value && ((t < T{}) != (u < U{})))
           throw narrowing_error();
       return t;
   }

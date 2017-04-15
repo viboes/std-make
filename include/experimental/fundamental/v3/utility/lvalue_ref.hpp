@@ -22,7 +22,7 @@ inline namespace fundamental_v3
   namespace detail
   {
   template <typename T, typename U>
-  struct is_lvalue_ref_or_wrapper : conditional<
+  struct _is_lvalue_ref_or_wrapper : conditional<
     is_convertible<U&&, T&>::value && !is_convertible<U&&, T&&>::value,
     true_type,
     false_type
@@ -37,10 +37,10 @@ inline namespace fundamental_v3
 
   public:
 
-    template <typename U, typename enable_if<detail::is_lvalue_ref_or_wrapper<T, U>::value, bool>::type = true>
+    template <typename U, typename enable_if<detail::_is_lvalue_ref_or_wrapper<T, U>::value, bool>::type = true>
       lvalue_ref(U&& ref) : _ref(forward<U>(ref)) {}
 
-    template <typename U, typename enable_if<!detail::is_lvalue_ref_or_wrapper<T, U>::value, bool>::type = true>
+    template <typename U, typename enable_if<!detail::_is_lvalue_ref_or_wrapper<T, U>::value, bool>::type = true>
       lvalue_ref(U&& ref) = delete;
 
     T& get() const { return _ref; }

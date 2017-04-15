@@ -25,14 +25,14 @@ inline  namespace fundamental_v3
   template <typename Ptr>
   class not_null
   {
-      Ptr ptr;
+      Ptr _ptr;
   public:
       static_assert(is_assignable<Ptr&, nullptr_t>::value, "T cannot be assigned nullptr.");
 
       // todo add conversion from convertible to Ptr
-      explicit not_null(Ptr p) : ptr(move(p))
+      explicit not_null(Ptr p) : _ptr(move(p))
       {
-        //Expects(ptr != nullptr);
+        //Expects(_ptr != nullptr);
       }
       not_null(not_null const&) = default;
       not_null& operator=(not_null const&) = default;
@@ -40,33 +40,33 @@ inline  namespace fundamental_v3
 
       not_null(nullptr_t) = delete;
 
-      Ptr& underlying() { return ptr; }
-      Ptr const& underlying() const { return ptr; }
+      Ptr& underlying() { return _ptr; }
+      Ptr const& underlying() const { return _ptr; }
 
-      auto operator*() const JASEL_DECLTYPE_RETURN_NOEXCEPT(*ptr)
-      auto operator*()  JASEL_DECLTYPE_RETURN_NOEXCEPT(*ptr)
-      auto operator->() const JASEL_DECLTYPE_RETURN_NOEXCEPT(::std::addressof(*ptr))
-      auto operator->() JASEL_DECLTYPE_RETURN_NOEXCEPT(::std::addressof(*ptr))
+      auto operator*() const JASEL_DECLTYPE_RETURN_NOEXCEPT(*_ptr)
+      auto operator*()  JASEL_DECLTYPE_RETURN_NOEXCEPT(*_ptr)
+      auto operator->() const JASEL_DECLTYPE_RETURN_NOEXCEPT(::std::addressof(*_ptr))
+      auto operator->() JASEL_DECLTYPE_RETURN_NOEXCEPT(::std::addressof(*_ptr))
   };
 
   template <typename T>
   class not_null<T*>
   {
-      T* ptr;
+      T* _ptr;
   public:
-      explicit not_null(T* p) : ptr(p)
+      explicit not_null(T* p) : _ptr(p)
       {
-        //Expects(ptr != nullptr);
+        //Expects(_ptr != nullptr);
       }
-      not_null(T& r) : ptr(&r) {}
+      not_null(T& r) : _ptr(&r) {}
       explicit not_null(nullptr_t) = delete;
-      T*& underlying() { return ptr; }
-      T* const& underlying() const { return ptr; }
+      T*& underlying() { return _ptr; }
+      T* const& underlying() const { return _ptr; }
 
-      auto operator*() const JASEL_DECLTYPE_RETURN_NOEXCEPT(*ptr)
-      auto operator*()  JASEL_DECLTYPE_RETURN_NOEXCEPT(*ptr)
-      auto operator->() const JASEL_DECLTYPE_RETURN_NOEXCEPT(::std::addressof(*ptr))
-      auto operator->() JASEL_DECLTYPE_RETURN_NOEXCEPT(::std::addressof(*ptr))
+      auto operator*() const JASEL_DECLTYPE_RETURN_NOEXCEPT(*_ptr)
+      auto operator*()  JASEL_DECLTYPE_RETURN_NOEXCEPT(*_ptr)
+      auto operator->() const JASEL_DECLTYPE_RETURN_NOEXCEPT(::std::addressof(*_ptr))
+      auto operator->() JASEL_DECLTYPE_RETURN_NOEXCEPT(::std::addressof(*_ptr))
   };
 
   template <typename Ptr>
