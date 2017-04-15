@@ -186,6 +186,7 @@ namespace pod
 
     JASEL_CXX14_CONSTEXPR const T* operator->() const { return &m_value; }
     JASEL_CXX14_CONSTEXPR T* operator->() { return &m_value; }
+
     JASEL_CXX14_CONSTEXPR const T& operator*() const& { return m_value; }
     JASEL_CXX14_CONSTEXPR T& operator*() & { return m_value; }
     JASEL_CXX14_CONSTEXPR const T&& operator*() const&& { return move(m_value); }

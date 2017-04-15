@@ -57,20 +57,26 @@ It behaves like an optional<T> and it is explicitly convertible to optional<T>.
 template <size_t Index, class T>
 class optional_ref {
 public:
-  using index_type = size_t;
-  static constexpr index_type index = Index;
-  using mask_type = size_t;
-  using value_type = const T;
+    using index_type = size_t;
+    static constexpr index_type index = Index;
+    using mask_type = size_t;
+    using value_type = const T;
 
-  optional_ref(optional_ref const&) = default;
-  optional_ref(optional_ref &&) = default;
-  optional_ref& operator=(optional_ref const&) = default;
-  optional_ref& operator=(optional_ref &&) = default;
+    optional_ref(optional_ref const&) = default;
+    optional_ref(optional_ref &&) = default;
+    optional_ref& operator=(optional_ref const&) = default;
+    optional_ref& operator=(optional_ref &&) = default;
 
-  //optional_ref(optional_ref<U> const&); // ???
-  //optional_ref(optional_ref<U> &&); // ???
-  //optional_ref& operator=(optional_ref<U> const&); // ???
-  //optional_ref& operator=(optional_ref<U> &&); // ???
+    //optional_ref(optional_ref<U> const&); // ???
+    //optional_ref(optional_ref<U> &&); // ???
+    //optional_ref& operator=(optional_ref<U> const&); // ???
+    //optional_ref& operator=(optional_ref<U> &&); // ???
+
+    optional_ref& operator=(nullopt_t) noexcept
+    {
+      reset();
+      return *this;
+    }
 
     template< class U = T >
     optional_ref& operator=(U && v)
@@ -79,14 +85,25 @@ public:
         set();
         return *this;
     }
+
+    // fixme: should inplace use {args...} instead of T(args..)
+    template <class... Args>
+    void emplace(Args&&... args) noexcept
+    {
+      *ref = T(std::forward<Args>(args)...);
+      set();
+    }
+
+    template <class U, class... Args>
+    void emplace(initializer_list<U> il, Args&&... args) noexcept
+    {
+      *ref = T(il, std::forward<Args>(args)...);
+      set();
+    }
+
     void reset() noexcept
     {
         *mask &= ~(1 << index);
-    }
-    optional_ref& operator=(nullopt_t) noexcept
-    {
-        reset();
-        return *this;
     }
 
     constexpr bool has_value() const noexcept
@@ -215,7 +232,6 @@ public:
 
     void swap(optional_ref& rhs) noexcept
     {
-            std::swap(index, rhs.index);
             std::swap(mask, rhs.mask);
             std::swap(ref, rhs.ref);
     }
@@ -279,7 +295,7 @@ public:
         return v;
     }
 
-    explicit JASEL_CXX14_CONSTEXPR operator optional<T>() const
+    explicit JASEL_CXX14_CONSTEXPR operator optional<const T>() const
     {
       if (has_value())
         return *get();
@@ -287,73 +303,72 @@ public:
     }
 
     friend constexpr bool operator == (const optional_ref & x, const optional_ref & y) noexcept
-    { return optional<T>(x) == optional<T>(y); }
+    { return optional<const T>(x) == optional<const T>(y); }
     friend constexpr bool operator != (const optional_ref & x, const optional_ref & y) noexcept
-    { return optional<T>(x) != optional<T>(y); }
+    { return optional<const T>(x) != optional<const T>(y); }
     friend constexpr bool operator < (const optional_ref & x, const optional_ref & y) noexcept
-    { return optional<T>(x) < optional<T>(y); }
+    { return optional<const T>(x) < optional<const T>(y); }
     friend constexpr bool operator <= (const optional_ref & x, const optional_ref & y) noexcept
-    { return optional<T>(x) <= optional<T>(y); }
+    { return optional<const T>(x) <= optional<const T>(y); }
     friend constexpr bool operator > (const optional_ref & x, const optional_ref & y) noexcept
-    { return optional<T>(x) > optional<T>(y); }
+    { return optional<const T>(x) > optional<const T>(y); }
     friend constexpr bool operator >= (const optional_ref & x, const optional_ref & y) noexcept
-    { return optional<T>(x) >= optional<T>(y); }
+    { return optional<const T>(x) >= optional<const T>(y); }
 
     friend constexpr bool operator == (const optional_ref & x, nullopt_t y) noexcept
-    { return optional<T>(x) == y; }
+    { return optional<const T>(x) == y; }
     friend constexpr bool operator != (const optional_ref & x, nullopt_t y) noexcept
-    { return optional<T>(x) != y; }
+    { return optional<const T>(x) != y; }
     friend constexpr bool operator < (const optional_ref & x, nullopt_t y) noexcept
-    { return optional<T>(x) < y; }
+    { return optional<const T>(x) < y; }
     friend constexpr bool operator <= (const optional_ref & x, nullopt_t y) noexcept
-    { return optional<T>(x) <= y; }
+    { return optional<const T>(x) <= y; }
     friend constexpr bool operator > (const optional_ref & x, nullopt_t y) noexcept
-    { return optional<T>(x) > y; }
+    { return optional<const T>(x) > y; }
     friend constexpr bool operator >= (const optional_ref & x, nullopt_t y) noexcept
-    { return optional<T>(x) >= y; }
+    { return optional<const T>(x) >= y; }
 
     friend constexpr bool operator == (nullopt_t x, const optional_ref & y) noexcept
-    { return x == optional<T>(y); }
+    { return x == optional<const T>(y); }
     friend constexpr bool operator != (nullopt_t x, const optional_ref & y) noexcept
-    { return x != optional<T>(y); }
+    { return x != optional<const T>(y); }
     friend constexpr bool operator < (nullopt_t x, const optional_ref & y) noexcept
-    { return x < optional<T>(y); }
+    { return x < optional<const T>(y); }
     friend constexpr bool operator <= (nullopt_t x, const optional_ref & y) noexcept
-    { return x <= optional<T>(y); }
+    { return x <= optional<const T>(y); }
     friend constexpr bool operator > (nullopt_t x, const optional_ref & y) noexcept
-    { return x > optional<T>(y); }
+    { return x > optional<const T>(y); }
     friend constexpr bool operator >= (nullopt_t x, const optional_ref & y) noexcept
-    { return x >= optional<T>(y); }
+    { return x >= optional<const T>(y); }
 
     friend constexpr bool operator == (const optional_ref & x, const T&  y) noexcept
-    { return optional<T>(x) == y; }
+    { return optional<const T>(x) == y; }
     friend constexpr bool operator != (const optional_ref & x, const T&  y) noexcept
-    { return optional<T>(x) != y; }
+    { return optional<const T>(x) != y; }
     friend constexpr bool operator < (const optional_ref & x, const T&  y) noexcept
-    { return optional<T>(x) < y; }
+    { return optional<const T>(x) < y; }
     friend constexpr bool operator <= (const optional_ref & x, const T&  y) noexcept
-    { return optional<T>(x) <= y; }
+    { return optional<const T>(x) <= y; }
     friend constexpr bool operator > (const optional_ref & x, const T&  y) noexcept
-    { return optional<T>(x) > y; }
+    { return optional<const T>(x) > y; }
     friend constexpr bool operator >= (const optional_ref & x, const T&  y) noexcept
-    { return optional<T>(x) >= y; }
+    { return optional<const T>(x) >= y; }
 
     friend constexpr bool operator == (const T&  x, const optional_ref & y) noexcept
-    { return x == optional<T>(y); }
+    { return x == optional<const T>(y); }
     friend constexpr bool operator != (const T&  x, const optional_ref & y) noexcept
-    { return x != optional<T>(y); }
+    { return x != optional<const T>(y); }
     friend constexpr bool operator < (const T&  x, const optional_ref & y) noexcept
-    { return x < optional<T>(y); }
+    { return x < optional<const T>(y); }
     friend constexpr bool operator <= (const T&  x, const optional_ref & y) noexcept
-    { return x <= optional<T>(y); }
+    { return x <= optional<const T>(y); }
     friend constexpr bool operator > (const T&  x, const optional_ref & y) noexcept
-    { return x > optional<T>(y); }
+    { return x > optional<const T>(y); }
     friend constexpr bool operator >= (const T&  x, const optional_ref & y) noexcept
-    { return x >= optional<T>(y); }
+    { return x >= optional<const T>(y); }
 
     void swap(optional_ref& rhs) noexcept
     {
-            std::swap(index, rhs.index);
             std::swap(mask, rhs.mask);
             std::swap(ref, rhs.ref);
     }
@@ -418,13 +433,6 @@ public:
     constexpr bool has_value() const noexcept
     {
         return has_value<detail::index<Types, T>::value>();
-    }
-
-    // fixme: shouldn't this private?
-    template <size_t I>
-    void set_mask()
-    {
-        mask |= (1 << I);
     }
 
     /// @pre has_value<I>
