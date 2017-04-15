@@ -261,6 +261,10 @@ test-suite pod
       [ run pod/optionals/pod_optionals_pass.cpp  ]
     ;
 
+test-suite scoped
+    : 
+      [ run scoped/scope_pass.cpp  ]
+    ;
 
 test-suite strong
     : 
