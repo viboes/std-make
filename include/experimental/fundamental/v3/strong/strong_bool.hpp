@@ -205,7 +205,7 @@ inline namespace fundamental_v3
     {
       using size_type = size_t;
       using size = integral_constant<size_type, 2>;
-      static strong_bool<Tag, T> val(size_type p) { return strong_bool<Tag, T>{static_cast<bool>(p)}; }
+      static strong_bool<Tag, T> val(size_type p) { return strong_bool<Tag, T>{static_cast<T>(p)}; }
 
       static size_type pos(strong_bool<Tag, T> u)  { return size_type{u.underlying()}; };
     };

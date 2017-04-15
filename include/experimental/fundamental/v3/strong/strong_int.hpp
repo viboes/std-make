@@ -46,6 +46,7 @@ inline namespace fundamental_v3
   </code>
   */
 
+  //fixme Wgy private_tagged?
   template <class Tag, class UT>
   struct strong_int final : private_tagged<Tag, UT>
   {
@@ -54,26 +55,38 @@ inline namespace fundamental_v3
       using base_type = private_tagged<Tag, UT>;
       using base_type::base_type;
 
-      // todo add conversions from other strong_int
+      /// @par Effects Constructs an uninitialized strong_int
       strong_int() = default;
       strong_int(strong_int const&) = default;
 
+      /// @par Effects Implicitly constructs a strong_int from another strong_int with implicit convertible underlying types
+      /// @par Throws: Whatever the underlying copy can throw.
+      /// @par Remarks: This overload participate in overload resolution only if
+      ///   is_constructible_v<UT, UT2 const&> && is_convertible_v<UT2 const&, UT>
       template <class UT2
+#if ! defined JASEL_DOXYGEN_INVOKED
       //fixme  error: constructor cannot be redeclared when using , typename = typename enable_if<>::type
         , enable_if_t<
             is_constructible_v<UT, UT2 const&> &&
             is_convertible_v<UT2 const&, UT>
             , bool> = false
+#endif
       >
       strong_int(strong_int<Tag, UT2> const& other)
         : base_type(other.underlying())
       {}
 
+      /// @par Effects Explicitly constructs a strong_int from another strong_int with explicit convertible underlying types
+      /// @par Throws: Whatever the underlying copy can throw.
+      /// @par Remarks: This overload participate in overload resolution only if
+      ///   is_constructible_v<UT, UT2 const&> && ! is_convertible_v<UT2 const&, UT>
       template <class UT2
+#if ! defined JASEL_DOXYGEN_INVOKED
         ,  typename = enable_if_t<
             is_constructible_v<UT, UT2 const&> &&
             ! is_convertible_v<UT2 const&, UT>
           >
+#endif
       >
       explicit strong_int(strong_int<Tag, UT2> const& other)
         : base_type(other.underlying())
@@ -97,11 +110,9 @@ inline namespace fundamental_v3
       { return strong_int(this->value--); }
 
       //  Multiplicative operators
-      // fixme: Should the * parameter be int?
       constexpr strong_int& operator*=(strong_int y)  noexcept
       { this->value *= y.underlying(); return *this; }
 
-      // fixme: Should the / parameter be int? Or both as in std::chrono::duration
       constexpr strong_int& operator/=(strong_int y)  noexcept
       { this->value /= y.underlying(); return *this; }
 
@@ -127,6 +138,7 @@ inline namespace fundamental_v3
 
   };
 
+  /// @par Returns A strong int with the tag `Tag` wrapping the value `x`
   template <class Tag, class R>
   constexpr strong_int<Tag, R> make_strong_int(R x)
   {
@@ -301,7 +313,7 @@ inline namespace fundamental_v3
     return os << x.underlying();
   }
 
-  // fixme: Should integer be a strong bool without tag?
+  // fixme: Should integer be a strong int without tag?
   using integer = strong_int<default_tag, int>;
   using integer8_t = strong_int<default_tag, int8_t>;
   using uinteger8_t = strong_int<default_tag, uint8_t>;
@@ -313,16 +325,19 @@ inline namespace fundamental_v3
   using uinteger64_t = strong_int<default_tag, uint64_t>;
 
   namespace ordinal {
+    /// A strong_int is an ordinal type if the underlying type is an ordinal type
     template <class Tag, class T>
-    struct traits<strong_int<Tag, T>> : integral_traits<T>    { };
+    struct traits<strong_int<Tag, T>> : wrapped_ordinal_traits<strong_int<Tag, T>>    { };
   }
 }
 }
 
+  /// Hash specialization forwarding to the hash of underlying type
   template <class Tag, class UT>
   struct hash<experimental::strong_int<Tag,UT>>
     : experimental::wrapped_hash<experimental::strong_int<Tag, UT>> {};
 
+  /// numeric_limits specialization forwarding to the numeric_limits of underlying type
   template <class Tag, class UT>
   struct numeric_limits<experimental::strong_int<Tag,UT>> : numeric_limits<UT> {  };
 

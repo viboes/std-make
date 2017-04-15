@@ -211,6 +211,7 @@ inline namespace fundamental_v3
   }
 
   namespace ordinal {
+    /// A strong_bounded_int is an ordinal type having the bounds Low..High
     template <class Tag, class T, T Low, T High >
     struct traits<strong_bounded_int<Tag, T, Low, High>>
     {
@@ -225,10 +226,12 @@ inline namespace fundamental_v3
 }
 }
 
+  /// Hash specialization forwarding to the hash of underlying type
   template <class Tag, class UT, UT Low, UT High>
   struct hash<experimental::strong_bounded_int<Tag,UT,Low,High>>
     : experimental::wrapped_hash<experimental::strong_bounded_int<Tag,UT,Low,High>> {};
 
+  /// numeric_limits specialization forwarding to the numeric_limits of underlying type
   template <class Tag, class UT, UT Low, UT High>
   struct numeric_limits<experimental::strong_bounded_int<Tag,UT,Low,High>> : numeric_limits<UT> {
       using T = experimental::strong_bounded_int<Tag,UT,Low,High>;

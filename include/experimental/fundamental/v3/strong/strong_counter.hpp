@@ -37,11 +37,8 @@ inline namespace fundamental_v3
 
   /**
   `strong_counter` is a strongly type tagged by the tag @c Domain that wraps an integral type @c UT and behaves like an @c UT
-  The main goal is to be able to define strong integers that don't mix between them.
-  No conversion to the underlying integer type is provided.
-
-  Note that this is not a safe int, it just forbids the conversions between
-  different strong integers types.
+  The main goal is to be able to define strong counters that are able to control how the mix between them.
+  No conversion to the underlying type is provided.
 
   Example
   <code>
@@ -53,6 +50,14 @@ inline namespace fundamental_v3
 
   </code>
   */
+
+  // fixme Wondering if strong_counter should be renamed to strong_quantity, as the representation can be a floating point
+  // fixme Should this class be final or not
+  // Note that strong_counter is not by itself a quantity unit, for that we need a Domain that manage units.
+  // This started as a dimensionless strong counter with a Tag
+  // Then I moved to a Domain that is able to manage with dimensionless and dimension-1. However the Tag is mixed on the Domain.
+  // Wondering if we need a Tag parameter for strongly types and one a Dimension parameter to manage with the conversions.
+  // Or maybe we should have quantity<Unit, Rep> and then strong_quantity<Tag, Quantity>.
 
   //! The domain_values type defines three common representation: zero, min, max.
   //! The zero, min, and max functions in strong_counter forward their work to these functions.
@@ -215,18 +220,11 @@ inline namespace fundamental_v3
   }
 #endif
 
-  // fixme Wondering if strong_counter should be renamed to strong_quantity, as the representation can be a floating point
-  // fixme Should this class be final or not
-  // Note that strong_counter is not by itself a quantity unit, for that we need a Domain that manage units.
-  // This started as a dimensionless strong counter with a Tag
-  // Then I moved to a Domain that is able to manage with dimensionless and dimension-1. However the Tag is mixed on the Domain.
-  // Wondering if we need a Tag parameter for strongly types and one a Dimension parameter to manage with the conversions.
-  // Or maybe we should have quantity<Unit, Rep> and then strong_quantity<Tag, Quantity>.
+  /// strong_counter is a strong number with restricted arithmetic (based on chrono::duration arithmetic).
+  /// In the same way we can count seconds, we can count oranges or cars.
   template <class Domain, class UT>
   struct strong_counter final : private_tagged<Domain, UT>
   {
-      // fixme do we need this restriction. While we could need it for counters
-      //static_assert(is_integral<UT>::value, "UT must be integral");
       using domain = Domain;
       using rep = UT;
 
@@ -234,7 +232,11 @@ inline namespace fundamental_v3
       using base_type::base_type;
 
       // constructors
+
+      //! @par Effects
+      //!   Construct an uninitialized strong_counter
       strong_counter() = default;
+
       strong_counter(strong_counter<Domain, UT> const&) = default;
       strong_counter(strong_counter<Domain, UT> &&) = default;
 
@@ -550,7 +552,7 @@ inline namespace fundamental_v3
   //! @param is the input stream
   //! @param x the \c strong_int
   //! @par Returns:<br> \c is.
-
+  // fixme: Shouldn't this depend on Domain?
   template <class CharT, class Traits, class Domain, class T >
   std::basic_istream<CharT, Traits>&
   operator>>(std::basic_istream<CharT, Traits>& is, strong_counter<Domain, T>& x)
@@ -569,7 +571,7 @@ inline namespace fundamental_v3
   //! @code
   //! os << x.undelying()
   //! @endcode
-
+  // fixme: Shouldn't this depend on Domain?
   template <class CharT, class Traits, class Domain, class T >
   std::basic_ostream<CharT, Traits>&
   operator<<(std::basic_ostream<CharT, Traits>& os, const strong_counter<Domain, T>& x)
@@ -578,8 +580,9 @@ inline namespace fundamental_v3
   }
 
   namespace ordinal {
+    /// A strong_counter is an ordinal type if the underlying type is an ordinal type
     template <class Tag, class T>
-    struct traits<strong_counter<Tag, T>> : integral_traits<T>    { };
+    struct traits<strong_counter<Tag, T>> : wrapped_ordinal_traits<strong_counter<Tag, T>>    { };
   }
 }
 }
@@ -596,16 +599,17 @@ inline namespace fundamental_v3
           >;
   };
 
-  //! hash specialization
+  /// Hash specialization forwarding to the hash of underlying type
   template <class Domain, class UT>
   struct hash<experimental::strong_counter<Domain,UT>>
     : experimental::wrapped_hash<experimental::strong_counter<Domain, UT>> {};
 
-  // fixme Is strong_counter eally a numeric type?
+#if 0
+  // fixme Is strong_counter really a numeric type?
   //! numeric_limits specialization
   template <class Domain, class UT>
   struct numeric_limits<experimental::strong_counter<Domain,UT>> : numeric_limits<UT> {  };
-
+#endif
 }
 #endif
 #endif // header

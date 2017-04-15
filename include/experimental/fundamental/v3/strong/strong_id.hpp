@@ -25,7 +25,7 @@ inline namespace fundamental_v3
   /**
   `strong_id` is a strongly type that wraps a regular type and behaves like a `Regular` type
   The main goal is to be able to define strong identifiers that don't mix between them.
-  No conversion to the underlying integer type is provided.
+  No conversion to the underlying type is provided as a strong_id is not an underlying type.
 
   Example
   <code>
@@ -40,12 +40,13 @@ inline namespace fundamental_v3
   template <class Tag, class UT = int>
   struct strong_id final : private_tagged<Tag, UT>
   {
+      //static_assert(is_integral<UT>, "The underlying of a strong_id must be an integral type");
+
       using base_type = private_tagged<Tag, UT>;
       using base_type::base_type;
 
       // copy constructor/assignment default
       constexpr strong_id() noexcept = default;
-
 
       //!@{
       //! relational operators
@@ -107,12 +108,13 @@ inline namespace fundamental_v3
 #if __cplusplus >= 201402L
   namespace ordinal {
     template <class Tag, class T>
-    struct traits<strong_id<Tag, T>> : integral_traits<T>    { };
+    struct traits<strong_id<Tag, T>> : wrapped_ordinal_traits<strong_id<Tag, T>>    { };
   }
 #endif
 }
 }
 
+/// Hash specialization forwarding to the hash of underlying type
   template <class Tag, class UT>
   struct hash<experimental::strong_id<Tag, UT>>
     : experimental::wrapped_hash<experimental::strong_id<Tag, UT>> {};
