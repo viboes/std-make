@@ -45,6 +45,42 @@ function(jasel_add_tests module dir)
     endforeach()
 endfunction()
 
+
+function(jasel_add_standalone_example example source)
+    # We compile each unit test with the possible combinations of options
+    # found in boost/jasel/detail/config.hpp.
+    #
+    # For lack of a better solution, we currently create different targets
+    # for each configuration.
+    # xxx  - JASEL_XXX
+    add_custom_target(${example})
+
+    macro(helper suffix)
+        add_executable(${example}-${suffix} ${source})
+        add_test(example.${example}-${suffix} ${example}-${suffix})
+        add_dependencies(${example} ${example}-${suffix})
+
+
+        foreach(def IN ITEMS ${ARGN})
+            set_property(TARGET ${example}-${suffix}
+                         APPEND PROPERTY COMPILE_DEFINITIONS ${def})
+        endforeach()
+    endmacro()
+    helper(normal)
+    #helper(xxx-yyyy JASEL_XXX                             JASEL_YYY)
+endfunction()
+
+function(jasel_add_examples module dir)
+    if(NOT TARGET ${module})
+        jasel_add_module(${module})
+    endif()
+
+    foreach(example IN ITEMS ${ARGN})
+        jasel_add_standalone_example(${module}.${example} ../example/${dir}/${example}.cpp)
+        add_dependencies(${module} ${module}.${example})
+    endforeach()
+endfunction()
+
 #=============================================================================
 # Test suites
 #=============================================================================
@@ -142,6 +178,13 @@ jasel_add_tests(
 )
 
 jasel_add_tests(
+    pod.optional pod/optional
+    ######
+    optional_pass
+)
+
+
+jasel_add_tests(
     range range
     ######
     range_c_array_pass
@@ -149,8 +192,15 @@ jasel_add_tests(
 )
 
 jasel_add_tests(
+    scoped scoped
+    ######
+    scope_pass
+)
+
+jasel_add_tests(
     strong strong
     ######
+    byte_pass
     strict_bool_pass
     strong_bool_pass
     strong_bounded_int_pass
@@ -158,6 +208,19 @@ jasel_add_tests(
     strong_enums_pass
     strong_id_pass
     strong_ints_pass
+)
+
+jasel_add_examples(
+    strong strong/
+    ######
+    duration_pass
+)
+
+jasel_add_examples(
+    chrono.frames chrono/
+    ######
+    frame_types_pass
+    day_types_pass
 )
 
 jasel_add_tests(
@@ -176,5 +239,12 @@ jasel_add_tests(
 )
 
 
-
+jasel_add_tests(
+    utility utility
+    ######
+    lvalue_ref_pass
+    out_param_pass
+    only_when_pass
+    not_null_pass
+)
 
