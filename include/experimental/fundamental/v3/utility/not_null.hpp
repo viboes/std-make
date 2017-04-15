@@ -3,10 +3,13 @@
 // http://www.boost.org/LICENSE_1_0.txt)
 //
 // Based on https://github.com/akrzemi1/explicit/blob/master/include/ak_toolkit/not_null.hpp
+// See https://github.com/akrzemi1/explicit/blob/master/doc/not_null.md
+// Note this not_null is different from gsl::not_null.
+// Copyright (C) 2016 Andrzej Krzemienski.
 // Copyright (C) 2017 Vicente J. Botet Escriba
 
-#ifndef JASEL_FUNDAMENTAL_V3_STRONG_NOT_NULL_HPP
-#define JASEL_FUNDAMENTAL_V3_STRONG_NOT_NULL_HPP
+#ifndef JASEL_FUNDAMENTAL_V3_UTILITY_NOT_NULL_HPP
+#define JASEL_FUNDAMENTAL_V3_UTILITY_NOT_NULL_HPP
 
 #include <experimental/fundamental/v2/config.hpp>
 

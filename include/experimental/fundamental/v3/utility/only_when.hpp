@@ -3,10 +3,12 @@
 // http://www.boost.org/LICENSE_1_0.txt)
 //
 // Based on https://github.com/akrzemi1/explicit/blob/master/include/ak_toolkit/only_when.hpp
+// See https://github.com/akrzemi1/explicit/blob/master/doc/only_when.md
+// Copyright (C) 2016 Andrzej Krzemienski.
 // Copyright (C) 2017 Vicente J. Botet Escriba
 
-#ifndef JASEL_FUNDAMENTAL_V3_STRONG_ONLY_WHEN_HPP
-#define JASEL_FUNDAMENTAL_V3_STRONG_ONLY_WHEN_HPP
+#ifndef JASEL_FUNDAMENTAL_V3_UTILITY_ONLY_WHEN_HPP
+#define JASEL_FUNDAMENTAL_V3_UTILITY_ONLY_WHEN_HPP
 
 #include <utility>
 #include <experimental/fundamental/v2/config.hpp>
