@@ -279,7 +279,13 @@ test-suite strong
       [ run ../example/strong/duration_pass.cpp  ]
     ;
 
-
+test-suite utility
+    : 
+      [ run utility/lvalue_ref_pass.cpp  ]
+      [ run utility/out_param_pass.cpp  ]
+      [ run utility/only_when_pass.cpp  ]
+      [ run utility/not_null_pass.cpp  ]
+    ;
 
 explicit fix ;
 test-suite fix

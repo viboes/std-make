@@ -15,39 +15,45 @@
 
 namespace std
 {
-namespace experimental
-{
-inline namespace fundamental_v3
-{
-  namespace detail
+  namespace experimental
   {
-  template <typename T, typename U>
-  struct _is_lvalue_ref_or_wrapper : conditional<
-    is_convertible<U&&, T&>::value && !is_convertible<U&&, T&&>::value,
-    true_type,
-    false_type
-  >::type {};
-  }
-
-  template <typename T>
-  class lvalue_ref
+  inline namespace fundamental_v3
   {
-    static_assert(!is_reference<T>::value, "lvalue_ref<T> can only be instantiated with a non-reference type");
-    T& _ref;
+    namespace detail
+    {
+      // todo: move to detail
 
-  public:
+      template <typename T, typename U>
+      struct _is_lvalue_ref_or_wrapper : conditional<
+      is_convertible<U&&, T&>::value && !is_convertible<U&&, T&&>::value,
+      true_type,
+      false_type
+      >::type
+      {};
+    }
 
-    template <typename U, typename enable_if<detail::_is_lvalue_ref_or_wrapper<T, U>::value, bool>::type = true>
-      lvalue_ref(U&& ref) : _ref(forward<U>(ref)) {}
+    template <typename T>
+    class lvalue_ref
+    {
+      static_assert(!is_reference<T>::value, "lvalue_ref<T> can only be instantiated with a non-reference type");
+      T& _ref;
 
-    template <typename U, typename enable_if<!detail::_is_lvalue_ref_or_wrapper<T, U>::value, bool>::type = true>
+    public:
+
+      template <typename U, typename enable_if<detail::_is_lvalue_ref_or_wrapper<T, U>::value, bool>::type = true>
+      lvalue_ref(U&& ref) : _ref(forward<U>(ref))
+      {}
+
+      template <typename U, typename enable_if<!detail::_is_lvalue_ref_or_wrapper<T, U>::value, bool>::type = true>
       lvalue_ref(U&& ref) = delete;
 
-    T& get() const { return _ref; }
-    operator T& () const { return _ref; }
-  };
+      T& get() const
+      { return _ref;}
+      operator T& () const
+      { return _ref;}
+    };
 
-
-}}}
+  }}
+}
 
 #endif // header

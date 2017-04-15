@@ -34,11 +34,9 @@ inline  namespace fundamental_v3
       {
         //Expects(_ptr != nullptr);
       }
-      not_null(not_null const&) = default;
-      not_null& operator=(not_null const&) = default;
       // todo add conversion from not_null<U>
 
-      not_null(nullptr_t) = delete;
+      explicit not_null(nullptr_t) = delete;
 
       Ptr& underlying() { return _ptr; }
       Ptr const& underlying() const { return _ptr; }
