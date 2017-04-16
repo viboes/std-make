@@ -8,7 +8,6 @@
 #define JASEL_EXPERIMENTAL_TEST_ORDINAL_BOOL_HPP
 
 #include <experimental/ordinal.hpp>
-#if __cplusplus >= 201402L
 
 enum class Bool : bool { False, True };
 
@@ -35,7 +34,8 @@ inline namespace fundamental_v3
     {
       using size_type = size_t;
       using size = integral_constant<size_type, 2>;
-      static constexpr
+      static
+      BOOST_CXX14_CONSTEXPR
       Bool val(size_type pos)  {
         switch (pos) {
         case 0: return Bool::False;
@@ -43,7 +43,8 @@ inline namespace fundamental_v3
         }
       }
 
-      static constexpr
+      static
+      BOOST_CXX14_CONSTEXPR
       size_t pos(Bool val)    {
         switch (val) {
         case Bool::False: return 0;
@@ -55,5 +56,4 @@ inline namespace fundamental_v3
 }}
 }
 
-#endif
 #endif

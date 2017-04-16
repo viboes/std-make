@@ -7,8 +7,6 @@
 #ifndef JASEL_EXPERIMENTAL_ORDINAL_RANGE_HPP
 #define JASEL_EXPERIMENTAL_ORDINAL_RANGE_HPP
 
-#if __cplusplus >= 201402L
 #include <experimental/fundamental/v3/ordinal/containers/ordinal_range.hpp>
-#endif
 
 #endif // header

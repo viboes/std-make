@@ -105,12 +105,10 @@ inline namespace fundamental_v3
     return os << x.underlying();
   }
 
-#if __cplusplus >= 201402L
   namespace ordinal {
     template <class Tag, class T>
     struct traits<strong_id<Tag, T>> : wrapped_ordinal_traits<strong_id<Tag, T>>    { };
   }
-#endif
 }
 }
 

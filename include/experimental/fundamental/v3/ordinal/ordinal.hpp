@@ -114,38 +114,43 @@ namespace meta {
   ///   the number of elements of the `Ordinal` type.
   template <class O>
   constexpr
-  decltype(auto) size() noexcept { return meta::size<O>::value; }
+  auto size() noexcept -> decltype(meta::size<O>::value)
+  { return meta::size<O>::value; }
 
   template <class Ord>
-  constexpr decltype(auto) val(size_t pos) noexcept
+  constexpr auto val(size_t pos) noexcept -> decltype(traits<Ord>::val(pos))
   {
       //JASEL_EXPECTS(valid_position<Ord>(pos));
       return traits<Ord>::val(pos);
   }
 
   template <class Ord>
-  constexpr decltype(auto) pos(Ord&& val) noexcept
+  constexpr auto pos(Ord&& val) noexcept -> decltype(traits<decay_t<Ord>>::pos(std::forward<Ord>(val)))
   {
       //JASEL_EXPECTS(unique<Ord>());
       return traits<decay_t<Ord>>::pos(std::forward<Ord>(val));
   }
 
   template <class Ord>
-  constexpr decltype(auto) first() noexcept {
+  constexpr auto first() noexcept -> decltype(ordinal::val<Ord>(0))
+  {
     return ordinal::val<Ord>(0);
   }
 
   template <class Ord>
-  constexpr decltype(auto) last() noexcept {
+  constexpr auto last() noexcept -> decltype(ordinal::val<Ord>(ordinal::meta::size<Ord>::value-1))
+  {
     return ordinal::val<Ord>(ordinal::meta::size<Ord>::value-1);
   }
 
   template <class Ord>
-  constexpr decltype(auto) succ(Ord&& val) noexcept {
+  constexpr auto succ(Ord&& val) noexcept -> decltype(ordinal::val<Ord>(ordinal::pos(val)+1))
+  {
     return ordinal::val<Ord>(ordinal::pos(val)+1) ;
   }
   template <class Ord>
-  constexpr decltype(auto) pred(Ord&& val) noexcept {
+  constexpr auto pred(Ord&& val) noexcept -> decltype(ordinal::val<Ord>(ordinal::pos(val)-1))
+  {
     return ordinal::val<Ord>(ordinal::pos(val)-1) ;
   }
 

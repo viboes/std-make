@@ -198,7 +198,6 @@ inline namespace fundamental_v3
     return os << bool(x.underlying());
   }
 
-#if __cplusplus >= 201402L
   namespace ordinal {
     template <class Tag, class T>
     struct traits<strict_bool<Tag, T>>
@@ -210,7 +209,6 @@ inline namespace fundamental_v3
       static size_type pos(strict_bool<Tag, T> u)  { return size_type{u.underlying()}; };
     };
   }
-#endif
 
 #if 0
   // fixme: Should boolean be a strong bool without tag?

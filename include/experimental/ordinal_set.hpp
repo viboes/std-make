@@ -7,8 +7,6 @@
 #ifndef JASEL_EXPERIMENTAL_ORDINAL_SET_HPP
 #define JASEL_EXPERIMENTAL_ORDINAL_SET_HPP
 
-#if __cplusplus >= 201402L
 #include <experimental/fundamental/v3/ordinal/containers/ordinal_set.hpp>
-#endif
 
 #endif // header

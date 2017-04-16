@@ -107,7 +107,6 @@ inline  namespace fundamental_v3
       }
     };
 
-#if __cplusplus >= 201402L
     template <class W
     , class = typename enable_if<is_ordinal<typename W::underlying_t>{}>::type
     >
@@ -121,7 +120,6 @@ inline  namespace fundamental_v3
 
       static size_type pos(W w)  { return size_type{w.underlying()}; };
     };
-#endif
 }
 }
 }

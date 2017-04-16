@@ -226,16 +226,23 @@ inline namespace fundamental_v3
         void swap (ordinal_array<T,O>& y) // noexcept(std::is_nothrow_swappable_v<T>)
         {
             for (size_type i = 0; i < static_size; ++i)
+#if __cplusplus >= 201402L
               swappable::swap(elems[i],y.elems[i]);
+#else
+            {
+              using std::swap;
+              swap(elems[i],y.elems[i]);
+            }
+#endif
         }
 
         //! direct access to data (read-only)
         //! \n<b>Returns:</b> elems.
-        constexpr const T* data() const {
+        JASEL_CXX14_CONSTEXPR const T* data() const {
           return elems;
         }
         //! \n<b>Returns:</b> elems.
-        constexpr T* data() {
+        JASEL_CXX14_CONSTEXPR T* data() {
           return elems;
         }
 

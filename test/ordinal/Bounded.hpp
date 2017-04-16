@@ -8,7 +8,6 @@
 #define JASEL_EXPERIMENTAL_TEST_ORDINAL_BOUNDED_HPP
 
 #include <experimental/ordinal.hpp>
-#if __cplusplus >= 201402L
 
 template <std::intmax_t F, std::intmax_t L, class T>
 struct Bounded {
@@ -48,5 +47,4 @@ inline namespace fundamental_v3
 }}
 }
 
-#endif
 #endif

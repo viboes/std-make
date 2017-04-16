@@ -13,7 +13,6 @@
 
 int main()
 {
-#if __cplusplus >= 201402L
 
   namespace stde = std::experimental;
   using Indx = Bounded<1,4,unsigned char>;
@@ -194,6 +193,5 @@ int main()
     auto x = ~os[Indx{1}];
     BOOST_TEST( ! x );
   }
-#endif
   return ::boost::report_errors();
 }
