@@ -11,8 +11,6 @@
  * We need a specific Domain for durations to state how durations convert between them.
  */
 
-#if __cplusplus >= 201402L
-
 #include <experimental/strong_counter.hpp>
 #include <experimental/type_traits.hpp>
 #include <ratio>
@@ -231,6 +229,3 @@ int main()
     return ::boost::report_errors();
 }
 
-#else
-int main() { return 0; }
-#endif

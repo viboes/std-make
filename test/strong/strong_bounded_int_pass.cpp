@@ -10,7 +10,6 @@
 
 #include <boost/detail/lightweight_test.hpp>
 
-#if __cplusplus >= 201402L
 namespace stdex = std::experimental;
 
 using Frame = stdex::strong_bounded_int<class FrameTag, int, -1023, 1023>;
@@ -20,10 +19,9 @@ using Slot = stdex::strong_bounded_int<class SlotTag, int, 0, 6>;
 Frame add(Frame x, Frame y){
   return x+y;
 }
-#endif
+
 int main()
 {
-#if __cplusplus >= 201402L
 
   {
       //Frame fn1 = 1;     // error - explicit required
@@ -265,7 +263,6 @@ int main()
     assert(stdex::ordinal::succ(Bounded{2}) == Bounded{3});
     assert(stdex::ordinal::pred(Bounded{3}) == Bounded{2});
   }
-#endif
   return ::boost::report_errors();
 }
 

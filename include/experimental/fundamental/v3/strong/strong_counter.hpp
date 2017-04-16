@@ -17,7 +17,6 @@
  *
  * In addition to the underlying() function it provides the count() member function.
  */
-#if __cplusplus >= 201402L || defined JASEL_DOXYGEN_INVOKED
 
 #include <experimental/fundamental/v3/strong/tagged.hpp>
 #include <experimental/fundamental/v3/strong/underlying_type.hpp>
@@ -304,32 +303,32 @@ inline namespace fundamental_v3
       // additive operators
       friend constexpr strong_counter operator+(strong_counter x)  noexcept
           { return x; }
-      constexpr strong_counter& operator+=(strong_counter y)  noexcept
+      JASEL_MUTABLE_CONSTEXPR strong_counter& operator+=(strong_counter y)  noexcept
           { this->value += y.count(); return *this; }
-      constexpr strong_counter operator++()  noexcept
+      JASEL_MUTABLE_CONSTEXPR strong_counter operator++()  noexcept
           { return strong_counter(++this->value); }
-      constexpr strong_counter operator++(int)  noexcept
+      JASEL_MUTABLE_CONSTEXPR strong_counter operator++(int)  noexcept
           { return strong_counter(this->value++); }
 
       friend constexpr strong_counter operator-(strong_counter x)  noexcept
           { return strong_counter(-x.count()); }
-      constexpr strong_counter& operator-=(strong_counter y)  noexcept
+      JASEL_MUTABLE_CONSTEXPR strong_counter& operator-=(strong_counter y)  noexcept
           { this->value -= y.count(); return *this; }
-      constexpr strong_counter operator--()  noexcept
+      JASEL_MUTABLE_CONSTEXPR strong_counter operator--()  noexcept
           { return strong_counter(--this->value); }
-      constexpr strong_counter operator--(int)  noexcept
+      JASEL_MUTABLE_CONSTEXPR strong_counter operator--(int)  noexcept
           { return strong_counter(this->value--); }
 
       //  Multiplicative operators
-      constexpr strong_counter& operator*=(UT y)  noexcept
+      JASEL_MUTABLE_CONSTEXPR strong_counter& operator*=(UT y)  noexcept
           { this->value *= y; return *this; }
 
-      constexpr strong_counter& operator/=(UT y)  noexcept
+      JASEL_MUTABLE_CONSTEXPR strong_counter& operator/=(UT y)  noexcept
           { this->value /= y; return *this; }
 
-      constexpr strong_counter& operator%=(strong_counter y)  noexcept
+      JASEL_MUTABLE_CONSTEXPR strong_counter& operator%=(strong_counter y)  noexcept
           { this->value %= y.count(); return *this; }
-      constexpr strong_counter& operator%=(UT y)  noexcept
+      JASEL_MUTABLE_CONSTEXPR strong_counter& operator%=(UT y)  noexcept
           { this->value %= y; return *this; }
 
       // relational operators
@@ -518,7 +517,7 @@ inline namespace fundamental_v3
   }
 
   template <class D, class R
-  , class = std::enable_if_t<
+  , class = enable_if_t<
       strong_counter<D, R>::min() < strong_counter<D, R>::zero()>>
   constexpr strong_counter<D, R> abs(strong_counter<D, R> d)
   {
@@ -610,5 +609,4 @@ inline namespace fundamental_v3
   struct numeric_limits<experimental::strong_counter<Domain,UT>> : numeric_limits<UT> {  };
 #endif
 }
-#endif
 #endif // header

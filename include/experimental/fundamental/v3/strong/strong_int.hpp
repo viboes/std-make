@@ -7,8 +7,6 @@
 #ifndef JASEL_FUNDAMENTAL_V3_STRONG_STRONG_INT_HPP
 #define JASEL_FUNDAMENTAL_V3_STRONG_STRONG_INT_HPP
 
-#if __cplusplus >= 201402L || defined JASEL_DOXYGEN_INVOKED
-
 #include <experimental/fundamental/v3/strong/tagged.hpp>
 #include <experimental/fundamental/v3/strong/underlying_type.hpp>
 #include <experimental/type_traits.hpp>
@@ -67,8 +65,8 @@ inline namespace fundamental_v3
 #if ! defined JASEL_DOXYGEN_INVOKED
       //fixme  error: constructor cannot be redeclared when using , typename = typename enable_if<>::type
         , enable_if_t<
-            is_constructible_v<UT, UT2 const&> &&
-            is_convertible_v<UT2 const&, UT>
+            is_constructible<UT, UT2 const&>::value &&
+            is_convertible<UT2 const&, UT>::value
             , bool> = false
 #endif
       >
@@ -83,8 +81,8 @@ inline namespace fundamental_v3
       template <class UT2
 #if ! defined JASEL_DOXYGEN_INVOKED
         ,  typename = enable_if_t<
-            is_constructible_v<UT, UT2 const&> &&
-            ! is_convertible_v<UT2 const&, UT>
+            is_constructible<UT, UT2 const&>::value &&
+            ! is_convertible<UT2 const&, UT>::value
           >
 #endif
       >
@@ -95,35 +93,35 @@ inline namespace fundamental_v3
       // todo add assignment?
 
       // additive operators
-      constexpr strong_int& operator+=(strong_int y)  noexcept
+      JASEL_MUTABLE_CONSTEXPR strong_int& operator+=(strong_int y)  noexcept
       { this->value += y.underlying(); return *this; }
-      constexpr strong_int operator++()  noexcept
+      JASEL_MUTABLE_CONSTEXPR strong_int operator++()  noexcept
       { return strong_int(++this->value); }
-      constexpr strong_int operator++(int)  noexcept
+      JASEL_MUTABLE_CONSTEXPR strong_int operator++(int)  noexcept
       { return strong_int(this->value++); }
 
-      constexpr strong_int& operator-=(strong_int y)  noexcept
+      JASEL_MUTABLE_CONSTEXPR strong_int& operator-=(strong_int y)  noexcept
       { this->value -= y.underlying(); return *this; }
-      constexpr strong_int operator--()  noexcept
+      JASEL_MUTABLE_CONSTEXPR strong_int operator--()  noexcept
       { return strong_int(--this->value); }
-      constexpr strong_int operator--(int)  noexcept
+      JASEL_MUTABLE_CONSTEXPR strong_int operator--(int)  noexcept
       { return strong_int(this->value--); }
 
       //  Multiplicative operators
-      constexpr strong_int& operator*=(strong_int y)  noexcept
+      JASEL_MUTABLE_CONSTEXPR strong_int& operator*=(strong_int y)  noexcept
       { this->value *= y.underlying(); return *this; }
 
-      constexpr strong_int& operator/=(strong_int y)  noexcept
+      JASEL_MUTABLE_CONSTEXPR strong_int& operator/=(strong_int y)  noexcept
       { this->value /= y.underlying(); return *this; }
 
-      constexpr strong_int& operator%=(strong_int y)  noexcept
+      JASEL_MUTABLE_CONSTEXPR strong_int& operator%=(strong_int y)  noexcept
       { this->value %= y.underlying(); return *this; }
 
-      constexpr strong_int& operator&=(strong_int y)  noexcept
+      JASEL_MUTABLE_CONSTEXPR strong_int& operator&=(strong_int y)  noexcept
       { this->value &= y.underlying(); return *this; }
-      constexpr strong_int& operator|=(strong_int y)  noexcept
+      JASEL_MUTABLE_CONSTEXPR strong_int& operator|=(strong_int y)  noexcept
       { this->value |= y.underlying(); return *this; }
-      constexpr strong_int& operator^=(strong_int y)  noexcept
+      JASEL_MUTABLE_CONSTEXPR strong_int& operator^=(strong_int y)  noexcept
       { this->value ^= y.underlying(); return *this; }
 
       // fixme: do we want the Bitwise logic operators for an integer? if strong_int should be a replacement of any int, yes.
@@ -131,9 +129,9 @@ inline namespace fundamental_v3
 
       // Bitwise logic operators
       // fixme: Should the << parameter be int?
-      constexpr strong_int& operator<<=(strong_int y)  noexcept
+      JASEL_MUTABLE_CONSTEXPR strong_int& operator<<=(strong_int y)  noexcept
       { this->value <<= y.value; return *this; }
-      constexpr strong_int& operator>>=(strong_int y)  noexcept
+      JASEL_MUTABLE_CONSTEXPR strong_int& operator>>=(strong_int y)  noexcept
       { this->value >>= y.value; return *this; }
 
   };
@@ -343,5 +341,4 @@ inline namespace fundamental_v3
 
 
 }
-#endif
 #endif // header

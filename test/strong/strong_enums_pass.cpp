@@ -5,8 +5,6 @@
 
 // <experimental/strong_enums.hpp>
 
-#if __cplusplus >= 201402L
-
 #include <experimental/strong_enums.hpp>
 #include <utility>
 #include <sstream>
@@ -252,7 +250,11 @@ int main()
     //auto h = std::hash<stdex::strong_enum<E,std::int8_t>>{};
     //auto h1 = std::hash<E>{}(E1);
     //auto h2 = std::hash<ES>{}(es1);
+#if __cplusplus >= 201402L
     BOOST_TEST(std::hash<ES>{}(es1)==std::hash<E>{}(E1));
+#else
+    BOOST_TEST(std::hash<ES>{}(es1)==std::hash<int>{}(int(E1)));
+#endif
   }
   {
     //Other o {1};
@@ -262,10 +264,3 @@ int main()
 
   return ::boost::report_errors();
 }
-
-#else
-int main()
-{
-    return 0;
-}
-#endif

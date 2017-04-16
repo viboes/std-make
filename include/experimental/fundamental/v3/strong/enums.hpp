@@ -7,8 +7,6 @@
 #ifndef JASEL_FUNDAMENTAL_V3_STRONG_STRONG_ENUMS_HPP
 #define JASEL_FUNDAMENTAL_V3_STRONG_STRONG_ENUMS_HPP
 
-#if __cplusplus >= 201402L || defined JASEL_DOXYGEN_INVOKED
-
 #include <experimental/fundamental/v3/strong/wrapper.hpp>
 #include <experimental/fundamental/v3/strong/underlying_type.hpp>
 #include <experimental/optional.hpp>
@@ -43,22 +41,22 @@ inline namespace fundamental_v3
   };
 
   template <class E, class Int>
-  constexpr E to_valid_enum(Int x) { if (is_valid_enum<E>(x)) return enum_cast<E>(x); else throw bad_enum_cast(); }
+  JASEL_CXX14_CONSTEXPR E to_valid_enum(Int x) { if (is_valid_enum<E>(x)) return enum_cast<E>(x); else throw bad_enum_cast(); }
 
   template <class E, class Int>
-  constexpr E to_valid_enum_or(Int x, E other) { if (is_valid_enum<E>(x)) return enum_cast<E>(x); else return other; }
+  JASEL_CXX14_CONSTEXPR E to_valid_enum_or(Int x, E other) { if (is_valid_enum<E>(x)) return enum_cast<E>(x); else return other; }
 
   template <class E, class Int>
-  constexpr E to_enumerator(Int x) { if (is_valid_enumerator<E>(x)) return enum_cast<E>(x); else throw bad_enum_cast(); }
+  JASEL_CXX14_CONSTEXPR E to_enumerator(Int x) { if (is_valid_enumerator<E>(x)) return enum_cast<E>(x); else throw bad_enum_cast(); }
 
   template <class E, class Int>
-  constexpr E to_enumerator_or(Int x, E other) { if (is_valid_enumerator<E>(x)) return enum_cast<E>(x); else return other; }
+  JASEL_CXX14_CONSTEXPR E to_enumerator_or(Int x, E other) { if (is_valid_enumerator<E>(x)) return enum_cast<E>(x); else return other; }
 
   template <class E, class Int>
-  constexpr optional<E> try_to_enumerator(Int x) { if (is_valid_enumerator<E>(x)) return enum_cast<E>(x); else return nullopt; }
+  JASEL_CXX14_CONSTEXPR optional<E> try_to_enumerator(Int x) { if (is_valid_enumerator<E>(x)) return enum_cast<E>(x); else return nullopt; }
 
   template <class E, class Int>
-  constexpr optional<E> try_to_valid_enum(Int x) { if (is_valid_enum<E>(x)) return enum_cast<E>(x); else return nullopt; }
+  JASEL_CXX14_CONSTEXPR optional<E> try_to_valid_enum(Int x) { if (is_valid_enum<E>(x)) return enum_cast<E>(x); else return nullopt; }
 
   // This template must be specialized for enum wrappers
 
@@ -295,5 +293,4 @@ inline namespace fundamental_v3
     : experimental::wrapped_hash<experimental::ordinal_enum<E,UT>> {};
 }
 
-#endif
 #endif // header

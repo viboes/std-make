@@ -248,7 +248,6 @@ int main()
     //unsigned char s;
     //UEngineStarted es6 {s};        // error unsigned char deleted
   }
-#if __cplusplus >= 201402L
   {
     using Bool = stdex::boolean;
     assert(stdex::ordinal::size<Bool>() == 2);
@@ -262,7 +261,6 @@ int main()
     assert(stdex::ordinal::succ(Bool{false}) == Bool{true});
     assert(stdex::ordinal::pred(Bool{true}) == Bool{false});
   }
-#endif
   {
     //stdex::boolean b{&S::foo}; // this fails as expected
     //UEngineStarted es {&S::foo}; // this fails as expected

@@ -9,7 +9,6 @@
 #include <sstream>
 
 #include <boost/detail/lightweight_test.hpp>
-#if  __cplusplus >= 201402L
 
 namespace stdex = std::experimental;
 
@@ -28,12 +27,11 @@ struct X {
 struct Y {
     explicit constexpr operator int() const { return 3; }
 };
-#endif
 
 int main()
 {
 
-#if  __cplusplus >= 201402L
+#if  __cplusplus >= 201002L
   {
     auto x = stdex::make_strong_counter<OrangeTag>(1);
     BOOST_TEST(x == OrangeCount(1));

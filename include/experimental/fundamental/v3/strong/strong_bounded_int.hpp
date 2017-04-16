@@ -7,8 +7,6 @@
 #ifndef JASEL_FUNDAMENTAL_V3_STRONG_STRONG_INT_HPP
 #define JASEL_FUNDAMENTAL_V3_STRONG_STRONG_INT_HPP
 
-#if __cplusplus >= 201402L || defined JASEL_DOXYGEN_INVOKED
-
 #include <experimental/fundamental/v3/strong/tagged.hpp>
 #include <experimental/fundamental/v3/strong/underlying_type.hpp>
 #include <experimental/ordinal.hpp>
@@ -70,8 +68,9 @@ inline namespace fundamental_v3
       }
       static constexpr UT cast(UT x)
       {
-        if ( valid(x) ) return x;
-        throw bad_bounded_int_cast();
+        return ( valid(x) )
+              ? x
+              : throw bad_bounded_int_cast();
       }
       // copy constructor/assignment default
       constexpr strong_bounded_int() noexcept = default;
@@ -82,34 +81,34 @@ inline namespace fundamental_v3
       { return x; }
       friend constexpr strong_bounded_int operator+(strong_bounded_int x, strong_bounded_int y)  noexcept
       { return strong_bounded_int(x.value + y.value); }
-      constexpr strong_bounded_int& operator+=(strong_bounded_int y)  noexcept
+      JASEL_MUTABLE_CONSTEXPR strong_bounded_int& operator+=(strong_bounded_int y)  noexcept
       {
         this->value = cast(this->value + y.value);
         return *this;
       }
-      constexpr strong_bounded_int operator++()  noexcept
+      JASEL_MUTABLE_CONSTEXPR strong_bounded_int operator++()  noexcept
       { return strong_bounded_int(++this->value); }
-      constexpr strong_bounded_int operator++(int)  noexcept
+      JASEL_MUTABLE_CONSTEXPR strong_bounded_int operator++(int)  noexcept
       { return strong_bounded_int(this->value++); }
 
       friend constexpr strong_bounded_int operator-(strong_bounded_int x)  noexcept
       { return strong_bounded_int(-x.value); }
       friend constexpr strong_bounded_int operator-(strong_bounded_int x, strong_bounded_int y)  noexcept
       { return strong_bounded_int(x.value - y.value); }
-      constexpr strong_bounded_int& operator-=(strong_bounded_int y)  noexcept
+      JASEL_MUTABLE_CONSTEXPR strong_bounded_int& operator-=(strong_bounded_int y)  noexcept
       {
         this->value = cast(this->value - y.value);
         return *this;
       }
-      constexpr strong_bounded_int operator--()  noexcept
+      JASEL_MUTABLE_CONSTEXPR strong_bounded_int operator--()  noexcept
       { return strong_bounded_int(--this->value); }
-      constexpr strong_bounded_int operator--(int)  noexcept
+      JASEL_MUTABLE_CONSTEXPR strong_bounded_int operator--(int)  noexcept
       { return strong_bounded_int(this->value--); }
 
       //  Multiplicative operators
       friend constexpr strong_bounded_int operator*(strong_bounded_int x, strong_bounded_int y)  noexcept
       { return strong_bounded_int(x.value * y.value); }
-      constexpr strong_bounded_int& operator*=(strong_bounded_int y)  noexcept
+      JASEL_MUTABLE_CONSTEXPR strong_bounded_int& operator*=(strong_bounded_int y)  noexcept
       {
         this->value = cast(this->value * y.value);
         return *this;
@@ -117,7 +116,7 @@ inline namespace fundamental_v3
 
       friend constexpr strong_bounded_int operator/(strong_bounded_int x, strong_bounded_int y)  noexcept
       { return strong_bounded_int(x.value / y.value); }
-      constexpr strong_bounded_int& operator/=(strong_bounded_int y)  noexcept
+      JASEL_MUTABLE_CONSTEXPR strong_bounded_int& operator/=(strong_bounded_int y)  noexcept
       {
         this->value = cast(this->value / y.value);
         return *this;
@@ -125,7 +124,7 @@ inline namespace fundamental_v3
 
       friend constexpr strong_bounded_int operator%(strong_bounded_int x, strong_bounded_int y)  noexcept
       { return strong_bounded_int(x.value % y.value); }
-      constexpr strong_bounded_int& operator%=(strong_bounded_int y)  noexcept
+      JASEL_MUTABLE_CONSTEXPR strong_bounded_int& operator%=(strong_bounded_int y)  noexcept
       {
         this->value = cast(this->value % y.value);
         return *this;
@@ -137,25 +136,25 @@ inline namespace fundamental_v3
 
       friend constexpr strong_bounded_int operator&(strong_bounded_int x, strong_bounded_int y)  noexcept
       { return strong_bounded_int(x.value & y.value); }
-      constexpr strong_bounded_int& operator&=(strong_bounded_int y)  noexcept
+      JASEL_MUTABLE_CONSTEXPR strong_bounded_int& operator&=(strong_bounded_int y)  noexcept
       { this->value = cast(this->value & y.value); return *this; }
       friend constexpr strong_bounded_int operator|(strong_bounded_int x, strong_bounded_int y)  noexcept
       { return strong_bounded_int(x.value | y.value); }
-      constexpr strong_bounded_int& operator|=(strong_bounded_int y)  noexcept
+      JASEL_MUTABLE_CONSTEXPR strong_bounded_int& operator|=(strong_bounded_int y)  noexcept
       { this->value = cast(this->value | y.value); return *this; }
       friend constexpr strong_bounded_int operator^(strong_bounded_int x, strong_bounded_int y)  noexcept
       { return strong_bounded_int(x.value ^ y.value); }
-      constexpr strong_bounded_int& operator^=(strong_bounded_int y)  noexcept
+      JASEL_MUTABLE_CONSTEXPR strong_bounded_int& operator^=(strong_bounded_int y)  noexcept
       { this->value = cast(this->value ^ y.value); return *this; }
 
       // Bitwise logic operators
       friend constexpr strong_bounded_int operator<<(strong_bounded_int x, int y)  noexcept
       { return strong_bounded_int(x.value << y); }
-      constexpr strong_bounded_int& operator<<=(int y)  noexcept
+      JASEL_MUTABLE_CONSTEXPR strong_bounded_int& operator<<=(int y)  noexcept
       { this->value = cast(this->value << y); return *this; }
       friend constexpr strong_bounded_int operator>>(strong_bounded_int x, int y)  noexcept
       { return strong_bounded_int(x.value >> y); }
-      constexpr strong_bounded_int& operator>>=(int y)  noexcept
+      JASEL_MUTABLE_CONSTEXPR strong_bounded_int& operator>>=(int y)  noexcept
       { this->value = cast(this->value >> y); return *this; }
 
       // relational operators
@@ -241,5 +240,4 @@ inline namespace fundamental_v3
   };
 
 }
-#endif
 #endif // header

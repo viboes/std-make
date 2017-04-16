@@ -113,7 +113,6 @@ inline  namespace fundamental_v3
     struct wrapped_ordinal_traits
     {
       using T =  typename W::underlying_t;
-      //static_assert(is_ordinal<T>::value, "");
       using size_type = size_t;
       using size = integral_constant<size_type, ordinal::traits<T>::max()-numeric_limits<T>::min()+1>;
       static W val(size_type p) { return W{T{p}}; }

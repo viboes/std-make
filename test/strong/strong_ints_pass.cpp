@@ -9,7 +9,6 @@
 #include <sstream>
 
 #include <boost/detail/lightweight_test.hpp>
-#if  __cplusplus >= 201402L
 
 namespace stdex = std::experimental;
 
@@ -32,12 +31,10 @@ struct X {
 struct Y {
     explicit operator int() { return true; }
 };
-#endif
 
 int main()
 {
 
-#if  __cplusplus >= 201402L
   {
     auto x = stdex::make_strong_int<OrangeTag>(1);
     BOOST_TEST(x == OrangeCount(1));
@@ -368,7 +365,6 @@ int main()
         //UCOrangeCount id  {c}; // this fails as expected - narrowing conversion
       }
   }
-#endif
   return ::boost::report_errors();
 }
 
