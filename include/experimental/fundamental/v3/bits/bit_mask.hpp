@@ -22,7 +22,6 @@
 #ifndef JASEL_FUNDAMENTAL_V3_BITS_BIT_MASK_HPP
 #define JASEL_FUNDAMENTAL_V3_BITS_BIT_MASK_HPP
 
-
 #include <stdexcept>
 #include <iosfwd>
 #include <string>
@@ -30,6 +29,8 @@
 #include <climits>
 #include <string>
 #include <limits>
+
+#include <experimental/fundamental/v2/config.hpp>
 
 
 // todo: Extract bits algorithms in an explicit file
@@ -70,10 +71,10 @@ inline namespace fundamental_v3
     //! @par Returns
     //!   The bits in x rotated to the left s times
     template <class T>
-    constexpr T rotl(T x, unsigned int s) noexcept
+    JASEL_MUTABLE_CONSTEXPR T rotl(T x, unsigned int s) noexcept
     {
       constexpr unsigned int N = std::numeric_limits<T>::digits;
-      const unsigned int m = s % N;
+      constexpr unsigned int m = s % N;
       return m==0
            ? x
            : (x << m) | (x >> (N - m))
@@ -117,9 +118,9 @@ inline namespace fundamental_v3
     template <size_t S, class T=unsigned>
     constexpr T single() noexcept
     {
-      constexpr unsigned int N = std::numeric_limits<T>::digits;
-      constexpr unsigned int m = S % N;
-      return (T(1) << m);
+      //constexpr unsigned int N = std::numeric_limits<T>::digits;
+      //constexpr unsigned int m = S % std::numeric_limits<T>::digits;
+      return T(1) << (S % std::numeric_limits<T>::digits);
     }
     //! @par Pre-condition:
     //!   s < sizeof(T) * CHAR_BIT
@@ -128,9 +129,9 @@ inline namespace fundamental_v3
     template <class T>
     constexpr T single(size_t s) noexcept
     {
-      constexpr unsigned int N = std::numeric_limits<T>::digits;
-      const unsigned int m = s % N;
-      return (T(1) << m);
+      //constexpr unsigned int N = std::numeric_limits<T>::digits;
+      //const unsigned int m = s % std::numeric_limits<T>::digits;
+      return T(1) << (s % std::numeric_limits<T>::digits);
     }
   }
     /**
@@ -168,7 +169,7 @@ inline namespace fundamental_v3
 
       T bits;
       // fixme: shouldn't we provide a function that checks the validity of a position?
-      constexpr void check(size_t testing) const
+      JASEL_MUTABLE_CONSTEXPR void check(size_t testing) const
       {
         // fixme: use assert here
         if (testing >=  N) throw std::out_of_range("bit_mask");
@@ -195,14 +196,14 @@ inline namespace fundamental_v3
         constexpr reference() noexcept = delete;
 
         //! assignment from bool
-        constexpr reference& operator=(bool x) noexcept
+        JASEL_MUTABLE_CONSTEXPR reference& operator=(bool x) noexcept
         {
           ref_.set(pos_,x);
           return *this;
         }
 
         //! assignment from another reference
-        constexpr reference& operator=(const reference& x) noexcept
+        JASEL_MUTABLE_CONSTEXPR reference& operator=(const reference& x) noexcept
         {
           ref_.set(pos_,x);
           return *this;
@@ -221,7 +222,7 @@ inline namespace fundamental_v3
         }
 
         //! flip the bit
-        constexpr reference flip()  noexcept
+        JASEL_MUTABLE_CONSTEXPR reference flip()  noexcept
         {
           ref_.flip(pos_);
           return *this;
@@ -328,7 +329,7 @@ inline namespace fundamental_v3
       //!   \c *this.
       //! @par Throws:
       //!   Nothing
-      constexpr bit_mask& operator&=(const bit_mask& rhs) noexcept
+      JASEL_MUTABLE_CONSTEXPR bit_mask& operator&=(const bit_mask& rhs) noexcept
       {
         bits &= rhs.bits;
         return *this;
@@ -341,7 +342,7 @@ inline namespace fundamental_v3
       //!   \c *this.
       //! @par Throws:
       //!   Nothing
-      constexpr bit_mask& operator|=(const bit_mask& rhs) noexcept
+      JASEL_MUTABLE_CONSTEXPR bit_mask& operator|=(const bit_mask& rhs) noexcept
       {
         bits |= rhs.bits;
         return *this;
@@ -354,7 +355,7 @@ inline namespace fundamental_v3
       //!   \c *this.
       //! @par Throws:
       //!   Nothing
-      constexpr bit_mask& operator^=(const bit_mask& rhs) noexcept
+      JASEL_MUTABLE_CONSTEXPR bit_mask& operator^=(const bit_mask& rhs) noexcept
       {
         bits ^= rhs.bits;
         bits &= bit_ops::up_to<N,T>();
@@ -369,7 +370,7 @@ inline namespace fundamental_v3
       //!   \c *this.
       //! @par Throws:
       //!   Nothing
-      constexpr bit_mask& operator<<=(size_t pos) noexcept
+      JASEL_MUTABLE_CONSTEXPR bit_mask& operator<<=(size_t pos) noexcept
       {
         bits <<= pos;
         bits &= bit_ops::up_to<N,T>();
@@ -385,7 +386,7 @@ inline namespace fundamental_v3
       //! @par Throws:
       //!   Nothing
 
-      constexpr bit_mask& operator>>=(size_t pos) noexcept
+      JASEL_MUTABLE_CONSTEXPR bit_mask& operator>>=(size_t pos) noexcept
       {
         bits >>= pos;
         bits &= bit_ops::up_to<N,T>();
@@ -413,7 +414,7 @@ inline namespace fundamental_v3
       //! @par Returns:
       //!   \c true if the bit at the associated position of \c e in \c *this has the value one,
       //! otherwise \c false.
-      constexpr bool operator[](size_t pos) const
+      JASEL_CXX14_CONSTEXPR bool operator[](size_t pos) const
       {
         //JASEL_EXPECTS(valid_position(pos));
         return bits & bit_ops::single<T>(pos);
@@ -432,7 +433,7 @@ inline namespace fundamental_v3
       //!   any access or update through the resulting reference potentially
       //!   accesses or modifies, respectively, the entire underlying  bitset.
 
-      constexpr reference operator[](size_t pos)
+      JASEL_CXX14_CONSTEXPR reference operator[](size_t pos)
       {
         //JASEL_EXPECTS(valid_position(pos));
         return reference(*this, pos);
@@ -444,7 +445,7 @@ inline namespace fundamental_v3
       //! @par Throws:
       //!   Nothing
 
-      constexpr bit_mask& set() noexcept
+      JASEL_MUTABLE_CONSTEXPR bit_mask& set() noexcept
       {
         bits = T(~0) & bit_ops::up_to<N,T>();
         return *this;
@@ -457,7 +458,7 @@ inline namespace fundamental_v3
       //!   \c *this.
       //! @par Throws:
       //!   @c std::out_of_range if @c setting does have a invalid bit position.
-      constexpr bit_mask& set(size_t setting, bool value = true)
+      JASEL_MUTABLE_CONSTEXPR bit_mask& set(size_t setting, bool value = true)
       {
         check(setting);
         bits &= ~bit_ops::single<T>(setting);
@@ -471,7 +472,7 @@ inline namespace fundamental_v3
       //!   \c *this.
       //! @par Throws:
       //!   Nothing
-      constexpr bit_mask& reset() noexcept
+      JASEL_MUTABLE_CONSTEXPR bit_mask& reset() noexcept
       {
         bits = T(0);
         return *this;
@@ -484,7 +485,7 @@ inline namespace fundamental_v3
       //! @par Returns:
       //!   \c *this.
 
-      constexpr bit_mask& reset(size_t resetting)
+      JASEL_MUTABLE_CONSTEXPR bit_mask& reset(size_t resetting)
       {
         check(resetting);
         bits &= ~bit_ops::single<T>(resetting);
@@ -497,7 +498,7 @@ inline namespace fundamental_v3
       //!   \c *this.
       //! @par Throws:
       //!   Nothing
-      constexpr bit_mask& flip() noexcept
+      JASEL_MUTABLE_CONSTEXPR bit_mask& flip() noexcept
       {
         bits = ~bits;
         bits &= bit_ops::up_to<N,T>();
@@ -510,7 +511,7 @@ inline namespace fundamental_v3
       //!   Toggles the bit at position associated to \c pos in \c *this.
       //! @par Returns:
       //!   \c *this.
-      constexpr bit_mask& flip(size_t flipping)
+      JASEL_MUTABLE_CONSTEXPR bit_mask& flip(size_t flipping)
       {
         check(flipping);
         bits ^= bit_ops::single<T>(flipping);
@@ -576,7 +577,7 @@ inline namespace fundamental_v3
       //!   \c true if the bit at position \c pos in \c *this has the value one.
       //! @par Throws:
       //!   std::out_of_range if the associated position of \c testing does not correspond to a valid bit position.
-      constexpr bool test(size_t testing) const
+      JASEL_MUTABLE_CONSTEXPR bool test(size_t testing) const
       {
         check(testing);
         return bits & bit_ops::single<T>(testing);
@@ -606,7 +607,7 @@ inline namespace fundamental_v3
       //! @par Returns:
       //!   <tt>bit_mask<N,T>(*this) <<= pos</tt>.
       //! @par Throws:<br> Nothing
-      constexpr bit_mask operator<<(std::size_t pos) const noexcept
+      JASEL_CXX14_CONSTEXPR bit_mask operator<<(std::size_t pos) const noexcept
       {
         bit_mask r = *this;
         r <<= pos;
@@ -616,7 +617,7 @@ inline namespace fundamental_v3
       //! @par Returns:
       //!   <tt>bit_mask<N,T>(*this) >>= pos</tt>.
       //! @par Throws:<br> Nothing
-      constexpr bit_mask operator>>(std::size_t pos) const noexcept
+      JASEL_CXX14_CONSTEXPR bit_mask operator>>(std::size_t pos) const noexcept
       {
         bit_mask r = *this;
         r >>= pos;
@@ -647,7 +648,7 @@ inline namespace fundamental_v3
     //! @par Returns:<br>   <tt>bit_mask<N,T>(lhs) &= rhs</tt>.
     //! @par Throws:<br> Nothing
     template <size_t N, typename T>
-    constexpr bit_mask<N,T> operator&(const bit_mask<N,T>& x, const bit_mask<N,T>& y) noexcept
+    JASEL_CXX14_CONSTEXPR bit_mask<N,T> operator&(const bit_mask<N,T>& x, const bit_mask<N,T>& y) noexcept
     {
       bit_mask<N,T> r = x;
       r &= y;
@@ -658,7 +659,7 @@ inline namespace fundamental_v3
     //! @par Returns:<br>   <tt>bit_mask<N,T>>(lhs) |= rhs</tt>.
     //! @par Throws:<br> Nothing
     template <size_t N, typename T >
-    constexpr bit_mask<N,T> operator|(const bit_mask<N,T>& x, const bit_mask<N,T>& y) noexcept
+    JASEL_CXX14_CONSTEXPR bit_mask<N,T> operator|(const bit_mask<N,T>& x, const bit_mask<N,T>& y) noexcept
     {
       bit_mask<N,T> r = x;
       r |= y;
@@ -669,7 +670,7 @@ inline namespace fundamental_v3
     //! @par Returns:<br>   <tt>bit_mask<N,T>(lhs) ^= rhs</tt>.
     //! @par Throws:<br> Nothing
     template <size_t N, typename T >
-    constexpr bit_mask<N,T> operator^(const bit_mask<N,T>& x, const bit_mask<N,T>& y) noexcept
+    JASEL_CXX14_CONSTEXPR bit_mask<N,T> operator^(const bit_mask<N,T>& x, const bit_mask<N,T>& y) noexcept
     {
       bit_mask<N,T> r = x;
       r ^= y;

@@ -11,7 +11,7 @@
 
 int main()
 {
-#if __cplusplus >= 201402L
+#if __cplusplus >= 201002L
 
   namespace stde = std::experimental;
   using UInt = unsigned char;
@@ -32,6 +32,7 @@ int main()
     BOOST_TEST(! bm[UInt{1}]);
     BOOST_TEST(! bm[UInt{2}]);
   }
+#if __cplusplus >= 201402L
   {// Default Constructor
     constexpr BitMask bm{};
     static_assert(0 == bm.count(), "");
@@ -39,18 +40,21 @@ int main()
     static_assert(! bm[UInt{1}], "");
     static_assert(! bm[UInt{2}], "");
   }
+#endif
   { // Constructible from UInt
     BitMask bm(std::experimental::pos_tag_t{}, UInt{2});
     BOOST_TEST( 1 == bm.count() );
     BOOST_TEST( bm.any() );
     BOOST_TEST(bm[UInt{2}]==true);
   }
+#if __cplusplus >= 201402L
   { // Constructible from UInt
     constexpr BitMask bm(std::experimental::pos_tag_t{}, UInt{2});
     static_assert( 1 == bm.count() , "");
     static_assert( bm.any() , "");
     static_assert(bm[UInt{2}]==true, "");
   }
+#endif
   { // operator [T]
     BitMask bm{};
     bm[UInt{1}]=true;
@@ -169,11 +173,13 @@ int main()
     auto x = bm.to_ulong();
     BOOST_TEST( 2 == x);
   }
+#if __cplusplus >= 201402L
   { // to_ulong
     constexpr BitMask bm(std::experimental::pos_tag_t{}, UInt{1});
     constexpr auto x = bm.to_ulong();
     static_assert( 2 == x, "");
   }
+#endif
   { // operator~
     BitMask bm{};
     auto bm2 = ~bm;
@@ -188,6 +194,7 @@ int main()
     BOOST_TEST( bm2[UInt{2}]);
     BOOST_TEST( bm2[UInt{3}]);
   }
+#if __cplusplus >= 201402L
   { // operator~
     constexpr BitMask bm{};
     constexpr auto bm2 = ~bm;
@@ -202,6 +209,7 @@ int main()
     static_assert( bm2[UInt{2}], "");
     static_assert( bm2[UInt{3}], "");
   }
+#endif
   { // operator&
     BitMask bm1(std::experimental::pos_tag_t{}, UInt{1});
     BitMask bm2(std::experimental::pos_tag_t{}, UInt{2});

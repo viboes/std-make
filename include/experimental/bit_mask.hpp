@@ -7,8 +7,6 @@
 #ifndef JASEL_EXPERIMENTAL_BIT_MASK_HPP
 #define JASEL_EXPERIMENTAL_BIT_MASK_HPP
 
-#if __cplusplus >= 201402L
 #include <experimental/fundamental/v3/bits/bit_mask.hpp>
-#endif
 
 #endif // header
