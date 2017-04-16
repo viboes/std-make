@@ -93,31 +93,31 @@ namespace chrono
 
       //! @par Effects: <br>If m_value < candinal, ++m_value. Otherwise sets m_value to 0.
       //! @par Returns:<br> *this.
-      constexpr modulo& operator++() noexcept
+      JASEL_MUTABLE_CONSTEXPR modulo& operator++() noexcept
           { if (++m_value == cardinal) m_value=0; return *this; }
 
       //! @par Effects: <br>++(*this).
       //! @par Returns:<br> Returns: A copy of *this as it existed on entry to this member function.
-      constexpr modulo operator++(int) noexcept
+      JASEL_MUTABLE_CONSTEXPR modulo operator++(int) noexcept
           { auto tmp(*this); ++(*this); return tmp; }
 
       //! @par Effects: <br>If m_value > 0, --m_value. Otherwise sets m_value to cardinal.
       //! @par Returns:<br> *this.
-      constexpr modulo& operator--() noexcept
+      JASEL_MUTABLE_CONSTEXPR modulo& operator--() noexcept
           { if (m_value == 0) m_value=cardinal; else --m_value; return *this;}
 
       //! @par Effects: <br>--(*this).
       //! @par Returns:<br> Returns: A copy of *this as it existed on entry to this member function.
-      constexpr modulo operator--(int) noexcept
+      JASEL_MUTABLE_CONSTEXPR modulo operator--(int) noexcept
           { auto tmp(*this); --(*this); return tmp; }
 
       //! @par Effects: <br>*this = *this + d.
       //! @par Returns:<br> *this.
-      constexpr modulo& operator+=(const duration_t& d) noexcept
+      JASEL_MUTABLE_CONSTEXPR modulo& operator+=(const duration_t& d) noexcept
           { *this = *this + d; return *this; }
       //! @par Effects: <br>*this = *this - d.
       //! @par Returns:<br> *this.
-      constexpr modulo& operator-=(const duration_t& d) noexcept
+      JASEL_MUTABLE_CONSTEXPR modulo& operator-=(const duration_t& d) noexcept
           { *this = *this - d; return *this; }
 
       //! @par Returns:<br> Rep{x} == Rep{y}.
