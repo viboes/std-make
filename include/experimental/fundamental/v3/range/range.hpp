@@ -31,9 +31,6 @@
 /// begin(t)/end(t) are valid.
 ///////////////////////////////////////////////////////////////////////////////////////
 
-
-#if __cplusplus >= 201402L
-
 #include <iterator>
 #include <utility>
 #include <experimental/type_traits.hpp>
@@ -49,9 +46,11 @@ namespace std
     {
       template <class R, class Enabler=void>
       struct is_range : false_type {};
+
+#if __cplusplus >= 201402L
       template <class T>
         constexpr bool is_range_v = is_range<T>::value;
-
+#endif
       namespace range // here range stands for a concept
       {
         namespace adl_begin_end {
@@ -71,9 +70,10 @@ namespace std
                 > >
               : true_type {};
 
+#if __cplusplus >= 201402L
           template <class T>
             constexpr bool has_adl_begin_end_v = has_adl_begin_end<T>::value;
-
+#endif
           template <class T>
           auto apply_begin(T&& t)
                 JASEL_DECLTYPE_RETURN_NOEXCEPT(
@@ -86,13 +86,11 @@ namespace std
                 )
         }
 
-
-
-
         template <class R, class Enabler=void>
         struct traits: traits<R, meta::when<true>>
         {};
 
+#if __cplusplus >= 201402L
         // Default failing specialization
         template <typename R, bool condition>
         struct traits<R, meta::when<condition>>
@@ -102,7 +100,7 @@ namespace std
           template <class T>
           static constexpr auto end(T&& x) = delete;
         };
-
+#endif
         template <class T, typename = void>
           struct has_trait_range
             : false_type {};
@@ -113,11 +111,13 @@ namespace std
             > >
             : true_type {};
 
+#if __cplusplus >= 201402L
         template <class T>
           constexpr bool has_trait_range_v = has_trait_range<T>::value;
 
         template <class T>
           constexpr bool has_adl_begin_end_v = adl_begin_end::has_adl_begin_end<T>::value;
+#endif
 
         template <class T, class Enabler=void>
           struct has_members_begin_end : false_type {};
@@ -130,8 +130,10 @@ namespace std
             >
           > : true_type {};
 
+#if __cplusplus >= 201402L
         template <class T>
           constexpr bool has_members_begin_end_v = has_members_begin_end<T>::value;
+#endif
 
         template <class T>
         constexpr auto begin(T&& x) noexcept -> decltype( traits<meta::uncvref_t<T>>::begin(forward<T>(x)) )
@@ -157,20 +159,24 @@ namespace std
         };
 #endif
         template <typename R>
-        struct traits<R, meta::when<has_members_begin_end_v<R>>>
+        struct traits<R, meta::when<has_members_begin_end<R>::value>>
         {
           template <class T>
-            static constexpr auto begin(T&& x) { return x.begin(); }
+            static constexpr auto begin(T&& x) -> decltype(x.begin())
+          { return x.begin(); }
           template <class T>
-            static constexpr auto end(T&& x) { return x.end(); }
+            static constexpr auto end(T&& x) -> decltype(x.end())
+          { return x.end(); }
         };
         template <typename R>
-        struct traits<R, meta::when<not has_members_begin_end_v<R> and has_adl_begin_end_v<R>>>
+        struct traits<R, meta::when<! has_members_begin_end<R>::value && adl_begin_end::has_adl_begin_end<R>::value>>
         {
           template <class T>
-            static constexpr auto begin(T&& x) { return x.begin(); }
+            static constexpr auto begin(T&& x) -> decltype(x.begin())
+          { return x.begin(); }
           template <class T>
-            static constexpr auto end(T&& x) { return x.end(); }
+            static constexpr auto end(T&& x)  -> decltype(x.end())
+          { return x.end(); }
         };
 
       }
@@ -188,5 +194,4 @@ namespace std
     }
   }
 }
-#endif
 #endif // header
