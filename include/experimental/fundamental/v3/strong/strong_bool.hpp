@@ -170,7 +170,7 @@ inline namespace fundamental_v3
   //! @par Effects:<br> Extracts a T from is and stores it in the passes x.
   //! @param is the input stream
   //! @param x the \c strong_bool
-  //! @par Returns:<br> \c is.
+  //! \n<b>Returns:</b><br> \c is.
 
   template <class CharT, class Traits, class Tag, class T >
   std::basic_istream<CharT, Traits>&
@@ -186,7 +186,7 @@ inline namespace fundamental_v3
   //! @param os the output stream
   //! @param x the \c strong_bool
   //!
-  //! @par Returns:<br> the result of the following expression
+  //! \n<b>Returns:</b><br> the result of the following expression
   //! @code
   //! os << bool(x.undelying())
   //! @endcode

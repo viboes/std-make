@@ -233,16 +233,15 @@ inline namespace fundamental_v3
 
       // constructors
 
-      //! @par Effects
-      //!   Construct an uninitialized strong_counter
+      //! \n<b>Effects:</b> Construct an uninitialized strong_counter
       strong_counter() = default;
 
       strong_counter(strong_counter<Domain, UT> const&) = default;
       strong_counter(strong_counter<Domain, UT> &&) = default;
 
-      //! @par Effects:<br> Constructs a strong_counter from its representations
-      //! @par Throws:<br> Anything the copy of the conversion throws.
-      //! @par Remarks:<br> This constructor doesn't participates in overload resolution if the representation is not is_intra_domain_convertible
+      //! \n<b>Effects:</b> Constructs a strong_counter from its representations
+      //! \n<b>Throws:</b> Anything the copy of the conversion throws.
+      //! \n<b>Remarks:</b> This constructor doesn't participates in overload resolution if the representation is not is_intra_domain_convertible
       template <class UT2>
       explicit strong_counter(UT2 const& r
 #if !defined JASEL_DOXYGEN_INVOKED
@@ -259,9 +258,9 @@ inline namespace fundamental_v3
 #endif
           ) = delete;
 
-      //! @par Effects:<br> Constructs a strong_counter from another strong_counter with a different domain and possibly representation
-      //! @par Throws:<br>  Anything the copy of the conversion throws.
-      //! @par Remarks:<br> This constructor doesn't participates in overload resolution if the representation is not is_inter_domain_convertible
+      //! \n<b>Effects:</b> Constructs a strong_counter from another strong_counter with a different domain and possibly representation
+      //! \n<b>Throws:</b>  Anything the copy of the conversion throws.
+      //! \n<b>Remarks:</b> This constructor doesn't participates in overload resolution if the representation is not is_inter_domain_convertible
       template <class Domain2, class UT2>
       strong_counter(strong_counter<Domain2, UT2> const& other
 #if !defined JASEL_DOXYGEN_INVOKED
@@ -466,7 +465,7 @@ inline namespace fundamental_v3
 
   // Rounding
 
-  //! @par Returns:<br> the greatest strong_counter t representable in To that is less or equal to d.
+  //! \n<b>Returns:</b><br> the greatest strong_counter t representable in To that is less or equal to d.
   //! The function does not participate in the overload resolution unless To is an instance of strong_counter.
 
   template <class To, class D, class R
@@ -479,7 +478,7 @@ inline namespace fundamental_v3
     return t;
   }
 
-  //! @par Returns:<br> the smallest strong_counter t representable in To that is greater or equal to d.
+  //! \n<b>Returns:</b><br> the smallest strong_counter t representable in To that is greater or equal to d.
   //! The function does not participate in the overload resolution unless To is an instance of strong_counter.
   template <class To, class D, class R
       , class = typename enable_if<is_strong_counter<To>{}>::type
@@ -492,7 +491,7 @@ inline namespace fundamental_v3
       return t;
   }
 
-  //! @par Returns:<br> the value t representable in To that is the closest to d.
+  //! \n<b>Returns:</b><br> the value t representable in To that is the closest to d.
   //! If there are two such values, returns the even value (that is, the value t such that t % 2 == 0).
   //! The function does not participate in the overload resolution unless To is an instance of strong_counter
   //! and treat_as_floating_point<typename To::rep>{} is false
@@ -548,10 +547,10 @@ inline namespace fundamental_v3
   // stream operators
 
   //! input function.
-  //! @par Effects:<br> Extracts a T from is and stores it in the passes x.
+  //! \n<b>Effects:</b> Extracts a T from is and stores it in the passes x.
   //! @param is the input stream
   //! @param x the \c strong_int
-  //! @par Returns:<br> \c is.
+  //! \n<b>Returns:</b><br> \c is.
   // fixme: Shouldn't this depend on Domain?
   template <class CharT, class Traits, class Domain, class T >
   std::basic_istream<CharT, Traits>&
@@ -567,7 +566,7 @@ inline namespace fundamental_v3
   //! @param os the output stream
   //! @param x the \c strong_int
   //!
-  //! @par Returns:<br> the result of the following expression
+  //! \n<b>Returns:</b><br> the result of the following expression
   //! @code
   //! os << x.undelying()
   //! @endcode

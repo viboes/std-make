@@ -22,6 +22,7 @@ int main()
     stde::ordinal_array<int,Indx> arr;
     BOOST_TEST(arr.size() == 3);
   }
+  // fixme: shouldn't {1, 2, 3.5} work?
   {
     stde::ordinal_array<float,Indx> c {{1, 2, 3.5}};
     BOOST_TEST(c.size() == 3);

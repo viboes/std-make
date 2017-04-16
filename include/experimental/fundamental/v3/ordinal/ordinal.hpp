@@ -67,7 +67,7 @@ namespace ordinal {
       //using size = integral_constant<size_type, numeric_limits<T>::max()-numeric_limits<T>::min()+1>;
       static T val(size_type p) { return T{p}; }
 
-      static size_type pos(T u)  { return size_type{u}; };
+      static size_type pos(T u)  { return size_type{u}; }
     };
     template <>
     struct traits<long long> : integral_traits<long long> {};
@@ -110,6 +110,8 @@ namespace meta {
 
 }
 
+  /// @par Returns
+  ///   the number of elements of the `Ordinal` type.
   template <class O>
   constexpr
   decltype(auto) size() noexcept { return meta::size<O>::value; }
@@ -169,8 +171,6 @@ namespace meta {
 #endif
 
   // todo add is_ct_ordinal<CTO>
-
-  // todo add specialization for integral types
 }
 }
 }
