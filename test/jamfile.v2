@@ -287,6 +287,15 @@ test-suite utility
       [ run utility/not_null_pass.cpp  ]
     ;
 
+
+
+test-suite numbers
+    : 
+      [ run numerics/numbers/double_wide_types_pass.cpp  ]
+      [ run numerics/numbers/double_wide_arithmetic_pass.cpp  ]
+
+    ;
+
 explicit fix ;
 test-suite fix
     : 
