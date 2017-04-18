@@ -29,6 +29,9 @@ inline namespace fundamental_v3
   template< bool B, class T = void >
   using enable_if_t = typename enable_if<B,T>::type;
 
+  template< class T >
+  using remove_reference_t = typename remove_reference<T>::type;
+
 #endif
 
 }
