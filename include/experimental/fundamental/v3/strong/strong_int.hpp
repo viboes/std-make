@@ -44,7 +44,7 @@ inline namespace fundamental_v3
   </code>
   */
 
-  //fixme Wgy private_tagged?
+  //fixme Why private_tagged?
   template <class Tag, class UT>
   struct strong_int final : private_tagged<Tag, UT>
   {
