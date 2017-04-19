@@ -20,8 +20,11 @@ namespace std
       template <class Final>
       struct multiplicative_base
       {
+      };
+      template <class Final>
+      struct multiplicative_base_no_check : multiplicative_base<Final>
+      {
         //! Forwards to the underlying value
-
         friend JASEL_MUTABLE_CONSTEXPR Final& operator*=(Final& x, Final const& y) noexcept
         {
           x._underlying() *= y._underlying();
@@ -45,7 +48,27 @@ namespace std
         }
       };
       template <class Final>
-      struct multiplicative : multiplicative_base<Final>
+      struct multiplicative_base_check : multiplicative_base<Final>
+      {
+        //! Forwards to the underlying value
+        friend JASEL_MUTABLE_CONSTEXPR Final& operator*=(Final& x, Final const& y) noexcept
+        {
+          x = Final(x._underlying() * y._underlying());
+          return x;
+        }
+        friend JASEL_MUTABLE_CONSTEXPR Final& operator/=(Final& x, Final const& y) noexcept
+        {
+          x = Final(x._underlying() / y._underlying());
+          return x;
+        }
+        friend JASEL_MUTABLE_CONSTEXPR Final& operator%=(Final& x, Final const& y) noexcept
+        {
+          x = Final(x._underlying() % y._underlying());
+          return x;
+        }
+      };
+      template <class Final>
+      struct multiplicative_check : multiplicative_base_check<Final>
       {
         friend constexpr Final operator*(Final const& x, Final const& y)  noexcept
         {
@@ -59,7 +82,6 @@ namespace std
         {
           return Final(x._underlying() % y._underlying());
         }
-
       };
     }
   }

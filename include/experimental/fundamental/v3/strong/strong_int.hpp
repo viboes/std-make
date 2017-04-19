@@ -60,9 +60,9 @@ inline namespace fundamental_v3
   template <class Tag, class UT>
   struct strong_int final
     : private_strong_type<strong_int<Tag, UT>, UT>
-    , mixin::additive_base<strong_int<Tag, UT>>
+    , mixin::additive_base_no_check<strong_int<Tag, UT>>
     , mixin::comparable_with_if<strong_int<Tag, UT>>
-    , mixin::multiplicative<strong_int<Tag, UT>>
+    , mixin::multiplicative_base_no_check<strong_int<Tag, UT>>
     , mixin::streamable<strong_int<Tag, UT>>
   {
       static_assert(is_integral<UT>::value, "UT must be integral");
@@ -141,12 +141,6 @@ inline namespace fundamental_v3
   constexpr auto operator+(strong_int<Tag,R1> x, strong_int<Tag,R2> y)  noexcept -> decltype(make_strong_int<Tag>(x.underlying() + y.underlying()))
   {
     return make_strong_int<Tag>(x.underlying() + y.underlying());
-  }
-
-  template <class Tag, class R>
-  constexpr auto operator-(strong_int<Tag,R> x)  noexcept -> decltype(make_strong_int<Tag>(-x.underlying()))
-  {
-    return make_strong_int<Tag>(-x.underlying());
   }
 
   template <class Tag, class R1, class R2>

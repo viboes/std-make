@@ -29,8 +29,29 @@ namespace std
           return Final(-x._underlying());
         }
 
-        //! Forwards to the underlying value
+        friend JASEL_MUTABLE_CONSTEXPR Final operator++(Final& x) noexcept
+        {
+          return Final(++x._underlying());
+        }
+        friend JASEL_MUTABLE_CONSTEXPR Final operator++(Final& x, int) noexcept
+        {
+          return Final(x._underlying()++);
+        }
+        friend JASEL_MUTABLE_CONSTEXPR Final operator--(Final& x ) noexcept
+        {
+          return Final(--x._underlying());
+        }
+        friend JASEL_MUTABLE_CONSTEXPR Final operator--(Final& x, int) noexcept
+        {
+          return Final(x._underlying()--);
+        }
 
+      };
+      template <class Final>
+      struct additive_base_no_check : additive_base<Final>
+      {
+        // todo These should be moved to homogeneous when I'll add heterogeneous
+        //! Forwards to the underlying value
         friend JASEL_MUTABLE_CONSTEXPR Final& operator+=(Final& x, Final const& y) noexcept
         {
           x._underlying() += y._underlying();
@@ -41,31 +62,33 @@ namespace std
 //          Final::_final(this)._underlying() += y._underlying();
 //          return Final::_final(this);
 //        }
-        friend JASEL_MUTABLE_CONSTEXPR Final operator++(Final& x) noexcept
-        {
-          return Final(++x._underlying());
-        }
-        friend JASEL_MUTABLE_CONSTEXPR Final operator++(Final& x, int) noexcept
-        {
-          return Final(x._underlying()++);
-        }
-
         friend JASEL_MUTABLE_CONSTEXPR Final& operator-=(Final& x, Final const& y) noexcept
         {
           x._underlying() -= y._underlying();
           return x;
         }
-        friend JASEL_MUTABLE_CONSTEXPR Final operator--(Final& x ) noexcept
-        {
-          return Final(--x._underlying());
-        }
-        friend JASEL_MUTABLE_CONSTEXPR Final operator--(Final& x, int) noexcept
-        {
-          return Final(x._underlying()--);
-        }
+
       };
       template <class Final>
-      struct additive : additive_base<Final>
+      struct additive_base_check : additive_base<Final>
+      {
+        // todo These should be moved to homogeneous when I'll add heterogeneous
+
+        //! Forwards to the underlying value
+        friend JASEL_MUTABLE_CONSTEXPR Final& operator+=(Final& x, Final const& y) noexcept
+        {
+          x = Final(x._underlying() + y._underlying());
+          return x;
+        }
+        friend JASEL_MUTABLE_CONSTEXPR Final& operator-=(Final& x, Final const& y) noexcept
+        {
+          x = Final(x._underlying() - y._underlying());
+          return x;
+        }
+
+      };
+      template <class Final>
+      struct additive_check : additive_base_check<Final>
       {
         friend constexpr Final operator+(Final const& x, Final const& y)  noexcept
         {
@@ -78,6 +101,8 @@ namespace std
         }
 
       };
+      // todo Add additive heterogeneous
+
     }
   }
 }

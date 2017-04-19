@@ -65,9 +65,9 @@ inline namespace fundamental_v3
   template <class Tag, class UT, UT Low, UT High>
   struct strong_bounded_int final
     : private_strong_type<strong_bounded_int<Tag, UT, Low, High>, UT>
-    , mixin::additive<strong_bounded_int<Tag, UT, Low, High>>
+    , mixin::additive_check<strong_bounded_int<Tag, UT, Low, High>>
     , mixin::comparable<strong_bounded_int<Tag, UT, Low, High>>
-    , mixin::multiplicative<strong_bounded_int<Tag, UT, Low, High>>
+    , mixin::multiplicative_check<strong_bounded_int<Tag, UT, Low, High>>
     , mixin::streamable<strong_bounded_int<Tag, UT, Low, High>>
   {
       static_assert(is_integral<UT>::value, "UT must be integral");
