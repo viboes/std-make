@@ -8,6 +8,7 @@
 #define JASEL_FUNDAMENTAL_V3_STRONG_UNDERLYING_TYPE_HPP
 
 #include <type_traits>
+#include <experimental/meta.hpp>
 
 namespace std
 {
@@ -17,10 +18,18 @@ inline  namespace fundamental_v3
 {
 
     //! underlying_type customization point
-    template <class E>
+    template <class T, class Enabler=void>
     struct underlying_type
-    : std::underlying_type<E>
-    {};
+  #if ! defined JASEL_DOXYGEN_INVOKED
+          : underlying_type<T, meta::when<true>> {}
+  #endif
+          ;
+
+    template <typename E>
+    struct underlying_type<E, meta::when<is_enum<E>::value>>
+      : std::underlying_type<E>
+    {
+    };
 
     template <class E>
     using underlying_type_t = typename underlying_type<E>::type;

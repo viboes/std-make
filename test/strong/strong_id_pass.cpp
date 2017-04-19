@@ -17,6 +17,8 @@ using BoardId     = stdex::strong_id<class BoardIdTag>;
 using UEngineId = stdex::strong_id<class EngineIdTag, unsigned int>;
 using UCEngineId = stdex::strong_id<class EngineIdTag, unsigned char>;
 
+static_assert(std::is_same<stdex::underlying_type_t<EngineId>, int>::value, "");
+
 void set_ids(EngineId engine, BoardId board){
   (void)engine;
   (void)board;

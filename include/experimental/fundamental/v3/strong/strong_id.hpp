@@ -7,8 +7,10 @@
 #ifndef JASEL_FUNDAMENTAL_V3_STRONG_STRONG_ID_HPP
 #define JASEL_FUNDAMENTAL_V3_STRONG_STRONG_ID_HPP
 
-#include <experimental/fundamental/v3/strong/tagged.hpp>
+#include <experimental/fundamental/v3/strong/strong_type.hpp>
 #include <experimental/fundamental/v3/strong/underlying_type.hpp>
+#include <experimental/fundamental/v3/strong/mixins/comparable.hpp>
+#include <experimental/fundamental/v3/strong/mixins/streamable.hpp>
 #include <experimental/ordinal.hpp>
 
 #include <type_traits>
@@ -21,7 +23,6 @@ namespace experimental
 {
 inline namespace fundamental_v3
 {
-
   /**
   `strong_id` is a strongly type that wraps a regular type and behaves like a `Regular` type
   The main goal is to be able to define strong identifiers that don't mix between them.
@@ -38,27 +39,18 @@ inline namespace fundamental_v3
   </code>
   */
   template <class Tag, class UT = int>
-  struct strong_id final : private_tagged<Tag, UT>
+  struct strong_id final
+    : private_strong_type<strong_id<Tag, UT>, UT>
+    , mixin::comparable<strong_id<Tag, UT>>
+    , mixin::streamable<strong_id<Tag, UT>>
   {
       //static_assert(is_integral<UT>, "The underlying of a strong_id must be an integral type");
 
-      using base_type = private_tagged<Tag, UT>;
+      using base_type = private_strong_type<strong_id<Tag, UT>, UT>;
+      using tag_type = Tag;
+      using underlying_t = UT;
+
       using base_type::base_type;
-
-      // copy constructor/assignment default
-      constexpr strong_id() noexcept = default;
-
-      //!@{
-      //! relational operators
-      //!
-      //! Forwards to the underlying value
-      friend constexpr bool operator==(strong_id x, strong_id y)  noexcept { return x.value == y.value; }
-      friend constexpr bool operator!=(strong_id x, strong_id y)  noexcept { return x.value != y.value; }
-      friend constexpr bool operator<(strong_id x, strong_id y)  noexcept { return x.value < y.value; }
-      friend constexpr bool operator>(strong_id x, strong_id y)  noexcept { return x.value > y.value; }
-      friend constexpr bool operator<=(strong_id x, strong_id y)  noexcept { return x.value <= y.value; }
-      friend constexpr bool operator>=(strong_id x, strong_id y)  noexcept { return x.value >= y.value; }
-      //!@}
   };
 
   static_assert(std::is_pod<strong_id<int>>::value, "");
@@ -70,40 +62,6 @@ inline namespace fundamental_v3
   //! underlying_type specialization for strong_id
   template <class Tag, class UT>
   struct underlying_type<strong_id<Tag, UT>> { using type = UT; };
-
-  // stream operators
-
-  //! input function.
-  //! @par Effects:<br> Extracts a T from is and stores it in the passes x.
-  //! @param is the input stream
-  //! @param x the \c strong_id
-  //! @par Returns:<br> \c is.
-
-  template <class CharT, class Traits, class Tag, class T >
-  std::basic_istream<CharT, Traits>&
-  operator>>(std::basic_istream<CharT, Traits>& is, strong_id<Tag, T>& x)
-  {
-    T v;
-    is >> v;
-    x = strong_id<Tag, T>(v);
-    return is;
-  }
-
-  //! output function.
-  //! @param os the output stream
-  //! @param x the \c strong_id
-  //!
-  //! @par Returns:<br> the result of the following expression
-  //! @code
-  //! os << x.undelying()
-  //! @endcode
-
-  template <class CharT, class Traits, class Tag, class T >
-  std::basic_ostream<CharT, Traits>&
-  operator<<(std::basic_ostream<CharT, Traits>& os, const strong_id<Tag, T>& x)
-  {
-    return os << x.underlying();
-  }
 
   namespace ordinal {
     template <class Tag, class T>
