@@ -20,6 +20,7 @@
 
 #include <experimental/fundamental/v3/strong/strong_type.hpp>
 #include <experimental/fundamental/v3/strong/underlying_type.hpp>
+#include <experimental/fundamental/v3/strong/mixins/additive.hpp>
 #include <experimental/fundamental/v3/strong/mixins/comparable.hpp>
 #include <experimental/fundamental/v3/strong/mixins/streamable.hpp>
 #include <experimental/ordinal.hpp>
@@ -226,6 +227,7 @@ inline namespace fundamental_v3
   template <class Domain, class UT>
   struct strong_counter final
     : private_strong_type<strong_counter<Domain, UT>, UT>
+    , mixin::additive_base<strong_counter<Domain, UT>>
     , mixin::comparable<strong_counter<Domain, UT>>
     , mixin::streamable<strong_counter<Domain, UT>>
     //: private_tagged<Domain, UT>
@@ -307,23 +309,13 @@ inline namespace fundamental_v3
           { return strong_counter{domain_values<Domain, UT>::max()}; }
 
       // additive operators
-      friend constexpr strong_counter operator+(strong_counter x)  noexcept
-          { return x; }
+      // todo add mixed
       JASEL_MUTABLE_CONSTEXPR strong_counter& operator+=(strong_counter y)  noexcept
           { this->value += y.count(); return *this; }
-      JASEL_MUTABLE_CONSTEXPR strong_counter operator++()  noexcept
-          { return strong_counter(++this->value); }
-      JASEL_MUTABLE_CONSTEXPR strong_counter operator++(int)  noexcept
-          { return strong_counter(this->value++); }
 
-      friend constexpr strong_counter operator-(strong_counter x)  noexcept
-          { return strong_counter(-x.count()); }
+      // todo add mixed
       JASEL_MUTABLE_CONSTEXPR strong_counter& operator-=(strong_counter y)  noexcept
           { this->value -= y.count(); return *this; }
-      JASEL_MUTABLE_CONSTEXPR strong_counter operator--()  noexcept
-          { return strong_counter(--this->value); }
-      JASEL_MUTABLE_CONSTEXPR strong_counter operator--(int)  noexcept
-          { return strong_counter(this->value--); }
 
       //  Multiplicative operators
       JASEL_MUTABLE_CONSTEXPR strong_counter& operator*=(UT y)  noexcept
@@ -332,6 +324,7 @@ inline namespace fundamental_v3
       JASEL_MUTABLE_CONSTEXPR strong_counter& operator/=(UT y)  noexcept
           { this->value /= y; return *this; }
 
+      // todo add mixed
       JASEL_MUTABLE_CONSTEXPR strong_counter& operator%=(strong_counter y)  noexcept
           { this->value %= y.count(); return *this; }
       JASEL_MUTABLE_CONSTEXPR strong_counter& operator%=(UT y)  noexcept
