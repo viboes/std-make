@@ -18,11 +18,15 @@ namespace std
     namespace mixin
     {
       template <class Final>
-      struct additive
+      struct additive_base
       {
         friend constexpr Final operator+(Final const&x)  noexcept
         {
           return x;
+        }
+        friend constexpr Final operator-(Final const&x)  noexcept
+        {
+          return Final(-x._underlying());
         }
 
         //! Forwards to the underlying value
@@ -59,6 +63,20 @@ namespace std
         {
           return Final(x._underlying()--);
         }
+      };
+      template <class Final>
+      struct additive : additive_base<Final>
+      {
+        friend constexpr Final operator+(Final const& x, Final const& y)  noexcept
+        {
+          return Final(x._underlying() + y._underlying());
+        }
+
+        friend constexpr Final operator-(Final const& x, Final const& y)  noexcept
+        {
+          return Final(x._underlying() - y._underlying());
+        }
+
       };
     }
   }

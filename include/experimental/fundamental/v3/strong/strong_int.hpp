@@ -11,6 +11,7 @@
 #include <experimental/fundamental/v3/strong/underlying_type.hpp>
 #include <experimental/fundamental/v3/strong/mixins/additive.hpp>
 #include <experimental/fundamental/v3/strong/mixins/comparable.hpp>
+#include <experimental/fundamental/v3/strong/mixins/multiplicative.hpp>
 #include <experimental/fundamental/v3/strong/mixins/streamable.hpp>
 #include <experimental/type_traits.hpp>
 #include <experimental/ordinal.hpp>
@@ -59,8 +60,9 @@ inline namespace fundamental_v3
   template <class Tag, class UT>
   struct strong_int final
     : private_strong_type<strong_int<Tag, UT>, UT>
-    , mixin::additive<strong_int<Tag, UT>>
+    , mixin::additive_base<strong_int<Tag, UT>>
     , mixin::comparable_with_if<strong_int<Tag, UT>>
+    , mixin::multiplicative<strong_int<Tag, UT>>
     , mixin::streamable<strong_int<Tag, UT>>
   {
       static_assert(is_integral<UT>::value, "UT must be integral");
@@ -107,17 +109,7 @@ inline namespace fundamental_v3
 
       // todo add assignment?
 
-
-      //  Multiplicative operators
-      JASEL_MUTABLE_CONSTEXPR strong_int& operator*=(strong_int y)  noexcept
-      { this->value *= y.underlying(); return *this; }
-
-      JASEL_MUTABLE_CONSTEXPR strong_int& operator/=(strong_int y)  noexcept
-      { this->value /= y.underlying(); return *this; }
-
-      JASEL_MUTABLE_CONSTEXPR strong_int& operator%=(strong_int y)  noexcept
-      { this->value %= y.underlying(); return *this; }
-
+      // Bitwise logic operators
       JASEL_MUTABLE_CONSTEXPR strong_int& operator&=(strong_int y)  noexcept
       { this->value &= y.underlying(); return *this; }
       JASEL_MUTABLE_CONSTEXPR strong_int& operator|=(strong_int y)  noexcept
@@ -128,7 +120,6 @@ inline namespace fundamental_v3
       // fixme: do we want the Bitwise logic operators for an integer? if strong_int should be a replacement of any int, yes.
       // This doesn't mean that we cannot have more specialized types
 
-      // Bitwise logic operators
       // fixme: Should the << parameter be int?
       JASEL_MUTABLE_CONSTEXPR strong_int& operator<<=(strong_int y)  noexcept
       { this->value <<= y.value; return *this; }
@@ -145,12 +136,6 @@ inline namespace fundamental_v3
   }
 
   // additive operators
-//  template <class Tag, class R>
-//  constexpr strong_int<Tag,R> operator+(strong_int<Tag,R> x)  noexcept
-//  {
-//    return x;
-//  }
-
   // begin this needs additive_with_if
   template <class Tag, class R1, class R2>
   constexpr auto operator+(strong_int<Tag,R1> x, strong_int<Tag,R2> y)  noexcept -> decltype(make_strong_int<Tag>(x.underlying() + y.underlying()))
