@@ -9,6 +9,7 @@
 
 #include <experimental/fundamental/v3/strong/strong_type.hpp>
 #include <experimental/fundamental/v3/strong/underlying_type.hpp>
+#include <experimental/fundamental/v3/strong/mixins/bitwise.hpp>
 #include <experimental/fundamental/v3/strong/mixins/comparable.hpp>
 #include <experimental/fundamental/v3/strong/mixins/streamable.hpp>
 #include <experimental/fundamental/v2/config.hpp>
@@ -100,6 +101,7 @@ inline  namespace fundamental_v3
 #else
     struct byte
         : protected_strong_type<byte, unsigned char>
+        , mixin::bitwise_no_check<byte>
         , mixin::comparable<byte>
         , mixin::streamable<byte>
     {
@@ -128,6 +130,7 @@ inline  namespace fundamental_v3
         return static_cast<unsigned char>( i );
     }
 
+#if 0
     template <class IntegerType, typename = enable_if<is_integral<IntegerType>::value>>
     constexpr byte& operator<<=(byte& b, IntegerType shift) noexcept
     {
@@ -178,6 +181,8 @@ inline  namespace fundamental_v3
     {
       return to_byte( ~ to_uchar( b ) );
     }
+#endif
+
 #endif
     static_assert(sizeof(byte) == 1, "byte must have size 1");
 }

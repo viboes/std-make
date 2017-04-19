@@ -10,6 +10,7 @@
 #include <experimental/fundamental/v3/strong/strong_type.hpp>
 #include <experimental/fundamental/v3/strong/underlying_type.hpp>
 #include <experimental/fundamental/v3/strong/mixins/additive.hpp>
+#include <experimental/fundamental/v3/strong/mixins/bitwise.hpp>
 #include <experimental/fundamental/v3/strong/mixins/comparable.hpp>
 #include <experimental/fundamental/v3/strong/mixins/multiplicative.hpp>
 #include <experimental/fundamental/v3/strong/mixins/streamable.hpp>
@@ -61,6 +62,7 @@ inline namespace fundamental_v3
   struct strong_int final
     : private_strong_type<strong_int<Tag, UT>, UT>
     , mixin::additive_base_no_check<strong_int<Tag, UT>>
+    //, mixin::bitwise_base_no_check<strong_int<Tag, UT>>
     , mixin::comparable_with_if<strong_int<Tag, UT>>
     , mixin::multiplicative_base_no_check<strong_int<Tag, UT>>
     , mixin::streamable<strong_int<Tag, UT>>
