@@ -9,6 +9,7 @@
 
 #include <experimental/fundamental/v3/strong/underlying_type.hpp>
 #include <experimental/ordinal.hpp>
+#include <experimental/fundamental/v2/config.hpp>
 #include <functional>
 
 namespace std
@@ -38,10 +39,26 @@ inline  namespace fundamental_v3
       constexpr underlying_t underlying() const noexcept
       { return value; }
 
+
     protected:
       //! the wrapped value
       underlying_t value;
     };
+
+#if 0
+    namespace detail
+    {
+        template <typename T>
+        T underlying_type(wrapper<T>&);
+    } // namespace detail
+
+    /// The underlying type of the [ts::strong_typedef]().
+    /// \exclude target
+    template <class T>
+    using underlying_type_t2 =
+        decltype(detail::underlying_type(std::declval<T>()));
+
+#endif
 
     //! underlying_type specialization for wrapper
     template <class UT>
@@ -59,6 +76,7 @@ inline  namespace fundamental_v3
       using typename base_type::underlying_t;
       using base_type::base_type;
       using base_type::underlying;
+      //using base_type::_underlying;
 
       //! @par Returns the underlying value
       constexpr operator UT () const noexcept
@@ -76,6 +94,7 @@ inline  namespace fundamental_v3
       using typename base_type::underlying_t;
       using base_type::base_type;
       using base_type::underlying;
+      //using base_type::_underlying;
 
       //! @par Returns the underlying value
       explicit constexpr operator UT () const noexcept
@@ -92,6 +111,7 @@ inline  namespace fundamental_v3
       using base_type = wrapper<UT>;
       using base_type::wrapper;
       using base_type::underlying;
+      //using base_type::_underlying;
 
       operator UT () const = delete;
     };

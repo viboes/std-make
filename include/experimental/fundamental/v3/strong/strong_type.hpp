@@ -9,6 +9,7 @@
 
 #include <experimental/fundamental/v3/strong/underlying_type.hpp>
 #include <experimental/fundamental/v3/strong/tagged.hpp>
+#include <experimental/fundamental/v2/config.hpp>
 
 namespace std
 {
@@ -29,7 +30,7 @@ inline  namespace fundamental_v3
     //! @tparam UT the underlying type
 
     template <class Final, class UT>
-    class strong_type
+    struct strong_type
     : tagged<Final, UT>
     {
       using base_type = tagged<Final, UT>;
@@ -39,7 +40,6 @@ inline  namespace fundamental_v3
 
     //private:
       // The following should be accessible only to mixins of the Final class.
-
       //! explicit conversion from a base const class to the @c Final class.
       template<typename F>
       static Final const& _final(F const* f)  {
@@ -51,16 +51,16 @@ inline  namespace fundamental_v3
         return static_cast<Final&>(*f);
       }
 
-      //! explicit conversion from a @c Final class to the underlying type.
-      template<typename F>
-      static underlying_t& _underlying(F* f){
-        return final(f).value;
+      //! explicit conversion to the underlying type.
+      //template<typename F>
+      JASEL_CXX14_CONSTEXPR underlying_t& _underlying(){
+        return this->value;
       }
 
-      //! explicit conversion from a <c>Final const</c> class to the underlying type.
-      template<typename F>
-      static underlying_t const& _underlying(F const* f){
-        return final(f).value;
+      //! explicit conversion to the underlying type.
+      //template<typename F>
+      JASEL_CXX14_CONSTEXPR underlying_t const& _underlying() const {
+        return this->value;
       }
     };
 
@@ -70,10 +70,15 @@ inline  namespace fundamental_v3
     //! @tparam UT the underlying type
     template <class Final, class UT>
     struct public_strong_type
-    : public_tagged<Final, UT>
+    : strong_type<Final, UT>
     {
-      using base_type = public_tagged<Final, UT>;
+      using base_type = strong_type<Final, UT>;
       using base_type::base_type;
+      //using base_type::_underlying;
+
+      //! @par Returns the underlying value
+      constexpr operator UT () const noexcept
+      { return this->value;}
     };
 
     //! protected_strong_type is a strong_type tagged that provides explicit conversion to the underlying type
@@ -82,10 +87,15 @@ inline  namespace fundamental_v3
     //! @tparam UT the underlying type
     template <class Final, class UT>
     struct protected_strong_type
-    : protected_tagged<Final, UT>
+    : strong_type<Final, UT>
     {
-      using base_type = protected_tagged<Final, UT>;
+      using base_type = strong_type<Final, UT>;
       using base_type::base_type;
+      //using base_type::_underlying;
+
+      //! @par Returns the underlying value
+      explicit constexpr operator UT () const noexcept
+      { return this->value;}
     };
 
     //! private_strong_type is a strong_type tagged that provides no conversion to the underlying type
@@ -94,10 +104,14 @@ inline  namespace fundamental_v3
     //! @tparam UT the underlying type
     template <class Final, class UT>
     struct private_strong_type
-    : private_tagged<Final, UT>
+    : strong_type<Final, UT>
     {
-      using base_type = private_tagged<Final, UT>;
+      using base_type = strong_type<Final, UT>;
       using base_type::base_type;
+      //using base_type::_underlying;
+
+      //! @par Returns the underlying value
+      explicit constexpr operator UT () const noexcept = delete;
     };
 
 }
