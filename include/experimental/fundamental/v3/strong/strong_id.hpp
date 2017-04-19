@@ -15,7 +15,6 @@
 
 #include <type_traits>
 #include <functional>
-#include <iosfwd>
 
 namespace std
 {

@@ -7,13 +7,15 @@
 #ifndef JASEL_FUNDAMENTAL_V3_STRONG_STRICT_BOOL_HPP
 #define JASEL_FUNDAMENTAL_V3_STRONG_STRICT_BOOL_HPP
 
-#include <experimental/fundamental/v3/strong/tagged.hpp>
+#include <experimental/fundamental/v3/strong/strong_type.hpp>
 #include <experimental/fundamental/v3/strong/underlying_type.hpp>
+#include <experimental/fundamental/v3/strong/mixins/comparable.hpp>
+#include <experimental/fundamental/v3/strong/mixins/logical.hpp>
+#include <experimental/fundamental/v3/strong/mixins/streamable.hpp>
 #include <experimental/ordinal.hpp>
 
 #include <type_traits>
 #include <functional>
-#include <iosfwd>
 
 namespace std
 {
@@ -43,9 +45,13 @@ inline namespace fundamental_v3
   // Do we need a Bool parameter? Which type will be a good candidate?
   // bool takes 4 bytes in some machines. Sometimes we want to use just 1 byte
   template <class Tag, class Bool = bool>
-  struct strict_bool final : tagged<Tag, Bool>
+  struct strict_bool final
+  : private_strong_type<strict_bool<Tag, Bool>, Bool>
+  , mixin::comparable<strict_bool<Tag, Bool>>
+  , mixin::logical<strict_bool<Tag, Bool>>
+  , mixin::streamable<strict_bool<Tag, Bool>>
   {
-      using base_type = tagged<Tag, Bool>;
+      using base_type = private_strong_type<strict_bool<Tag, Bool>, Bool>;
       using base_type::base_type;
 
       // copy constructor/assignment default
@@ -66,7 +72,6 @@ inline namespace fundamental_v3
       template <class C, class R, class ... Args>
       constexpr explicit strict_bool (R(C::*)(Args...)) = delete;
 
-      //!@{
       // boolean operators
       // fixme do we need these && and || operators?
       // strict_bool is explicit convertible to bool and so && and || operator will force the conversion to bool
@@ -75,39 +80,17 @@ inline namespace fundamental_v3
       // todo do we need mixed boolean operators?
       // If yes, which would be the result. IMO, it should be bool.
       // If not, there will be a conversion to bool and the result is bool
-      //friend constexpr strict_bool operator&&(strict_bool x, strict_bool y)  noexcept { return strict_bool(x.value && y.value); }
-      //friend constexpr strict_bool operator&&(bool x, strict_bool y)  noexcept { return strict_bool(x && y.value); }
-      //friend constexpr strict_bool operator&&(strict_bool x, bool y)  noexcept { return strict_bool(x.value && y); }
 
-      //friend constexpr strict_bool operator||(strict_bool x, strict_bool y)  noexcept { return strict_bool(x.value || y.value); }
-      //friend constexpr strict_bool operator||(bool x, strict_bool y)  noexcept { return strict_bool(x || y.value); }
-      //friend constexpr strict_bool operator||(strict_bool x, bool y)  noexcept { return strict_bool(x.value || y); }
-
-      //friend constexpr strict_bool operator!(strict_bool x)  noexcept { return strict_bool(! x.value); }
-      //!@}
-
-
-      //!@{
-      //! relational operators
-      //!
-      //! Forwards to the underlying value
-      friend constexpr bool operator==(strict_bool x, strict_bool y)  noexcept { return x.value == y.value; }
-      //friend constexpr bool operator==(bool x, strict_bool y)  noexcept { return x == y.value; }
-      //friend constexpr bool operator==(strict_bool x, bool y)  noexcept { return x.value == y; }
-
-      friend constexpr bool operator!=(strict_bool x, strict_bool y)  noexcept { return x.value != y.value; }
-      // fixme do we need order
-      friend constexpr bool operator<(strict_bool x, strict_bool y)  noexcept { return x.value < y.value; }
-      friend constexpr bool operator>(strict_bool x, strict_bool y)  noexcept { return x.value > y.value; }
-      friend constexpr bool operator<=(strict_bool x, strict_bool y)  noexcept { return x.value <= y.value; }
-      friend constexpr bool operator>=(strict_bool x, strict_bool y)  noexcept { return x.value >= y.value; }
-      //!@}
   };
 
   template <class Tag>
-  struct strict_bool<Tag, bool> final : protected_tagged<Tag, bool>
+  struct strict_bool<Tag, bool> final
+    : protected_strong_type<strict_bool<Tag, bool>, bool>
+    , mixin::comparable<strict_bool<Tag, bool>>
+    , mixin::logical<strict_bool<Tag, bool>>
+    , mixin::streamable<strict_bool<Tag, bool>>
   {
-      using base_type = protected_tagged<Tag, bool>;
+      using base_type = protected_strong_type<strict_bool<Tag, bool>, bool>;
       using base_type::base_type;
 
       // copy constructor/assignment default
@@ -122,36 +105,6 @@ inline namespace fundamental_v3
       template <class C, class R, class ... Args>
       constexpr explicit strict_bool (R(C::*)(Args...)) = delete;
 
-      //!@{
-      // boolean operators
-      friend constexpr strict_bool operator&&(strict_bool x, strict_bool y)  noexcept { return strict_bool(x.value && y.value); }
-      //friend constexpr strict_bool operator&&(bool x, strict_bool y)  noexcept { return strict_bool(x && y.value); }
-      //friend constexpr strict_bool operator&&(strict_bool x, bool y)  noexcept { return strict_bool(x.value && y); }
-
-      friend constexpr strict_bool operator||(strict_bool x, strict_bool y)  noexcept { return strict_bool(x.value || y.value); }
-      //friend constexpr strict_bool operator||(bool x, strict_bool y)  noexcept { return strict_bool(x || y.value); }
-      //friend constexpr strict_bool operator||(strict_bool x, bool y)  noexcept { return strict_bool(x.value || y); }
-
-      friend constexpr strict_bool operator!(strict_bool x)  noexcept { return strict_bool(! x.value); }
-      // todo do we need mixed boolean operators?
-      //!@}
-
-
-      //!@{
-      //! relational operators
-      //!
-      //! Forwards to the underlying value
-      friend constexpr bool operator==(strict_bool x, strict_bool y)  noexcept { return x.value == y.value; }
-      //friend constexpr bool operator==(bool x, strict_bool y)  noexcept { return x == y.value; }
-      //friend constexpr bool operator==(strict_bool x, bool y)  noexcept { return x.value == y; }
-
-      friend constexpr bool operator!=(strict_bool x, strict_bool y)  noexcept { return x.value != y.value; }
-      // fixme do we need order
-      friend constexpr bool operator<(strict_bool x, strict_bool y)  noexcept { return x.value < y.value; }
-      friend constexpr bool operator>(strict_bool x, strict_bool y)  noexcept { return x.value > y.value; }
-      friend constexpr bool operator<=(strict_bool x, strict_bool y)  noexcept { return x.value <= y.value; }
-      friend constexpr bool operator>=(strict_bool x, strict_bool y)  noexcept { return x.value >= y.value; }
-      //!@}
   };
 
   static_assert(std::is_pod<strict_bool<bool>>::value, "");
@@ -163,40 +116,6 @@ inline namespace fundamental_v3
   //! underlying_type specialization for strict_bool
   template <class Tag, class Bool>
   struct underlying_type<strict_bool<Tag, Bool>> { using type = Bool; };
-
-  // stream operators
-
-  //! input function.
-  //! @par Effects:<br> Extracts a T from is and stores it in the passes x.
-  //! @param is the input stream
-  //! @param x the \c strict_bool
-  //! \n<b>Returns:</b><br> \c is.
-
-  template <class CharT, class Traits, class Tag, class T >
-  std::basic_istream<CharT, Traits>&
-  operator>>(std::basic_istream<CharT, Traits>& is, strict_bool<Tag, T>& x)
-  {
-    T v;
-    is >> v;
-    x = strict_bool<Tag, T>(v);
-    return is;
-  }
-
-  //! output function.
-  //! @param os the output stream
-  //! @param x the \c strict_bool
-  //!
-  //! \n<b>Returns:</b><br> the result of the following expression
-  //! @code
-  //! os << bool(x.undelying())
-  //! @endcode
-
-  template <class CharT, class Traits, class Tag, class T >
-  std::basic_ostream<CharT, Traits>&
-  operator<<(std::basic_ostream<CharT, Traits>& os, const strict_bool<Tag, T>& x)
-  {
-    return os << bool(x.underlying());
-  }
 
   namespace ordinal {
     template <class Tag, class T>
@@ -210,18 +129,12 @@ inline namespace fundamental_v3
     };
   }
 
-#if 0
-  // fixme: Should boolean be a strong bool without tag?
-  using boolean = strict_bool<default_tag, bool>;
-  using boolean8_t = strict_bool<default_tag, uint8_t>;
-#endif
 }
 }
 
   template <class Tag, class UT>
   struct hash<experimental::strict_bool<Tag,UT>> :
     experimental::wrapped_hash<experimental::strict_bool<Tag,UT>> {};
-
 
 }
 

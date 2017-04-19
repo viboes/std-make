@@ -7,13 +7,15 @@
 #ifndef JASEL_FUNDAMENTAL_V3_STRONG_STRONG_BOOL_HPP
 #define JASEL_FUNDAMENTAL_V3_STRONG_STRONG_BOOL_HPP
 
-#include <experimental/fundamental/v3/strong/tagged.hpp>
+#include <experimental/fundamental/v3/strong/strong_type.hpp>
 #include <experimental/fundamental/v3/strong/underlying_type.hpp>
+#include <experimental/fundamental/v3/strong/mixins/comparable.hpp>
+#include <experimental/fundamental/v3/strong/mixins/logical.hpp>
+#include <experimental/fundamental/v3/strong/mixins/streamable.hpp>
 #include <experimental/ordinal.hpp>
 
 #include <type_traits>
 #include <functional>
-#include <iosfwd>
 
 namespace std
 {
@@ -40,12 +42,45 @@ inline namespace fundamental_v3
 
   </code>
   */
+
+  // Q/A
   // Do we need a Bool parameter? Which type will be a good candidate?
   // bool takes 4 bytes in some machines. Sometimes we want to use just 1 byte
+  //
+  // fixme Should strong_bool be implicitly convertible from bool?
+  // It is better if strong types are only explicitly convertible from its underlying type, so that we avoid overload ambiguity.
+  // However, requiring an explicit conversion make the code cumbersome.
+  // Maybe we need a boolean type that has some of the strong_bool abilities, but it is convertible from bool.
+  //
+  // fixme Should this class convert implicitly or explicitly to bool?
+  // A strong bool is a bool, so we could convert it implicitly.
+  // Note that having implicit conversions introduce overload ambiguity.
+  // For the time being, we support only explicit conversion on both sides.
+  //
+  // fixme do we need the logical operators ?
+  // strong_bool is (explicit) convertible to bool and so && and || operator and ?: operator will force the conversion to bool
+  // If we don't define them we need to be explicit to convert to strong_bool
+  // If we define them, we need to be explicit to convert to bool.
+  // This can be the reason d'être of the difference between strict_bool and strong_bool.
+  //
+  // Do we need mixed boolean operators?
+  // If yes, which would be the result. IMO, it should be bool.
+  // If not, there will be a conversion to bool and the result is bool
+  // So we don't need them
+  //
+  // fixme What should be the result of comparing two enums? bool or strong_bool?
+  // For the time being, these functions return bool.
+  //
+  // fixme Should strong_bool be comparable?
+
   template <class Tag, class Bool = bool>
-  struct strong_bool final : tagged<Tag, Bool>
+  struct strong_bool final
+     : private_strong_type<strong_bool<Tag, Bool>, Bool>
+     , mixin::comparable<strong_bool<Tag, Bool>>
+     , mixin::logical<strong_bool<Tag, Bool>>
+     , mixin::streamable<strong_bool<Tag, Bool>>
   {
-      using base_type = tagged<Tag, Bool>;
+      using base_type = private_strong_type<strong_bool<Tag, Bool>, Bool>;
       using base_type::base_type;
 
       // copy constructor/assignment default
@@ -66,48 +101,17 @@ inline namespace fundamental_v3
       template <class C, class R, class ... Args>
       constexpr explicit strong_bool (R(C::*)(Args...)) = delete;
 
-      //!@{
-      // boolean operators
-      // fixme do we need these && and || operators?
-      // strong_bool is explicit convertible to bool and so && and || operator will force the conversion to bool
-      // If we don't define them we need to be explicit to convert to strong_bool
-      // If we define them, we need to be explicit to convert to bool.
-      // todo do we need mixed boolean operators?
-      // If yes, which would be the result. IMO, it should be bool.
-      // If not, there will be a conversion to bool and the result is bool
-      friend constexpr strong_bool operator&&(strong_bool x, strong_bool y)  noexcept { return strong_bool(x.value && y.value); }
-      //friend constexpr strong_bool operator&&(bool x, strong_bool y)  noexcept { return strong_bool(x && y.value); }
-      //friend constexpr strong_bool operator&&(strong_bool x, bool y)  noexcept { return strong_bool(x.value && y); }
 
-      friend constexpr strong_bool operator||(strong_bool x, strong_bool y)  noexcept { return strong_bool(x.value || y.value); }
-      //friend constexpr strong_bool operator||(bool x, strong_bool y)  noexcept { return strong_bool(x || y.value); }
-      //friend constexpr strong_bool operator||(strong_bool x, bool y)  noexcept { return strong_bool(x.value || y); }
-
-      friend constexpr strong_bool operator!(strong_bool x)  noexcept { return strong_bool(! x.value); }
-      //!@}
-
-
-      //!@{
-      //! relational operators
-      //!
-      //! Forwards to the underlying value
-      friend constexpr bool operator==(strong_bool x, strong_bool y)  noexcept { return x.value == y.value; }
-      //friend constexpr bool operator==(bool x, strong_bool y)  noexcept { return x == y.value; }
-      //friend constexpr bool operator==(strong_bool x, bool y)  noexcept { return x.value == y; }
-
-      friend constexpr bool operator!=(strong_bool x, strong_bool y)  noexcept { return x.value != y.value; }
-      // fixme do we need order
-      friend constexpr bool operator<(strong_bool x, strong_bool y)  noexcept { return x.value < y.value; }
-      friend constexpr bool operator>(strong_bool x, strong_bool y)  noexcept { return x.value > y.value; }
-      friend constexpr bool operator<=(strong_bool x, strong_bool y)  noexcept { return x.value <= y.value; }
-      friend constexpr bool operator>=(strong_bool x, strong_bool y)  noexcept { return x.value >= y.value; }
-      //!@}
   };
 
   template <class Tag>
-  struct strong_bool<Tag, bool> final : protected_tagged<Tag, bool>
+  struct strong_bool<Tag, bool> final
+  : protected_strong_type<strong_bool<Tag, bool>, bool>
+  , mixin::comparable<strong_bool<Tag, bool>>
+  , mixin::logical<strong_bool<Tag, bool>>
+  , mixin::streamable<strong_bool<Tag, bool>>
   {
-      using base_type = protected_tagged<Tag, bool>;
+      using base_type = protected_strong_type<strong_bool<Tag, bool>, bool>;
       using base_type::base_type;
 
       // copy constructor/assignment default
@@ -121,37 +125,6 @@ inline namespace fundamental_v3
       constexpr explicit strong_bool (R(*)(Args...)) = delete;
       template <class C, class R, class ... Args>
       constexpr explicit strong_bool (R(C::*)(Args...)) = delete;
-
-      //!@{
-      // boolean operators
-      friend constexpr strong_bool operator&&(strong_bool x, strong_bool y)  noexcept { return strong_bool(x.value && y.value); }
-      //friend constexpr strong_bool operator&&(bool x, strong_bool y)  noexcept { return strong_bool(x && y.value); }
-      //friend constexpr strong_bool operator&&(strong_bool x, bool y)  noexcept { return strong_bool(x.value && y); }
-
-      friend constexpr strong_bool operator||(strong_bool x, strong_bool y)  noexcept { return strong_bool(x.value || y.value); }
-      //friend constexpr strong_bool operator||(bool x, strong_bool y)  noexcept { return strong_bool(x || y.value); }
-      //friend constexpr strong_bool operator||(strong_bool x, bool y)  noexcept { return strong_bool(x.value || y); }
-
-      friend constexpr strong_bool operator!(strong_bool x)  noexcept { return strong_bool(! x.value); }
-      // todo do we need mixed boolean operators?
-      //!@}
-
-
-      //!@{
-      //! relational operators
-      //!
-      //! Forwards to the underlying value
-      friend constexpr bool operator==(strong_bool x, strong_bool y)  noexcept { return x.value == y.value; }
-      //friend constexpr bool operator==(bool x, strong_bool y)  noexcept { return x == y.value; }
-      //friend constexpr bool operator==(strong_bool x, bool y)  noexcept { return x.value == y; }
-
-      friend constexpr bool operator!=(strong_bool x, strong_bool y)  noexcept { return x.value != y.value; }
-      // fixme do we need order
-      friend constexpr bool operator<(strong_bool x, strong_bool y)  noexcept { return x.value < y.value; }
-      friend constexpr bool operator>(strong_bool x, strong_bool y)  noexcept { return x.value > y.value; }
-      friend constexpr bool operator<=(strong_bool x, strong_bool y)  noexcept { return x.value <= y.value; }
-      friend constexpr bool operator>=(strong_bool x, strong_bool y)  noexcept { return x.value >= y.value; }
-      //!@}
   };
 
   static_assert(std::is_pod<strong_bool<bool>>::value, "");
@@ -163,40 +136,6 @@ inline namespace fundamental_v3
   //! underlying_type specialization for strong_bool
   template <class Tag, class Bool>
   struct underlying_type<strong_bool<Tag, Bool>> { using type = Bool; };
-
-  // stream operators
-
-  //! input function.
-  //! @par Effects:<br> Extracts a T from is and stores it in the passes x.
-  //! @param is the input stream
-  //! @param x the \c strong_bool
-  //! \n<b>Returns:</b><br> \c is.
-
-  template <class CharT, class Traits, class Tag, class T >
-  std::basic_istream<CharT, Traits>&
-  operator>>(std::basic_istream<CharT, Traits>& is, strong_bool<Tag, T>& x)
-  {
-    T v;
-    is >> v;
-    x = strong_bool<Tag, T>(v);
-    return is;
-  }
-
-  //! output function.
-  //! @param os the output stream
-  //! @param x the \c strong_bool
-  //!
-  //! \n<b>Returns:</b><br> the result of the following expression
-  //! @code
-  //! os << bool(x.undelying())
-  //! @endcode
-
-  template <class CharT, class Traits, class Tag, class T >
-  std::basic_ostream<CharT, Traits>&
-  operator<<(std::basic_ostream<CharT, Traits>& os, const strong_bool<Tag, T>& x)
-  {
-    return os << bool(x.underlying());
-  }
 
   namespace ordinal {
     template <class Tag, class T>
