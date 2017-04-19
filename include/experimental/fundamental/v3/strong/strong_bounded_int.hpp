@@ -11,7 +11,7 @@
 #include <experimental/fundamental/v3/strong/underlying_type.hpp>
 #include <experimental/fundamental/v3/strong/mixins/additive.hpp>
 #include <experimental/fundamental/v3/strong/mixins/comparable.hpp>
-#include <experimental/fundamental/v3/strong/mixins/multiplicative.hpp>
+#include <experimental/fundamental/v3/strong/mixins/integer_multiplicative.hpp>
 #include <experimental/fundamental/v3/strong/mixins/streamable.hpp>
 #include <experimental/ordinal.hpp>
 
@@ -67,7 +67,7 @@ inline namespace fundamental_v3
     : private_strong_type<strong_bounded_int<Tag, UT, Low, High>, UT>
     , mixin::additive_check<strong_bounded_int<Tag, UT, Low, High>>
     , mixin::comparable<strong_bounded_int<Tag, UT, Low, High>>
-    , mixin::multiplicative_check<strong_bounded_int<Tag, UT, Low, High>>
+    , mixin::integer_multiplicative_check<strong_bounded_int<Tag, UT, Low, High>>
     , mixin::streamable<strong_bounded_int<Tag, UT, Low, High>>
   {
       static_assert(is_integral<UT>::value, "UT must be integral");

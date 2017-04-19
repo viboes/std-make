@@ -41,11 +41,6 @@ namespace std
           x._underlying() /= y._underlying();
           return x;
         }
-        friend JASEL_MUTABLE_CONSTEXPR Final& operator%=(Final& x, Final const& y) noexcept
-        {
-          x._underlying() %= y._underlying();
-          return x;
-        }
       };
       template <class Final>
       struct multiplicative_base_check : multiplicative_base<Final>
@@ -61,11 +56,6 @@ namespace std
           x = Final(x._underlying() / y._underlying());
           return x;
         }
-        friend JASEL_MUTABLE_CONSTEXPR Final& operator%=(Final& x, Final const& y) noexcept
-        {
-          x = Final(x._underlying() % y._underlying());
-          return x;
-        }
       };
       template <class Final>
       struct multiplicative_check : multiplicative_base_check<Final>
@@ -77,10 +67,6 @@ namespace std
         friend constexpr Final operator/(Final const& x, Final const& y)  noexcept
         {
           return Final(x._underlying() / y._underlying());
-        }
-        friend constexpr Final operator%(Final const& x, Final const& y)  noexcept
-        {
-          return Final(x._underlying() % y._underlying());
         }
       };
     }

@@ -12,7 +12,7 @@
 #include <experimental/fundamental/v3/strong/mixins/additive.hpp>
 #include <experimental/fundamental/v3/strong/mixins/bitwise.hpp>
 #include <experimental/fundamental/v3/strong/mixins/comparable.hpp>
-#include <experimental/fundamental/v3/strong/mixins/multiplicative.hpp>
+#include <experimental/fundamental/v3/strong/mixins/integer_multiplicative.hpp>
 #include <experimental/fundamental/v3/strong/mixins/streamable.hpp>
 #include <experimental/type_traits.hpp>
 #include <experimental/ordinal.hpp>
@@ -64,7 +64,7 @@ inline namespace fundamental_v3
     , mixin::additive_base_no_check<strong_int<Tag, UT>>
     //, mixin::bitwise_base_no_check<strong_int<Tag, UT>>
     , mixin::comparable_with_if<strong_int<Tag, UT>>
-    , mixin::multiplicative_base_no_check<strong_int<Tag, UT>>
+    , mixin::integer_multiplicative_base_no_check<strong_int<Tag, UT>>
     , mixin::streamable<strong_int<Tag, UT>>
   {
       static_assert(is_integral<UT>::value, "UT must be integral");
