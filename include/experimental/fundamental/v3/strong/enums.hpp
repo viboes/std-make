@@ -7,12 +7,13 @@
 #ifndef JASEL_FUNDAMENTAL_V3_STRONG_STRONG_ENUMS_HPP
 #define JASEL_FUNDAMENTAL_V3_STRONG_STRONG_ENUMS_HPP
 
-#include <experimental/fundamental/v3/strong/wrapper.hpp>
+#include <experimental/fundamental/v3/strong/strong_type.hpp>
 #include <experimental/fundamental/v3/strong/underlying_type.hpp>
+#include <experimental/fundamental/v3/strong/mixins/comparable.hpp>
+#include <experimental/fundamental/v3/strong/mixins/streamable.hpp>
 #include <experimental/optional.hpp>
 #include <exception>
 #include <functional>
-#include <iosfwd>
 
 namespace std
 {
@@ -77,10 +78,13 @@ inline namespace fundamental_v3
   template <class E>
   using native_enum_type_t = typename native_enum_type<E>::type;
 
-  template <class E, class UT=typename underlying_type<E>::type>
-  struct enum_wrapper : private_wrapper<UT>
+  template <class Final, class E, class UT=typename underlying_type<E>::type>
+  struct enum_wrapper
+      : private_strong_type<Final, UT>
+      , mixin::comparable<Final>
+      , mixin::streamable<Final>
   {
-      using base_type = private_wrapper<UT>;
+      using base_type = private_strong_type<Final, UT>;
       using base_type::base_type;
 
       typedef E enum_type;
@@ -104,62 +108,21 @@ inline namespace fundamental_v3
   //! typedef strong_enum<SE::type, uint8_t> SSE
 
   template <class E, class UT=typename underlying_type<E>::type>
-  struct strong_enum final : enum_wrapper<E, UT>
+  struct strong_enum final : enum_wrapper<strong_enum<E, UT>, E, UT>
   {
-      using base_type = enum_wrapper<E, UT>;
-      using base_type::enum_wrapper;
-
-      friend constexpr bool operator==(strong_enum x, strong_enum y) noexcept { return x.value == y.value; }
-      friend constexpr bool operator!=(strong_enum x, strong_enum y) noexcept { return x.value != y.value; }
-      friend constexpr bool operator<(strong_enum x, strong_enum y) noexcept { return x.value < y.value; }
-      friend constexpr bool operator<=(strong_enum x, strong_enum y) noexcept { return x.value <= y.value; }
-      friend constexpr bool operator>(strong_enum x, strong_enum y) noexcept { return x.value > y.value; }
-      friend constexpr bool operator>=(strong_enum x, strong_enum y) noexcept { return x.value >= y.value; }
+      using base_type = enum_wrapper<strong_enum<E, UT>, E, UT>;
+      using base_type::base_type;
 
   };
-
-  // stream operators
-
-  //! strong_enum input function.
-  //! @par Effects:<br> Extracts a T from is and stores it in the passes x.
-  //! @param is the input stream
-  //! @param x the \c strong_enum
-  //! @par Returns:<br> \c is.
-
-  template <class CharT, class Traits, class E, class T >
-  std::basic_istream<CharT, Traits>&
-  operator>>(std::basic_istream<CharT, Traits>& is, strong_enum<E, T>& x)
-  {
-    T v;
-    is >> v;
-    x = strong_enum<E, T>(v);
-    return is;
-  }
-
-  //! strong_enum output function.
-  //! @param os the output stream
-  //! @param x the \c strong_enum
-  //!
-  //! @par Returns:<br> the result of the following expression
-  //! @code
-  //! os << bool(x.undelying())
-  //! @endcode
-
-  template <class CharT, class Traits, class E, class T >
-  std::basic_ostream<CharT, Traits>&
-  operator<<(std::basic_ostream<CharT, Traits>& os, const strong_enum<E, T>& x)
-  {
-    return os << x.underlying();
-  }
 
   template <class E, class UT>
   struct underlying_type<strong_enum<E,UT>> { typedef UT type; };
 
   // safe_enum is a strong_enum that checks the validity of the values of the enum using is_valid_enum
   template <class E, class UT=typename underlying_type<E>::type>
-  struct safe_enum final: enum_wrapper<E,UT>
+  struct safe_enum final: enum_wrapper<safe_enum<E, UT>, E, UT>
   {
-      using base_type = enum_wrapper<E,UT>;
+      using base_type = enum_wrapper<safe_enum<E, UT>, E, UT>;
       using base_type::base_type;
       using underlying_t = typename base_type::underlying_t;
 
@@ -169,48 +132,7 @@ inline namespace fundamental_v3
       constexpr safe_enum() noexcept = default;
       explicit safe_enum(underlying_t v): base_type(UT(to_valid_enum<E>(v))) {}
 
-      friend constexpr bool operator==(safe_enum x, safe_enum y) noexcept { return x.value == y.value; }
-      friend constexpr bool operator!=(safe_enum x, safe_enum y) noexcept { return x.value != y.value; }
-      friend constexpr bool operator<(safe_enum x, safe_enum y) noexcept { return x.value < y.value; }
-      friend constexpr bool operator<=(safe_enum x, safe_enum y) noexcept { return x.value <= y.value; }
-      friend constexpr bool operator>(safe_enum x, safe_enum y) noexcept { return x.value > y.value; }
-      friend constexpr bool operator>=(safe_enum x, safe_enum y) noexcept { return x.value >= y.value; }
-
   };
-
-  // stream operators
-
-  //! safe_enum input function.
-  //! @par Effects:<br> Extracts a T from is and stores it in the passes x.
-  //! @param is the input stream
-  //! @param x the \c safe_enum
-  //! @par Returns:<br> \c is.
-
-  template <class CharT, class Traits, class E, class T >
-  std::basic_istream<CharT, Traits>&
-  operator>>(std::basic_istream<CharT, Traits>& is, safe_enum<E, T>& x)
-  {
-    T v;
-    is >> v;
-    x = safe_enum<E, T>(v);
-    return is;
-  }
-
-  //! safe_enum output function.
-  //! @param os the output stream
-  //! @param x the \c safe_enum
-  //!
-  //! @par Returns:<br> the result of the following expression
-  //! @code
-  //! os << bool(x.undelying())
-  //! @endcode
-
-  template <class CharT, class Traits, class E, class T >
-  std::basic_ostream<CharT, Traits>&
-  operator<<(std::basic_ostream<CharT, Traits>& os, const safe_enum<E, T>& x)
-  {
-    return os << int(x.to_enum());
-  }
 
   template <class E, class UT>
   struct underlying_type<safe_enum<E,UT>> { typedef UT type; };
@@ -218,9 +140,9 @@ inline namespace fundamental_v3
   // ordinal_enum is a strong enum that checks the validity of the values of the enum using is_enumerator
   // is_enumerator is specialized for ordinal enums
   template <class E, class UT=typename underlying_type<E>::type>
-  struct ordinal_enum final: enum_wrapper<E,UT>
+  struct ordinal_enum final: enum_wrapper<ordinal_enum<E, UT>, E, UT>
   {
-      using base_type = enum_wrapper<E,UT>;
+      using base_type = enum_wrapper<ordinal_enum<E, UT>, E, UT>;
       using base_type::base_type;
       using underlying_t = typename  base_type::underlying_t;
 
@@ -230,54 +152,12 @@ inline namespace fundamental_v3
       constexpr ordinal_enum() noexcept = default;
       explicit ordinal_enum(underlying_t v): base_type(UT(to_enumerator<E>(v))) {}
 
-      friend constexpr bool operator==(ordinal_enum x, ordinal_enum y) noexcept { return x.value == y.value; }
-      friend constexpr bool operator!=(ordinal_enum x, ordinal_enum y) noexcept { return x.value != y.value; }
-
       // Note that ordinal_enum order is based on the underlying type not the position
-      friend constexpr bool operator<(ordinal_enum x, ordinal_enum y) noexcept { return x.value < y.value; }
-      friend constexpr bool operator<=(ordinal_enum x, ordinal_enum y) noexcept { return x.value <= y.value; }
-      friend constexpr bool operator>(ordinal_enum x, ordinal_enum y) noexcept { return x.value > y.value; }
-      friend constexpr bool operator>=(ordinal_enum x, ordinal_enum y) noexcept { return x.value >= y.value; }
 
   };
 
-  // stream operators
-  // fixme enums don't define the stream operators
-  //! ordinal_enum input function.
-  //! @par Effects:<br> Extracts a T from is and stores it in the passes x.
-  //! @param is the input stream
-  //! @param x the \c safe_enum
-  //! @par Returns:<br> \c is.
-
-  template <class CharT, class Traits, class E, class T >
-  std::basic_istream<CharT, Traits>&
-  operator>>(std::basic_istream<CharT, Traits>& is, ordinal_enum<E, T>& x)
-  {
-    T v;
-    is >> v;
-    x = ordinal_enum<E, T>(v);
-    return is;
-  }
-
-  //! ordinal_enum output function.
-  //! @param os the output stream
-  //! @param x the \c ordinal_enum
-  //!
-  //! @par Returns:<br> the result of the following expression
-  //! @code
-  //! os << +x.undelying()
-  //! @endcode
-
-  template <class CharT, class Traits, class E, class T >
-  std::basic_ostream<CharT, Traits>&
-  operator<<(std::basic_ostream<CharT, Traits>& os, const ordinal_enum<E, T>& x)
-  {
-    return os << +x.to_undelying();
-  }
-
   template <class E, class UT>
   struct underlying_type<ordinal_enum<E,UT>> { typedef UT type; };
-
 
 }
 }
