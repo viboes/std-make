@@ -12,14 +12,14 @@
 namespace stdex = std::experimental;
 namespace nmx = std::experimental::numerics;
 
-static_assert(std::is_same_v<decltype(nmx::wide_neg(int32_t(1))), int64_t>, "error");
-static_assert(std::is_same_v<decltype(nmx::wide_neg(uint32_t(1))), uint64_t>, "error");
+static_assert(std::is_same<decltype(nmx::wide_neg(int32_t(1))), int64_t>::value, "error");
+static_assert(std::is_same<decltype(nmx::wide_neg(uint32_t(1))), uint64_t>::value, "error");
 
-static_assert(std::is_same_v<decltype(nmx::wide_add(int32_t(1), int32_t(1))), int64_t>, "error");
-static_assert(std::is_same_v<decltype(nmx::wide_add(uint32_t(1), uint32_t(1))), uint64_t>, "error");
+static_assert(std::is_same<decltype(nmx::wide_add(int32_t(1), int32_t(1))), int64_t>::value, "error");
+static_assert(std::is_same<decltype(nmx::wide_add(uint32_t(1), uint32_t(1))), uint64_t>::value, "error");
 
-static_assert(std::is_same_v<decltype(nmx::wide_sub(int32_t(1), int32_t(1))), int64_t>, "error");
-static_assert(std::is_same_v<decltype(nmx::wide_sub(uint32_t(1), uint32_t(1))), uint64_t>, "error");
+static_assert(std::is_same<decltype(nmx::wide_sub(int32_t(1), int32_t(1))), int64_t>::value, "error");
+static_assert(std::is_same<decltype(nmx::wide_sub(uint32_t(1), uint32_t(1))), uint64_t>::value, "error");
 
 int main()
 {

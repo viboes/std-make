@@ -14,24 +14,24 @@
 namespace stdex = std::experimental;
 namespace nmx = std::experimental::numerics;
 
-static_assert(std::is_same_v<decltype(nmx::to_signed(1)), int>, "error");
-static_assert(std::is_same_v<decltype(nmx::to_signed(1u)), int>, "error");
-static_assert(std::is_same_v<decltype(nmx::to_unsigned(1)), unsigned int>, "error");
-static_assert(std::is_same_v<decltype(nmx::to_unsigned(1u)), unsigned int>, "error");
+static_assert(std::is_same<decltype(nmx::to_signed(1)), int>::value, "error");
+static_assert(std::is_same<decltype(nmx::to_signed(1u)), int>::value, "error");
+static_assert(std::is_same<decltype(nmx::to_unsigned(1)), unsigned int>::value, "error");
+static_assert(std::is_same<decltype(nmx::to_unsigned(1u)), unsigned int>::value, "error");
 
-static_assert(std::is_same_v<decltype(nmx::to_double((std::int8_t)1)), std::int16_t>, "error");
-static_assert(std::is_same_v<decltype(nmx::to_double((std::uint8_t)1)), std::uint16_t>, "error");
-static_assert(std::is_same_v<decltype(nmx::to_double((std::int16_t)1)), std::int32_t>, "error");
-static_assert(std::is_same_v<decltype(nmx::to_double((std::uint16_t)1)), std::uint32_t>, "error");
-static_assert(std::is_same_v<decltype(nmx::to_double((std::int32_t)1)), std::int64_t>, "error");
-static_assert(std::is_same_v<decltype(nmx::to_double((std::uint32_t)1)), std::uint64_t>, "error");
+static_assert(std::is_same<decltype(nmx::to_double((std::int8_t)1)), std::int16_t>::value, "error");
+static_assert(std::is_same<decltype(nmx::to_double((std::uint8_t)1)), std::uint16_t>::value, "error");
+static_assert(std::is_same<decltype(nmx::to_double((std::int16_t)1)), std::int32_t>::value, "error");
+static_assert(std::is_same<decltype(nmx::to_double((std::uint16_t)1)), std::uint32_t>::value, "error");
+static_assert(std::is_same<decltype(nmx::to_double((std::int32_t)1)), std::int64_t>::value, "error");
+static_assert(std::is_same<decltype(nmx::to_double((std::uint32_t)1)), std::uint64_t>::value, "error");
 
-static_assert(std::is_same_v<decltype(nmx::to_half((std::int16_t)1)), std::int8_t>, "error");
-static_assert(std::is_same_v<decltype(nmx::to_half((std::uint16_t)1)), std::uint8_t>, "error");
-static_assert(std::is_same_v<decltype(nmx::to_half((std::int32_t)1)), std::int16_t>, "error");
-static_assert(std::is_same_v<decltype(nmx::to_half((std::uint32_t)1)), std::uint16_t>, "error");
-static_assert(std::is_same_v<decltype(nmx::to_half((std::int64_t)1)), std::int32_t>, "error");
-static_assert(std::is_same_v<decltype(nmx::to_half((std::uint64_t)1)), std::uint32_t>, "error");
+static_assert(std::is_same<decltype(nmx::to_half((std::int16_t)1)), std::int8_t>::value, "error");
+static_assert(std::is_same<decltype(nmx::to_half((std::uint16_t)1)), std::uint8_t>::value, "error");
+static_assert(std::is_same<decltype(nmx::to_half((std::int32_t)1)), std::int16_t>::value, "error");
+static_assert(std::is_same<decltype(nmx::to_half((std::uint32_t)1)), std::uint16_t>::value, "error");
+static_assert(std::is_same<decltype(nmx::to_half((std::int64_t)1)), std::int32_t>::value, "error");
+static_assert(std::is_same<decltype(nmx::to_half((std::uint64_t)1)), std::uint32_t>::value, "error");
 
 int main()
 {

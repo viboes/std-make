@@ -9,7 +9,7 @@
 #define JASEL_NUMERIC_V1_NUMBERS_DOUBLE_WIDE_TYPES_HPP
 
 #include <cstdint>
-#include <type_traits>
+#include <experimental/type_traits.hpp>
 
 namespace std
 {
@@ -97,14 +97,14 @@ inline  namespace v1
   template <typename T>
   half_width<unsigned_<T>> split_upper( T a )
   {
-    static_assert(is_integral_v<T>, "T must be integral");
+    static_assert(is_integral<T>::value, "T must be integral");
 
     return to_half(to_unsigned(a) >> (8 * sizeof(T) / 2));
   }
   template <typename T>
   half_width<unsigned_<T>> split_lower( T a )
   {
-    static_assert(is_integral_v<T>, "T must be integral");
+    static_assert(is_integral<T>::value, "T must be integral");
 
     return to_half(to_unsigned(a));
   }
@@ -112,16 +112,16 @@ inline  namespace v1
   template <typename T>
   unsigned_<double_width<T>> wide_unsigned( T high, T low )
   {
-    static_assert(is_integral_v<T>, "T must be integral");
-    static_assert(is_unsigned_v<T>, "T must be integral");
+    static_assert(is_integral<T>::value, "T must be integral");
+    static_assert(is_unsigned<T>::value, "T must be integral");
 
     return (to_double(high) << (8*sizeof(T)))  | to_double(low);
   }
   template <typename T>
   signed_<double_width<T>> wide_signed( T high, T low )
   {
-    static_assert(is_integral_v<T>, "T must be integral");
-    static_assert(is_unsigned_v<T>, "T must be integral");
+    static_assert(is_integral<T>::value, "T must be integral");
+    static_assert(is_unsigned<T>::value, "T must be integral");
 
     return to_signed(wide_unsigned(high, low));
   }
