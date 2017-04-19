@@ -12,6 +12,7 @@
 #include <experimental/fundamental/v3/strong/mixins/comparable.hpp>
 #include <experimental/fundamental/v3/strong/mixins/streamable.hpp>
 #include <experimental/ordinal.hpp>
+#include <experimental/fundamental/v2/config.hpp>
 
 #include <type_traits>
 #include <functional>
