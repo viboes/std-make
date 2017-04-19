@@ -7,8 +7,10 @@
 #ifndef JASEL_FUNDAMENTAL_V3_STRONG_BYTE_HPP
 #define JASEL_FUNDAMENTAL_V3_STRONG_BYTE_HPP
 
+#include <experimental/fundamental/v3/strong/strong_type.hpp>
 #include <experimental/fundamental/v3/strong/underlying_type.hpp>
-#include <experimental/fundamental/v3/strong/wrapper.hpp>
+#include <experimental/fundamental/v3/strong/mixins/comparable.hpp>
+#include <experimental/fundamental/v3/strong/mixins/streamable.hpp>
 #include <experimental/fundamental/v2/config.hpp>
 
 #if defined __clang__ && __cplusplus > 201402L
@@ -96,22 +98,13 @@ inline  namespace fundamental_v3
       return byte{ to_uchar( ~ to_uchar( b ) ) };
     }
 #else
-    struct byte : protected_wrapper<unsigned char>
+    struct byte
+        : protected_strong_type<byte, unsigned char>
+        , mixin::comparable<byte>
+        , mixin::streamable<byte>
     {
-      using base_type = protected_wrapper<unsigned char>;
+      using base_type = protected_strong_type<byte, unsigned char>;
       using base_type::base_type;
-
-      //!@{
-      //! relational operators
-      //!
-      //! Forwards to the underlying value
-      friend constexpr bool operator==(byte x, byte y)  noexcept { return x.value == y.value; }
-      friend constexpr bool operator!=(byte x, byte y)  noexcept { return x.value != y.value; }
-      friend constexpr bool operator<(byte x, byte y)  noexcept { return x.value < y.value; }
-      friend constexpr bool operator>(byte x, byte y)  noexcept { return x.value > y.value; }
-      friend constexpr bool operator<=(byte x, byte y)  noexcept { return x.value <= y.value; }
-      friend constexpr bool operator>=(byte x, byte y)  noexcept { return x.value >= y.value; }
-      //!@}
     };
 
     template< class T >
