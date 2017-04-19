@@ -18,8 +18,10 @@
  * In addition to the underlying() function it provides the count() member function.
  */
 
-#include <experimental/fundamental/v3/strong/tagged.hpp>
+#include <experimental/fundamental/v3/strong/strong_type.hpp>
 #include <experimental/fundamental/v3/strong/underlying_type.hpp>
+#include <experimental/fundamental/v3/strong/mixins/comparable.hpp>
+#include <experimental/fundamental/v3/strong/mixins/streamable.hpp>
 #include <experimental/ordinal.hpp>
 #include <experimental/type_traits.hpp>
 
@@ -222,12 +224,16 @@ inline namespace fundamental_v3
   /// strong_counter is a strong number with restricted arithmetic (based on chrono::duration arithmetic).
   /// In the same way we can count seconds, we can count oranges or cars.
   template <class Domain, class UT>
-  struct strong_counter final : private_tagged<Domain, UT>
+  struct strong_counter final
+    : private_strong_type<strong_counter<Domain, UT>, UT>
+    , mixin::comparable<strong_counter<Domain, UT>>
+    , mixin::streamable<strong_counter<Domain, UT>>
+    //: private_tagged<Domain, UT>
   {
       using domain = Domain;
       using rep = UT;
 
-      using base_type = private_tagged<Domain, UT>;
+      using base_type = private_strong_type<strong_counter<Domain, UT>, UT>;
       using base_type::base_type;
 
       // constructors
@@ -331,21 +337,22 @@ inline namespace fundamental_v3
       JASEL_MUTABLE_CONSTEXPR strong_counter& operator%=(UT y)  noexcept
           { this->value %= y; return *this; }
 
-      // relational operators
-      friend constexpr bool operator==(strong_counter x, strong_counter y)  noexcept
-           { return x.count() == y.count(); }
-      friend constexpr bool operator!=(strong_counter x, strong_counter y)  noexcept
-          { return x.count() != y.count(); }
-      friend constexpr bool operator<(strong_counter x, strong_counter y)  noexcept
-          { return x.count() < y.count(); }
-      friend constexpr bool operator>(strong_counter x, strong_counter y)  noexcept
-          { return x.count() > y.count(); }
-      friend constexpr bool operator<=(strong_counter x, strong_counter y)  noexcept
-          { return x.count() <= y.count(); }
-      friend constexpr bool operator>=(strong_counter x, strong_counter y)  noexcept
-          { return x.count() >= y.count(); }
-
+      // commented for now, however the behavior should depend on the Domain (e.g. duration domain compare when Tag is different)
       // todo add mixed relational operators for strong_counter
+//      // relational operators
+//      friend constexpr bool operator==(strong_counter x, strong_counter y)  noexcept
+//           { return x.count() == y.count(); }
+//      friend constexpr bool operator!=(strong_counter x, strong_counter y)  noexcept
+//          { return x.count() != y.count(); }
+//      friend constexpr bool operator<(strong_counter x, strong_counter y)  noexcept
+//          { return x.count() < y.count(); }
+//      friend constexpr bool operator>(strong_counter x, strong_counter y)  noexcept
+//          { return x.count() > y.count(); }
+//      friend constexpr bool operator<=(strong_counter x, strong_counter y)  noexcept
+//          { return x.count() <= y.count(); }
+//      friend constexpr bool operator>=(strong_counter x, strong_counter y)  noexcept
+//          { return x.count() >= y.count(); }
+
 
   };
 
@@ -543,39 +550,39 @@ inline namespace fundamental_v3
   static_assert(std::is_standard_layout<strong_counter<bool,int>>::value, "");
   static_assert(std::is_trivial<strong_counter<bool,int>>::value, "");
 #endif
-  // stream operators
-
-  //! input function.
-  //! \n<b>Effects:</b> Extracts a T from is and stores it in the passes x.
-  //! @param is the input stream
-  //! @param x the \c strong_int
-  //! \n<b>Returns:</b><br> \c is.
-  // fixme: Shouldn't this depend on Domain?
-  template <class CharT, class Traits, class Domain, class T >
-  std::basic_istream<CharT, Traits>&
-  operator>>(std::basic_istream<CharT, Traits>& is, strong_counter<Domain, T>& x)
-  {
-    T v;
-    is >> v;
-    x = strong_counter<Domain, T>(v);
-    return is;
-  }
-
-  //! output function.
-  //! @param os the output stream
-  //! @param x the \c strong_int
-  //!
-  //! \n<b>Returns:</b><br> the result of the following expression
-  //! @code
-  //! os << x.undelying()
-  //! @endcode
-  // fixme: Shouldn't this depend on Domain?
-  template <class CharT, class Traits, class Domain, class T >
-  std::basic_ostream<CharT, Traits>&
-  operator<<(std::basic_ostream<CharT, Traits>& os, const strong_counter<Domain, T>& x)
-  {
-    return os << x.underlying();
-  }
+//  // stream operators
+//
+//  //! input function.
+//  //! \n<b>Effects:</b> Extracts a T from is and stores it in the passes x.
+//  //! @param is the input stream
+//  //! @param x the \c strong_int
+//  //! \n<b>Returns:</b><br> \c is.
+//  // fixme: Shouldn't this depend on Domain?
+//  template <class CharT, class Traits, class Domain, class T >
+//  std::basic_istream<CharT, Traits>&
+//  operator>>(std::basic_istream<CharT, Traits>& is, strong_counter<Domain, T>& x)
+//  {
+//    T v;
+//    is >> v;
+//    x = strong_counter<Domain, T>(v);
+//    return is;
+//  }
+//
+//  //! output function.
+//  //! @param os the output stream
+//  //! @param x the \c strong_int
+//  //!
+//  //! \n<b>Returns:</b><br> the result of the following expression
+//  //! @code
+//  //! os << x.undelying()
+//  //! @endcode
+//  // fixme: Shouldn't this depend on Domain?
+//  template <class CharT, class Traits, class Domain, class T >
+//  std::basic_ostream<CharT, Traits>&
+//  operator<<(std::basic_ostream<CharT, Traits>& os, const strong_counter<Domain, T>& x)
+//  {
+//    return os << x.underlying();
+//  }
 
   namespace ordinal {
     /// A strong_counter is an ordinal type if the underlying type is an ordinal type
