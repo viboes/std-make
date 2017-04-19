@@ -7,8 +7,10 @@
 #ifndef JASEL_FUNDAMENTAL_V3_STRONG_STRONG_INT_HPP
 #define JASEL_FUNDAMENTAL_V3_STRONG_STRONG_INT_HPP
 
-#include <experimental/fundamental/v3/strong/tagged.hpp>
+#include <experimental/fundamental/v3/strong/strong_type.hpp>
 #include <experimental/fundamental/v3/strong/underlying_type.hpp>
+#include <experimental/fundamental/v3/strong/mixins/comparable.hpp>
+#include <experimental/fundamental/v3/strong/mixins/streamable.hpp>
 #include <experimental/type_traits.hpp>
 #include <experimental/ordinal.hpp>
 
@@ -43,14 +45,24 @@ inline namespace fundamental_v3
 
   </code>
   */
+  template <class Tag, class UT>
+  struct strong_int;
+
+  namespace mixin {
+    template <class Tag, class UT1, class UT2>
+    struct is_comparable_with<strong_int<Tag, UT1>, strong_int<Tag, UT2>> : true_type {};
+  }
 
   //fixme Why private_tagged?
   template <class Tag, class UT>
-  struct strong_int final : private_tagged<Tag, UT>
+  struct strong_int final
+    : private_strong_type<strong_int<Tag, UT>, UT>
+    , mixin::comparable_with_if<strong_int<Tag, UT>>
+    , mixin::streamable<strong_int<Tag, UT>>
   {
       static_assert(is_integral<UT>::value, "UT must be integral");
 
-      using base_type = private_tagged<Tag, UT>;
+      using base_type = private_strong_type<strong_int<Tag, UT>, UT>;
       using base_type::base_type;
 
       /// @par Effects Constructs an uninitialized strong_int
@@ -226,46 +238,7 @@ inline namespace fundamental_v3
     return make_strong_int<Tag>(x.underlying() >> y);
   }
 
-  // relational operators
-  template <class Tag, class R1, class R2>
-  constexpr auto operator==(strong_int<Tag,R1> x, strong_int<Tag,R2> y)  noexcept -> decltype(x.underlying() == y.underlying())
-  {
-    return x.underlying() == y.underlying();
-  }
-
-  template <class Tag, class R1, class R2>
-  constexpr auto operator!=(strong_int<Tag,R1> x, strong_int<Tag,R2> y)  noexcept -> decltype(x.underlying() != y.underlying())
-  {
-    return x.underlying() != y.underlying();
-  }
-
-  template <class Tag, class R1, class R2>
-  constexpr auto operator<(strong_int<Tag,R1> x, strong_int<Tag,R2> y)  noexcept -> decltype(x.underlying() < y.underlying())
-  {
-    return x.underlying() < y.underlying();
-  }
-
-  template <class Tag, class R1, class R2>
-  constexpr auto operator>(strong_int<Tag,R1> x, strong_int<Tag,R2> y)  noexcept -> decltype(x.underlying() > y.underlying())
-  {
-    return x.underlying() > y.underlying();
-  }
-
-  template <class Tag, class R1, class R2>
-  constexpr auto operator<=(strong_int<Tag,R1> x, strong_int<Tag,R2> y)  noexcept -> decltype(x.underlying() <= y.underlying())
-  {
-    return x.underlying() <= y.underlying();
-  }
-
-  template <class Tag, class R1, class R2>
-  constexpr auto operator>=(strong_int<Tag,R1> x, strong_int<Tag,R2> y)  noexcept -> decltype(x.underlying() >= y.underlying())
-  {
-    return x.underlying() >= y.underlying();
-  }
-
   // fixme do we need swap?
-
-
 
   //! underlying_type specialization for strong_int
   template <class Tag, class UT>
@@ -276,40 +249,6 @@ inline namespace fundamental_v3
   static_assert(std::is_trivially_copyable<strong_int<bool,int>>::value, "");
   static_assert(std::is_standard_layout<strong_int<bool,int>>::value, "");
   static_assert(std::is_trivial<strong_int<bool,int>>::value, "");
-
-  // stream operators
-
-  //! input function.
-  //! @par Effects:<br> Extracts a T from is and stores it in the passes x.
-  //! @param is the input stream
-  //! @param x the \c strong_int
-  //! @par Returns:<br> \c is.
-
-  template <class CharT, class Traits, class Tag, class T >
-  std::basic_istream<CharT, Traits>&
-  operator>>(std::basic_istream<CharT, Traits>& is, strong_int<Tag, T>& x)
-  {
-    T v;
-    is >> v;
-    x = strong_int<Tag, T>(v);
-    return is;
-  }
-
-  //! output function.
-  //! @param os the output stream
-  //! @param x the \c strong_int
-  //!
-  //! @par Returns:<br> the result of the following expression
-  //! @code
-  //! os << x.undelying()
-  //! @endcode
-
-  template <class CharT, class Traits, class Tag, class T >
-  std::basic_ostream<CharT, Traits>&
-  operator<<(std::basic_ostream<CharT, Traits>& os, const strong_int<Tag, T>& x)
-  {
-    return os << x.underlying();
-  }
 
   // fixme: Should integer be a strong int without tag?
   using integer = strong_int<default_tag, int>;
