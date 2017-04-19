@@ -131,6 +131,7 @@ inline  namespace fundamental_v3
     }
 
 #if 0
+    // remove after checking the implementation using bitwise mixin is really equivalent.
     template <class IntegerType, typename = enable_if<is_integral<IntegerType>::value>>
     constexpr byte& operator<<=(byte& b, IntegerType shift) noexcept
     {
