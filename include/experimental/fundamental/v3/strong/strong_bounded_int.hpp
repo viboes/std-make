@@ -7,8 +7,10 @@
 #ifndef JASEL_FUNDAMENTAL_V3_STRONG_STRONG_INT_HPP
 #define JASEL_FUNDAMENTAL_V3_STRONG_STRONG_INT_HPP
 
-#include <experimental/fundamental/v3/strong/tagged.hpp>
+#include <experimental/fundamental/v3/strong/strong_type.hpp>
 #include <experimental/fundamental/v3/strong/underlying_type.hpp>
+#include <experimental/fundamental/v3/strong/mixins/comparable.hpp>
+#include <experimental/fundamental/v3/strong/mixins/streamable.hpp>
 #include <experimental/ordinal.hpp>
 
 #include <stdexcept>
@@ -51,12 +53,23 @@ inline namespace fundamental_v3
   //    and use it in quantity<Domain, bounded_integer<>>
 
   template <class Tag, class UT, UT Low, UT High>
-  struct strong_bounded_int final : private_tagged<Tag, UT>
+  struct strong_bounded_int;
+
+  namespace mixin {
+    template <class Tag, class UT1, UT1 Low1, UT1 High1, class UT2, UT2 Low2, UT2 High2>
+    struct is_comparable_with<strong_bounded_int<Tag, UT1, Low1, High1>, strong_bounded_int<Tag, UT2, Low2, High2>> : true_type {};
+  }
+
+  template <class Tag, class UT, UT Low, UT High>
+  struct strong_bounded_int final
+  : private_strong_type<strong_bounded_int<Tag, UT, Low, High>, UT>
+  , mixin::comparable<strong_bounded_int<Tag, UT, Low, High>>
+  , mixin::streamable<strong_bounded_int<Tag, UT, Low, High>>
   {
       static_assert(is_integral<UT>::value, "UT must be integral");
       static_assert(Low <= High, "Low must be less equal than High");
 
-      using base_type = private_tagged<Tag, UT>;
+      using base_type = private_strong_type<strong_bounded_int<Tag, UT, Low, High>, UT>;
       using base_type::base_type;
       using base_type::underlying;
 
@@ -157,13 +170,6 @@ inline namespace fundamental_v3
       JASEL_MUTABLE_CONSTEXPR strong_bounded_int& operator>>=(int y)  noexcept
       { this->value = cast(this->value >> y); return *this; }
 
-      // relational operators
-      friend constexpr bool operator==(strong_bounded_int x, strong_bounded_int y)  noexcept { return x.value == y.value; }
-      friend constexpr bool operator!=(strong_bounded_int x, strong_bounded_int y)  noexcept { return x.value != y.value; }
-      friend constexpr bool operator<(strong_bounded_int x, strong_bounded_int y)  noexcept { return x.value < y.value; }
-      friend constexpr bool operator>(strong_bounded_int x, strong_bounded_int y)  noexcept { return x.value > y.value; }
-      friend constexpr bool operator<=(strong_bounded_int x, strong_bounded_int y)  noexcept { return x.value <= y.value; }
-      friend constexpr bool operator>=(strong_bounded_int x, strong_bounded_int y)  noexcept { return x.value >= y.value; }
   };
 
   template <class Tag, class UT, UT Low, UT High>
@@ -174,40 +180,6 @@ inline namespace fundamental_v3
   static_assert(std::is_trivially_copyable<strong_bounded_int<bool,int,0,3>>::value, "");
   static_assert(std::is_standard_layout<strong_bounded_int<bool,int,0,3>>::value, "");
   static_assert(std::is_trivial<strong_bounded_int<bool,int,0,3>>::value, "");
-
-  // stream operators
-
-  //! input function.
-  //! \n<b>Effects:</b> Extracts a T from is and stores it in the passes x.
-  //! @param is the input stream
-  //! @param x the \c strong_bool
-  //! \n<b>Returns:</b> \c is.
-
-  template <class CharT, class Traits, class Tag, class T, T Low, T High >
-  std::basic_istream<CharT, Traits>&
-  operator>>(std::basic_istream<CharT, Traits>& is, strong_bounded_int<Tag, T, Low, High>& x)
-  {
-    T v;
-    is >> v;
-    x = strong_bounded_int<Tag, T, Low, High>(v);
-    return is;
-  }
-
-  //! output function.
-  //! @param os the output stream
-  //! @param x the \c strong_bool
-  //!
-  //! \n<b>Returns:</b> the result of the following expression
-  //! @code
-  //! os << x.undelying()
-  //! @endcode
-
-  template <class CharT, class Traits, class Tag, class T, T Low, T High >
-  std::basic_ostream<CharT, Traits>&
-  operator<<(std::basic_ostream<CharT, Traits>& os, const strong_bounded_int<Tag, T, Low, High>& x)
-  {
-    return os << x.underlying();
-  }
 
   namespace ordinal {
     /// A strong_bounded_int is an ordinal type having the bounds Low..High
