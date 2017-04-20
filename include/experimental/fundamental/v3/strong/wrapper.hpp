@@ -46,6 +46,8 @@ inline  namespace fundamental_v3
     };
 
 #if 0
+    // todo: this could help to find out the underlying type of any type inheriting from wrapper
+    // This comes from type_safe library.
     namespace detail
     {
         template <typename T>
@@ -76,7 +78,6 @@ inline  namespace fundamental_v3
       using typename base_type::underlying_t;
       using base_type::base_type;
       using base_type::underlying;
-      //using base_type::_underlying;
 
       //! @par Returns the underlying value
       constexpr operator UT () const noexcept
@@ -94,7 +95,6 @@ inline  namespace fundamental_v3
       using typename base_type::underlying_t;
       using base_type::base_type;
       using base_type::underlying;
-      //using base_type::_underlying;
 
       //! @par Returns the underlying value
       explicit constexpr operator UT () const noexcept
@@ -111,7 +111,6 @@ inline  namespace fundamental_v3
       using base_type = wrapper<UT>;
       using base_type::wrapper;
       using base_type::underlying;
-      //using base_type::_underlying;
 
       operator UT () const = delete;
     };
@@ -126,6 +125,9 @@ inline  namespace fundamental_v3
           return std::hash<UT>{}(s.underlying());
       }
     };
+
+    // todo: traits are specialized type by type, but we want to specialize all the types that model another concept , e.g. wrapped.
+    // todo: try to use when<is_wrapped<T>>
 
     template <class W
     , class = typename enable_if<is_ordinal<typename W::underlying_t>{}>::type

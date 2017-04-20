@@ -11,6 +11,7 @@
 #include <experimental/fundamental/v2/config.hpp>
 #include <utility>
 #include <limits>
+#include <climits>
 #include <type_traits>
 
 // Open points:
@@ -56,31 +57,66 @@ namespace ordinal {
 #endif
     };
 #endif
-    // Trivial trait that makes use of explicit conversion
-    // valid for all the signed integral builtins
-    template <typename T>
-    struct integral_traits
-    {
-      static_assert(is_integral<T>::value, "");
-      using size_type = size_t;
-      // todo uncomment when numeric_limits<T>::max() and numeric_limits<T>::min() will be constexpr
-      //using size = integral_constant<size_type, numeric_limits<T>::max()-numeric_limits<T>::min()+1>;
-      static T val(size_type p) { return T{p}; }
 
-      static size_type pos(T u)  { return size_type{u}; }
+    // arithmetic traits: usable by bounded with a step of 1
+    // fixme: do we need to make SizeType width enough
+    template <class T, T Low, T High, T Step = T{1}, class SizeType=size_t>
+    struct arithmetic_traits
+    {
+      static_assert(is_arithmetic<T>::value, "T must be arithmetic");
+
+      using size_type = SizeType;
+      using value_type = T;
+
+      static constexpr size_type size_v = (size_type(High)-size_type(Low)+1u);
+      using size = integral_constant<size_type, size_v>;
+      static constexpr value_type val(size_type p) { return value_type{p*Step+Low}; }
+
+      static constexpr size_type pos(value_type v)  { return static_cast<size_type>(v*Step-Low); };
     };
+
+    // todo add a logarithmic 2 traits: usable with bit masks
+#if 0
+    // uncomment when we have constexpr for numeric_limits<T>::min(), numeric_limits<T>::max()
+    template <typename T>
+    struct integral_traits: : arithmetic_traits<T, numeric_limits<T>::min(), numeric_limits<T>::max()>
+    {
+      static_assert(is_integral<T>::value, "T must be integral");
+      static_assert(sizeof(T) <= sizeof(size_t), "The sizeof T must not be greater than the sizeof size_t");
+    };
+    // todo specialize ordinal_traits using when<condition> is_integral<T> and sizeof(T) <= sizeof(size_t)
+#endif
+#if 0
+    //error: non-type template argument is not a constant expression
+    //      using size = integral_constant<size_type, (High-Low+1)/Step>;
     template <>
-    struct traits<long long> : integral_traits<long long> {};
+    struct traits<long long> : arithmetic_traits<long long, LLONG_MIN, LLONG_MAX> {};
     template <>
-    struct traits<long> : integral_traits<long> {};
+    struct traits<unsigned long long> : arithmetic_traits<unsigned long long, 0, ULLONG_MAX> {};
     template <>
-    struct traits<int> : integral_traits<int> {};
+    struct traits<long> : arithmetic_traits<long, LONG_MIN, LONG_MAX,unsigned long, unsigned long long> {};
     template <>
-    struct traits<short> : integral_traits<short> {};
+    struct traits<unsigned long> : arithmetic_traits<unsigned long, 0, ULONG_MAX,unsigned long, unsigned long long> {};
+#endif
     template <>
-    struct traits<char> : integral_traits<char> {};
+    struct traits<int> : arithmetic_traits<int, INT_MIN, INT_MAX> {};
     template <>
-    struct traits<bool> : integral_traits<bool> {};
+    struct traits<unsigned int> : arithmetic_traits<unsigned int, 0, UINT_MAX> {};
+    template <>
+    struct traits<short> : arithmetic_traits<short, SHRT_MIN, SHRT_MAX> {};
+    template <>
+    struct traits<unsigned short> : arithmetic_traits<unsigned short, 0, USHRT_MAX> {};
+    template <>
+    struct traits<signed char> : arithmetic_traits<signed char, SCHAR_MIN, SCHAR_MAX> {};
+    template <>
+    struct traits<unsigned char> : arithmetic_traits<unsigned char, 0, UCHAR_MAX> {};
+    // fixme should char be an ordinal type?
+    //  it is isomorphic to 0..(CHAR_MAX-CHAR_MIN+1)
+    // fixme: is bool an ordinal type?
+    //  it is isomorphic to 0..1
+    template <>
+    struct traits<bool> : arithmetic_traits<bool, false, true> {};
+
 
 namespace meta {
 
@@ -96,6 +132,8 @@ namespace meta {
   template <class O, size_t I>
   struct val;
 
+  // todo Specialize pos/val for integral types.
+  // fixme: Should these traits make use of when(cnd) to allow conditional specializations?
   template <class O>
   struct first : meta::val<O, 0> {};
 

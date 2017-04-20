@@ -24,9 +24,11 @@ namespace experimental
 inline namespace fundamental_v3
 {
   /**
-  `strong_id` is a strongly type that wraps a regular type and behaves like a `Regular` type
+  `strong_id` is a strongly type that wraps a regular type and behaves like a
+  `Regular` type, comparable, streamable and `Ordinal` type, able to enumerate.
   The main goal is to be able to define strong identifiers that don't mix between them.
-  No conversion to the underlying type is provided as a strong_id is not an underlying type.
+  No conversion to the underlying type is provided as a strong_id is not an underlying type,
+  however you can always have access to it using the underlying fuction.
 
   Example
   <code>
@@ -63,6 +65,7 @@ inline namespace fundamental_v3
   template <class Tag, class UT>
   struct underlying_type<strong_id<Tag, UT>> { using type = UT; };
 
+  // An Id is an Ordinal type if its underlying type is an Ordinal type.
   namespace ordinal {
     template <class Tag, class T>
     struct traits<strong_id<Tag, T>> : wrapped_ordinal_traits<strong_id<Tag, T>>    { };
@@ -70,7 +73,7 @@ inline namespace fundamental_v3
 }
 }
 
-/// Hash specialization forwarding to the hash of underlying type
+  /// Hash specialization forwarding to the hash of underlying type
   template <class Tag, class UT>
   struct hash<experimental::strong_id<Tag, UT>>
     : experimental::wrapped_hash<experimental::strong_id<Tag, UT>> {};
