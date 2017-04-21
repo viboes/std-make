@@ -22,6 +22,7 @@
 #include <experimental/fundamental/v3/strong/underlying_type.hpp>
 #include <experimental/fundamental/v3/strong/mixins/additive.hpp>
 #include <experimental/fundamental/v3/strong/mixins/comparable.hpp>
+#include <experimental/fundamental/v3/strong/mixins/modable.hpp>
 #include <experimental/fundamental/v3/strong/mixins/streamable.hpp>
 #include <experimental/ordinal.hpp>
 #include <experimental/type_traits.hpp>
@@ -237,6 +238,7 @@ inline namespace fundamental_v3
     : private_strong_type<strong_counter<Domain, UT>, UT>
     , mixin::additive_with_if<strong_counter<Domain, UT>>
     , mixin::comparable<strong_counter<Domain, UT>>
+    , mixin::modable<strong_counter<Domain, UT>>
     , mixin::streamable<strong_counter<Domain, UT>>
     //: private_tagged<Domain, UT>
   {
@@ -287,24 +289,9 @@ inline namespace fundamental_v3
       }
 
       // assignment
-#if 1
       strong_counter& operator=(strong_counter<Domain, UT> const&) = default;
       strong_counter& operator=(strong_counter<Domain, UT> &&) = default;
-#else
-      strong_counter& operator=(strong_counter<Domain, UT> const& other)
-      {
-        this->value = other.value;
-        std::cout << "strong_counter& operator=(strong_counter<Domain, UT> const&) \n";
-        return *this;
-      }
 
-      strong_counter& operator=(strong_counter<Domain, UT> && other)
-      {
-        this->value = other.value;
-        std::cout << "strong_counter& operator=(strong_counter<Domain, UT> &&) \n";
-        return *this;
-      }
-#endif
       constexpr UT count() const noexcept
           { return this->underlying(); }
 
@@ -323,9 +310,6 @@ inline namespace fundamental_v3
       JASEL_MUTABLE_CONSTEXPR strong_counter& operator/=(UT y)  noexcept
           { this->value /= y; return *this; }
 
-      // todo add mixed
-      JASEL_MUTABLE_CONSTEXPR strong_counter& operator%=(strong_counter y)  noexcept
-          { this->value %= y.count(); return *this; }
       JASEL_MUTABLE_CONSTEXPR strong_counter& operator%=(UT y)  noexcept
           { this->value %= y; return *this; }
 
@@ -400,17 +384,6 @@ inline namespace fundamental_v3
     typedef strong_counter<D1, CR> CD;
     return CD(CD(x).count() % static_cast<CR>(y));
   }
-
-  template <class D1, class R1, class D2, class R2>
-  constexpr
-  typename common_type<strong_counter<D1, R1>, strong_counter<D2, R2> >::type
-  operator%(const strong_counter<D1, R1>& x,
-        const strong_counter<D2, R2>& y)
-  {
-    typedef typename common_type<strong_counter<D1, R1>, strong_counter<D2, R2> >::type CD;
-    return CD(CD(x).count() % CD(y).count());
-  }
-
 
   template <class T>
   struct is_strong_counter : std::false_type {};
