@@ -20,6 +20,9 @@ inline namespace fundamental_v3
 
 #if __cplusplus == 201103L
 
+  template< class... T >
+  using common_type_t = typename common_type<T...>::type;
+
   template< bool B, class T, class F >
   using conditional_t = typename conditional<B,T,F>::type;
 

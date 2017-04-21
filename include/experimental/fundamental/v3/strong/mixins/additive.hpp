@@ -9,7 +9,7 @@
 
 #include <experimental/fundamental/v2/config.hpp>
 #include <experimental/fundamental/v3/strong/mixins/is_compatible_with.hpp>
-#include <type_traits>
+#include <experimental/type_traits.hpp>
 
 namespace std
 {
@@ -105,19 +105,17 @@ namespace std
       {
         template <class Other, typename = enable_if_t<Pred<Final, Other>::value>>
         friend constexpr
-        typename common_type<Final, Other>::type
-        operator+(Final const& x, Other const& y)  noexcept
+        common_type_t<Final, Other> operator+(Final const& x, Other const& y)  noexcept
         {
-          using CT = typename common_type<Final, Other>::type;
+          using CT = common_type_t<Final, Other>;
           return CT(CT(x)._underlying() + CT(y)._underlying());
         }
 
         template <class Other, typename = enable_if_t<Pred<Final, Other>::value>>
         friend constexpr
-        typename common_type<Final, Other>::type
-        operator-(Final const& x, Other const& y)  noexcept
+        common_type_t<Final, Other> operator-(Final const& x, Other const& y)  noexcept
         {
-          using CT = typename common_type<Final, Other>::type;
+          using CT = common_type_t<Final, Other>;
           return CT(CT(x)._underlying() - CT(y)._underlying());
         }
 

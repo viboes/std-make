@@ -9,6 +9,8 @@
 
 #include <experimental/fundamental/v2/config.hpp>
 #include <experimental/fundamental/v3/strong/mixins/is_compatible_with.hpp>
+#include <experimental/type_traits.hpp>
+#include <experimental/meta/v1/rebind.hpp>
 
 namespace std
 {
@@ -51,11 +53,30 @@ namespace std
       struct modable_with_if : modable_assign<Final, Check>
       {
         template <class Other, typename = enable_if_t<Pred<Final, Other>::value>>
-        friend constexpr typename common_type<Final, Other>::type operator%(Final const& x, Other const& y)  noexcept
+        friend constexpr common_type_t<Final, Other> operator%(Final const& x, Other const& y)  noexcept
         {
           using CT = typename common_type<Final, Other>::type;
 
           return CT(CT(x)._underlying() % CT(y)._underlying());
+        }
+      };
+
+      template <class Final, class UT=underlying_type_t<Final>>
+      struct modable_with
+      {
+        friend JASEL_MUTABLE_CONSTEXPR Final& operator%=(Final& x, UT const& y) noexcept
+        {
+          x._underlying() %= y;
+          return x;
+        }
+        template <class UT2
+          , typename = enable_if_t<is_convertible<UT2,UT>::value>
+        >
+        friend constexpr meta::rebind_t<Final, common_type_t<UT, UT2>> operator%(Final const& x, UT2 const& y)  noexcept
+        {
+          using CR = common_type_t<UT, UT2>;
+          using CT = meta::rebind_t<Final, CR>;
+          return CT(CT(x)._underlying() % CR(y));
         }
       };
 

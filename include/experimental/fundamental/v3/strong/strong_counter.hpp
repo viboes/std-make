@@ -22,8 +22,9 @@
 #include <experimental/fundamental/v3/strong/underlying_type.hpp>
 #include <experimental/fundamental/v3/strong/mixins/additive.hpp>
 #include <experimental/fundamental/v3/strong/mixins/comparable.hpp>
-#include <experimental/fundamental/v3/strong/mixins/modable.hpp>
+#include <experimental/fundamental/v3/strong/mixins/integer_multiplicative.hpp>
 #include <experimental/fundamental/v3/strong/mixins/streamable.hpp>
+#include <experimental/meta/v1/rebind.hpp>
 #include <experimental/ordinal.hpp>
 #include <experimental/type_traits.hpp>
 
@@ -230,7 +231,16 @@ inline namespace fundamental_v3
     template <class Domain1, class UT1, class Domain2, class UT2>
     struct is_compatible_with<strong_counter<Domain1, UT1>, strong_counter<Domain2, UT2>> : true_type {};
   }
+}
 
+namespace meta
+{
+  template <class Domain, class UT1, class UT2>
+  struct rebind<strong_counter<Domain, UT1>, UT2> : id<strong_counter<Domain, UT2>> {};
+}
+
+inline namespace fundamental_v3
+{
   /// strong_counter is a strong number with restricted arithmetic (based on chrono::duration arithmetic).
   /// In the same way we can count seconds, we can count oranges or cars.
   template <class Domain, class UT>
@@ -238,9 +248,9 @@ inline namespace fundamental_v3
     : private_strong_type<strong_counter<Domain, UT>, UT>
     , mixin::additive_with_if<strong_counter<Domain, UT>>
     , mixin::comparable<strong_counter<Domain, UT>>
+    , mixin::integer_multiplicative_with<strong_counter<Domain, UT>, UT>
     , mixin::modable<strong_counter<Domain, UT>>
     , mixin::streamable<strong_counter<Domain, UT>>
-    //: private_tagged<Domain, UT>
   {
       using domain = Domain;
       using rep = UT;
@@ -248,6 +258,8 @@ inline namespace fundamental_v3
       using base_type = private_strong_type<strong_counter<Domain, UT>, UT>;
       using base_type::base_type;
 
+      template <class UT2>
+      using rebind = strong_counter<Domain, UT2>;
       // constructors
 
       //! \n<b>Effects:</b> Construct an uninitialized strong_counter
@@ -303,16 +315,6 @@ inline namespace fundamental_v3
       static constexpr strong_counter max()  noexcept
           { return strong_counter{domain_values<Domain, UT>::max()}; }
 
-      //  Multiplicative operators
-      JASEL_MUTABLE_CONSTEXPR strong_counter& operator*=(UT y)  noexcept
-          { this->value *= y; return *this; }
-
-      JASEL_MUTABLE_CONSTEXPR strong_counter& operator/=(UT y)  noexcept
-          { this->value /= y; return *this; }
-
-      JASEL_MUTABLE_CONSTEXPR strong_counter& operator%=(UT y)  noexcept
-          { this->value %= y; return *this; }
-
       // commented for now, however the behavior should depend on the Domain (e.g. duration domain compare when Tag is different)
       // todo add mixed relational operators for strong_counter
 //      // relational operators
@@ -334,36 +336,7 @@ inline namespace fundamental_v3
 
   // mixed arithmetic for strong_counter
 
-  template <class D1, class R1, class R2>
-  constexpr
-  strong_counter<D1, typename common_type<R1, R2>::type >
-  operator*(const strong_counter<D1, R1>& x,
-        const R2& y)
-  {
-    typedef typename common_type<R1, R2>::type CR;
-    typedef strong_counter<D1, CR> CD;
-    return CD(CD(x).count() * static_cast<CR>(y));
-  }
-
-  template <class D1, class R1, class R2>
-  constexpr
-  strong_counter<D1, typename common_type<R1, R2>::type >
-  operator*(const R2& y, const strong_counter<D1, R1>& x)
-  {
-    return x * y;
-  }
-
-  template <class D1, class R1, class R2>
-  constexpr
-  strong_counter<D1, typename common_type<R1, R2>::type >
-  operator/(const strong_counter<D1, R1>& x,
-        const R2& y)
-  {
-    typedef typename common_type<R1, R2>::type CR;
-    typedef strong_counter<D1, CR> CD;
-    return CD(CD(x).count() / static_cast<CR>(y));
-  }
-
+    // todo: try to generalize this operator on multiplicative_with
   template <class D1, class R1, class D2, class R2>
   constexpr
   typename common_type<R1, R2>::type
@@ -372,17 +345,6 @@ inline namespace fundamental_v3
   {
     typedef typename common_type<strong_counter<D1, R1>, strong_counter<D2, R2> >::type CD;
     return CD(x).count() / CD(y).count();
-  }
-
-  template <class D1, class R1, class R2>
-  constexpr
-  strong_counter<D1, typename common_type<R1, R2>::type >
-  operator%(const strong_counter<D1, R1>& x,
-        const R2& y)
-  {
-    typedef typename common_type<R1, R2>::type CR;
-    typedef strong_counter<D1, CR> CD;
-    return CD(CD(x).count() % static_cast<CR>(y));
   }
 
   template <class T>

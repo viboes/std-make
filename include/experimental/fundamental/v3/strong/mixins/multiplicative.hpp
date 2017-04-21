@@ -9,6 +9,8 @@
 
 #include <experimental/fundamental/v2/config.hpp>
 #include <experimental/fundamental/v3/strong/mixins/is_compatible_with.hpp>
+#include <experimental/type_traits.hpp>
+#include <experimental/meta/v1/rebind.hpp>
 
 namespace std
 {
@@ -63,45 +65,64 @@ namespace std
 
       // heterogeneous
 
-#if 0
-      template <class Final, template <class, class> class Pred=is_compatible_with>
-      struct multiplicative_with_if_base_no_check
-      {
-        //! Forwards to the underlying value
-        template <class Other, typename = enable_if_t<Pred<Final, Other>::value>>
-        friend JASEL_MUTABLE_CONSTEXPR Final& operator*=(Final& x, Other const& y) noexcept
-        {
-          x._underlying() *= y._underlying();
-          return x;
-        }
-
-        template <class Other, typename = enable_if_t<Pred<Final, Other>::value>>
-        friend JASEL_MUTABLE_CONSTEXPR Final& operator/=(Final& x, Other const& y) noexcept
-        {
-          x._underlying() /= y._underlying();
-          return x;
-        }
-      };
-#endif
-      // heterogeneous
       template <class Final, class Check=no_check, template <class, class> class Pred=is_compatible_with>
       struct multiplicative_with_if : multiplicative_assign<Final, Check>
       {
         template <class Other, typename = enable_if_t<Pred<Final, Other>::value>>
-        friend constexpr typename common_type<Final, Other>::type operator*(Final const& x, Other const& y)  noexcept
+        friend constexpr common_type_t<Final, Other> operator*(Final const& x, Other const& y)  noexcept
         {
-          using CT = typename common_type<Final, Other>::type;
+          using CT = common_type_t<Final, Other>;
           return CT(CT(x)._underlying() * CT(y)._underlying());
         }
 
         template <class Other, typename = enable_if_t<Pred<Final, Other>::value>>
-        friend constexpr typename common_type<Final, Other>::type operator/(Final const& x, Other const& y)  noexcept
+        friend constexpr common_type_t<Final, Other> operator/(Final const& x, Other const& y)  noexcept
         {
-          using CT = typename common_type<Final, Other>::type;
+          using CT = common_type_t<Final, Other>;
           return CT(CT(x)._underlying() / CT(y)._underlying());
         }
       };
 
+      template <class Final, class UT=underlying_type_t<Final>>
+      struct multiplicative_with
+      {
+        friend JASEL_MUTABLE_CONSTEXPR Final& operator*=(Final& x, UT const& y) noexcept
+        {
+          x._underlying() *= y;
+          return x;
+        }
+        friend JASEL_MUTABLE_CONSTEXPR Final& operator/=(Final& x, UT const& y) noexcept
+        {
+          x._underlying() /= y;
+          return x;
+        }
+
+        template <class UT2>
+        friend constexpr
+        meta::rebind_t<Final, common_type_t<UT, UT2>> operator*(Final const& x, UT2 const& y)  noexcept
+        {
+          using CR = common_type_t<UT, UT2>;
+          using CT = meta::rebind_t<Final, CR>;
+          return CT(CT(x)._underlying() * CR(y));
+        }
+
+        template <class UT2>
+        friend constexpr
+        meta::rebind_t<Final, common_type_t<UT, UT2>> operator*(UT2 const& x, Final const& y)  noexcept
+        {
+          return y * x;
+        }
+
+        template <class UT2
+          , typename = enable_if_t<is_convertible<UT2,UT>::value>
+        >
+        friend constexpr meta::rebind_t<Final, common_type_t<UT, UT2>> operator/(Final const& x, UT2 const& y)  noexcept
+        {
+          using CR = common_type_t<UT, UT2>;
+          using CT = meta::rebind_t<Final, CR>;
+          return CT(CT(x)._underlying() / CR(y));
+        }
+      };
     }
   }
 }

@@ -29,6 +29,12 @@ namespace std
           , modable_with_if<Final, Check, Pred>
       {
       };
+      template <class Final, class UT=underlying_type_t<Final>>
+      struct integer_multiplicative_with
+          : multiplicative_with<Final, UT>
+          , modable_with<Final, UT>
+      {
+      };
 
     }
   }
