@@ -10,6 +10,7 @@
 #include <experimental/fundamental/v3/strong/strong_type.hpp>
 #include <experimental/fundamental/v3/strong/underlying_type.hpp>
 #include <experimental/fundamental/v3/strong/mixins/additive.hpp>
+#include <experimental/fundamental/v3/strong/mixins/bitwise.hpp>
 #include <experimental/fundamental/v3/strong/mixins/comparable.hpp>
 #include <experimental/fundamental/v3/strong/mixins/integer_multiplicative.hpp>
 #include <experimental/fundamental/v3/strong/mixins/streamable.hpp>
@@ -65,9 +66,10 @@ inline namespace fundamental_v3
   template <class Tag, class UT, UT Low, UT High>
   struct strong_bounded_int final
     : private_strong_type<strong_bounded_int<Tag, UT, Low, High>, UT>
-    , mixin::additive<strong_bounded_int<Tag, UT, Low, High>, mixin::check>
-    , mixin::comparable<strong_bounded_int<Tag, UT, Low, High>>
-    , mixin::integer_multiplicative<strong_bounded_int<Tag, UT, Low, High>, mixin::check>
+    , mixin::additive_with_if<strong_bounded_int<Tag, UT, Low, High>, mixin::check>
+    , mixin::bitwise_with_if<strong_bounded_int<Tag, UT, Low, High>, mixin::check>
+    , mixin::comparable_with_if<strong_bounded_int<Tag, UT, Low, High>>
+    , mixin::integer_multiplicative_with_if<strong_bounded_int<Tag, UT, Low, High>, mixin::check>
     , mixin::streamable<strong_bounded_int<Tag, UT, Low, High>>
   {
       static_assert(is_integral<UT>::value, "UT must be integral");
@@ -92,34 +94,6 @@ inline namespace fundamental_v3
       // copy constructor/assignment default
       constexpr strong_bounded_int() noexcept = default;
       constexpr explicit strong_bounded_int(UT v) : base_type(cast(v)) {}
-
-      // Bitwise logic operators
-      friend constexpr strong_bounded_int operator~(strong_bounded_int x)  noexcept
-      { return strong_bounded_int(~x.value); }
-
-      friend constexpr strong_bounded_int operator&(strong_bounded_int x, strong_bounded_int y)  noexcept
-      { return strong_bounded_int(x.value & y.value); }
-      JASEL_MUTABLE_CONSTEXPR strong_bounded_int& operator&=(strong_bounded_int y)  noexcept
-      { this->value = cast(this->value & y.value); return *this; }
-      friend constexpr strong_bounded_int operator|(strong_bounded_int x, strong_bounded_int y)  noexcept
-      { return strong_bounded_int(x.value | y.value); }
-      JASEL_MUTABLE_CONSTEXPR strong_bounded_int& operator|=(strong_bounded_int y)  noexcept
-      { this->value = cast(this->value | y.value); return *this; }
-      friend constexpr strong_bounded_int operator^(strong_bounded_int x, strong_bounded_int y)  noexcept
-      { return strong_bounded_int(x.value ^ y.value); }
-      JASEL_MUTABLE_CONSTEXPR strong_bounded_int& operator^=(strong_bounded_int y)  noexcept
-      { this->value = cast(this->value ^ y.value); return *this; }
-
-      // Bitwise logic operators
-      friend constexpr strong_bounded_int operator<<(strong_bounded_int x, int y)  noexcept
-      { return strong_bounded_int(x.value << y); }
-      JASEL_MUTABLE_CONSTEXPR strong_bounded_int& operator<<=(int y)  noexcept
-      { this->value = cast(this->value << y); return *this; }
-      friend constexpr strong_bounded_int operator>>(strong_bounded_int x, int y)  noexcept
-      { return strong_bounded_int(x.value >> y); }
-      JASEL_MUTABLE_CONSTEXPR strong_bounded_int& operator>>=(int y)  noexcept
-      { this->value = cast(this->value >> y); return *this; }
-
   };
 
   template <class Tag, class UT, UT Low, UT High>
@@ -143,7 +117,6 @@ inline namespace fundamental_v3
       static size_type pos(strong_bounded_int<Tag, T, Low, High> u)  { return static_cast<size_type>(u.underlying()-Low); };
     };
   }
-
 }
 }
 

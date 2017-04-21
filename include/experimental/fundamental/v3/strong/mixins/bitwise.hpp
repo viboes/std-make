@@ -26,6 +26,22 @@ namespace std
         {
           return Final(~x._underlying());
         }
+        template <class IntegralType, typename = enable_if<is_integral<IntegralType>::value>>
+        friend constexpr Final operator<<(Final const&x, IntegralType y) noexcept
+        {
+          return Final(x._underlying() << y);
+        }
+        template <class IntegralType, typename = enable_if<is_integral<IntegralType>::value>>
+        friend constexpr Final operator>>(Final const&x, IntegralType y) noexcept
+        {
+          return Final(x._underlying() >> y);
+        }
+
+      };
+
+      template <class Final, class Check=no_check>
+      struct bitwise_assign : bitwise_base<Final>
+      {
         friend JASEL_MUTABLE_CONSTEXPR Final& operator&=(Final &x, Final const&y) noexcept
         {
           x._underlying() &= y._underlying();
@@ -53,21 +69,42 @@ namespace std
           x._underlying() >>= y;
           return x;
         }
-        template <class IntegralType, typename = enable_if<is_integral<IntegralType>::value>>
-        friend constexpr Final operator<<(Final const&x, IntegralType y) noexcept
-        {
-          return Final(x._underlying() << y);
-        }
-        template <class IntegralType, typename = enable_if<is_integral<IntegralType>::value>>
-        friend constexpr Final operator>>(Final const&x, IntegralType y) noexcept
-        {
-          return Final(x._underlying() >> y);
-        }
-
       };
 
       template <class Final>
-      struct bitwise : bitwise_base<Final>
+      struct bitwise_assign<Final, check> : bitwise_base<Final>
+      {
+        friend JASEL_MUTABLE_CONSTEXPR Final& operator&=(Final &x, Final const&y) noexcept
+        {
+          x = x & y;
+          return x;
+        }
+        friend JASEL_MUTABLE_CONSTEXPR Final& operator|=(Final &x, Final const& y) noexcept
+        {
+          x = x | y;
+          return x;
+        }
+        friend JASEL_MUTABLE_CONSTEXPR Final& operator^=(Final &x, Final const&y) noexcept
+        {
+          x = x ^ y;
+          return x;
+        }
+        template <class IntegralType, typename = enable_if<is_integral<IntegralType>::value>>
+        friend JASEL_MUTABLE_CONSTEXPR Final& operator<<=(Final &x, IntegralType y) noexcept
+        {
+          x = x << y;
+          return x;
+        }
+        template <class IntegralType, typename = enable_if<is_integral<IntegralType>::value>>
+        friend JASEL_MUTABLE_CONSTEXPR Final& operator>>=(Final &x, IntegralType y) noexcept
+        {
+          x = x >> y;
+          return x;
+        }
+
+      };
+      template <class Final, class Check=no_check>
+      struct bitwise : bitwise_assign<Final, Check>
       {
         friend constexpr Final operator&(Final const&x, Final const& y) noexcept
         {
@@ -83,8 +120,8 @@ namespace std
         }
       };
 
-      template <class Final, template <class, class> class Pred=is_compatible_with>
-      struct bitwise_with_if : bitwise_base<Final>
+      template <class Final, class Check=no_check, template <class, class> class Pred=is_compatible_with>
+      struct bitwise_with_if : bitwise_assign<Final, Check>
       {
         template <class Other, typename = enable_if_t<Pred<Final, Other>::value>>
         friend constexpr typename common_type<Final, Other>::type operator&(Final const&x, Other const& y) noexcept
