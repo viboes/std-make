@@ -101,7 +101,7 @@ inline  namespace fundamental_v3
 #else
     struct byte
         : protected_strong_type<byte, unsigned char>
-        , mixin::bitwise_no_check<byte>
+        , mixin::bitwise<byte>
         , mixin::comparable<byte>
         , mixin::streamable<byte>
     {

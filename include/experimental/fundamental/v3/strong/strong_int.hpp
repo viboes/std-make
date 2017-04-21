@@ -62,7 +62,7 @@ inline namespace fundamental_v3
   struct strong_int final
     : private_strong_type<strong_int<Tag, UT>, UT>
     , mixin::additive_with_if<strong_int<Tag, UT>>
-    //, mixin::bitwise_base_no_check<strong_int<Tag, UT>>
+    , mixin::bitwise_with_if<strong_int<Tag, UT>>
     , mixin::comparable_with_if<strong_int<Tag, UT>>
     , mixin::integer_multiplicative_with_if<strong_int<Tag, UT>>
     , mixin::streamable<strong_int<Tag, UT>>
@@ -109,25 +109,6 @@ inline namespace fundamental_v3
         : base_type(other.underlying())
       {}
 
-      // todo add assignment?
-
-      // Bitwise logic operators
-      JASEL_MUTABLE_CONSTEXPR strong_int& operator&=(strong_int y)  noexcept
-      { this->value &= y.underlying(); return *this; }
-      JASEL_MUTABLE_CONSTEXPR strong_int& operator|=(strong_int y)  noexcept
-      { this->value |= y.underlying(); return *this; }
-      JASEL_MUTABLE_CONSTEXPR strong_int& operator^=(strong_int y)  noexcept
-      { this->value ^= y.underlying(); return *this; }
-
-      // fixme: do we want the Bitwise logic operators for an integer? if strong_int should be a replacement of any int, yes.
-      // This doesn't mean that we cannot have more specialized types
-
-      // fixme: Should the << parameter be int?
-      JASEL_MUTABLE_CONSTEXPR strong_int& operator<<=(int y)  noexcept
-      { this->value <<= y; return *this; }
-      JASEL_MUTABLE_CONSTEXPR strong_int& operator>>=(int y)  noexcept
-      { this->value >>= y; return *this; }
-
   };
 
   /// @par Returns A strong int with the tag `Tag` wrapping the value `x`
@@ -135,44 +116,6 @@ inline namespace fundamental_v3
   constexpr strong_int<Tag, R> make_strong_int(R x)
   {
     return strong_int<Tag, R>(x);
-  }
-
-  // Bitwise logic operators
-
-  template <class Tag, class R>
-  constexpr strong_int<Tag,R> operator~(strong_int<Tag,R> x)  noexcept
-  {
-    return strong_int<Tag,R>(~x.underlying());
-  }
-
-  template <class Tag, class R1, class R2>
-  constexpr auto operator&(strong_int<Tag,R1> x, strong_int<Tag,R2> y)  noexcept -> decltype(make_strong_int<Tag>(x.underlying() & y.underlying()))
-  {
-    return make_strong_int<Tag>(x.underlying() & y.underlying());
-  }
-
-  template <class Tag, class R1, class R2>
-  constexpr auto operator|(strong_int<Tag,R1> x, strong_int<Tag,R2> y)  noexcept -> decltype(make_strong_int<Tag>(x.underlying() | y.underlying()))
-  {
-    return make_strong_int<Tag>(x.underlying() | y.underlying());
-  }
-
-  template <class Tag, class R1, class R2>
-  constexpr auto operator^(strong_int<Tag,R1> x, strong_int<Tag,R2> y)  noexcept -> decltype(make_strong_int<Tag>(x.underlying() ^ y.underlying()))
-  {
-    return make_strong_int<Tag>(x.underlying() ^ y.underlying());
-  }
-
-  template <class Tag, class R1, class R2>
-  constexpr auto operator<<(strong_int<Tag,R1> x, strong_int<Tag,R2> y)  noexcept -> decltype(make_strong_int<Tag>(x.underlying() << y.underlying()))
-  {
-    return make_strong_int<Tag>(x.underlying() << y.underlying());
-  }
-
-  template <class Tag, class R1, class R2>
-  constexpr auto operator>>(strong_int<Tag,R1> x, strong_int<Tag,R2> y)  noexcept -> decltype(make_strong_int<Tag>(x.underlying() >> y.underlying()))
-  {
-    return make_strong_int<Tag>(x.underlying() >> y);
   }
 
   // fixme do we need swap?
