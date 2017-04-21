@@ -235,7 +235,7 @@ inline namespace fundamental_v3
   template <class Domain, class UT>
   struct strong_counter final
     : private_strong_type<strong_counter<Domain, UT>, UT>
-    , mixin::additive_with_if_no_check<strong_counter<Domain, UT>>
+    , mixin::additive_with_if<strong_counter<Domain, UT>>
     , mixin::comparable<strong_counter<Domain, UT>>
     , mixin::streamable<strong_counter<Domain, UT>>
     //: private_tagged<Domain, UT>

@@ -61,10 +61,10 @@ inline namespace fundamental_v3
   template <class Tag, class UT>
   struct strong_int final
     : private_strong_type<strong_int<Tag, UT>, UT>
-    , mixin::additive_with_if_no_check<strong_int<Tag, UT>>
+    , mixin::additive_with_if<strong_int<Tag, UT>>
     //, mixin::bitwise_base_no_check<strong_int<Tag, UT>>
     , mixin::comparable_with_if<strong_int<Tag, UT>>
-    , mixin::integer_multiplicative_with_if_no_check<strong_int<Tag, UT>>
+    , mixin::integer_multiplicative_with_if<strong_int<Tag, UT>>
     , mixin::streamable<strong_int<Tag, UT>>
   {
       static_assert(is_integral<UT>::value, "UT must be integral");

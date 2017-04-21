@@ -18,28 +18,15 @@ namespace std
   {
     namespace mixin
     {
-      template <class Final>
-      struct integer_multiplicative_base_no_check : multiplicative_base_no_check<Final>, modable_base_no_check<Final>
-      {
-      };
-      template <class Final>
-      struct integer_multiplicative_base_check : multiplicative_base_check<Final>, modable_base_check<Final>
-      {
-      };
-      template <class Final>
-      struct integer_multiplicative_check : multiplicative_check<Final>, modable_check<Final>
+      template <class Final, class Check=no_check>
+      struct integer_multiplicative : multiplicative<Final, Check>, modable<Final, Check>
       {
       };
 
-      template <class Final>
-      struct integer_multiplicative_no_check : multiplicative_no_check<Final>, modable_no_check<Final>
-      {
-      };
-
-      template <class Final, template <class, class> class Pred=is_compatible_with>
-      struct integer_multiplicative_with_if_no_check
-          : multiplicative_with_if_no_check<Final, Pred>
-          , modable_with_if_no_check<Final, Pred>
+      template <class Final, class Check=no_check, template <class, class> class Pred=is_compatible_with>
+      struct integer_multiplicative_with_if
+          : multiplicative_with_if<Final, Check, Pred>
+          , modable_with_if<Final, Check, Pred>
       {
       };
 

@@ -18,8 +18,8 @@ namespace std
   {
     namespace mixin
     {
-      template <class Final>
-      struct multiplicative_base_no_check
+      template <class Final, class Check=no_check>
+      struct multiplicative_assign
       {
         //! Forwards to the underlying value
         friend JASEL_MUTABLE_CONSTEXPR Final& operator*=(Final& x, Final const& y) noexcept
@@ -34,34 +34,22 @@ namespace std
         }
       };
       template <class Final>
-      struct multiplicative_base_check
+      struct multiplicative_assign<Final, check>
       {
-        //! Forwards to the underlying value
         friend JASEL_MUTABLE_CONSTEXPR Final& operator*=(Final& x, Final const& y) noexcept
         {
-          x = Final(x._underlying() * y._underlying());
+          x = x * y;
           return x;
         }
         friend JASEL_MUTABLE_CONSTEXPR Final& operator/=(Final& x, Final const& y) noexcept
         {
-          x = Final(x._underlying() / y._underlying());
+          x = x / y;
           return x;
         }
       };
-      template <class Final>
-      struct multiplicative_no_check : multiplicative_base_no_check<Final>
-      {
-        friend constexpr Final operator*(Final const& x, Final const& y)  noexcept
-        {
-          return Final(x._underlying() * y._underlying());
-        }
-        friend constexpr Final operator/(Final const& x, Final const& y)  noexcept
-        {
-          return Final(x._underlying() / y._underlying());
-        }
-      };
-      template <class Final>
-      struct multiplicative_check : multiplicative_base_check<Final>
+      //homegeneous
+      template <class Final, class Check=no_check>
+      struct multiplicative : multiplicative_assign<Final, Check>
       {
         friend constexpr Final operator*(Final const& x, Final const& y)  noexcept
         {
@@ -95,9 +83,9 @@ namespace std
         }
       };
 #endif
-      template <class Final, template <class, class> class Pred=is_compatible_with>
-      //struct multiplicative_with_if_no_check : multiplicative_with_if_base_no_check<Final, Pred>
-      struct multiplicative_with_if_no_check : multiplicative_base_no_check<Final>
+      // heterogeneous
+      template <class Final, class Check=no_check, template <class, class> class Pred=is_compatible_with>
+      struct multiplicative_with_if : multiplicative_assign<Final, Check>
       {
         template <class Other, typename = enable_if_t<Pred<Final, Other>::value>>
         friend constexpr typename common_type<Final, Other>::type operator*(Final const& x, Other const& y)  noexcept
