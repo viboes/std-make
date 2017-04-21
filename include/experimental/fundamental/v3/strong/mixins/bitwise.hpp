@@ -70,11 +70,13 @@ namespace std
           x._underlying() <<= y;
           return x;
         }
-        friend constexpr Final operator>>(Final const&x, int y) noexcept
+        template <class IntegralType, typename = enable_if<is_integral<IntegralType>::value>>
+        friend constexpr Final operator>>(Final const&x, IntegralType y) noexcept
         {
           return Final(x._underlying() >> y);
         }
-        friend JASEL_MUTABLE_CONSTEXPR Final& operator>>=(Final &x, int y) noexcept
+        template <class IntegralType, typename = enable_if<is_integral<IntegralType>::value>>
+        friend JASEL_MUTABLE_CONSTEXPR Final& operator>>=(Final &x, IntegralType y) noexcept
         {
           x._underlying() >>= y;
           return x;

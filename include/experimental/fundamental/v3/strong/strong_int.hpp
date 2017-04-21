@@ -54,17 +54,17 @@ inline namespace fundamental_v3
 
   namespace mixin {
     template <class Tag, class UT1, class UT2>
-    struct is_comparable_with<strong_int<Tag, UT1>, strong_int<Tag, UT2>> : true_type {};
+    struct is_compatible_with<strong_int<Tag, UT1>, strong_int<Tag, UT2>> : true_type {};
   }
 
   //fixme Why private_tagged?
   template <class Tag, class UT>
   struct strong_int final
     : private_strong_type<strong_int<Tag, UT>, UT>
-    , mixin::additive_base_no_check<strong_int<Tag, UT>>
+    , mixin::additive_with_if_no_check<strong_int<Tag, UT>>
     //, mixin::bitwise_base_no_check<strong_int<Tag, UT>>
     , mixin::comparable_with_if<strong_int<Tag, UT>>
-    , mixin::integer_multiplicative_base_no_check<strong_int<Tag, UT>>
+    , mixin::integer_multiplicative_with_if_no_check<strong_int<Tag, UT>>
     , mixin::streamable<strong_int<Tag, UT>>
   {
       static_assert(is_integral<UT>::value, "UT must be integral");
@@ -123,10 +123,10 @@ inline namespace fundamental_v3
       // This doesn't mean that we cannot have more specialized types
 
       // fixme: Should the << parameter be int?
-      JASEL_MUTABLE_CONSTEXPR strong_int& operator<<=(strong_int y)  noexcept
-      { this->value <<= y.value; return *this; }
-      JASEL_MUTABLE_CONSTEXPR strong_int& operator>>=(strong_int y)  noexcept
-      { this->value >>= y.value; return *this; }
+      JASEL_MUTABLE_CONSTEXPR strong_int& operator<<=(int y)  noexcept
+      { this->value <<= y; return *this; }
+      JASEL_MUTABLE_CONSTEXPR strong_int& operator>>=(int y)  noexcept
+      { this->value >>= y; return *this; }
 
   };
 
@@ -136,41 +136,6 @@ inline namespace fundamental_v3
   {
     return strong_int<Tag, R>(x);
   }
-
-  // additive operators
-  // begin this needs additive_with_if
-  template <class Tag, class R1, class R2>
-  constexpr auto operator+(strong_int<Tag,R1> x, strong_int<Tag,R2> y)  noexcept -> decltype(make_strong_int<Tag>(x.underlying() + y.underlying()))
-  {
-    return make_strong_int<Tag>(x.underlying() + y.underlying());
-  }
-
-  template <class Tag, class R1, class R2>
-  constexpr auto operator-(strong_int<Tag,R1> x, strong_int<Tag,R2> y)  noexcept -> decltype(make_strong_int<Tag>(x.underlying() - y.underlying()))
-  {
-    return make_strong_int<Tag>(x.underlying() - y.underlying());
-  }
-  // end this needs additive_with_if
-
-  //  Multiplicative operators
-  template <class Tag, class R1, class R2>
-  constexpr auto operator*(strong_int<Tag,R1> x, strong_int<Tag,R2> y)  noexcept -> decltype(make_strong_int<Tag>(x.underlying() * y.underlying()))
-  {
-    return make_strong_int<Tag>(x.underlying() * y.underlying());
-  }
-
-  template <class Tag, class R1, class R2>
-  constexpr auto operator/(strong_int<Tag,R1> x, strong_int<Tag,R2> y)  noexcept -> decltype(make_strong_int<Tag>(x.underlying() / y.underlying()))
-  {
-    return make_strong_int<Tag>(x.underlying() / y.underlying());
-  }
-
-  template <class Tag, class R1, class R2>
-  constexpr auto operator%(strong_int<Tag,R1> x, strong_int<Tag,R2> y)  noexcept -> decltype(make_strong_int<Tag>(x.underlying() * y.underlying()))
-  {
-    return make_strong_int<Tag>(x.underlying() % y.underlying());
-  }
-
 
   // Bitwise logic operators
 

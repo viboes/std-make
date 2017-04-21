@@ -59,7 +59,7 @@ namespace std
         { return x.underlying() >= y.underlying();}
         //!@}
       };
-      template <class Final, template <class, class> class Pred=is_comparable_with>
+      template <class Final, template <class, class> class Pred=is_compatible_with>
       struct comparable_with_if : comparable<Final>, equality_comparable_with_if<Final, Pred>
       {
         //!@{

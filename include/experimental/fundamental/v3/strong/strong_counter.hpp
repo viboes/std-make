@@ -222,12 +222,20 @@ inline namespace fundamental_v3
   }
 #endif
 
+  template <class Domain, class UT>
+  struct strong_counter;
+
+  namespace mixin {
+    template <class Domain1, class UT1, class Domain2, class UT2>
+    struct is_compatible_with<strong_counter<Domain1, UT1>, strong_counter<Domain2, UT2>> : true_type {};
+  }
+
   /// strong_counter is a strong number with restricted arithmetic (based on chrono::duration arithmetic).
   /// In the same way we can count seconds, we can count oranges or cars.
   template <class Domain, class UT>
   struct strong_counter final
     : private_strong_type<strong_counter<Domain, UT>, UT>
-    , mixin::additive_base<strong_counter<Domain, UT>>
+    , mixin::additive_with_if_no_check<strong_counter<Domain, UT>>
     , mixin::comparable<strong_counter<Domain, UT>>
     , mixin::streamable<strong_counter<Domain, UT>>
     //: private_tagged<Domain, UT>
@@ -308,15 +316,6 @@ inline namespace fundamental_v3
       static constexpr strong_counter max()  noexcept
           { return strong_counter{domain_values<Domain, UT>::max()}; }
 
-      // additive operators
-      // todo add mixed
-      JASEL_MUTABLE_CONSTEXPR strong_counter& operator+=(strong_counter y)  noexcept
-          { this->value += y.count(); return *this; }
-
-      // todo add mixed
-      JASEL_MUTABLE_CONSTEXPR strong_counter& operator-=(strong_counter y)  noexcept
-          { this->value -= y.count(); return *this; }
-
       //  Multiplicative operators
       JASEL_MUTABLE_CONSTEXPR strong_counter& operator*=(UT y)  noexcept
           { this->value *= y; return *this; }
@@ -350,26 +349,6 @@ inline namespace fundamental_v3
   };
 
   // mixed arithmetic for strong_counter
-
-  template <class D1, class R1, class D2, class R2>
-  constexpr
-  typename common_type<strong_counter<D1, R1>, strong_counter<D2, R2> >::type
-  operator+(const strong_counter<D1, R1>& x,
-        const strong_counter<D2, R2>& y)
-  {
-    typedef typename common_type<strong_counter<D1, R1>, strong_counter<D2, R2> >::type CD;
-    return CD(CD(x).count() + CD(y).count());
-  }
-
-  template <class D1, class R1, class D2, class R2>
-  constexpr
-  typename common_type<strong_counter<D1, R1>, strong_counter<D2, R2> >::type
-  operator-(const strong_counter<D1, R1>& x,
-        const strong_counter<D2, R2>& y)
-  {
-    typedef typename common_type<strong_counter<D1, R1>, strong_counter<D2, R2> >::type CD;
-    return CD(CD(x).count() - CD(y).count());
-  }
 
   template <class D1, class R1, class R2>
   constexpr

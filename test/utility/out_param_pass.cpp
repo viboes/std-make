@@ -18,6 +18,9 @@ void assign(stdex::out_param<std::string&> obj, std::string const& value)
   obj.get() = value;
 }
 
+void func(int in_a, int in_b, stdex::out_param<int&> out)
+{
+}
 
 int main()
 {

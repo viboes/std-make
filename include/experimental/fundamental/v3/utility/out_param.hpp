@@ -25,9 +25,20 @@ inline namespace fundamental_v3
     static_assert(is_lvalue_reference<T>::value, "only references to non-const");
     static_assert(!is_const<typename remove_reference<T>::type>::value, "only references to non-const");
     T& _ref;
+    // no assignable by default as it contains a reference
   public:
     explicit out_param(T& ref) : _ref(ref) {}
-    T& get() { return _ref; }
+    // assign and get access to the reference
+    T& operator=(T value)
+    {
+      _ref = move(value);
+      return ref;
+    }
+    T& get()
+    {
+      return _ref;
+    }
+
   };
 
   template <typename T>

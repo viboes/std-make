@@ -8,6 +8,7 @@
 #define JASEL_FUNDAMENTAL_V3_STRONG_MIXIN_MULTIPLICATIVE_HPP
 
 #include <experimental/fundamental/v2/config.hpp>
+#include <experimental/fundamental/v3/strong/mixins/is_compatible_with.hpp>
 
 namespace std
 {
@@ -18,11 +19,7 @@ namespace std
     namespace mixin
     {
       template <class Final>
-      struct multiplicative_base
-      {
-      };
-      template <class Final>
-      struct multiplicative_base_no_check : multiplicative_base<Final>
+      struct multiplicative_base_no_check
       {
         //! Forwards to the underlying value
         friend JASEL_MUTABLE_CONSTEXPR Final& operator*=(Final& x, Final const& y) noexcept
@@ -30,12 +27,6 @@ namespace std
           x._underlying() *= y._underlying();
           return x;
         }
-//        JASEL_MUTABLE_CONSTEXPR Final& operator+=(Final y) noexcept
-//        {
-//          Final::_final(this)._underlying() += y._underlying();
-//          return Final::_final(this);
-//        }
-
         friend JASEL_MUTABLE_CONSTEXPR Final& operator/=(Final& x, Final const& y) noexcept
         {
           x._underlying() /= y._underlying();
@@ -43,7 +34,7 @@ namespace std
         }
       };
       template <class Final>
-      struct multiplicative_base_check : multiplicative_base<Final>
+      struct multiplicative_base_check
       {
         //! Forwards to the underlying value
         friend JASEL_MUTABLE_CONSTEXPR Final& operator*=(Final& x, Final const& y) noexcept
@@ -58,6 +49,18 @@ namespace std
         }
       };
       template <class Final>
+      struct multiplicative_no_check : multiplicative_base_no_check<Final>
+      {
+        friend constexpr Final operator*(Final const& x, Final const& y)  noexcept
+        {
+          return Final(x._underlying() * y._underlying());
+        }
+        friend constexpr Final operator/(Final const& x, Final const& y)  noexcept
+        {
+          return Final(x._underlying() / y._underlying());
+        }
+      };
+      template <class Final>
       struct multiplicative_check : multiplicative_base_check<Final>
       {
         friend constexpr Final operator*(Final const& x, Final const& y)  noexcept
@@ -69,6 +72,48 @@ namespace std
           return Final(x._underlying() / y._underlying());
         }
       };
+
+      // heterogeneous
+
+#if 0
+      template <class Final, template <class, class> class Pred=is_compatible_with>
+      struct multiplicative_with_if_base_no_check
+      {
+        //! Forwards to the underlying value
+        template <class Other, typename = enable_if_t<Pred<Final, Other>::value>>
+        friend JASEL_MUTABLE_CONSTEXPR Final& operator*=(Final& x, Other const& y) noexcept
+        {
+          x._underlying() *= y._underlying();
+          return x;
+        }
+
+        template <class Other, typename = enable_if_t<Pred<Final, Other>::value>>
+        friend JASEL_MUTABLE_CONSTEXPR Final& operator/=(Final& x, Other const& y) noexcept
+        {
+          x._underlying() /= y._underlying();
+          return x;
+        }
+      };
+#endif
+      template <class Final, template <class, class> class Pred=is_compatible_with>
+      //struct multiplicative_with_if_no_check : multiplicative_with_if_base_no_check<Final, Pred>
+      struct multiplicative_with_if_no_check : multiplicative_base_no_check<Final>
+      {
+        template <class Other, typename = enable_if_t<Pred<Final, Other>::value>>
+        friend constexpr typename common_type<Final, Other>::type operator*(Final const& x, Other const& y)  noexcept
+        {
+          using CT = typename common_type<Final, Other>::type;
+          return CT(CT(x)._underlying() * CT(y)._underlying());
+        }
+
+        template <class Other, typename = enable_if_t<Pred<Final, Other>::value>>
+        friend constexpr typename common_type<Final, Other>::type operator/(Final const& x, Other const& y)  noexcept
+        {
+          using CT = typename common_type<Final, Other>::type;
+          return CT(CT(x)._underlying() / CT(y)._underlying());
+        }
+      };
+
     }
   }
 }

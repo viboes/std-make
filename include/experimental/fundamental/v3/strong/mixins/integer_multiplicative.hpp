@@ -30,6 +30,19 @@ namespace std
       struct integer_multiplicative_check : multiplicative_check<Final>, modable_check<Final>
       {
       };
+
+      template <class Final>
+      struct integer_multiplicative_no_check : multiplicative_no_check<Final>, modable_no_check<Final>
+      {
+      };
+
+      template <class Final, template <class, class> class Pred=is_compatible_with>
+      struct integer_multiplicative_with_if_no_check
+          : multiplicative_with_if_no_check<Final, Pred>
+          , modable_with_if_no_check<Final, Pred>
+      {
+      };
+
     }
   }
 }

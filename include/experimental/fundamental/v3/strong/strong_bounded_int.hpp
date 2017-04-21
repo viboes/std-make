@@ -59,7 +59,7 @@ inline namespace fundamental_v3
 
   namespace mixin {
     template <class Tag, class UT1, UT1 Low1, UT1 High1, class UT2, UT2 Low2, UT2 High2>
-    struct is_comparable_with<strong_bounded_int<Tag, UT1, Low1, High1>, strong_bounded_int<Tag, UT2, Low2, High2>> : true_type {};
+    struct is_compatible_with<strong_bounded_int<Tag, UT1, Low1, High1>, strong_bounded_int<Tag, UT2, Low2, High2>> : true_type {};
   }
 
   template <class Tag, class UT, UT Low, UT High>

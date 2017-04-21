@@ -7,6 +7,7 @@
 #ifndef JASEL_FUNDAMENTAL_V3_STRONG_MIXIN_EQUALITY_COMPARABLE_HPP
 #define JASEL_FUNDAMENTAL_V3_STRONG_MIXIN_EQUALITY_COMPARABLE_HPP
 
+#include <experimental/fundamental/v3/strong/mixins/is_compatible_with.hpp>
 #include <experimental/meta.hpp>
 
 namespace std
@@ -43,14 +44,7 @@ namespace std
         { return x.underlying() != y.underlying();}
       };
 
-      // todo: this predicate either must be more specific or it should be more generic as it can be used also on other situations.
-      template <class T, class U>
-      struct is_comparable_with : false_type {};
-
-      //template <class T>
-      //struct is_comparable_with<T,T> : true_type {};
-
-      template <class Final, template <class, class> class Pred=is_comparable_with>
+      template <class Final, template <class, class> class Pred=is_compatible_with>
       struct equality_comparable_with_if : equality_comparable<Final>
       {
         //! Forwards to the underlying value
