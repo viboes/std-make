@@ -124,21 +124,21 @@ namespace std
       struct bitwise_with_if : bitwise_assign<Final, Check>
       {
         template <class Other, typename = enable_if_t<Pred<Final, Other>::value>>
-        friend constexpr typename common_type<Final, Other>::type operator&(Final const&x, Other const& y) noexcept
+        friend constexpr common_type_t<Final, Other> operator&(Final const&x, Other const& y) noexcept
         {
-          using CT = typename common_type<Final, Other>::type;
+          using CT = common_type_t<Final, Other>;
           return CT(CT(x)._underlying() & CT(y)._underlying());
         }
         template <class Other, typename = enable_if_t<Pred<Final, Other>::value>>
-        friend constexpr typename common_type<Final, Other>::type operator|(Final const& x, Other const& y) noexcept
+        friend constexpr common_type_t<Final, Other> operator|(Final const& x, Other const& y) noexcept
         {
-          using CT = typename common_type<Final, Other>::type;
+          using CT = common_type_t<Final, Other>;
           return CT(CT(x)._underlying() | CT(y)._underlying());
         }
         template <class Other, typename = enable_if_t<Pred<Final, Other>::value>>
-        friend constexpr typename common_type<Final, Other>::type operator^(Final const&x, Other const&y) noexcept
+        friend constexpr common_type<Final, Other> operator^(Final const&x, Other const&y) noexcept
         {
-          using CT = typename common_type<Final, Other>::type;
+          using CT = common_type<Final, Other>;
           return CT(CT(x)._underlying() ^ CT(y)._underlying());
         }
 

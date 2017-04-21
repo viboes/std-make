@@ -8,7 +8,7 @@
 #define JASEL_FUNDAMENTAL_V2_FACTORY_MAKE_HPP
 
 #include <utility>
-#include <type_traits>
+#include <experimental/type_traits.hpp>
 #include <experimental/meta/v1/is_callable.hpp>
 #include <experimental/meta/v1/decay_unwrap.hpp>
 #include <experimental/meta/v1/when.hpp>
@@ -67,10 +67,10 @@ namespace type_constructible
   // make() overload
   template <class TC, int = 0, int...>
   constexpr
-  typename enable_if<
+  enable_if_t<
       meta::is_callable<TC(void)>::value,
       meta::invoke<TC, void>
-  >::type make()
+  > make()
   {
     return traits<meta::invoke<TC, void>>::make();
   }
@@ -83,10 +83,10 @@ namespace type_constructible
 
   // make overload: requires a type constructor, deduce the underlying type
   template <class TC, int = 0, int..., class ...Xs>
-  constexpr typename enable_if<
+  constexpr enable_if_t<
     meta::is_callable<TC(meta::decay_unwrap_t<Xs>...)>::value,
     meta::invoke<TC, meta::decay_unwrap_t<Xs>...>
-  >::type
+  >
   make(Xs&& ...xs)
   {
     return traits<meta::invoke<TC, meta::decay_unwrap_t<Xs>...>>::make(std::forward<Xs>(xs)...);
@@ -95,10 +95,10 @@ namespace type_constructible
 
   // make overload: requires a type with a specific underlying type, don't deduce the underlying type from Xs
   template <class M, int = 0, int..., class ...Xs>
-  constexpr typename enable_if<
+  constexpr enable_if_t<
     ! meta::is_callable<M(meta::decay_unwrap_t<Xs>...)>::value
     , M
-  >::type
+  >
   make(Xs&& ...xs)
   {
     return traits<M>::make(std::forward<Xs>(xs)...);

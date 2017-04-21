@@ -9,7 +9,7 @@
 #ifndef JASEL_V3_FUNDAMENTAL_TYPE_TRAITS_DISJUNCTION_HPP
 #define JASEL_V3_FUNDAMENTAL_TYPE_TRAITS_DISJUNCTION_HPP
 
-#include <type_traits>
+#include <experimental/fundamental/v3/type_traits/type_traits_t.hpp>
 
 namespace std
 {
@@ -18,11 +18,11 @@ namespace experimental
 inline namespace fundamental_v3
 {
   // disjunction
-  template<class...> struct disjunction : std::false_type { };
+  template<class...> struct disjunction : false_type { };
   template<class B1> struct disjunction<B1> : B1 { };
   template<class B1, class... Bn>
   struct disjunction<B1, Bn...>
-      : std::conditional<bool(B1::value), B1, disjunction<Bn...>>::type  { };
+      : conditional_t<bool(B1::value), B1, disjunction<Bn...>>  { };
 
 #if __cplusplus >= 201402L
   template <class ...Bs>

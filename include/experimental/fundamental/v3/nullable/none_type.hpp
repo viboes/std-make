@@ -36,11 +36,11 @@ inline namespace fundamental_v3
 #endif
   ;
   template <class I>
-  struct none_type<I const> : none_type<typename decay<I>::type> { };
+  struct none_type<I const> : none_type<decay_t<I>> { };
   template <class I>
-  struct none_type<I volatile> : none_type<typename decay<I>::type> { };
+  struct none_type<I volatile> : none_type<decay_t<I>> { };
   template <class I>
-  struct none_type<I const volatile> : none_type<typename decay<I>::type> { };
+  struct none_type<I const volatile> : none_type<decay_t<I>> { };
 
 #if ! defined JASEL_DOXYGEN_INVOKED
   namespace nullable_detail {

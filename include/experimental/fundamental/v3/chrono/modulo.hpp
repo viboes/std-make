@@ -180,9 +180,9 @@ namespace chrono
 #if defined JASEL_DOXYGEN_INVOKED
   ModuloTo
 #else
-  typename enable_if <
+  enable_if_t <
     chrono_detail::is_modulo<ModuloTo>::value, ModuloTo
-  >::type
+  >
 #endif
   to_modulo(modulo<D,SD,R> m)
   {

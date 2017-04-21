@@ -55,7 +55,7 @@ namespace std
         template <class Other, typename = enable_if_t<Pred<Final, Other>::value>>
         friend constexpr common_type_t<Final, Other> operator%(Final const& x, Other const& y)  noexcept
         {
-          using CT = typename common_type<Final, Other>::type;
+          using CT = common_type_t<Final, Other>;
 
           return CT(CT(x)._underlying() % CT(y)._underlying());
         }

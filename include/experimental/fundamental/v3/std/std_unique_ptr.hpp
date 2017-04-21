@@ -11,6 +11,7 @@
 #include <experimental/meta.hpp>
 #include <experimental/nullable.hpp>
 #include <experimental/functor.hpp>
+#include <experimental/type_traits.hpp>
 #include <memory>
 
 namespace std
@@ -32,7 +33,7 @@ namespace std
   template <class T>
     unique_ptr<T> make_unique(typename remove_reference<T>::type&& x)
   {
-    return unique_ptr<T>(new T(std::forward<typename remove_reference<T>::type>(x)));
+    return unique_ptr<T>(new T(forward<typename remove_reference<T>::type>(x)));
   }
 
   // variadic overload

@@ -41,21 +41,21 @@ inline namespace fundamental_v3
   using ValueType = meta::eval<value_type<T>>;
 
   template <class T >
-  struct value_type<T*> : enable_if<is_object<T>::value, typename remove_cv<T>::type>  {};
+  struct value_type<T*> : enable_if<is_object<T>::value, remove_cv_t<T>>  {};
 
   template <class I>
-  struct value_type<I const> : value_type<typename decay<I>::type> { };
+  struct value_type<I const> : value_type<decay_t<I>> { };
   template <class I>
-  struct value_type<I volatile> : value_type<typename decay<I>::type> { };
+  struct value_type<I volatile> : value_type<decay_t<I>> { };
   template <class I>
-  struct value_type<I const volatile> : value_type<typename decay<I>::type> { };
+  struct value_type<I const volatile> : value_type<decay_t<I>> { };
 
 
   namespace detail {
     template <class T, bool IsArray, bool HasValueTypeMember , bool HasElementTypeMember >
     struct value_type;
     template <class T>
-    struct value_type<T, true, false, false>: value_type_t<typename decay<T>::type> {};
+    struct value_type<T, true, false, false>: value_type_t<decay_t<T>> {};
     template <class T >
     struct value_type<T, false, true, false>: meta::id<typename T::value_type> {};
     template <class T >

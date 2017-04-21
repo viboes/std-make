@@ -245,8 +245,8 @@ namespace sum_type
     // explicit result type
     template <class R, class ST, class F1, class F2, class... Fs
 #if ! defined JASEL_DOXYGEN_INVOKED
-    , typename enable_if<
-      ! sum_type_detail::is_tuple<ST>::value, int>::type = 0
+    , enable_if_t<
+      ! sum_type_detail::is_tuple<ST>::value, int> = 0
 #endif
       >
     decltype(auto) match(ST const& that, F1 && f1, F2 && f2, Fs &&... fs)
@@ -259,8 +259,8 @@ namespace sum_type
     }
     template <class R, class ST, class F1, class... Fs
 #if ! defined JASEL_DOXYGEN_INVOKED
-    , typename enable_if<
-      ! sum_type_detail::is_tuple<ST>::value, int>::type = 0
+    , enable_if_t<
+      ! sum_type_detail::is_tuple<ST>::value, int> = 0
 #endif
       >
     decltype(auto) match(ST & that, F1 && f1, Fs &&... fs)
@@ -287,9 +287,9 @@ namespace sum_type
     // result type deduced the nested typedef result_type of all functions
     template <class ST, class F1, class F2, class... Fs
 #if ! defined JASEL_DOXYGEN_INVOKED
-    , typename enable_if<
+    , enable_if_t<
       ! sum_type_detail::is_tuple<ST>::value
-      && sum_type_detail::have_result_type_member<F1>::value, int>::type = 0
+      && sum_type_detail::have_result_type_member<F1>::value, int> = 0
 #endif
       >
     decltype(auto) match(ST const& that, F1 && f1, F2 && f2, Fs &&... fs)
@@ -299,9 +299,9 @@ namespace sum_type
     }
     template <class ST, class F1, class F2, class... Fs
 #if ! defined JASEL_DOXYGEN_INVOKED
-    , typename enable_if<
+    , enable_if_t<
       ! sum_type_detail::is_tuple<ST>::value
-      && sum_type_detail::have_result_type_member<F1>::value, int>::type = 0
+      && sum_type_detail::have_result_type_member<F1>::value, int> = 0
 #endif
       >
     decltype(auto) match(ST& that, F1 && f1, F2 && f2, Fs &&... fs)
@@ -313,8 +313,8 @@ namespace sum_type
     // result type deduced the nested typedef result_type of all functions on a product of sum types
     template <class... STs, class F, class... Fs
 #if ! defined JASEL_DOXYGEN_INVOKED
-    , typename enable_if<
-      sum_type_detail::have_result_type_member<F>::value, int>::type = 0
+    , enable_if_t<
+      sum_type_detail::have_result_type_member<F>::value, int> = 0
 #endif
       >
     decltype(auto) match(tuple<STs...> const& those, F && f, Fs &&... fs)

@@ -10,9 +10,9 @@
 #ifndef JASEL_FUNDAMENTAL_V3_UTILITY_ONLY_WHEN_HPP
 #define JASEL_FUNDAMENTAL_V3_UTILITY_ONLY_WHEN_HPP
 
-#include <utility>
-#include <type_traits>
+#include <experimental/type_traits.hpp>
 #include <experimental/fundamental/v2/config.hpp>
+#include <utility>
 
 namespace std
 {
@@ -41,10 +41,10 @@ namespace std
     namespace detail
     {
       template <typename, typename T>
-      using _is_signed_integral = typename conditional<
-      is_signed<T>::value && is_integral<T>::value,
-      true_type,
-      false_type>::type;
+      using _is_signed_integral = conditional_t<
+          is_signed<T>::value && is_integral<T>::value,
+          true_type,
+          false_type>;
 
       template <typename I, typename T>
       std::false_type _test_no_narrowing(long long);
@@ -64,25 +64,28 @@ namespace std
       };
 # if defined __GNUC__ && ! defined __clang__
       template <typename I, typename T>
-      struct _is_int_convertible_but_no_float : conditional<decltype(_test_no_narrowing<I, T>(1))::value
-      && is_convertible<T, I>::value
-      && is_constructible<_int_no_double_test<I>, T>::value,
-      true_type, false_type>::type
+      struct _is_int_convertible_but_no_float : conditional_t<decltype(_test_no_narrowing<I, T>(1))::value
+                  && is_convertible<T, I>::value
+                  && is_constructible<_int_no_double_test<I>, T>::value,
+        true_type,
+        false_type
+      >
       {};
 #else
       template <typename I, typename T>
-      struct _is_int_convertible_but_no_float : conditional<decltype(_test_no_narrowing<I, T>(1))::value
-      && is_convertible<T, I>::value,
-      true_type, false_type>::type
+      struct _is_int_convertible_but_no_float : conditional_t<decltype(_test_no_narrowing<I, T>(1))::value
+        && is_convertible<T, I>::value,
+        true_type, false_type
+      >
       {};
 #endif
       // todo: move to detail
       template <typename T, typename U>
-      struct _is_lvalue_ref_or_wrapper2 : conditional<
+      struct _is_lvalue_ref_or_wrapper2 : conditional_t<
       is_convertible<U&&, T&>::value && !is_convertible<U&&, T&&>::value,
-      true_type,
-      false_type
-      >::type
+        true_type,
+        false_type
+      >
       {};
     }
 #endif

@@ -15,7 +15,7 @@
 #include <functional>
 
 #include <utility>
-#include <type_traits>
+#include <experimental/type_traits.hpp>
 
 namespace std
 {
@@ -135,7 +135,7 @@ inline namespace fundamental_v3
   constexpr
   auto deref(T&& x)
     JASEL_DECLTYPE_RETURN (
-      traits<typename decay<T>::type>::deref(x)
+      traits<decay_t<T>>::deref(x)
     )
 
 
@@ -151,13 +151,13 @@ inline namespace fundamental_v3
       using value_type_t = typename value_type<T>::type;
 
   template <class T>
-    struct value_type { using type = typename remove_reference<decltype(nullable::deref(declval<T>()))>::type; };
+    struct value_type { using type = remove_reference_t<decltype(nullable::deref(declval<T>()))>; };
 
   template <class T>
   constexpr
   auto deref_none(T&& x)
     JASEL_DECLTYPE_RETURN (
-      traits<typename decay<T>::type>::deref_none(x)
+      traits<decay_t<T>>::deref_none(x)
     )
 
   template <class T>
@@ -246,14 +246,14 @@ inline namespace fundamental_v3
 
   namespace nullable {
 
-  template < class C, typename enable_if<is_nullable<C>::value, int>::type=0 >
+  template < class C, enable_if_t<is_nullable<C>::value, int> = 0 >
   constexpr bool operator==(none_t, C const& x) { return ! nullable::has_value(x); }
-  template < class C, typename enable_if<is_nullable<C>::value, int>::type=0  >
+  template < class C, enable_if_t<is_nullable<C>::value, int> = 0  >
   constexpr bool operator==(C const& x, none_t) { return ! nullable::has_value(x); }
 
-  template < class C, typename enable_if<is_nullable<C>::value, int>::type=0  >
+  template < class C, enable_if_t<is_nullable<C>::value, int> = 0  >
   constexpr bool operator!=(none_t, C const& x) { return nullable::has_value(x); }
-  template < class C, typename enable_if<is_nullable<C>::value, int>::type=0  >
+  template < class C, enable_if_t<is_nullable<C>::value, int> = 0  >
   bool operator!=(C const& x, none_t) { return nullable::has_value(x); }
 
   template < class C>
@@ -267,24 +267,24 @@ inline namespace fundamental_v3
   bool operator!=(C * x, none_t) { return nullable::has_value(x); }
 
 
-  template < class C, typename enable_if<is_strict_weakly_ordered_nullable<C>::value, int>::type=0  >
+  template < class C, enable_if_t<is_strict_weakly_ordered_nullable<C>::value, int> = 0  >
   constexpr bool operator<(none_t, C const& x) { return nullable::has_value(x); }
-  template < class C, typename enable_if<is_strict_weakly_ordered_nullable<C>::value, int>::type=0 >
+  template < class C, enable_if_t<is_strict_weakly_ordered_nullable<C>::value, int> = 0 >
   constexpr bool operator<(C const& x, none_t) { return false; }
 
-  template < class C, typename enable_if<is_strict_weakly_ordered_nullable<C>::value, int>::type=0 >
+  template < class C, enable_if_t<is_strict_weakly_ordered_nullable<C>::value, int> = 0 >
   constexpr bool operator<=(none_t, C const& x) { return true; }
-  template < class C, typename enable_if<is_strict_weakly_ordered_nullable<C>::value, int>::type=0 >
+  template < class C, enable_if_t<is_strict_weakly_ordered_nullable<C>::value, int> = 0 >
   constexpr bool operator<=(C const& x, none_t) { return ! nullable::has_value(x); }
 
-  template < class C, typename enable_if<is_strict_weakly_ordered_nullable<C>::value, int>::type=0 >
+  template < class C, enable_if_t<is_strict_weakly_ordered_nullable<C>::value, int> = 0 >
   constexpr bool operator>(none_t, C const& x) { return false; }
-  template < class C, typename enable_if<is_strict_weakly_ordered_nullable<C>::value, int>::type=0 >
+  template < class C, enable_if_t<is_strict_weakly_ordered_nullable<C>::value, int> = 0 >
   constexpr bool operator>(C const& x, none_t) { return nullable::has_value(x); }
 
-  template < class C, typename enable_if<is_strict_weakly_ordered_nullable<C>::value, int>::type=0  >
+  template < class C, enable_if_t<is_strict_weakly_ordered_nullable<C>::value, int> = 0  >
   constexpr bool operator>=(none_t, C const& x) { return ! nullable::has_value(x); }
-  template < class C, typename enable_if<is_strict_weakly_ordered_nullable<C>::value, int>::type=0  >
+  template < class C, enable_if_t<is_strict_weakly_ordered_nullable<C>::value, int> = 0  >
   constexpr bool operator>=(C const& x, none_t) { return true; }
 
   template <class N, class F, class T>

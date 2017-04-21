@@ -10,7 +10,7 @@
 #ifndef JASEL_EXPERIMENTAL_UTILITY_LVALUE_REF_HPP
 #define JASEL_EXPERIMENTAL_UTILITY_LVALUE_REF_HPP
 
-#include <type_traits>
+#include <experimental/type_traits.hpp>
 #include <utility>
 
 namespace std
@@ -25,11 +25,11 @@ namespace std
       // todo: move to detail
 
       template <typename T, typename U>
-      struct _is_lvalue_ref_or_wrapper : conditional<
-      is_convertible<U&&, T&>::value && !is_convertible<U&&, T&&>::value,
-      true_type,
-      false_type
-      >::type
+      struct _is_lvalue_ref_or_wrapper : conditional_t<
+          is_convertible<U&&, T&>::value && !is_convertible<U&&, T&&>::value,
+          true_type,
+          false_type
+      >
       {};
     }
 #endif
@@ -42,11 +42,11 @@ namespace std
 
     public:
 
-      template <typename U, typename enable_if<detail::_is_lvalue_ref_or_wrapper<T, U>::value, bool>::type = true>
+      template <typename U, enable_if_t<detail::_is_lvalue_ref_or_wrapper<T, U>::value, bool> = true>
       lvalue_ref(U&& ref) : _ref(forward<U>(ref))
       {}
 
-      template <typename U, typename enable_if<!detail::_is_lvalue_ref_or_wrapper<T, U>::value, bool>::type = true>
+      template <typename U, enable_if_t<!detail::_is_lvalue_ref_or_wrapper<T, U>::value, bool> = true>
       lvalue_ref(U&& ref) = delete;
 
       T& get() const

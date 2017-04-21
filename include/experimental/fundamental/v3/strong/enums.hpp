@@ -12,6 +12,7 @@
 #include <experimental/fundamental/v3/strong/mixins/comparable.hpp>
 #include <experimental/fundamental/v3/strong/mixins/streamable.hpp>
 #include <experimental/optional.hpp>
+#include <experimental/type_traits.hpp>
 #include <exception>
 #include <functional>
 
@@ -62,7 +63,7 @@ inline namespace fundamental_v3
   // This template must be specialized for enum wrappers
 
   template <class E>
-  typename enable_if<is_enum<E>::value, E>::type to_enum(E v)
+  enable_if_t<is_enum<E>::value, E> to_enum(E v)
   { return v; }
 
   template <class T>
@@ -78,7 +79,7 @@ inline namespace fundamental_v3
   template <class E>
   using native_enum_type_t = typename native_enum_type<E>::type;
 
-  template <class Final, class E, class UT=typename underlying_type<E>::type>
+  template <class Final, class E, class UT=underlying_type_t<E>>
   struct enum_wrapper
       : private_strong_type<Final, UT>
       , mixin::comparable<Final>
@@ -107,7 +108,7 @@ inline namespace fundamental_v3
   //! };
   //! typedef strong_enum<SE::type, uint8_t> SSE
 
-  template <class E, class UT=typename underlying_type<E>::type>
+  template <class E, class UT=underlying_type_t<E>>
   struct strong_enum final : enum_wrapper<strong_enum<E, UT>, E, UT>
   {
       using base_type = enum_wrapper<strong_enum<E, UT>, E, UT>;
@@ -119,7 +120,7 @@ inline namespace fundamental_v3
   struct underlying_type<strong_enum<E,UT>> { typedef UT type; };
 
   // safe_enum is a strong_enum that checks the validity of the values of the enum using is_valid_enum
-  template <class E, class UT=typename underlying_type<E>::type>
+  template <class E, class UT=underlying_type_t<E>>
   struct safe_enum final: enum_wrapper<safe_enum<E, UT>, E, UT>
   {
       using base_type = enum_wrapper<safe_enum<E, UT>, E, UT>;
@@ -139,7 +140,7 @@ inline namespace fundamental_v3
 
   // ordinal_enum is a strong enum that checks the validity of the values of the enum using is_enumerator
   // is_enumerator is specialized for ordinal enums
-  template <class E, class UT=typename underlying_type<E>::type>
+  template <class E, class UT=underlying_type<E>>
   struct ordinal_enum final: enum_wrapper<ordinal_enum<E, UT>, E, UT>
   {
       using base_type = enum_wrapper<ordinal_enum<E, UT>, E, UT>;

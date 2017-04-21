@@ -10,7 +10,7 @@
 #ifndef JASEL_EXPERIMENTAL_UTILITY_OUT_PARAM_HPP
 #define JASEL_EXPERIMENTAL_UTILITY_OUT_PARAM_HPP
 
-#include <type_traits>
+#include <experimental/type_traits.hpp>
 
 namespace std
 {
@@ -23,7 +23,7 @@ inline namespace fundamental_v3
   class out_param
   {
     static_assert(is_lvalue_reference<T>::value, "only references to non-const");
-    static_assert(!is_const<typename remove_reference<T>::type>::value, "only references to non-const");
+    static_assert(!is_const<remove_reference_t<T>>::value, "only references to non-const");
     T& _ref;
     // no assignable by default as it contains a reference
   public:

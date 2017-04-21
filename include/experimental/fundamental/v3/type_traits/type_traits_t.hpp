@@ -35,6 +35,11 @@ inline namespace fundamental_v3
   template< class T >
   using remove_reference_t = typename remove_reference<T>::type;
 
+  template< class T >
+  using remove_cv_t = typename remove_cv<T>::type;
+
+
+
 #endif
 
 }

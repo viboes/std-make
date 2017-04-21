@@ -89,7 +89,7 @@ namespace detail
       struct yes{ char a[1]; };
       struct no { char a[2]; };
 
-      template <size_t I, class U> static yes test(typename variant_alternative<I,U>::type*);
+      template <size_t I, class U> static yes test(variant_alternative_t<I,U>*);
       template <size_t I, class U> static no test(...);
       static const bool value = sizeof(test<N, T>(nullptr)) == sizeof(yes);
   };

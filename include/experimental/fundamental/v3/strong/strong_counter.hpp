@@ -84,7 +84,7 @@ inline namespace fundamental_v3
   //! However, implicit conversions can happen on most domains if treat_as_floating_point<Rep>::value == true.
 
   template <class Domain, class Rep>
-  struct treat_as_floating_point : std::is_floating_point<Rep> {};
+  struct treat_as_floating_point : is_floating_point<Rep> {};
 
 
   template <class Domain>
@@ -164,7 +164,7 @@ inline namespace fundamental_v3
 
       template<class D, class F, class T, class D2>
       static constexpr auto test(int) ->
-      decltype(f(static_cast<T>(inter_domain_convert<D, T>(std::declval<D2>(), std::declval<F>()))), true)
+      decltype(f(static_cast<T>(inter_domain_convert<D, T>(declval<D2>(), declval<F>()))), true)
       {
           return true;
       }
@@ -186,7 +186,7 @@ inline namespace fundamental_v3
 
       template<class D, class F, class T, class D2>
       static constexpr auto test(int) ->
-      decltype(f(static_cast<T>(inter_domain_cast<D, T>(std::declval<D2>(), std::declval<F>()))), true)
+      decltype(f(static_cast<T>(inter_domain_cast<D, T>(declval<D2>(), declval<F>()))), true)
       {
           return true;
       }
@@ -208,7 +208,7 @@ inline namespace fundamental_v3
 
       template<class D, class F, class T>
       static constexpr auto test(int) ->
-      decltype(f(static_cast<T>(intra_domain_convert<D, T>(std::declval<F>()))), true)
+      decltype(f(static_cast<T>(intra_domain_convert<D, T>(declval<F>()))), true)
       {
           return true;
       }
@@ -274,7 +274,7 @@ inline namespace fundamental_v3
       template <class UT2>
       explicit strong_counter(UT2 const& r
 #if !defined JASEL_DOXYGEN_INVOKED
-          , typename enable_if<detail::is_intra_domain_convertible<Domain, UT2, UT>::value>::type* = nullptr
+          , enable_if_t<detail::is_intra_domain_convertible<Domain, UT2, UT>::value>* = nullptr
 #endif
           )
           : base_type(detail::intra_domain_convert<Domain, UT>(r))
@@ -283,7 +283,7 @@ inline namespace fundamental_v3
       template <class UT2>
       explicit strong_counter(UT2 const& r
 #if !defined JASEL_DOXYGEN_INVOKED
-          , typename enable_if<! detail::is_intra_domain_convertible<Domain, UT2, UT>::value>::type* = nullptr
+          , enable_if_t<! detail::is_intra_domain_convertible<Domain, UT2, UT>::value>* = nullptr
 #endif
           ) = delete;
 
@@ -293,7 +293,7 @@ inline namespace fundamental_v3
       template <class Domain2, class UT2>
       strong_counter(strong_counter<Domain2, UT2> const& other
 #if !defined JASEL_DOXYGEN_INVOKED
-          , typename enable_if<detail::is_inter_domain_convertible<Domain, UT2, UT, Domain2>::value>::type* = nullptr
+          , enable_if_t<detail::is_inter_domain_convertible<Domain, UT2, UT, Domain2>::value>* = nullptr
 #endif
           )
           : base_type(detail::inter_domain_convert<Domain,UT>(Domain2{}, other.count()))
@@ -339,18 +339,18 @@ inline namespace fundamental_v3
     // todo: try to generalize this operator on multiplicative_with
   template <class D1, class R1, class D2, class R2>
   constexpr
-  typename common_type<R1, R2>::type
+  common_type_t<R1, R2>
   operator/(const strong_counter<D1, R1>& x,
         const strong_counter<D2, R2>& y)
   {
-    typedef typename common_type<strong_counter<D1, R1>, strong_counter<D2, R2> >::type CD;
+    typedef common_type_t<strong_counter<D1, R1>, strong_counter<D2, R2> > CD;
     return CD(x).count() / CD(y).count();
   }
 
   template <class T>
-  struct is_strong_counter : std::false_type {};
+  struct is_strong_counter : false_type {};
   template <class D, class R>
-  struct is_strong_counter<strong_counter<D,R>> : std::true_type {};
+  struct is_strong_counter<strong_counter<D,R>> : true_type {};
 
   // strong_counter_cast
 
@@ -363,12 +363,12 @@ inline namespace fundamental_v3
 
   template <class StrongCounterTo, class DomainFrom, class RepFrom
 #if !defined JASEL_DOXYGEN_INVOKED
-      , class = typename enable_if<
+      , class = enable_if_t<
                   conjunction<
                     is_strong_counter<StrongCounterTo>
                   , detail::is_inter_domain_cast<typename StrongCounterTo::domain, RepFrom, typename StrongCounterTo::rep, DomainFrom>
                   >::value
-                >::type
+                >
 #endif
   >
   constexpr StrongCounterTo strong_counter_cast(strong_counter<DomainFrom, RepFrom> const& sc)
@@ -382,7 +382,7 @@ inline namespace fundamental_v3
   //! The function does not participate in the overload resolution unless To is an instance of strong_counter.
 
   template <class To, class D, class R
-      , class = typename enable_if<is_strong_counter<To>{}>::type
+      , class = enable_if_t<is_strong_counter<To>{}>
   >
   To strong_counter_floor(const strong_counter<D, R>& d)
   {
@@ -394,7 +394,7 @@ inline namespace fundamental_v3
   //! \n<b>Returns:</b><br> the smallest strong_counter t representable in To that is greater or equal to d.
   //! The function does not participate in the overload resolution unless To is an instance of strong_counter.
   template <class To, class D, class R
-      , class = typename enable_if<is_strong_counter<To>{}>::type
+      , class = enable_if<is_strong_counter<To>{}>
   >
   To strong_counter_ceil(const strong_counter<D, R>& d)
   {
@@ -409,9 +409,9 @@ inline namespace fundamental_v3
   //! The function does not participate in the overload resolution unless To is an instance of strong_counter
   //! and treat_as_floating_point<typename To::rep>{} is false
   template <class To, class D, class R
-      , class = typename enable_if<is_strong_counter<To>{}
+      , class = enable_if_t<is_strong_counter<To>{}
                 && ! treat_as_floating_point<typename To::domain, typename To::rep>{}
-                >::type
+                >
   >
   To strong_counter_round(const strong_counter<D, R>& d)
   {
@@ -451,11 +451,11 @@ inline namespace fundamental_v3
   { using type = UT; };
 
 #if 1
-  static_assert(std::is_pod<strong_counter<bool,int>>::value, "");
-  static_assert(std::is_trivially_default_constructible<strong_counter<bool,int>>::value, "");
-  static_assert(std::is_trivially_copyable<strong_counter<bool,int>>::value, "");
-  static_assert(std::is_standard_layout<strong_counter<bool,int>>::value, "");
-  static_assert(std::is_trivial<strong_counter<bool,int>>::value, "");
+  static_assert(is_pod<strong_counter<bool,int>>::value, "");
+  static_assert(is_trivially_default_constructible<strong_counter<bool,int>>::value, "");
+  static_assert(is_trivially_copyable<strong_counter<bool,int>>::value, "");
+  static_assert(is_standard_layout<strong_counter<bool,int>>::value, "");
+  static_assert(is_trivial<strong_counter<bool,int>>::value, "");
 #endif
 //  // stream operators
 //
@@ -466,8 +466,8 @@ inline namespace fundamental_v3
 //  //! \n<b>Returns:</b><br> \c is.
 //  // fixme: Shouldn't this depend on Domain?
 //  template <class CharT, class Traits, class Domain, class T >
-//  std::basic_istream<CharT, Traits>&
-//  operator>>(std::basic_istream<CharT, Traits>& is, strong_counter<Domain, T>& x)
+//  basic_istream<CharT, Traits>&
+//  operator>>(basic_istream<CharT, Traits>& is, strong_counter<Domain, T>& x)
 //  {
 //    T v;
 //    is >> v;
@@ -485,8 +485,8 @@ inline namespace fundamental_v3
 //  //! @endcode
 //  // fixme: Shouldn't this depend on Domain?
 //  template <class CharT, class Traits, class Domain, class T >
-//  std::basic_ostream<CharT, Traits>&
-//  operator<<(std::basic_ostream<CharT, Traits>& os, const strong_counter<Domain, T>& x)
+//  basic_ostream<CharT, Traits>&
+//  operator<<(basic_ostream<CharT, Traits>& os, const strong_counter<Domain, T>& x)
 //  {
 //    return os << x.underlying();
 //  }
@@ -506,8 +506,8 @@ inline namespace fundamental_v3
   struct common_type<experimental::strong_counter<Domain1,UT1>, experimental::strong_counter<Domain2,UT2>>
   {
       using type =  experimental::strong_counter<
-          typename std::common_type<Domain1, Domain2>::type,
-          typename std::common_type<UT1, UT2>::type
+          typename common_type<Domain1, Domain2>::type,
+          typename common_type<UT1, UT2>::type
           >;
   };
 

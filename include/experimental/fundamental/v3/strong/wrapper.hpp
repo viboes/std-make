@@ -11,6 +11,7 @@
 #include <experimental/ordinal.hpp>
 #include <experimental/fundamental/v2/config.hpp>
 #include <functional>
+#include <experimental/type_traits.hpp>
 
 namespace std
 {
@@ -118,7 +119,7 @@ inline  namespace fundamental_v3
     template <class W>
     struct wrapped_hash  {
       using argument_type = W;
-      using UT = typename underlying_type<W>::type ;
+      using UT = underlying_type_t<W> ;
       using result_type = std::size_t;
       result_type operator()(argument_type const& s) const
       {
@@ -130,7 +131,7 @@ inline  namespace fundamental_v3
     // todo: try to use when<is_wrapped<T>>
 
     template <class W
-    , class = typename enable_if<is_ordinal<typename W::underlying_t>{}>::type
+    , class = enable_if_t<is_ordinal<typename W::underlying_t>{}>
     >
     struct wrapped_ordinal_traits
     {

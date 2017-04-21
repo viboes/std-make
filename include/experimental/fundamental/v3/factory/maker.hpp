@@ -9,6 +9,7 @@
 
 #include <utility>
 #include <experimental/fundamental/v3/factory/make.hpp>
+#include <experimental/type_traits.hpp>
 
 namespace std
 {
@@ -60,10 +61,10 @@ namespace detail_maker
 #endif
   template <class T>
 #if ! defined JASEL_DOXYGEN_INVOKED
-  typename enable_if<
+  enable_if_t<
       ! is_type_constructor<T>::value
       , detail_maker::maker_t<T>
-    >::type
+    >
 #else
     decltype(auto)
 #endif
@@ -71,10 +72,10 @@ namespace detail_maker
 
   template <class TC>
 #if ! defined JASEL_DOXYGEN_INVOKED
-  typename enable_if<
+  enable_if_t<
       is_type_constructor<TC>::value
       , detail_maker::maker_tc<TC>
-    >::type
+    >
 #else
     auto
 #endif
