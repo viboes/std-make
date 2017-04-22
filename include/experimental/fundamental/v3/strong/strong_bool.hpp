@@ -48,21 +48,25 @@ inline namespace fundamental_v3
   // Do we need a Bool parameter? Which type will be a good candidate?
   // bool takes 4 bytes in some machines. Sometimes we want to use just 1 byte
   //
-  // fixme Should strong_bool be implicitly convertible from bool?
+  // fixme: Is this a safe bool or a strong type bool?
+  // We are mixing strong features with safe features. Maybe we need a strong_bool and a strong_safe_bool.
+  // Note that strong_bool<Tag, safe_bool<>> is not a strong_safe_bool :(
+  //
+  // Should strong_bool be implicitly convertible from bool?
   // It is better if strong types are only explicitly convertible from its underlying type, so that we avoid overload ambiguity.
   // However, requiring an explicit conversion make the code cumbersome.
-  // Maybe we need a boolean type that has some of the strong_bool abilities, but it is convertible from bool.
+  // See safe_bool.
   //
   // fixme Should this class convert implicitly or explicitly to bool?
   // A strong bool is a bool, so we could convert it implicitly.
-  // Note that having implicit conversions introduce overload ambiguity.
+  // Note that having implicit conversions introduce overload ambiguity and undesirable operations e.g. +
   // For the time being, we support only explicit conversion on both sides.
   //
   // fixme do we need the logical operators ?
-  // strong_bool is (explicit) convertible to bool and so && and || operator and ?: operator will force the conversion to bool
-  // If we don't define them we need to be explicit to convert to strong_bool
-  // If we define them, we need to be explicit to convert to bool.
-  // This can be the reason d'être of the difference between strict_bool and strong_bool.
+  // strong_bool is explicit convertible to bool and so && and || operator and ?: operator will force the conversion to bool
+  // If we don't define them we need to explicitly convert to strong_bool
+  // If we define them, we need to explicitly to convert to bool.
+  // This can be the reason d'être of another type.
   //
   // Do we need mixed boolean operators?
   // If yes, which would be the result. IMO, it should be bool.
@@ -73,6 +77,16 @@ inline namespace fundamental_v3
   // For the time being, these functions return bool.
   //
   // fixme Should strong_bool be comparable?
+  //  is bool comparable because it converts to int?
+  //  Maybe the best is to define them if the underlying type provides them.
+  //
+  // fixme Should strong_bool remove the default constructor?
+  // We want strong types to be default constructible if they are by default.
+  // Forcing the default construction, add more functionality than needed.
+  // This is maybe the role of safe_bool.
+  //
+  // fixme Should strong_bool default construct to false?
+  // This is maybe the role of safe_bool.
 
   template <class Tag, class Bool = bool>
   struct strong_bool final
@@ -85,6 +99,9 @@ inline namespace fundamental_v3
       using base_type = strong_type<strong_bool<Tag, Bool>, Bool>;
       using base_type::base_type;
 
+      // Now that we have a safe_bool, we don't want to restrict the representation to an integral type
+      //static_assert(is_integral<Bool>::value, "The representation must be an integral type");
+
       // copy constructor/assignment default
       constexpr strong_bool() noexcept = default;
       // If Bool is not bool, we want an explicit conversion from bool but not Bool.
@@ -92,6 +109,7 @@ inline namespace fundamental_v3
       constexpr explicit strong_bool (bool b) : base_type(b) {};
 
       // unwanted conversions
+      // Now that we have a safe_bool, we don't want to restrict the representation to an integral type
       constexpr explicit strong_bool (int) = delete;
       constexpr explicit strong_bool (double) = delete;
       constexpr explicit strong_bool (void*) = delete;
@@ -146,18 +164,12 @@ inline namespace fundamental_v3
       static size_type pos(strong_bool<Tag, T> u)  { return size_type{u.underlying()}; };
     };
   }
-
-  // fixme: Should boolean be a strong bool without tag?
-  using boolean = strong_bool<default_tag, bool>;
-  using boolean8_t = strong_bool<default_tag, uint8_t>;
 }
 }
 
   template <class Tag, class UT>
   struct hash<experimental::strong_bool<Tag,UT>> :
     experimental::wrapped_hash<experimental::strong_bool<Tag,UT>> {};
-
-
 }
 
 #endif // header

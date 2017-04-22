@@ -270,6 +270,7 @@ test-suite strong
     : 
       [ run strong/byte_pass.cpp  ]
       [ run strong/strong_enums_pass.cpp  ]
+      [ run strong/safe_bool_pass.cpp  ]
       [ run strong/strong_bool_pass.cpp  ]
       [ run strong/strict_bool_pass.cpp  ]
       [ run strong/strong_ints_pass.cpp  ]

@@ -7,6 +7,7 @@
 #ifndef JASEL_EXPERIMENTAL_STRONG_BOOL_HPP
 #define JASEL_EXPERIMENTAL_STRONG_BOOL_HPP
 
+#include <experimental/fundamental/v3/strong/safe_bool.hpp>
 #include <experimental/fundamental/v3/strong/strong_bool.hpp>
 #include <experimental/fundamental/v3/strong/strict_bool.hpp>
 
