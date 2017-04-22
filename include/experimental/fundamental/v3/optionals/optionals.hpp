@@ -33,6 +33,7 @@ namespace experimental
 inline namespace fundamental_v3
 {
 
+//todo  move this to meta
 namespace detail {
   template <class Tpl, class T>
   struct index;
@@ -86,7 +87,7 @@ public:
         return *this;
     }
 
-    // fixme: should inplace use {args...} instead of T(args..)
+    // fixme: should enplace use {args...} instead of T(args..)?
     template <class... Args>
     void emplace(Args&&... args) noexcept
     {
