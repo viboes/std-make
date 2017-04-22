@@ -12,7 +12,6 @@
 #include <experimental/meta/v1/id.hpp>
 #include <experimental/meta/v1/eval.hpp>
 #include <experimental/type_traits.hpp>
-#include <type_traits>
 
 namespace std
 {
