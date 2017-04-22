@@ -19,14 +19,12 @@
 
 #include <experimental/fundamental/v3/expected/config.hpp>
 #include <experimental/fundamental/v3/expected/unexpected.hpp>
-#include <experimental/fundamental/v3/expected/detail/static_addressof.hpp>
-#include <experimental/fundamental/v3/expected/detail/constexpr_utility.hpp>
+#include <experimental/utility.hpp>
 #include <experimental/fundamental/v3/config/requires.hpp>
 #include <experimental/fundamental/v3/expected/error_traits.hpp>
 #include <experimental/fundamental/v3/expected/bad_expected_access.hpp>
 #include <experimental/fundamental/v3/in_place.hpp>
 #include <experimental/type_constructible.hpp>
-//#include <boost/type.hpp>
 
 #ifdef JASEL_EXPERIMENTAL_V3_EXPECTED_USE_BOOST_HPP
 #include <boost/exception_ptr.hpp>

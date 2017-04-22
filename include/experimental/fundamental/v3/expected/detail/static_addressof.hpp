@@ -2,6 +2,7 @@
 // accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 // (C) Copyright 2013,2014 Vicente J. Botet Escriba
+#error
 
 #ifndef JASEL_EXPERIMENTAL_V3_EXPECTED_DETAIL_STATIC_ADDRESSOF_HPP
 #define JASEL_EXPERIMENTAL_V3_EXPECTED_DETAIL_STATIC_ADDRESSOF_HPP

@@ -26,6 +26,8 @@
 #endif
 
 # include <experimental/fundamental/v2/config.hpp>
+# include <experimental/utility.hpp>
+# include <experimental/type_traits.hpp>
 
 #if defined JASEL_STD_HAVE_OPTIONAL
 #include <optional>
@@ -445,9 +447,9 @@ namespace pod
   }
 
   template <class T>
-  constexpr optional<typename decay<T>::type, bool> make_optional(T&& v)
+  constexpr optional<decay_t<T>, bool> make_optional(T&& v)
   {
-    return optional<typename decay<T>::type, bool>(forward<T>(v));
+    return optional<decay_t<T>, bool>(constexpr_forward<T>(v));
   }
 
 #if 0
