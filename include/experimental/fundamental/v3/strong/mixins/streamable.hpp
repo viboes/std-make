@@ -31,10 +31,7 @@ inline namespace fundamental_v3
         std::basic_istream<CharT, Traits>&
         operator>>(std::basic_istream<CharT, Traits>& is, Final& x)
         {
-          using underlying_t = typename Final::underlying_t;
-          underlying_t v;
-          is >> v;
-          x = Final(v);
+          is >> x._underlying();
           return is;
         }
 
@@ -52,7 +49,7 @@ inline namespace fundamental_v3
         std::basic_ostream<CharT, Traits>&
         operator<<(std::basic_ostream<CharT, Traits>& os, const Final& x)
         {
-          return os << x.underlying();
+          return os << x._underlying();
         }
     };
   }
