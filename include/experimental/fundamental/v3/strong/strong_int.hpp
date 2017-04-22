@@ -60,7 +60,7 @@ inline namespace fundamental_v3
   //fixme Why private_tagged?
   template <class Tag, class UT>
   struct strong_int final
-    : private_strong_type<strong_int<Tag, UT>, UT>
+    : strong_type<strong_int<Tag, UT>, UT>
     , mixin::additive_with_if<strong_int<Tag, UT>>
     , mixin::bitwise_with_if<strong_int<Tag, UT>>
     , mixin::comparable_with_if<strong_int<Tag, UT>>
@@ -69,7 +69,7 @@ inline namespace fundamental_v3
   {
       static_assert(is_integral<UT>::value, "UT must be integral");
 
-      using base_type = private_strong_type<strong_int<Tag, UT>, UT>;
+      using base_type = strong_type<strong_int<Tag, UT>, UT>;
       using base_type::base_type;
 
       /// @par Effects Constructs an uninitialized strong_int

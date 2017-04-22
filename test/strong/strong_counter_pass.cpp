@@ -91,13 +91,11 @@ int main()
         OrangeCount oc{1};
         BOOST_TEST(oc == OrangeCount{1});
       }
-#if 1
-      { // constructor from implicitly convertible to UT
+      { // explicit constructor from implicitly convertible to UT
         short s=1;
         OrangeCount oc{int(s)};
         BOOST_TEST(oc == OrangeCount{1});
       }
-#endif
       { // copy constructor
         OrangeCount oc1{1};
         OrangeCount oc2{oc1};
@@ -109,7 +107,7 @@ int main()
         oc2 = oc1;
         BOOST_TEST(oc2 == oc1);
       }
-#if COMPILE_ERROR
+#if defined COMPILE_ERROR
       { // assignment from UT
         OrangeCount oc1{1};
         oc1 = 2; // error
@@ -125,6 +123,12 @@ int main()
         OrangeCount oc2{2};
         BOOST_TEST(oc1+oc2 == OrangeCount{3});
       }
+#if defined COMPILE_ERROR
+      { // operator+(x,y)
+        OrangeCount oc1{1};
+        OrangeCount oc2 = oc1+1; // error
+      }
+#endif
       { // operator+=(x)
         OrangeCount oc1{1};
         OrangeCount oc2{2};
@@ -134,19 +138,22 @@ int main()
       { // operator++()
         OrangeCount oc1{1};
         auto oc2 = ++oc1;
+        static_assert(std::is_same<decltype(oc2), OrangeCount>::value, "error");
         BOOST_TEST(oc1 == OrangeCount{2});
         BOOST_TEST(oc2 == OrangeCount{2});
       }
       { // operator++(int)
         OrangeCount oc1{1};
         auto oc2 = oc1++;
+        static_assert(std::is_same<decltype(oc2), OrangeCount>::value, "error");
         BOOST_TEST(oc1 == OrangeCount{2});
         BOOST_TEST(oc2 == OrangeCount{1});
       }
 
       { // operator-(x)
         OrangeCount oc{1};
-        OrangeCount oc2 = -oc;
+        auto oc2 = -oc;
+        static_assert(std::is_same<decltype(oc2), OrangeCount>::value, "error");
         BOOST_TEST(oc2 == OrangeCount{-1});
       }
       { // operator-(x,y)
@@ -163,12 +170,14 @@ int main()
       { // operator--()
         OrangeCount oc1{1};
         auto oc2 = --oc1;
+        static_assert(std::is_same<decltype(oc2), OrangeCount>::value, "error");
         BOOST_TEST(oc1 == OrangeCount{0});
         BOOST_TEST(oc2 == OrangeCount{0});
       }
       { // operator--(int)
         OrangeCount oc1{1};
         auto oc2 = oc1--;
+        static_assert(std::is_same<decltype(oc2), OrangeCount>::value, "error");
         BOOST_TEST(oc1 == OrangeCount{0});
         BOOST_TEST(oc2 == OrangeCount{1});
       }

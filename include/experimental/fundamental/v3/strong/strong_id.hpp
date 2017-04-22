@@ -42,13 +42,13 @@ inline namespace fundamental_v3
   */
   template <class Tag, class UT = int>
   struct strong_id final
-    : private_strong_type<strong_id<Tag, UT>, UT>
+    : strong_type<strong_id<Tag, UT>, UT>
     , mixin::comparable<strong_id<Tag, UT>>
     , mixin::streamable<strong_id<Tag, UT>>
   {
       //static_assert(is_integral<UT>, "The underlying of a strong_id must be an integral type");
 
-      using base_type = private_strong_type<strong_id<Tag, UT>, UT>;
+      using base_type = strong_type<strong_id<Tag, UT>, UT>;
       using tag_type = Tag;
       using underlying_t = UT;
 

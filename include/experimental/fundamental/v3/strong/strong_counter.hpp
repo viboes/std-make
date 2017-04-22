@@ -245,7 +245,7 @@ inline namespace fundamental_v3
   /// In the same way we can count seconds, we can count oranges or cars.
   template <class Domain, class UT>
   struct strong_counter final
-    : private_strong_type<strong_counter<Domain, UT>, UT>
+    : strong_type<strong_counter<Domain, UT>, UT>
     , mixin::additive_with_if<strong_counter<Domain, UT>>
     , mixin::comparable<strong_counter<Domain, UT>>
     , mixin::integer_multiplicative_with<strong_counter<Domain, UT>, UT>
@@ -255,7 +255,7 @@ inline namespace fundamental_v3
       using domain = Domain;
       using rep = UT;
 
-      using base_type = private_strong_type<strong_counter<Domain, UT>, UT>;
+      using base_type = strong_type<strong_counter<Domain, UT>, UT>;
       using base_type::base_type;
 
       template <class UT2>

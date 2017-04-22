@@ -138,7 +138,9 @@ int main()
       { // operator+(x,y)
         SOrangeCount oc1{1};
         SOrangeCount oc2{2};
-        SOrangeCount oc = oc1+oc2;
+        auto oc = oc1+oc2;
+        static_assert(std::is_same<decltype(oc), SOrangeCount>::value, "error");
+
         BOOST_TEST(oc == SOrangeCount{3});
       }
 
@@ -184,7 +186,9 @@ int main()
       { // operator-(x,y)
         SOrangeCount oc1{1};
         SOrangeCount oc2{2};
-        SOrangeCount oc = oc1-oc2;
+        auto oc = oc1-oc2;
+        static_assert(std::is_same<decltype(oc), SOrangeCount>::value, "error");
+
         BOOST_TEST(oc == SOrangeCount{-1});
       }
       { // operator-(x,y)
@@ -195,7 +199,8 @@ int main()
       { // operator-(x,y)
         UOrangeCount oc1{3};
         UOrangeCount oc2{2};
-        UOrangeCount oc = oc1-oc2;
+        auto oc = oc1-oc2;
+        static_assert(std::is_same<decltype(oc), UOrangeCount>::value, "error");
         BOOST_TEST(oc == UOrangeCount{1});
       }
       { // operator-=(x)

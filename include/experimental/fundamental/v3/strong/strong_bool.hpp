@@ -9,6 +9,7 @@
 
 #include <experimental/fundamental/v3/strong/strong_type.hpp>
 #include <experimental/fundamental/v3/strong/underlying_type.hpp>
+#include <experimental/fundamental/v3/strong/mixins/convertible.hpp>
 #include <experimental/fundamental/v3/strong/mixins/comparable.hpp>
 #include <experimental/fundamental/v3/strong/mixins/logical.hpp>
 #include <experimental/fundamental/v3/strong/mixins/streamable.hpp>
@@ -68,19 +69,20 @@ inline namespace fundamental_v3
   // If not, there will be a conversion to bool and the result is bool
   // So we don't need them
   //
-  // fixme What should be the result of comparing two enums? bool or strong_bool?
+  // fixme What should be the result of comparing two strong_bool? bool or strong_bool?
   // For the time being, these functions return bool.
   //
   // fixme Should strong_bool be comparable?
 
   template <class Tag, class Bool = bool>
   struct strong_bool final
-     : private_strong_type<strong_bool<Tag, Bool>, Bool>
+     : strong_type<strong_bool<Tag, Bool>, Bool>
      , mixin::comparable<strong_bool<Tag, Bool>>
+     , mixin::explicit_convertible_to<strong_bool<Tag, Bool>, bool>
      , mixin::logical<strong_bool<Tag, Bool>>
      , mixin::streamable<strong_bool<Tag, Bool>>
   {
-      using base_type = private_strong_type<strong_bool<Tag, Bool>, Bool>;
+      using base_type = strong_type<strong_bool<Tag, Bool>, Bool>;
       using base_type::base_type;
 
       // copy constructor/assignment default
@@ -88,9 +90,6 @@ inline namespace fundamental_v3
       // If Bool is not bool, we want an explicit conversion from bool but not Bool.
       constexpr explicit strong_bool (Bool) = delete;
       constexpr explicit strong_bool (bool b) : base_type(b) {};
-
-      // If Bool is not bool, we want an explicit conversion to bool
-      constexpr explicit operator bool() const { return bool(this->value); }
 
       // unwanted conversions
       constexpr explicit strong_bool (int) = delete;
@@ -100,18 +99,17 @@ inline namespace fundamental_v3
       constexpr explicit strong_bool (R(*)(Args...)) = delete;
       template <class C, class R, class ... Args>
       constexpr explicit strong_bool (R(C::*)(Args...)) = delete;
-
-
   };
 
   template <class Tag>
   struct strong_bool<Tag, bool> final
-  : protected_strong_type<strong_bool<Tag, bool>, bool>
+  : strong_type<strong_bool<Tag, bool>, bool>
   , mixin::comparable<strong_bool<Tag, bool>>
+  , mixin::explicit_convertible_to<strong_bool<Tag, bool>, bool>
   , mixin::logical<strong_bool<Tag, bool>>
   , mixin::streamable<strong_bool<Tag, bool>>
   {
-      using base_type = protected_strong_type<strong_bool<Tag, bool>, bool>;
+      using base_type = strong_type<strong_bool<Tag, bool>, bool>;
       using base_type::base_type;
 
       // copy constructor/assignment default
