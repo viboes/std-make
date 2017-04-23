@@ -18,7 +18,8 @@ namespace experimental
 inline  namespace fundamental_v3
 {
 
-    //! strong_type wraps an underlying type providing access to the underlying value.  with a specific @c Final tag.
+
+    //! strong_type wraps an underlying type providing access to the underlying value with a specific @c Final tag.
     //!
     //! The main goal of the Final tag is double : make two strong_type types with different Final tag different types and have access to the Final
     //!
@@ -28,6 +29,13 @@ inline  namespace fundamental_v3
     //!
     //! @tparam Tag the tag type
     //! @tparam UT the underlying type
+
+    //! strong_type provides a explicit constructor from convertibles to the underlying type.
+    //! Some StronType types could need
+    //! * implicit construction
+    //!    => They must add an implicit constructor and forward (e.g. safe_bool)
+    //! * construction only from the underlying type (e.g. byte)
+    //!    => They must add an SFINAE constructor
 
     template <class Final, class UT>
     struct strong_type
