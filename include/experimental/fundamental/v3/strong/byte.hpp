@@ -10,6 +10,7 @@
 #include <experimental/fundamental/v3/strong/strong_type.hpp>
 #include <experimental/fundamental/v3/strong/underlying_type.hpp>
 #include <experimental/fundamental/v3/strong/mixins/bitwise.hpp>
+#include <experimental/fundamental/v3/strong/mixins/convertible.hpp>
 #include <experimental/fundamental/v3/strong/mixins/comparable.hpp>
 #include <experimental/fundamental/v3/strong/mixins/streamable.hpp>
 #include <experimental/fundamental/v2/config.hpp>
@@ -27,12 +28,14 @@ inline  namespace fundamental_v3
 #if defined JASEL_HAVE_ENUM_CLASS_CONSTRUCTION_FROM_UNDERLYING_TYPE || defined JASEL_DOXYGEN_INVOKED
     enum class byte : unsigned char {};
 
-    template <class IntegerType= unsigned int, typename = enable_if<is_integral<IntegerType>::value>>
+    //! helper function to cast from byte to IntegralType
+    template <class IntegerType= unsigned int, typename = enable_if_t<is_integral<IntegerType>::value>>
     constexpr IntegerType to_integer(byte b) noexcept
     {
       return static_cast<IntegerType>(b);
     }
 
+    //! helper function to cast from byte to the underlying unsigned char
     inline constexpr unsigned char to_uchar( byte b ) noexcept
     {
         return to_integer<unsigned char>( b );
@@ -42,32 +45,33 @@ inline  namespace fundamental_v3
         return static_cast<unsigned char>( i );
     }
 
-    template< class T >
-    inline constexpr byte to_byte( T v ) noexcept
+    //! helper function to cast from IntegralType to byte
+    template< class IntegralType, typename = enable_if_t<is_integral<IntegralType>::value> >
+    inline constexpr byte to_byte( IntegralType v ) noexcept
     {
-      return byte{ to_uchar(v) };
+      return byte{ static_cast<unsigned char>(v) };
     }
 
-    template <class IntegerType, typename = enable_if<is_integral<IntegerType>::value>>
+    template <class IntegerType, typename = enable_if_t<is_integral<IntegerType>::value>>
     constexpr byte& operator<<=(byte& b, IntegerType shift) noexcept
     {
-      return b = byte{ to_uchar( b ) << shift };
+      return b = byte{ to_uchar(to_uchar( b ) << shift) };
     }
-    template <class IntegerType, typename = enable_if<is_integral<IntegerType>::value>>
+    template <class IntegerType, typename = enable_if_t<is_integral<IntegerType>::value>>
     constexpr byte operator<<(byte b, IntegerType shift) noexcept
     {
-      return byte{ to_uchar( to_uchar( b ) << shift ) };
+      return byte{ to_uchar(to_uchar( b ) << shift) };
     }
-    template <class IntegerType, typename = enable_if<is_integral<IntegerType>::value>>
+    template <class IntegerType, typename = enable_if_t<is_integral<IntegerType>::value>>
     constexpr byte& operator>>=(byte& b, IntegerType shift) noexcept
     {
-      return b = byte{ to_uchar( b ) >> shift };
+      return b = byte{ to_uchar(to_uchar( b ) >> shift) };
     }
 
-    template <class IntegerType, typename = enable_if<is_integral<IntegerType>::value>>
+    template <class IntegerType, typename = enable_if_t<is_integral<IntegerType>::value>>
     constexpr byte operator>>(byte b, IntegerType shift) noexcept
     {
-      return byte{ to_uchar( b ) >> shift };
+      return byte{ to_uchar(to_uchar( b ) >> shift) };
     }
 
     constexpr byte& operator|=(byte& l, byte r) noexcept
@@ -100,22 +104,29 @@ inline  namespace fundamental_v3
     }
 #else
     struct byte
-        : protected_strong_type<byte, unsigned char>
+        : strong_type<byte, unsigned char>
         , mixin::bitwise<byte>
         , mixin::comparable<byte>
+        , mixin::explicit_convertible_to<byte, unsigned char>
         , mixin::streamable<byte>
     {
-      using base_type = protected_strong_type<byte, unsigned char>;
+      using base_type = strong_type<byte, unsigned char>;
       using base_type::base_type;
+
+      byte() noexcept = default;
+
+      template< class IntegralType, typename = enable_if_t<is_same<IntegralType, unsigned char>::value> >
+      explicit constexpr byte( IntegralType v ) noexcept : base_type(v) { }
     };
 
-    template< class T >
-    inline constexpr byte to_byte( T v ) noexcept
+    //! helper function to cast from IntegralType to byte
+    template< class IntegralType, typename = enable_if_t<is_integral<IntegralType>::value> >
+    inline constexpr byte to_byte( IntegralType v ) noexcept
     {
-      return { static_cast<byte>( v ) };
+      return { static_cast<byte>( static_cast<unsigned char>(v) ) };
     }
 
-    template <class IntegerType = unsigned int, typename = enable_if<is_integral<IntegerType>::value>>
+    template <class IntegerType = unsigned int, typename = enable_if_t<is_integral<IntegerType>::value>>
     constexpr IntegerType to_integer(byte b) noexcept
     {
       return static_cast<IntegerType>(b.underlying());
@@ -132,55 +143,55 @@ inline  namespace fundamental_v3
 
 #if 0
     // remove after checking the implementation using bitwise mixin is really equivalent.
-    template <class IntegerType, typename = enable_if<is_integral<IntegerType>::value>>
+    template <class IntegerType, typename = enable_if_t<is_integral<IntegerType>::value>>
     constexpr byte& operator<<=(byte& b, IntegerType shift) noexcept
     {
-      return b = to_byte( to_uchar( b ) << shift );
+      return b = to_byte( to_uchar (to_uchar( b ) << shift) );
     }
-    template <class IntegerType, typename = enable_if<is_integral<IntegerType>::value>>
+    template <class IntegerType, typename = enable_if_t<is_integral<IntegerType>::value>>
     constexpr byte operator<<(byte b, IntegerType shift) noexcept
     {
-      return to_byte( to_uchar( b ) << shift );
+      return to_byte( to_uchar(to_uchar( b ) << shift) );
     }
-    template <class IntegerType, typename = enable_if<is_integral<IntegerType>::value>>
+    template <class IntegerType, typename = enable_if_t<is_integral<IntegerType>::value>>
     constexpr byte& operator>>=(byte& b, IntegerType shift) noexcept
     {
-      return b = to_byte( to_uchar( b ) >> shift );
+      return b = to_byte( to_uchar(to_uchar( b ) >> shift) );
     }
 
-    template <class IntegerType, typename = enable_if<is_integral<IntegerType>::value>>
+    template <class IntegerType, typename = enable_if_t<is_integral<IntegerType>::value>>
     constexpr byte operator>>(byte b, IntegerType shift) noexcept
     {
-      return to_byte( to_uchar( b ) >> shift );
+      return to_byte( to_uchar(to_uchar( b ) >> shift) );
     }
 
     JASEL_MUTABLE_CONSTEXPR byte& operator|=(byte& l, byte r) noexcept
     {
-      return l = to_byte( to_uchar( l ) | to_uchar( r ) );
+      return l = to_byte( to_uchar(to_uchar( l ) | to_uchar( r )) );
     }
     constexpr byte operator|(byte l, byte r) noexcept
     {
-      return to_byte( to_uchar( l ) | to_uchar( r ) );
+      return to_byte( to_uchar(to_uchar( l ) | to_uchar( r )) );
     }
     JASEL_MUTABLE_CONSTEXPR byte& operator&=(byte& l, byte r) noexcept
     {
-      return l = to_byte( to_uchar( l ) & to_uchar( r ) );
+      return l = to_byte( to_uchar(to_uchar( l ) & to_uchar( r )) );
     }
     constexpr byte operator&(byte l, byte r) noexcept
     {
-      return to_byte( to_uchar( l ) & to_uchar( r ) );
+      return to_byte( to_uchar(to_uchar( l ) & to_uchar( r )) );
     }
     JASEL_MUTABLE_CONSTEXPR byte& operator^=(byte& l, byte r) noexcept
     {
-      return l = to_byte( to_uchar( l ) ^ to_uchar( r ) );
+      return l = to_byte( to_uchar(to_uchar( l ) ^ to_uchar( r )) );
     }
     constexpr byte operator^(byte l, byte r) noexcept
     {
-      return to_byte( to_uchar( l ) ^ to_uchar( r ) );
+      return to_byte( to_uchar(to_uchar( l ) ^ to_uchar( r )) );
     }
     constexpr byte operator~(byte b) noexcept
     {
-      return to_byte( ~ to_uchar( b ) );
+      return to_byte( to_uchar(~ to_uchar( b )) );
     }
 #endif
 
