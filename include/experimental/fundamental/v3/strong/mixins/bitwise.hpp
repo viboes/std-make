@@ -24,17 +24,17 @@ namespace std
       {
         friend constexpr Final operator~(Final const& x) noexcept
         {
-          return Final(~x._underlying());
+          return Final(~x._backdoor()._underlying());
         }
         template <class IntegralType, typename = enable_if<is_integral<IntegralType>::value>>
         friend constexpr Final operator<<(Final const&x, IntegralType y) noexcept
         {
-          return Final(x._underlying() << y);
+          return Final(x._backdoor()._underlying() << y);
         }
         template <class IntegralType, typename = enable_if<is_integral<IntegralType>::value>>
         friend constexpr Final operator>>(Final const&x, IntegralType y) noexcept
         {
-          return Final(x._underlying() >> y);
+          return Final(x._backdoor()._underlying() >> y);
         }
 
       };
@@ -44,29 +44,29 @@ namespace std
       {
         friend JASEL_MUTABLE_CONSTEXPR Final& operator&=(Final &x, Final const&y) noexcept
         {
-          x._underlying() &= y._underlying();
+          x._backdoor()._underlying() &= y._backdoor()._underlying();
           return x;
         }
         friend JASEL_MUTABLE_CONSTEXPR Final& operator|=(Final &x, Final const& y) noexcept
         {
-          x._underlying() |= y._underlying();
+          x._backdoor()._underlying() |= y._backdoor()._underlying();
           return x;
         }
         friend JASEL_MUTABLE_CONSTEXPR Final& operator^=(Final &x, Final const&y) noexcept
         {
-          x._underlying() ^= y._underlying();
+          x._backdoor()._underlying() ^= y._backdoor()._underlying();
           return x;
         }
         template <class IntegralType, typename = enable_if<is_integral<IntegralType>::value>>
         friend JASEL_MUTABLE_CONSTEXPR Final& operator<<=(Final &x, IntegralType y) noexcept
         {
-          x._underlying() <<= y;
+          x._backdoor()._underlying() <<= y;
           return x;
         }
         template <class IntegralType, typename = enable_if<is_integral<IntegralType>::value>>
         friend JASEL_MUTABLE_CONSTEXPR Final& operator>>=(Final &x, IntegralType y) noexcept
         {
-          x._underlying() >>= y;
+          x._backdoor()._underlying() >>= y;
           return x;
         }
       };
@@ -108,15 +108,15 @@ namespace std
       {
         friend constexpr Final operator&(Final const&x, Final const& y) noexcept
         {
-          return Final(x._underlying() & y._underlying());
+          return Final(x._backdoor()._underlying() & y._backdoor()._underlying());
         }
         friend constexpr Final operator|(Final const& x, Final const& y) noexcept
         {
-          return Final(x._underlying() | y._underlying());
+          return Final(x._backdoor()._underlying() | y._backdoor()._underlying());
         }
         friend constexpr Final operator^(Final const&x, Final const&y) noexcept
         {
-          return Final(x._underlying() ^ y._underlying());
+          return Final(x._backdoor()._underlying() ^ y._backdoor()._underlying());
         }
       };
 
@@ -127,19 +127,19 @@ namespace std
         friend constexpr common_type_t<Final, Other> operator&(Final const&x, Other const& y) noexcept
         {
           using CT = common_type_t<Final, Other>;
-          return CT(CT(x)._underlying() & CT(y)._underlying());
+          return CT(CT(x)._backdoor()._underlying() & CT(y)._backdoor()._underlying());
         }
         template <class Other, typename = enable_if_t<Pred<Final, Other>::value>>
         friend constexpr common_type_t<Final, Other> operator|(Final const& x, Other const& y) noexcept
         {
           using CT = common_type_t<Final, Other>;
-          return CT(CT(x)._underlying() | CT(y)._underlying());
+          return CT(CT(x)._backdoor()._underlying() | CT(y)._backdoor()._underlying());
         }
         template <class Other, typename = enable_if_t<Pred<Final, Other>::value>>
         friend constexpr common_type<Final, Other> operator^(Final const&x, Other const&y) noexcept
         {
           using CT = common_type<Final, Other>;
-          return CT(CT(x)._underlying() ^ CT(y)._underlying());
+          return CT(CT(x)._backdoor()._underlying() ^ CT(y)._backdoor()._underlying());
         }
 
       };

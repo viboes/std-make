@@ -25,7 +25,7 @@ namespace std
       {
         constexpr explicit operator T () const noexcept
         {
-          return static_cast<T>(Final::_final(this).underlying());
+          return static_cast<T>(Final::_final(this)._backdoor()._underlying());
         }
       };
       template <class Final, class T>
@@ -33,7 +33,7 @@ namespace std
       {
         constexpr operator T () const noexcept
         {
-          return Final::_final(this).underlying();
+          return Final::_final(this)._backdoor()._underlying();
         }
       };
 

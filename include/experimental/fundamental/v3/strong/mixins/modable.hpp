@@ -25,7 +25,7 @@ namespace std
       {
         friend JASEL_MUTABLE_CONSTEXPR Final& operator%=(Final& x, Final const& y) noexcept
         {
-          x._underlying() %= y._underlying();
+          x._backdoor()._underlying() %= y._backdoor()._underlying();
           return x;
         }
       };
@@ -44,7 +44,7 @@ namespace std
       {
         friend constexpr Final operator%(Final const& x, Final const& y)  noexcept
         {
-          return Final(x._underlying() % y._underlying());
+          return Final(x._backdoor()._underlying() % y._backdoor()._underlying());
         }
       };
 
@@ -57,7 +57,7 @@ namespace std
         {
           using CT = common_type_t<Final, Other>;
 
-          return CT(CT(x)._underlying() % CT(y)._underlying());
+          return CT(CT(x)._backdoor()._underlying() % CT(y)._backdoor()._underlying());
         }
       };
 
@@ -66,7 +66,7 @@ namespace std
       {
         friend JASEL_MUTABLE_CONSTEXPR Final& operator%=(Final& x, UT const& y) noexcept
         {
-          x._underlying() %= y;
+          x._backdoor()._underlying() %= y;
           return x;
         }
         template <class UT2
@@ -76,7 +76,7 @@ namespace std
         {
           using CR = common_type_t<UT, UT2>;
           using CT = meta::rebind_t<Final, CR>;
-          return CT(CT(x)._underlying() % CR(y));
+          return CT(CT(x)._backdoor()._underlying() % CR(y));
         }
       };
 

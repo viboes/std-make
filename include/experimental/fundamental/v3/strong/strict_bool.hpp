@@ -46,12 +46,13 @@ inline namespace fundamental_v3
   // bool takes 4 bytes in some machines. Sometimes we want to use just 1 byte
   template <class Tag, class Bool = bool>
   struct strict_bool final
-  : private_strong_type<strict_bool<Tag, Bool>, Bool>
+  : strong_type<strict_bool<Tag, Bool>, Bool>
   , mixin::comparable<strict_bool<Tag, Bool>>
+  , mixin::explicit_convertible_to<strong_bool<Tag, Bool>, bool>
   , mixin::logical<strict_bool<Tag, Bool>>
   , mixin::streamable<strict_bool<Tag, Bool>>
   {
-      using base_type = private_strong_type<strict_bool<Tag, Bool>, Bool>;
+      using base_type = strong_type<strict_bool<Tag, Bool>, Bool>;
       using base_type::base_type;
 
       // copy constructor/assignment default
@@ -59,9 +60,6 @@ inline namespace fundamental_v3
       // If Bool is not bool, we want an explicit conversion from bool but not Bool.
       constexpr explicit strict_bool (Bool) = delete;
       constexpr explicit strict_bool (bool b) : base_type(b) {};
-
-      // If Bool is not bool, we want an explicit conversion to bool
-      constexpr explicit operator bool() const { return bool(this->value); }
 
       // unwanted conversions
       constexpr explicit strict_bool (int) = delete;
@@ -85,12 +83,13 @@ inline namespace fundamental_v3
 
   template <class Tag>
   struct strict_bool<Tag, bool> final
-    : protected_strong_type<strict_bool<Tag, bool>, bool>
+    : strong_type<strict_bool<Tag, bool>, bool>
     , mixin::comparable<strict_bool<Tag, bool>>
+    , mixin::explicit_convertible_to<strong_bool<Tag, bool>, bool>
     , mixin::logical<strict_bool<Tag, bool>>
     , mixin::streamable<strict_bool<Tag, bool>>
   {
-      using base_type = protected_strong_type<strict_bool<Tag, bool>, bool>;
+      using base_type = strong_type<strict_bool<Tag, bool>, bool>;
       using base_type::base_type;
 
       // copy constructor/assignment default

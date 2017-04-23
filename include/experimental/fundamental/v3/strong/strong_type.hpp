@@ -46,8 +46,6 @@ inline  namespace fundamental_v3
 
       using typename base_type::underlying_t;
 
-    //private:
-      // The following should be accessible only to mixins of the Final class.
       //! explicit conversion from a base const class to the @c Final class.
       template<typename F>
       static Final const& _final(F const* f)  {
@@ -59,69 +57,53 @@ inline  namespace fundamental_v3
         return static_cast<Final&>(*f);
       }
 
-      //! explicit conversion to the underlying type.
-      //template<typename F>
-      JASEL_CXX14_CONSTEXPR underlying_t& _underlying(){
-        return this->value;
+    private:
+      friend struct backdoor;
+      friend struct const_backdoor;
+      // The following should be accessible only to mixins of the Final class.
+      class backdoor {
+      public:
+        constexpr backdoor(Final& f)
+        : that(&f) {}
+
+        //! explicit conversion to the underlying type.
+        //template<typename F>
+        JASEL_CXX14_CONSTEXPR underlying_t& _underlying() const {
+          return that->value;
+        }
+      private:
+        Final* that;
+      };
+      class const_backdoor {
+      public:
+        constexpr const_backdoor(Final const& f)
+        : that(&f) {}
+
+        //! explicit conversion to the underlying type.
+        //template<typename F>
+        JASEL_CXX14_CONSTEXPR underlying_t const& _underlying() const {
+          return that->value;
+        }
+      private:
+        Final const* that;
+      };
+
+    public:
+      template<typename F>
+      static const_backdoor _backdoor(F const* f)  {
+        return const_backdoor(_final(f));
       }
-
-      //! explicit conversion to the underlying type.
-      //template<typename F>
-      JASEL_CXX14_CONSTEXPR underlying_t const& _underlying() const {
-        return this->value;
+      const_backdoor _backdoor() const {
+        return const_backdoor(_final(this));
+      }
+      template<typename F>
+      static backdoor _backdoor(F* f) {
+        return backdoor(_final(f));
+      }
+      backdoor _backdoor() {
+        return backdoor(_final(this));
       }
     };
-
-    //! public_strong_type is a strong_type tagged that provides implicit conversion to the underlying type
-    //!
-    //! @tparam Tag the tag type
-    //! @tparam UT the underlying type
-    template <class Final, class UT>
-    struct public_strong_type
-    : strong_type<Final, UT>
-    {
-      using base_type = strong_type<Final, UT>;
-      using base_type::base_type;
-      //using base_type::_underlying;
-
-      //! @par Returns the underlying value
-      constexpr operator UT () const noexcept
-      { return this->value;}
-    };
-
-    //! protected_strong_type is a strong_type tagged that provides explicit conversion to the underlying type
-    //!
-    //! @tparam Tag the tag type
-    //! @tparam UT the underlying type
-    template <class Final, class UT>
-    struct protected_strong_type
-    : strong_type<Final, UT>
-    {
-      using base_type = strong_type<Final, UT>;
-      using base_type::base_type;
-      //using base_type::_underlying;
-
-      //! @par Returns the underlying value
-      explicit constexpr operator UT () const noexcept
-      { return this->value;}
-    };
-
-    //! private_strong_type is a strong_type tagged that provides no conversion to the underlying type
-    //!
-    //! @tparam Tag the tag type
-    //! @tparam UT the underlying type
-    template <class Final, class UT>
-    struct private_strong_type
-    : strong_type<Final, UT>
-    {
-      using base_type = strong_type<Final, UT>;
-      using base_type::base_type;
-      //using base_type::_underlying;
-
-      //! @par Returns the underlying value
-      explicit constexpr operator UT () const noexcept = delete;
-    };
-
 }
 }
 }

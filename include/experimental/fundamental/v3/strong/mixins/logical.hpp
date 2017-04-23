@@ -20,11 +20,11 @@ inline namespace fundamental_v3
     struct logical
     {
         //! Forwards to the underlying value
-        friend constexpr Final operator&&(Final x, Final y)  noexcept { return Final(x.underlying() && y.underlying()); }
+        friend constexpr Final operator&&(Final x, Final y)  noexcept { return Final(x._backdoor()._underlying() && y._backdoor()._underlying()); }
         //! Forwards to the underlying value
-        friend constexpr Final operator||(Final x, Final y)  noexcept { return Final(x.underlying() || y.underlying()); }
+        friend constexpr Final operator||(Final x, Final y)  noexcept { return Final(x._backdoor()._underlying() || y._backdoor()._underlying()); }
         //! Forwards to the underlying value
-        friend constexpr Final operator!(Final x)  noexcept { return Final(! x.underlying()); }
+        friend constexpr Final operator!(Final x)  noexcept { return Final(! x._backdoor()._underlying()); }
     };
   }
 }

@@ -31,7 +31,7 @@ inline namespace fundamental_v3
         std::basic_istream<CharT, Traits>&
         operator>>(std::basic_istream<CharT, Traits>& is, Final& x)
         {
-          is >> x._underlying();
+          is >> x._backdoor()._underlying();
           return is;
         }
 
@@ -49,7 +49,7 @@ inline namespace fundamental_v3
         std::basic_ostream<CharT, Traits>&
         operator<<(std::basic_ostream<CharT, Traits>& os, const Final& x)
         {
-          return os << x._underlying();
+          return os << x._backdoor()._underlying();
         }
     };
   }
