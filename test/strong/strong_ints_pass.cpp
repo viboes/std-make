@@ -20,6 +20,8 @@ using UCOrangeCount = stdex::strong_int<class OrangeTag, unsigned char>;
 using SOrangeCount = stdex::strong_int<class OrangeTag, short>;
 using COrangeCount = stdex::strong_int<class OrangeTag, char>;
 
+static_assert(sizeof(OrangeCount)==sizeof(int), "");
+
 OrangeCount add(OrangeCount x, OrangeCount y){
   return x+y;
 }

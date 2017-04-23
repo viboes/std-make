@@ -55,10 +55,12 @@ int main()
 
       stdex::boolean es6 =true;
       BOOST_TEST(es6);
-      //stdex::boolean b6 =cr;       // fixme: do we want these to be convertible?
+      stdex::boolean b6 =cr;     // ok:implicit conversion between different strong bools
+      BOOST_TEST(!b6);
       //bool b = cr;                  // error as expected- implicit conversion required
 
-      //stdex::boolean es7 {cr};       // fixme:no conversion between different strong bools
+      stdex::boolean b7 {cr};       // ok:conversion between different strong bools
+      BOOST_TEST(!b7);
 
       bool ans = es && !cr;           // ok - explicit conversion to bool implied by the use of &&
       BOOST_TEST(ans);
@@ -82,8 +84,8 @@ int main()
       stdex::boolean es2 = false;
       BOOST_TEST(es2<es1);
       BOOST_TEST(es2!=es1);
-      //stdex::boolean8_t     cr = false;
-      //BOOST_TEST(cr<es1); // fixme
+      stdex::boolean8_t     cr = false;
+      BOOST_TEST(cr<es1); // ok
   }
   {
       stdex::boolean es1 = true;

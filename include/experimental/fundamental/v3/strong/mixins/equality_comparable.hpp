@@ -45,7 +45,7 @@ namespace std
       };
 
       template <class Final, template <class, class> class Pred=is_compatible_with>
-      struct equality_comparable_with_if : equality_comparable<Final>
+      struct equality_comparable_with_if
       {
         //! Forwards to the underlying value
         template <class Other, typename = enable_if_t<Pred<Final, Other>::value>>
@@ -56,9 +56,7 @@ namespace std
         template <class Other, typename = enable_if_t<Pred<Final, Other>::value>>
         friend constexpr bool operator!=(Final const& x, Other const& y) noexcept
         { return x.underlying() != y.underlying();}
-
       };
-
     }
   }
 }

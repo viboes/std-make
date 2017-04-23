@@ -60,7 +60,8 @@ namespace std
         //!@}
       };
       template <class Final, template <class, class> class Pred=is_compatible_with>
-      struct comparable_with_if : comparable<Final>, equality_comparable_with_if<Final, Pred>
+      struct comparable_with_if
+          : equality_comparable_with_if<Final, Pred>
       {
         //!@{
         //! relational operators

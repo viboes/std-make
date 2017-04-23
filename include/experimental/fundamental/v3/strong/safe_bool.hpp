@@ -24,6 +24,13 @@ namespace experimental
 inline namespace fundamental_v3
 {
 
+  template <class Bool = bool>
+  struct safe_bool;
+
+  namespace mixin {
+    template <class B1, class B2>
+    struct is_compatible_with<safe_bool<B1>, safe_bool<B2>> : true_type {};
+  }
   // Q/A
   // Do we need a Bool parameter? Which type will be a good candidate?
   // bool takes 4 bytes in some machines. Sometimes we want to use just 1 byte
@@ -55,8 +62,14 @@ inline namespace fundamental_v3
   // fixme What should be the result of comparing two safe_bool? bool or safe_bool?
   // For the time being, these functions return bool.
   //
-  // fixme Should safe_bool be comparable?
-  // fixme Should safe_bool default construct to false?
+  // Should safe_bool be ordered?
+  //  Independently of the bool int conversion, a boolean is ordered (false < true)
+  //
+  // Should safe_bool default construct to false?
+  //    If we add a default constructor safe_bool will not be trivial anymore, and couldn't be used in physical structs.
+  //
+  // Should safe_bool<B1> and safe_bool<B1> be convertible?
+  //    The single difference is the representation. A safe_bool has only two values and so it should be implicitly convertible
 
   /// A safe bool is a boolean type that stores a representation Bool
   /// convertible *implicitly* from bool
@@ -64,10 +77,11 @@ inline namespace fundamental_v3
   /// Not convertible implicitly from int, double, pointers.
   /// It is comparable, streamable and hashable
   /// It provides the boolean operations indirectly via the explicit conversion.
-  template <class Bool = bool>
+
+  template <class Bool>
   struct safe_bool final
      : strong_type<safe_bool<Bool>, Bool>
-     , mixin::comparable<safe_bool<Bool>>
+     , mixin::comparable_with_if<safe_bool<Bool>>
      , mixin::explicit_convertible_to<safe_bool<Bool>, bool>
      , mixin::streamable<safe_bool<Bool>>
   {
@@ -81,6 +95,19 @@ inline namespace fundamental_v3
       // maybe we need a template here and only_when<B, is_same> so that we other implicit conversions
       constexpr safe_bool (bool b) : base_type(b) {};
 
+      constexpr safe_bool (safe_bool const& b) noexcept = default;
+      template <class B>
+      constexpr safe_bool (safe_bool<B> b) noexcept
+        : base_type(b.underlying()) {}
+
+      JASEL_CXX14_CONSTEXPR safe_bool& operator=(safe_bool const& b) noexcept = default;
+      template <class B>
+      JASEL_CXX14_CONSTEXPR safe_bool& operator=(safe_bool<B> b) noexcept
+      {
+        this->value = b.underlying();
+        return *this;
+      }
+
       // unwanted conversions
       constexpr explicit safe_bool (Bool) = delete;
       constexpr explicit safe_bool (int) = delete;
@@ -90,6 +117,7 @@ inline namespace fundamental_v3
       constexpr explicit safe_bool (R(*)(Args...)) = delete;
       template <class C, class R, class ... Args>
       constexpr explicit safe_bool (R(C::*)(Args...)) = delete;
+
   };
   template <>
   struct safe_bool<bool> final
@@ -113,6 +141,20 @@ inline namespace fundamental_v3
       constexpr explicit safe_bool (R(*)(Args...)) = delete;
       template <class C, class R, class ... Args>
       constexpr explicit safe_bool (R(C::*)(Args...)) = delete;
+
+      constexpr safe_bool (safe_bool const& b) noexcept = default;
+      template <class B>
+      constexpr safe_bool (safe_bool<B> b) noexcept
+        : base_type(b.underlying()) {}
+
+      JASEL_CXX14_CONSTEXPR safe_bool& operator=(safe_bool const& b) noexcept = default;
+      template <class B>
+      JASEL_CXX14_CONSTEXPR safe_bool& operator=(safe_bool<B> b) noexcept
+      {
+        this->value = b.underlying();
+        return *this;
+      }
+
   };
 
   static_assert(std::is_pod<safe_bool<bool>>::value, "");
@@ -137,12 +179,14 @@ inline namespace fundamental_v3
     };
   }
 
-  // fixme: Should boolean be a strong bool without tag?
+  //! alias of safe_bool using the builtin bool
   using boolean = safe_bool<bool>;
+  //! alias of safe_bool using 1 byte
   using boolean8_t = safe_bool<uint8_t>;
 }
 }
 
+  //! Hash specialization forward to underlying type
   template <class UT>
   struct hash<experimental::safe_bool<UT>> :
     experimental::wrapped_hash<experimental::safe_bool<UT>> {};

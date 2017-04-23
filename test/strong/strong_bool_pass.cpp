@@ -18,6 +18,9 @@ using CrewReady     = stdex::strong_bool<class CrewReadyTag>;
 using UEngineStarted = stdex::strong_bool<class EngineStartedTag, unsigned char>;
 using UCrewReady     = stdex::strong_bool<class CrewReadyTag, unsigned char>;
 
+static_assert(sizeof(EngineStarted)==sizeof(bool), "");
+static_assert(sizeof(UEngineStarted)==sizeof(unsigned char), "");
+
 using IBool     = stdex::strong_bool<class IBoolTag, int>;
 
 static_assert(sizeof(UEngineStarted)==1, "");

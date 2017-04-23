@@ -16,6 +16,8 @@ using OrangeCount = stdex::strong_counter<class OrangeTag, int>;
 using OrangeCountDC = stdex::strong_counter<class OrangeTag, int>;
 using AppelCount = stdex::strong_counter<class AppelTag, int>;
 
+static_assert(sizeof(OrangeCount)==sizeof(int), "");
+
 OrangeCount add(OrangeCount x, OrangeCount y){
   return x+y;
 }
