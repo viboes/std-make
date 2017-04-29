@@ -4,14 +4,14 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 project(Jasel CXX)
 
-find_package(Boost)
-
-if (NOT BOOST_FOUND)
-    message(WARNING "Boost was not found; Forcing directory.")
-    set(Boost_INCLUDE_DIRS "$ENV{BOOST_ROOT}")
-    message("${Boost_INCLUDE_DIRS}")
-    
-endif()
+#find_package(Boost)
+#
+#if (NOT BOOST_FOUND)
+#    message(WARNING "Boost was not found; Forcing directory.")
+#    set(Boost_INCLUDE_DIRS "$ENV{BOOST_ROOT}")
+#    message("${Boost_INCLUDE_DIRS}")
+#    
+#endif()
 
 find_package(Git)
 
