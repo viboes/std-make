@@ -21,7 +21,8 @@ int read_value(stdex::not_null<std::unique_ptr<int>> p)
 void test_not_null_unique_ptr()
 {
     int ans = read_value(stdex::as_not_null(std::unique_ptr<int>{new int{2}}));
-    assert (2 == ans);
+    BOOST_TEST (2 == ans);
+
 }
 
 
