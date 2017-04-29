@@ -167,6 +167,29 @@ int main()
     BOOST_TEST(! x);
     BOOST_TEST(! has_value(x));
   }
+  {
+    stde::optional<stde::optional<int>> x = stde::none<stde::optional>() ;
+    BOOST_TEST(! x);
+    BOOST_TEST(! has_value(x));
+  }
+  {
+    stde::optional<stde::optional<int>> x = stde::none<stde::optional<stde::optional<int>> >() ;
+    BOOST_TEST(! x);
+    BOOST_TEST(! has_value(x));
+  }
+  // fixme: do we want this to work. See https://github.com/viboes/std-make/issues/14
+#if 1
+  {
+    stde::optional<stde::optional<int>> x = stde::none<stde::optional<int>>() ;
+    BOOST_TEST(x);
+    BOOST_TEST(has_value(x));
+  }
+#endif
+  {
+    stde::optional<stde::optional<int>> x { stde::none<stde::optional>() };
+    BOOST_TEST(! x);
+    BOOST_TEST(! has_value(x));
+  }
 
 #if defined __clang__
   {
