@@ -1,156 +1,324 @@
-# Use, modification, and distribution are
-# subject to the Boost Software License, Version 1.0. (See accompanying
-# file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
-#
-# Copyright Vicente J. Botet Escribe 2015.
+# Copyright Louis Dionne 2013-2016
+# Copyright Gonzalo BG 2014-2017
+# Copyright Julian Becker 2015
+# Copyright Manu Sánchez 2015
+# Copyright Casey Carter 2015-2017
+# Copyright Eric Niebler 2015-2016
+# Copyright Paul Fultz II 2015-2016
+# Copyright Jakub Szuppe 2016.
+# Copyright Vicente Botet 2017.
 
-#
-# See https://svn.boost.org/trac/boost/wiki/TravisCoverals for description of this file
-# and how it can be used with Boost libraries.
-#
-# File revision #2
+# Distributed under the Boost Software License, Version 1.0.
+# (See accompanying file LICENSE.txt or copy at http://boost.org/LICENSE_1_0.txt)
+
+# Adapted from various sources, including:
+# - Eric Nibbler's Range-v3: https://github.com/ericniebler/range-v3
 
 language: cpp
- 
-os:
-- linux
+script: cmake
+
+env:
+  global:
+    - DEPS_DIR=${TRAVIS_BUILD_DIR}/deps
+    - BOOST_URL="http://sourceforge.net/projects/boost/files/boost/1.63.0/boost_1_63_0.tar.gz"
+    - BOOST_VERSION="1_63_0"
+
+cache:
+  directories:
+    - ${TRAVIS_BUILD_DIR}/deps/cmake
 
 matrix:
   include:
-    - compiler: gcc
-      env: 
-      - GCC_VERSION="4.9"
-      - TOOLSET=gcc-4.9
-      - LIBCXX="libstdc++"
-      - STDLIB_LIBCXX=""
-      - CXX_STANDARD=c++1y
-      
-#    - compiler: clang
-#      env: 
-#      - TOOLSET=clang
-#      - LIBCXX="libc++"
-#      - CXX_STANDARD=c++1y
-#      - STDLIB_LIBCXX="-stdlib=$LIBCXX"
+    - env: BUILD_TYPE=Release CPP=11 ASAN=Off SYSTEM_LIBCXX=On BOOST=On
+      os: osx
+      compiler: clang
 
-env:
-    global:
+    # ASAN disabled for clang < 3.8 builds per resolution of
+    #  https://llvm.org/bugs/show_bug.cgi?id=22757
 
-        - DEFINES="-DJASEL_STD_EXPERIMENTAL_FUNDAMENTALS_V2_STD_OPTIONAL_NOT_INSTALLED -DJASEL_STD_EXPERIMENTAL_FUNDAMENTALS_V2_BOOST_EXPECTED_NOT_INSTALLED"
-        # Autodetect Boost branch by using the following code: - BRANCH_TO_TEST=`git rev-parse --abbrev-ref HEAD`
-        # or by - BRANCH_TO_TEST=$TRAVIS_BRANCH or just directly specify it
-        - BRANCH_TO_TEST=$TRAVIS_BRANCH
+    # clang 3.6 C++11/14 Release libc++
+    - env: CLANG_VERSION=3.6 BUILD_TYPE=Release CPP=11 ASAN=Off LIBCXX=On BOOST=On
+      os: linux
+      addons: &clang36
+        apt:
+          packages:
+            - clang-3.6
+            - g++-5
+            - valgrind
+          sources:
+            - ubuntu-toolchain-r-test
+            - llvm-toolchain-precise-3.6
 
-        # Files, which coverage results must be ignored (files from other projects).
-        # Example: - IGNORE_COVERAGE='*/boost/progress.hpp */filesystem/src/*'
-        - IGNORE_COVERAGE=''
+    - env: CLANG_VERSION=3.6 BUILD_TYPE=Release CPP=14 ASAN=Off LIBCXX=On HEADERS=On BOOST=On
+      os: linux
+      addons: *clang36
 
-        # The next declaration is the encrypted COVERITY_SCAN_TOKEN, created
-        # via the "travis encrypt" command using the project repo's public key.
-        #
-        # You can get it from "Configure TravisCI" on your Coverity project page
-        #- secure: "WJQ9X51EmtIKOe7LTAKsGx/RTq60ENxSRdTvoJ2MWMHzD0+8mW32Qki60zXBaOrKuNAa0rBWj1dVIgKBxpQdWHJgSdZbBJzQ+ZLUVHB1fFMp/P8IITywceTdBw2WMqWML8pBpcXM/+mQXr+xjAVDDxcQ+7f7HKna4T7S3daN5x4="
+    # clang 3.7 C++11/14 Release libc++
+    - env: CLANG_VERSION=3.7 BUILD_TYPE=Release CPP=11 ASAN=Off LIBCXX=On CLANG_MODULES=Off BOOST=On
+      os: linux
+      addons: &clang37
+        apt:
+          packages:
+            - util-linux
+            - clang-3.7
+            - g++-5
+            - valgrind
+          sources:
+            - ubuntu-toolchain-r-test
+            - llvm-toolchain-precise-3.7
+
+    - env: CLANG_VERSION=3.7 BUILD_TYPE=Release CPP=14 ASAN=Off LIBCXX=On HEADERS=On CLANG_MODULES=Off BOOST=On
+      os: linux
+      addons: *clang37
+
+    # clang 3.8 C++11/14 Release ASAN libc++
+    - env: CLANG_VERSION=3.8 BUILD_TYPE=Release CPP=11 ASAN=On LIBCXX=On CLANG_MODULES=Off BOOST=On
+      os: linux
+      addons: &clang38
+        apt:
+          packages:
+            - util-linux
+            - clang-3.8
+            - g++-5
+            - valgrind
+          sources:
+            - ubuntu-toolchain-r-test
+            - llvm-toolchain-precise-3.8
+
+    - env: CLANG_VERSION=3.8 BUILD_TYPE=Release CPP=14 ASAN=On LIBCXX=On HEADERS=On CLANG_MODULES=Off BOOST=On
+      os: linux
+      addons: *clang38
+
+    # clang 3.9 C++11/14 Release ASAN libc++
+    - env: CLANG_VERSION=3.9 BUILD_TYPE=Release CPP=11 ASAN=On LIBCXX=On CLANG_MODULES=Off BOOST=On
+      os: linux
+      addons: &clang39
+        apt:
+          packages:
+            - util-linux
+            - clang-3.9
+            - g++-5
+            - valgrind
+          sources:
+            - ubuntu-toolchain-r-test
+            - llvm-toolchain-precise-3.9
+
+    - env: CLANG_VERSION=3.9 BUILD_TYPE=Release CPP=14 ASAN=On LIBCXX=On HEADERS=On CLANG_MODULES=Off BOOST=On
+      os: linux
+      addons: *clang39
+
+    # clang 4.0 C++11/14 Release ASAN libc++
+    - env: CLANG_VERSION=4.0 BUILD_TYPE=Release CPP=11 ASAN=On LIBCXX=On CLANG_MODULES=Off BOOST=On
+      os: linux
+      addons: &clang40
+        apt:
+          packages:
+            - util-linux
+            - clang-4.0
+            - g++-5
+            - valgrind
+          sources:
+            - ubuntu-toolchain-r-test
+            - llvm-toolchain-precise-4.0
 
 
+    - env: CLANG_VERSION=4.0 BUILD_TYPE=Release CPP=14 ASAN=On LIBCXX=On HEADERS=On CLANG_MODULES=Off BOOST=On
+      os: linux
+      addons: *clang40
 
+    # clang 5 C++11/14/1z Debug/Release-ASAN libc++, 11 Debug libstdc++
+    - env: CLANG_VERSION=5.0 BUILD_TYPE=Debug CPP=11 ASAN=Off LIBCXX=On CLANG_MODULES=Off BOOST=On
+      os: linux
+      addons: &clang5
+        apt:
+          packages:
+            - util-linux
+            - clang-5.0
+            - g++-6
+            - valgrind
+          sources:
+            - ubuntu-toolchain-r-test
+            - llvm-toolchain-precise
+
+    - env: CLANG_VERSION=5.0 BUILD_TYPE=Release CPP=11 ASAN=On LIBCXX=On CLANG_MODULES=Off BOOST=On
+      os: linux
+      addons: *clang5
+
+    - env: CLANG_VERSION=5.0 BUILD_TYPE=Debug CPP=14 ASAN=Off LIBCXX=On CLANG_MODULES=Off BOOST=On
+      os: linux
+      addons: *clang5
+
+    - env: CLANG_VERSION=5.0 BUILD_TYPE=Release CPP=14 ASAN=On LIBCXX=On CLANG_MODULES=Off BOOST=On
+      os: linux
+      addons: *clang5
+
+    - env: CLANG_VERSION=5.0 BUILD_TYPE=Debug CPP=1z ASAN=Off LIBCXX=On HEADERS=On CLANG_MODULES=Off BOOST=On
+      os: linux
+      addons: *clang5
+
+    - env: CLANG_VERSION=5.0 BUILD_TYPE=Release CPP=1z ASAN=On LIBCXX=On CLANG_MODULES=Off BOOST=On
+      os: linux
+      addons: *clang5
+
+    - env: CLANG_VERSION=5.0 BUILD_TYPE=Release CPP=11 ASAN=Off LIBCXX=Off CLANG_MODULES=Off BOOST=On
+      os: linux
+      addons: *clang5
+
+    #   # gcc-4.8 C++11 Debug/Release
+    # - env: GCC_VERSION=4.8 BUILD_TYPE=Debug CPP=11 ASAN=Off LIBCXX=Off HEADERS=On BOOST=On
+    #   os: linux
+    #   addons: &gcc48
+    #     apt:
+    #       packages:
+    #         - g++-4.8
+    #         - valgrind
+    #       sources:
+    #         - ubuntu-toolchain-r-test
+
+    # - env: GCC_VERSION=4.8 BUILD_TYPE=Release CPP=11 ASAN=Off LIBCXX=Off BOOST=On
+    #   os: linux
+    #   addons: *gcc48
+
+      # gcc-4.9 C++11/C++14 Release
+    - env: GCC_VERSION=4.9 BUILD_TYPE=Release CPP=11 ASAN=Off LIBCXX=Off BOOST=On
+      os: linux
+      addons: &gcc49
+        apt:
+          packages:
+            - g++-4.9
+            - valgrind
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - env: GCC_VERSION=4.9 BUILD_TYPE=Release CPP=14 ASAN=Off LIBCXX=Off HEADERS=On BOOST=On
+      os: linux
+      addons: *gcc49
+
+      # gcc-5 C++11/C++14 Release
+    - env: GCC_VERSION=5 BUILD_TYPE=Release CPP=11 ASAN=Off LIBCXX=Off BOOST=On
+      os: linux
+      addons: &gcc5
+        apt:
+          packages:
+            - g++-5
+            - valgrind
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - env: GCC_VERSION=5 BUILD_TYPE=Release CPP=14 ASAN=Off LIBCXX=Off HEADERS=On BOOST=On
+      os: linux
+      addons: *gcc5
+
+    # gcc-6 C++11/14/1z Debug/Release
+    - env: GCC_VERSION=6 BUILD_TYPE=Debug CPP=11 ASAN=Off LIBCXX=Off BOOST=On
+      os: linux
+      addons: &gcc6
+        apt:
+          packages:
+            - g++-6
+            - valgrind
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - env: GCC_VERSION=6 BUILD_TYPE=Release CPP=11 ASAN=Off LIBCXX=Off BOOST=On
+      os: linux
+      addons: *gcc6
+
+    - env: GCC_VERSION=6 BUILD_TYPE=Debug CPP=14 ASAN=Off LIBCXX=Off BOOST=On
+      os: linux
+      addons: *gcc6
+
+    - env: GCC_VERSION=6 BUILD_TYPE=Release CPP=14 ASAN=Off LIBCXX=Off BOOST=On
+      os: linux
+      addons: *gcc6
+
+    - env: GCC_VERSION=6 BUILD_TYPE=Debug CPP=1z ASAN=Off LIBCXX=Off HEADERS=On BOOST=On
+      os: linux
+      addons: *gcc6
+
+    - env: GCC_VERSION=6 BUILD_TYPE=Release CPP=1z ASAN=Off LIBCXX=Off BOOST=On
+      os: linux
+      addons: *gcc6
+
+# Install dependencies
 before_install:
-    #######################
-    - echo "Installing GCC"
-    - sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
-    - sudo apt-get update -qq
-    - if [ -n "$GCC_VERSION" ]; then sudo apt-get install -qq g++-${GCC_VERSION}; fi
-    - if [ "$CXX" = "g++" ]; then export CXX="g++-${GCC_VERSION}" CC="gcc-${GCC_VERSION}"; fi
+  - export CHECKOUT_PATH=`pwd`;
+  - |
+    if [ "$TRAVIS_OS_NAME" == "osx" ]; then
+      brew update
+      brew install valgrind
+      brew install gnu-sed --with-default-names
+      brew install gnu-which --with-default-names
+    fi
+  - |
+    if [ "${TRAVIS_OS_NAME}" == "linux" ]; then
+      if [ -z "$(ls -A ${TRAVIS_BUILD_DIR}/deps/cmake/bin)" ]; then
+        CMAKE_URL="https://cmake.org/files/v3.7/cmake-3.7.2-Linux-x86_64.tar.gz"
+        mkdir -p ${TRAVIS_BUILD_DIR}/deps/cmake && travis_retry wget --no-check-certificate --quiet -O - "${CMAKE_URL}" | tar --strip-components=1 -xz -C ${TRAVIS_BUILD_DIR}/deps/cmake
+      fi
+      export PATH="${TRAVIS_BUILD_DIR}/deps/cmake/bin:${PATH}"
+    else
+      if ! brew ls --version cmake &>/dev/null; then brew install cmake; fi
+    fi
+  - if [ -n "$GCC_VERSION" ]; then export CXX="g++-${GCC_VERSION}" CC="gcc-${GCC_VERSION}"; fi
+  - if [ -n "$CLANG_VERSION" ]; then export CXX="clang++-${CLANG_VERSION}" CC="clang-${CLANG_VERSION}"; fi
+  - which $CXX
+  - which $CC
+  - which valgrind
+  - $CXX --version
+  - if [ "$ASAN" == "On" ]; then export SANITIZER=Address; fi
+  - if [ -n "$CLANG_VERSION" ]; then sudo PATH="${PATH}" CXX="$CXX" CC="$CC" ./install_libcxx.sh; fi
 
-    #######################
-    # Install libc++
-    - if [ "$LIBCXX" = "libc++" ]; then echo "Installing libc++";  fi
-    - if [ "$LIBCXX" = "libc++" ]; then svn co --quiet http://llvm.org/svn/llvm-project/libcxx/trunk libcxx; fi
-    - if [ "$LIBCXX" = "libc++" ]; then cd libcxx/lib && bash buildit; fi
-    - if [ "$LIBCXX" = "libc++" ]; then sudo cp ./libc++.so.1.0 /usr/lib/; fi
-    - if [ "$LIBCXX" = "libc++" ]; then sudo mkdir /usr/include/c++/v1; fi
-    - if [ "$LIBCXX" = "libc++" ]; then cd .. && sudo cp -r include/* /usr/include/c++/v1/; fi
-    - if [ "$LIBCXX" = "libc++" ]; then cd /usr/lib && sudo ln -sf libc++.so.1.0 libc++.so; fi
-    - if [ "$LIBCXX" = "libc++" ]; then sudo ln -sf libc++.so.1.0 libc++.so.1 && cd $cwd; fi
-    
-#    #######################
-#    - echo "Installing Boost.Expected"
-#    - BOOST_EXPECTED=$HOME/expected
-#    - git init $BOOST_EXPECTED
-#    - cd $BOOST_EXPECTED
-#    - git remote add --no-tags -t master origin git@github.com:viboes/Boost.Expected.git
-#    - git fetch
-#    - git checkout master
-    
-#    #######################
-#    - echo "Installing st-optional"
-#    - STD_OPTIONAL=$HOME/std_optional
-#    - git init $STD_OPTIONAL
-#    - cd $STD_OPTIONAL
-#    - git remote add --no-tags -t master origin git@github.com:viboes/Optional.git
-#    - git fetch
-#    - git checkout master
-   
-   
-    #######################
-    # Cloning Boost libraries (fast nondeep cloning)
-    - BOOST=$HOME/boost-local
-    - PATH=$BOOST:$PATH
-    - BOOST_ROOT=$BOOST
-    - BOOST_BUILD_PATH=$BOOST/tools/build
-    - git init $BOOST
-    - cd $BOOST
-    - pwd
-    - git remote add --no-tags -t $BRANCH_TO_TEST origin https://github.com/boostorg/boost.git
-    - git fetch --depth=1
-    - git checkout $BRANCH_TO_TEST
-    - git submodule update --init --merge
-    - git remote set-branches --add origin $BRANCH_TO_TEST
-    - git pull --recurse-submodules
-    - git submodule update --init
-    - git checkout $BRANCH_TO_TEST
-    - git submodule foreach "git reset --quiet --hard; git clean -fxd"
-    - git reset --hard; git clean -fxd
-    - git status
-    - ./bootstrap.sh
-    - ./b2 headers
-    
-    #######################
-    - env
-    - clang --version
-    - gcc --version
+  # Download and install Boost
+  # Adapted from Boost.Compute (under the Boost License)
+  # Copyright Jakub Szuppe 2016.
+  - |
+    if [[ ${TRAVIS_OS_NAME} == "linux" && ${BOOST} == "On" ]]; then
+      if [ ! -f "${DEPS_DIR}/boost/${BOOST_VERSION}_cached" ]; then
+        # create dirs for source and install
+        mkdir -p ${DEPS_DIR}/boost${BOOST_VERSION}
+        mkdir -p ${DEPS_DIR}/boost
+        rm -rf ${DEPS_DIR}/boost/*
+        # download
+        travis_retry wget --no-check-certificate --quiet -O - ${BOOST_URL} | tar --strip-components=1 -xz -C ${DEPS_DIR}/boost${BOOST_VERSION}
+        pushd ${DEPS_DIR}/boost${BOOST_VERSION}
+        # configure and install
+        ./bootstrap.sh --prefix=${DEPS_DIR}/boost/
+        #--with-libraries=chrono,date_time,system
+        ./b2 toolset=clang cxxflags="-stdlib=libc++ -nostdinc++ -cxx-isystem /usr/include/c++/v1/" linkflags="-stdlib=libc++"
+        ./b2 -d0 install
+        popd
+        touch ${DEPS_DIR}/boost/${BOOST_VERSION}_cached
+      else
+        echo 'Using cached Boost ${BOOST_VERSION} libraries.'
+      fi
+    fi
 
-    #######################
-    # Set this to the name of the library
-    - PROJECT_TO_TEST=`basename $TRAVIS_BUILD_DIR`
+install:
+  - cd $CHECKOUT_PATH
+
+  # Workaround for valgrind bug: https://bugs.kde.org/show_bug.cgi?id=326469.
+  # It is fixed in valgrind 3.10 so this won't be necessary if someone
+  # replaces the current valgrind (3.7) with valgrind-3.10
+  - if [ "$BUILD_TYPE" == "Release" ] && [ "$ASAN" == "Off" ]; then sed -i 's/march=native/msse4.2/' CMakeLists.txt; fi
+
+  - mkdir -p build
+  - cd build
+  - if [ -n "$CLANG_VERSION" -a "$ASAN" == "On" ]; then CXX_FLAGS="${CXX_FLAGS} -fsanitize=address,undefined,integer -fno-omit-frame-pointer -fno-sanitize=unsigned-integer-overflow"; fi
+  - if [ -n "$GCC_VERSION" -a "$ASAN" == "On" ]; then CXX_FLAGS="${CXX_FLAGS} -fsanitize=address,undefined -fno-omit-frame-pointer"; fi
+  - if [ "$GCC_VERSION" == "5" ]; then CXX_FLAGS="${CXX_FLAGS}"; fi
+  - if [ -n "$CLANG_VERSION" ]; then CXX_FLAGS="${CXX_FLAGS} -D__extern_always_inline=inline"; fi
+  - if [ "$LIBCXX" == "On" ]; then CXX_FLAGS="${CXX_FLAGS} -stdlib=libc++ -nostdinc++ -cxx-isystem /usr/include/c++/v1/ -Wno-unused-command-line-argument"; fi
+  - if [ "$HEADERS" == "On" ]; then HEADER_CHECK=1; else HEADER_CHECK=0; fi
+  - cmake .. -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DCMAKE_CXX_FLAGS="${CXX_FLAGS}" -DCMAKE_EXE_LINKER_FLAGS="${CXX_LINKER_FLAGS}"
+  - if [ "$BOOST" == "On" ]; then cmake .. -DBOOST_ROOT=${DEPS_DIR}/boost; fi
+  - if [ "$CLANG_MODULES" == "On" ] && [ "$LIBCXX" == "On" ]; then cmake .. "; fi
+  - make -j2 VERBOSE=1
 
 script:
-    #######################
-    - echo "Testing $PROJECT_TO_TEST"
-    - cd $TRAVIS_BUILD_DIR/test
-    # `--coverage` flags required to generate coverage info for Coveralls
-    - $BOOST/b2 toolset=$TOOLSET -sBOOST_ROOT=$BOOST cxxflags="$DEFINES --coverage -std=$CXX_STANDARD $STDLIB_LIBCXX" linkflags="--coverage $STDLIB_LIBCXX"
+  # Only enable valgrind for non-ASAN Release builds (keep this in sync with line 309)
+  - if [ "$BUILD_TYPE" == "Release" ] && [ "$ASAN" == "Off" ]; then CTEST_FLAGS="-D ExperimentalMemCheck"; fi
+  - ctest -j2 -VV ${CTEST_FLAGS}
 
-after_success:
-    # Copying Coveralls data to a separate folder
-    - mkdir -p $TRAVIS_BUILD_DIR/coverals
-    - find bin/ -name "*.gcda" -exec cp "{}" $TRAVIS_BUILD_DIR/coverals/ \;
-    - find bin/ -name "*.gcno" -exec cp "{}" $TRAVIS_BUILD_DIR/coverals/ \;
-
-    # Preparing Coveralls data by
-    # ... installing the tools
-    - sudo apt-get install -qq python-yaml lcov
-    # ... changind data format to a readable one
-    - lcov --directory $TRAVIS_BUILD_DIR/coverals --base-directory ./ --capture --output-file $TRAVIS_BUILD_DIR/coverals/coverage.info
-
-    # ... erasing /test/ /example/ folder data
-    #- lcov --remove $TRAVIS_BUILD_DIR/coverals/coverage.info "/usr*" "$TRAVIS_BUILD_DIR/test/*" $IGNORE_COVERAGE "$TRAVIS_BUILD_DIR/tests/*" "$TRAVIS_BUILD_DIR/examples/*" "$TRAVIS_BUILD_DIR/example/*" -o $TRAVIS_BUILD_DIR/coverals/coverage.info
-
-    # ... erasing data that is not related to this project directly
-    #- cd $BOOST
-    #- OTHER_LIBS=`grep "submodule .*" .gitmodules | sed 's/\[submodule\ "\(.*\)"\]/"\*\/boost\/\1\.hpp" "\*\/boost\/\1\/\*"/g'| sed "/\"\*\/boost\/$PROJECT_TO_TEST\/\*\"/d" | sed ':a;N;$!ba;s/\n/ /g'`
-    #- echo $OTHER_LIBS
-    #- eval "lcov --remove $TRAVIS_BUILD_DIR/coverals/coverage.info $OTHER_LIBS -o $TRAVIS_BUILD_DIR/coverals/coverage.info"
-
-    # Sending data to Coveralls
-    - cd $TRAVIS_BUILD_DIR
-    - gem install coveralls-lcov
-    - coveralls-lcov coverals/coverage.info
+notifications:
+  email: false
