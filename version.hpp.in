@@ -1,0 +1,25 @@
+/// \file
+// JASEL library
+//
+//  Copyright Vicente J. Botet Escriba 2017
+//
+//  Use, modification and distribution is subject to the
+//  Boost Software License, Version 1.0. (See accompanying
+//  file LICENSE_1_0.txt or copy at
+//  http://www.boost.org/LICENSE_1_0.txt)
+//
+// Project home: https://github.com/viboes/std_make
+//
+
+#ifndef JASEL_VERSION_HPP
+#define JASEL_VERSION_HPP
+
+#define JASEL_MAJOR 0
+#define JASEL_MINOR 3
+#define JASEL_PATCHLEVEL 0
+
+#define JASEL_VERSION (JASEL_MAJOR * 10000 \
+                        + JASEL_MINOR * 100 \
+                        + JASEL_PATCHLEVEL)
+
+#endif
