@@ -45,7 +45,7 @@ namespace ordinal {
     {
       using size = void;
       using size_type = size_t;
-#if __cplusplus >= 201402L
+#if __cplusplus >= 201402L || defined JASEL_DOXYGEN_INVOKED
       template <class U>
       static
       U val(size_type)  = delete;
@@ -208,7 +208,7 @@ namespace meta {
   template <class T>
   struct is_ordinal<const volatile T> : is_ordinal<T> {};
 
-#if __cplusplus >= 201402L
+#if __cplusplus >= 201402L || defined JASEL_DOXYGEN_INVOKED
   template <class T>
   constexpr bool is_ordinal_v = is_ordinal<T>::value ;
 #endif

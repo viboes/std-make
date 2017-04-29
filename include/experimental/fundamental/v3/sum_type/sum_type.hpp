@@ -9,7 +9,7 @@
 #ifndef JASEL_FUNDAMENTAL_V3_SUM_TYPE_PRODUCT_TYPE_HPP
 #define JASEL_FUNDAMENTAL_V3_SUM_TYPE_PRODUCT_TYPE_HPP
 #define YAFPL_X1
-#if __cplusplus >= 201402L || defined JASEL_DOXYGEN_INVOKED
+#if __cplusplus >= 201002L || defined JASEL_DOXYGEN_INVOKED
 
 
 ///////////////////////////////////////////////////////////////////////////////////////
@@ -225,9 +225,10 @@ namespace sum_type {
     template <class T> struct size<const T> : size<T> {};
     template <class T> struct size<volatile T> : size<T> {};
     template <class T> struct size<const volatile T> : size<T> {};
+#if __cplusplus >= 201402L || defined JASEL_DOXYGEN_INVOKED
     template <class ST>
     constexpr size_t size_v = size<ST>::value;
-
+#endif
     template <size_t I, class ST, class= std::enable_if_t< I<size_v<ST> >>
     struct alternative : traits<ST>::template alternative<I> {};
     template <size_t I, class ST>
@@ -242,13 +243,16 @@ namespace sum_type {
         : integral_constant<bool, 0 == sum_type::size_v<ST>> {}
 #endif
         ;
+#if __cplusplus >= 201402L || defined JASEL_DOXYGEN_INVOKED
     template <class ST>
     constexpr size_t empty_v = empty<ST>::value;
+#endif
     template <class ST>
     struct not_empty : integral_constant<bool, (0 != sum_type::size_v<ST>)> {};
+#if __cplusplus >= 201402L || defined JASEL_DOXYGEN_INVOKED
     template <class ST>
     constexpr size_t not_empty_v = not_empty<ST>::value;
-
+#endif
     template <size_t I, class ST
       , class= std::enable_if_t< I < size_v<meta::uncvref_t<ST>> >
     >
@@ -305,9 +309,10 @@ namespace sum_type {
   struct is_sum_type<volatile T> : is_sum_type<T> {};
   template <class T>
   struct is_sum_type<const volatile T> : is_sum_type<T> {};
+#if __cplusplus >= 201402L || defined JASEL_DOXYGEN_INVOKED
   template <class T>
   constexpr bool is_sum_type_v = is_sum_type<T>::value ;
-
+#endif
   namespace sum_type {
     template <class ST, template <class> class Trait, bool B = is_sum_type_v<ST> >
     struct friendly_type_trait

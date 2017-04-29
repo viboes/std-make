@@ -11,13 +11,9 @@
 
 int main()
 {
-#if __cplusplus >= 201402L
-
   namespace stde = std::experimental;
 
-  static_assert(! stde::is_functor_v<int>, "");
-
-  #endif
+  static_assert(! stde::is_functor<int>::value, "");
 
   return ::boost::report_errors();
 }

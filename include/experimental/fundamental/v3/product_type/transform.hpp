@@ -53,12 +53,11 @@ namespace product_type
    * @param f Callable object to be invoked on each product type element
    *
    * @par Requires:
-   * - DProductType is a model of ProductType.
-   * - DF is a model of Callable<product_type::element_t<I, DProductType>>...  and
+   * - DProductType is a model of ProductType with all its elements the same and
+   * - DF is a model of Callable<product_type::element_t<I, DProductType>>...
    *
    * where DF and DProductType are respectively the decay of F and ProductType removing cv and reference.
    */
-
   template <class F, class ProductType
 #if ! defined JASEL_DOXYGEN_INVOKED
   // todo add constraint on F
@@ -84,6 +83,19 @@ namespace product_type
           product_type::element_sequence_for<ProductType>{});
   }
 
+  /**
+   * Invoke the Callable object fi for each one of the product type elements and return the result wrapped using a type constructor.
+   *
+   * @param pt product type whose elements to be used as arguments to f
+   * @param f a product type of Callable object to be invoked on each product type element
+   *
+   * @par Requires:
+   * - DProductType is a model of ProductType with all its elements the same and
+   * - DF is a model of ProductType where each element is a model of Callable<product_type::element_t<I, DProductType>>.
+   * - Both product types have the same size
+   *
+   * where DF and DProductType are respectively the decay of F and ProductType removing cv and reference.
+   */
   template <class F, class ProductType
 #if ! defined JASEL_DOXYGEN_INVOKED
   // todo add constraint on F
@@ -109,6 +121,18 @@ namespace product_type
           product_type::element_sequence_for<ProductType>{});
   }
 
+  /**
+   * Invoke the Callable object f for each one of the product type elements and return the result wrapped using a product type  type constructor.
+   *
+   * @param pt product type whose elements to be used as arguments to f
+   * @param f Callable object to be invoked on each product type element. It is an overloaded set.
+   *
+   * @par Requires:
+   * - DProductType is a model of ProductType with all its elements the same and
+   * - DF is a model of Callable<product_type::element_t<I, DProductType>>...
+   *
+   * where DF and DProductType are respectively the decay of F and ProductType removing cv and reference.
+   */
 
   template <class F, class ProductType
 #if ! defined JASEL_DOXYGEN_INVOKED

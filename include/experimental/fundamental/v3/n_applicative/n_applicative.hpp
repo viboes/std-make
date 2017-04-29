@@ -9,8 +9,6 @@
 #ifndef JASEL_FUNDAMENTAL_V3_N_APPLICATIVE_N_APPLICATIVE_HPP
 #define JASEL_FUNDAMENTAL_V3_N_APPLICATIVE_N_APPLICATIVE_HPP
 
-#if __cplusplus >= 201402L
-
 ///////////////////////////////////////////////////////////////////////////////////////
 ///
 ///////////////////////////////////////////////////////////////////////////////////////
@@ -31,9 +29,10 @@ inline namespace fundamental_v3
   template <class T>
     struct is_n_applicative;
 
+#if __cplusplus >= 201402L || defined JASEL_DOXYGEN_INVOKED
   template <class T>
     constexpr bool is_n_applicative_v = is_n_applicative<T>::value;
-
+#endif
 namespace n_applicative
 {
   using namespace n_functor;
@@ -48,18 +47,20 @@ namespace n_applicative
   template <typename Ap, bool condition>
   struct traits<Ap, meta::when<condition>>
   {
+#if __cplusplus >= 201402L || defined JASEL_DOXYGEN_INVOKED
     // ap:: [T->U] x [T] -> [U]
     template <class F, class A>
       static auto ap(F&& y, A&& x) =delete;
     template <class A, class T>
       static auto pure(T&& x) =delete;
+#endif
   };
 
   template <class F, class A>
   // requires is_same_v<type_constructor_t<decay_t<A>>, type_constructor_t<decay_t<F>>>
   auto
     ap(F&& f, A&& x)
-      JASEL_NOEXCEPT_RETURN(
+       JASEL_DECLTYPE_RETURN_NOEXCEPT(
           traits<type_constructor_t<decay_t<A>>>::ap(forward<F>(f), forward<A>(x))
        )
 
@@ -67,7 +68,7 @@ namespace n_applicative
    // requires is_same_v<value_type_t<A>, T>
    auto
      pure(Ts&& ...xs)
-       JASEL_NOEXCEPT_RETURN(
+        JASEL_DECLTYPE_RETURN_NOEXCEPT(
            traits<type_constructor_t<A>>::template pure<A>(forward<Ts>(xs)...)
         )
 
@@ -86,5 +87,4 @@ namespace n_applicative
 }
 }
 }
-#endif
 #endif // header

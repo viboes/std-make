@@ -5,7 +5,7 @@
 // (See accompanying file // LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 //////////////////////////////////////////////////////////////////////////////
-#if __cplusplus >= 201402L || defined JASEL_DOXYGEN_INVOKED
+#if __cplusplus >= 201002L || defined JASEL_DOXYGEN_INVOKED
 
 #ifndef JASEL_FUNDAMENTAL_V3_NULLABLE_AP_HPP
 #define JASEL_FUNDAMENTAL_V3_NULLABLE_AP_HPP
@@ -40,7 +40,7 @@ namespace nullable
   // && is_type_constructible_v<decay_t<N>>
   //>
   >
-  constexpr auto
+  JASEL_CXX14_CONSTEXPR auto
   ap(F&& f, N&& n) -> decltype(
       make<TypeConstructor<decay_t<N>>>(nullable::deref(std::forward<F>(f))(nullable::deref(forward<N>(n))))
       )
@@ -56,14 +56,14 @@ namespace nullable
   {
     template <class T, class F>
       static constexpr auto ap(F&& f, T&& x)
-      {
-        return nullable::ap(forward<F>(f), forward<T>(x));
-      }
+        JASEL_DECLTYPE_RETURN_NOEXCEPT(
+          nullable::ap(forward<F>(f), forward<T>(x))
+        )
     template <class N, class T>
       static auto pure(T&& x)
-      {
-        return make<N>(forward<T>(x));
-      }
+        JASEL_DECLTYPE_RETURN_NOEXCEPT(
+          make<N>(forward<T>(x))
+        )
   };
 }
 

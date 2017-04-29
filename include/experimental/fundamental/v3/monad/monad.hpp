@@ -9,8 +9,6 @@
 #ifndef JASEL_FUNDAMENTAL_V3_MONAD_MONAD_HPP
 #define JASEL_FUNDAMENTAL_V3_MONAD_MONAD_HPP
 
-#if __cplusplus >= 201402L || defined JASEL_DOXYGEN_INVOKED
-
 ///////////////////////////////////////////////////////////////////////////////////////
 ///
 ///////////////////////////////////////////////////////////////////////////////////////
@@ -32,8 +30,10 @@ inline namespace fundamental_v3
   template <class T>
     struct is_monad;
 
+#if __cplusplus >= 201402L || defined JASEL_DOXYGEN_INVOKED
   template <class T>
     constexpr bool is_monad_v = is_monad<T>::value;
+#endif
 
 namespace monad
 {
@@ -52,15 +52,17 @@ namespace monad
   template <typename MM, bool condition>
   struct traits<MM, meta::when<condition>>
   {
+#if __cplusplus >= 201402L || defined JASEL_DOXYGEN_INVOKED
     // bind:: [T] x [T->[U]] -> [U]
     template <class M, class F>
       static auto bind(M&& x, F&& y) =delete;
+#endif
   };
 
   template <class M, class F>
   auto
     bind(M&& x, F&& f)
-      JASEL_NOEXCEPT_RETURN(
+       JASEL_DECLTYPE_RETURN_NOEXCEPT(
           traits<type_constructor_t<decay_t<M>>>::bind(forward<M>(x), forward<F>(f))
        )
 
@@ -83,5 +85,4 @@ namespace monad
 }
 }
 }
-#endif
 #endif // header

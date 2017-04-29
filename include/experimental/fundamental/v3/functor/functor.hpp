@@ -9,8 +9,6 @@
 #ifndef JASEL_FUNDAMENTAL_V3_FUNCTOR_FUNCTOR_HPP
 #define JASEL_FUNDAMENTAL_V3_FUNCTOR_FUNCTOR_HPP
 
-#if __cplusplus >= 201402L || defined JASEL_DOXYGEN_INVOKED
-
 ///////////////////////////////////////////////////////////////////////////////////////
 ///
 ///////////////////////////////////////////////////////////////////////////////////////
@@ -31,8 +29,10 @@ inline namespace fundamental_v3
   template <class T>
     struct is_functor;
 
+#if __cplusplus >= 201402L || defined JASEL_DOXYGEN_INVOKED
   template <class T>
     constexpr bool is_functor_v = is_functor<T>::value;
+#endif
 
 namespace functor
 {
@@ -49,22 +49,24 @@ namespace functor
   template <typename U, bool condition>
   struct traits<U, meta::when<condition>>
   {
+#if __cplusplus >= 201402L || defined JASEL_DOXYGEN_INVOKED
       template <class T, class F>
         static auto transform(T&& x, F&& y) =delete;
+#endif
   };
 
   template <class T, class F>
   auto
     transform(T&& x, F&& f)
-      JASEL_NOEXCEPT_RETURN(
-          traits<type_constructor_t<meta::uncvref_t<T>>>::transform(forward<T>(x),forward<F>(f))
-       )
+        JASEL_DECLTYPE_RETURN_NOEXCEPT(
+            traits<type_constructor_t<meta::uncvref_t<T>>>::transform(forward<T>(x),forward<F>(f))
+        )
 
   template <class F, class T>
    auto
      map(F&& f, T&& x)
-       JASEL_NOEXCEPT_RETURN(
-           functor::transform(forward<F>(f), forward<T>(x))
+        JASEL_DECLTYPE_RETURN_NOEXCEPT(
+            functor::transform(forward<F>(f), forward<T>(x))
         )
 }
 
@@ -85,5 +87,4 @@ namespace functor
 }
 }
 
-#endif
 #endif // header

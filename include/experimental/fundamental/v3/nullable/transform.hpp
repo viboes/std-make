@@ -5,7 +5,6 @@
 // (See accompanying file // LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 //////////////////////////////////////////////////////////////////////////////
-#if __cplusplus >= 201402L || defined JASEL_DOXYGEN_INVOKED
 
 #ifndef JASEL_FUNDAMENTAL_V3_NULLABLE_TRANSFORM_HPP
 #define JASEL_FUNDAMENTAL_V3_NULLABLE_TRANSFORM_HPP
@@ -40,7 +39,7 @@ namespace nullable
   // && is_type_constructible_v<meta::uncvref_t<N>>
   //>
   >
-  constexpr meta::invoke<TypeConstructor<decay_t<N>>, meta::ResultType<decay_t<F>, value_type_t<decay_t<N>>>>
+  BOOST_CXX14_CONSTEXPR meta::invoke<TypeConstructor<decay_t<N>>, meta::ResultType<decay_t<F>, value_type_t<decay_t<N>>>>
   transform(N&& n, F&& f)
   {
     if (nullable::has_value(forward<N>(n)))
@@ -55,9 +54,9 @@ namespace nullable
   {
     template <class T, class F>
       static constexpr auto transform(T&& x, F&& f)
-      {
-        return nullable::transform(forward<T>(x), forward<F>(f));
-      }
+      JASEL_DECLTYPE_RETURN_NOEXCEPT(
+        nullable::transform(forward<T>(x), forward<F>(f))
+      )
   };
 }
 
@@ -72,13 +71,12 @@ struct traits<N, meta::when<
 {
   template <class T, class F>
     static constexpr auto transform(T&& x, F&& f)
-    {
-      return nullable::transform(forward<T>(x), forward<F>(f));
-    }
+      JASEL_DECLTYPE_RETURN_NOEXCEPT(
+          nullable::transform(forward<T>(x), forward<F>(f));
+      )
 };
 }
 #endif
 }}
 }
 #endif // header
-#endif

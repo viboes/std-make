@@ -116,7 +116,14 @@ inline namespace fundamental_v3
     )
 
   template <class TC>
-  using none_type_t = decltype(nullable::none<TC>());
+  struct none_type;
+
+  template <class TC>
+  struct none_type {
+    using type = decltype(nullable::none<TC>());
+  };
+  template <class TC>
+  using none_type_t = typename none_type<TC>::type;
 
   template <class T>
   constexpr

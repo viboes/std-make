@@ -15,6 +15,7 @@
 #include <experimental/make.hpp>
 #include <experimental/meta.hpp>
 #include <experimental/fundamental/v3/sum_type/sum_type.hpp>
+#include <experimental/type_traits.hpp>
 #include <utility>
 #include <functional>
 
@@ -60,7 +61,7 @@ namespace detail
 
     template <size_t I, class ST
 #if ! defined JASEL_DOXYGEN_INVOKED
-    , class= std::enable_if_t< I < size::value >
+    , class= enable_if_t< I < size::value >
 #endif
     >
       static constexpr decltype(auto) get(ST&& st) noexcept
@@ -70,7 +71,7 @@ namespace detail
     template <class V, class ST>
       static constexpr decltype(auto) visit(V&& v, ST&& st) noexcept
       {
-        if (nullable::has_value(std::forward<ST>(st)))
+        if (nullable::has_value(forward<ST>(st)))
           return JASEL_INVOKE(forward<V>(v),nullable::deref(forward<ST>(st)));
         return JASEL_INVOKE(forward<V>(v),nullable::deref_none(forward<ST>(st)));
       }

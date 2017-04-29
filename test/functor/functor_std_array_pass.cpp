@@ -23,8 +23,8 @@ int main()
 
   using T = std::array<int, 2>;
 
-  static_assert(stde::is_product_type_v<T>, "ERROR");
-  static_assert(stde::is_type_constructible_v<T>, "ERROR");
+  static_assert(stde::is_product_type<T>::value, "ERROR");
+  static_assert(stde::is_type_constructible<T>::value, "ERROR");
   static_assert(std::is_base_of<stde::functor::tag, stde::functor::traits<stde::array_tc>> ::value, "ERROR");
   static_assert(stde::is_functor<stde::array_tc>::value, "ERROR");
 

@@ -5,7 +5,7 @@
 // (See accompanying file // LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 //////////////////////////////////////////////////////////////////////////////
-#if __cplusplus >= 201402L || defined JASEL_DOXYGEN_INVOKED
+#if __cplusplus >= 201002L || defined JASEL_DOXYGEN_INVOKED
 
 #ifndef JASEL_FUNDAMENTAL_V3_NULLABLE_BIND_HPP
 #define JASEL_FUNDAMENTAL_V3_NULLABLE_BIND_HPP
@@ -40,7 +40,7 @@ namespace nullable
   // && is_type_constructible_v<decay_t<N>>
   //>
   >
-  constexpr auto
+  JASEL_CXX14_CONSTEXPR auto
   bind(M&& m, F&& f) -> decltype(
       std::forward<F>(f)(nullable::deref(forward<M>(m)))
       )
@@ -55,9 +55,9 @@ namespace nullable
   {
     template <class M, class F>
       static constexpr auto bind(M&& x, F&& f)
-      {
-        return nullable::bind(forward<M>(x), forward<F>(f));
-      }
+        JASEL_DECLTYPE_RETURN_NOEXCEPT(
+            nullable::bind(forward<M>(x), forward<F>(f))
+        )
   };
 }
 }}

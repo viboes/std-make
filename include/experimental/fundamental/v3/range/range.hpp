@@ -47,7 +47,7 @@ namespace std
       template <class R, class Enabler=void>
       struct is_range : false_type {};
 
-#if __cplusplus >= 201402L
+#if __cplusplus >= 201402L || defined JASEL_DOXYGEN_INVOKED
       template <class T>
         constexpr bool is_range_v = is_range<T>::value;
 #endif
@@ -90,17 +90,17 @@ namespace std
         struct traits: traits<R, meta::when<true>>
         {};
 
-#if __cplusplus >= 201402L
         // Default failing specialization
         template <typename R, bool condition>
         struct traits<R, meta::when<condition>>
         {
+#if __cplusplus >= 201402L || defined JASEL_DOXYGEN_INVOKED
           template <class T>
           static constexpr auto begin(T&& x) = delete;
           template <class T>
           static constexpr auto end(T&& x) = delete;
-        };
 #endif
+        };
         template <class T, typename = void>
           struct has_trait_range
             : false_type {};
@@ -111,7 +111,7 @@ namespace std
             > >
             : true_type {};
 
-#if __cplusplus >= 201402L
+#if __cplusplus >= 201402L || defined JASEL_DOXYGEN_INVOKED
         template <class T>
           constexpr bool has_trait_range_v = has_trait_range<T>::value;
 
@@ -130,7 +130,7 @@ namespace std
             >
           > : true_type {};
 
-#if __cplusplus >= 201402L
+#if __cplusplus >= 201402L || defined JASEL_DOXYGEN_INVOKED
         template <class T>
           constexpr bool has_members_begin_end_v = has_members_begin_end<T>::value;
 #endif
