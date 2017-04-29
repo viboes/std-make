@@ -124,7 +124,7 @@ inline namespace fundamental_v3
       using size = integral_constant<size_type, 2>;
       static strict_bool<Tag, T> val(size_type p) { return strict_bool<Tag, T>{static_cast<T>(p)}; }
 
-      static size_type pos(strict_bool<Tag, T> u)  { return size_type{u.underlying()}; };
+      static size_type pos(strict_bool<Tag, T> u)  { return size_type{u.underlying()}; }
     };
   }
 

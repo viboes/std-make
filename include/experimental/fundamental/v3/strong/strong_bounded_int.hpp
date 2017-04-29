@@ -114,7 +114,7 @@ inline namespace fundamental_v3
       using size = integral_constant<size_type, High-Low+1>;
       static strong_bounded_int<Tag, T, Low, High> val(size_type p) { return strong_bounded_int<Tag, T, Low, High>{static_cast<T>(p+Low)}; }
 
-      static size_type pos(strong_bounded_int<Tag, T, Low, High> u)  { return static_cast<size_type>(u.underlying()-Low); };
+      static size_type pos(strong_bounded_int<Tag, T, Low, High> u)  { return static_cast<size_type>(u.underlying()-Low); }
     };
   }
 }
