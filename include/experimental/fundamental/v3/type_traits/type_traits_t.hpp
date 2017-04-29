@@ -6,8 +6,8 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef JASEL_V3_FUNDAMENTAL_TYPE_TRAITS_TYPE_TRAITS_T__HPP
-#define JASEL_V3_FUNDAMENTAL_TYPE_TRAITS_TYPE_TRAITS_T__HPP
+#ifndef JASEL_V3_FUNDAMENTAL_TYPE_TRAITS_TYPE_TRAITS_T_HPP
+#define JASEL_V3_FUNDAMENTAL_TYPE_TRAITS_TYPE_TRAITS_T_HPP
 
 #include <type_traits>
 
