@@ -75,6 +75,7 @@ inline namespace fundamental_v3
       /// @par Effects Constructs an uninitialized strong_int
       strong_int() = default;
       strong_int(strong_int const&) = default;
+      strong_int& operator=(strong_int const&) = default;
 
       /// @par Effects Implicitly constructs a strong_int from another strong_int with implicit convertible underlying types
       /// @par Throws: Whatever the underlying copy can throw.
@@ -84,7 +85,8 @@ inline namespace fundamental_v3
 #if ! defined JASEL_DOXYGEN_INVOKED
       //fixme  error: constructor cannot be redeclared when using , typename = typename enable_if<>::type
         , enable_if_t<
-            is_constructible<UT, UT2 const&>::value &&
+        ! is_same<UT, UT2>::value &&
+        is_constructible<UT, UT2 const&>::value &&
             is_convertible<UT2 const&, UT>::value
             , bool> = false
 #endif

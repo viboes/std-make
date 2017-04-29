@@ -140,7 +140,7 @@ inline  namespace fundamental_v3
       using size = integral_constant<size_type, ordinal::traits<T>::max()-numeric_limits<T>::min()+1>;
       static W val(size_type p) { return W{T{p}}; }
 
-      static size_type pos(W w)  { return size_type{w.underlying()}; };
+      static size_type pos(W w)  { return size_type{w.underlying()}; }
     };
 }
 }

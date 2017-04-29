@@ -72,7 +72,7 @@ namespace ordinal {
       using size = integral_constant<size_type, size_v>;
       static constexpr value_type val(size_type p) { return value_type{p*Step+Low}; }
 
-      static constexpr size_type pos(value_type v)  { return static_cast<size_type>(v*Step-Low); };
+      static constexpr size_type pos(value_type v)  { return static_cast<size_type>(v*Step-Low); }
     };
 
     // todo add a logarithmic 2 traits: usable with bit masks

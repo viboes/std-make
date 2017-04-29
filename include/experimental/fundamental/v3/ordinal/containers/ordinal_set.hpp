@@ -76,46 +76,51 @@ inline namespace fundamental_v3
       //! It exists only as a helper class for `ordinal_set`'s `operator[]`.
       class reference {
         friend class ordinal_set<T>;
-        ordinal_set<T>& ref_;
+        ordinal_set<T>* ref_;
         T pos_;
         reference() noexcept;
         reference(ordinal_set<T>& ref, T pos)
-        : ref_(ref), pos_(pos)
+        : ref_(&ref), pos_(pos)
         { }
       public:
-        ~reference() noexcept
-        { }
+        ~reference() noexcept = default;
 
         //! assignement from bool
         reference& operator=(bool x) noexcept
         {
-          ref_.set(pos_,x);
+          ref_->set(pos_,x);
           return *this;
         }
 
+        reference(reference const& x)
+          : ref_(x.ref_), pos_(x.pos_)
+        {
+
+        }
         //! assignement from another reference
         reference& operator=(const reference& x) noexcept
         {
-          ref_.set(pos_,x);
+          ref_ = x.ref_;
+          pos_ = x.pos_;
           return *this;
         }
 
         //! flip the bit
         bool operator~() const noexcept
         {
-          return ! ref_.test(pos_);
+          return ! ref_->test(pos_);
         }
 
         //! implicit conversion to bool
         operator bool() const noexcept
         {
-          return ref_.test(pos_);
+          return ref_->test(pos_);
         }
 
         //! flip the bit
         reference flip() noexcept
         {
-          ref_.flip(pos_);
+          ref_->flip(pos_);
           return *this;
         }
       };
