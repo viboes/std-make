@@ -301,7 +301,7 @@ install:
   # It is fixed in valgrind 3.10 so this won't be necessary if someone
   # replaces the current valgrind (3.7) with valgrind-3.10
   - echo $CHECKOUT_PATH
-  #fixme - if [ "$BUILD_TYPE" == "Release" ] && [ "$ASAN" == "Off" ]; then sed -i 's/march=native/msse4.2/' CMakeLists.txt; fi
+  - if [ "$BUILD_TYPE" == "Release" ] && [ "$ASAN" == "Off" ]; then sed -i 's/march=native/msse4.2/' CMakeLists.txt; fi
 
   - mkdir -p build
   - cd build
