@@ -277,22 +277,22 @@ inline namespace fundamental_v3
   template < class C, enable_if_t<is_strict_weakly_ordered_nullable<C>::value, int> = 0  >
   constexpr bool operator<(none_t, C const& x) { return nullable::has_value(x); }
   template < class C, enable_if_t<is_strict_weakly_ordered_nullable<C>::value, int> = 0 >
-  constexpr bool operator<(C const& x, none_t) { return false; }
+  constexpr bool operator<(C const&, none_t) { return false; }
 
   template < class C, enable_if_t<is_strict_weakly_ordered_nullable<C>::value, int> = 0 >
-  constexpr bool operator<=(none_t, C const& x) { return true; }
+  constexpr bool operator<=(none_t, C const&) { return true; }
   template < class C, enable_if_t<is_strict_weakly_ordered_nullable<C>::value, int> = 0 >
   constexpr bool operator<=(C const& x, none_t) { return ! nullable::has_value(x); }
 
   template < class C, enable_if_t<is_strict_weakly_ordered_nullable<C>::value, int> = 0 >
-  constexpr bool operator>(none_t, C const& x) { return false; }
+  constexpr bool operator>(none_t, C const&) { return false; }
   template < class C, enable_if_t<is_strict_weakly_ordered_nullable<C>::value, int> = 0 >
   constexpr bool operator>(C const& x, none_t) { return nullable::has_value(x); }
 
   template < class C, enable_if_t<is_strict_weakly_ordered_nullable<C>::value, int> = 0  >
   constexpr bool operator>=(none_t, C const& x) { return ! nullable::has_value(x); }
   template < class C, enable_if_t<is_strict_weakly_ordered_nullable<C>::value, int> = 0  >
-  constexpr bool operator>=(C const& x, none_t) { return true; }
+  constexpr bool operator>=(C const&, none_t) { return true; }
 
   template <class N, class F, class T>
     JASEL_CXX14_CONSTEXPR value_type_t<N> apply_or(N&& n, F&& f, T&& v)

@@ -131,7 +131,7 @@ inline namespace fundamental_v3
     {
       //constexpr unsigned int N = std::numeric_limits<T>::digits;
       //const unsigned int m = s % std::numeric_limits<T>::digits;
-      return T(1) << (s % std::numeric_limits<T>::digits);
+      return T(T(1) << (s % std::numeric_limits<T>::digits));
     }
   }
     /**
@@ -187,44 +187,40 @@ inline namespace fundamental_v3
       //! It exists only as a helper class for @c bit_mask's @c operator[].
       class reference {
         friend class bit_mask<N,T>;
-        bit_mask<N,T>& ref_;
+        bit_mask<N,T>* ref_;
         T pos_;
         constexpr reference(bit_mask<N,T>& ref, T pos) noexcept
-          : ref_(ref), pos_(pos)
+          : ref_(&ref), pos_(pos)
         { }
       public:
         constexpr reference() noexcept = delete;
+        constexpr reference(reference const&) noexcept = default;
+        reference& operator=(reference const&) noexcept = default;
+        ~reference() noexcept = default;
 
         //! assignment from bool
         JASEL_MUTABLE_CONSTEXPR reference& operator=(bool x) noexcept
         {
-          ref_.set(pos_,x);
-          return *this;
-        }
-
-        //! assignment from another reference
-        JASEL_MUTABLE_CONSTEXPR reference& operator=(const reference& x) noexcept
-        {
-          ref_.set(pos_,x);
+          ref_->set(pos_,x);
           return *this;
         }
 
         //! flip the bit
-        constexpr bool operator~() noexcept
+        constexpr bool operator~() const noexcept
         {
-          return ! ref_.test(pos_);
+          return ! ref_->test(pos_);
         }
 
         //! implicit conversion to bool
         constexpr operator bool() const noexcept
         {
-          return ref_.test(pos_);
+          return ref_->test(pos_);
         }
 
         //! flip the bit
         JASEL_MUTABLE_CONSTEXPR reference flip()  noexcept
         {
-          ref_.flip(pos_);
+          ref_->flip(pos_);
           return *this;
         }
       };
@@ -397,7 +393,8 @@ inline namespace fundamental_v3
       //!   A count of the number of bits set in \c *this.
       constexpr std::size_t count() const noexcept
       {
-        return __builtin_popcount(bits);
+        // fixme
+        return static_cast<size_t>(__builtin_popcount(bits));
       }
 
       //! @par Returns:
@@ -436,7 +433,7 @@ inline namespace fundamental_v3
       JASEL_CXX14_CONSTEXPR reference operator[](size_t pos)
       {
         //JASEL_EXPECTS(valid_position(pos));
-        return reference(*this, pos);
+        return reference(*this, static_cast<T>(pos));
       }
       //! @par Effects:
       //!   Sets all bits in \c *this.

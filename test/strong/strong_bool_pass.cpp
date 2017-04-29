@@ -146,12 +146,12 @@ int main()
   }
   {
       EngineStarted es1 {true};
-      auto b = true || es1 ;
+      auto b = (true) || es1 ;
       BOOST_TEST(b==true);
   }
   {
       EngineStarted es1 {false};
-      auto b = true || es1 ;
+      auto b = (true) || es1 ;
       BOOST_TEST(b==true);
   }
   {

@@ -18,18 +18,18 @@ namespace stde = std::experimental;
 struct NoDefaultConstructible
 {
   NoDefaultConstructible() = delete;
-  NoDefaultConstructible(int )  {};
+  NoDefaultConstructible(int )  {}
 };
 
 struct NoCopyConstructible
 {
-  NoCopyConstructible()  {};
+  NoCopyConstructible()  {}
   NoCopyConstructible(NoCopyConstructible const&) = delete;
   NoCopyConstructible(NoCopyConstructible &&) = default;
 };
 struct NoMoveConstructible
 {
-  NoMoveConstructible()  {};
+  NoMoveConstructible()  {}
   NoMoveConstructible(NoMoveConstructible const&) = default;
   NoMoveConstructible(NoMoveConstructible &&) = delete;
   NoMoveConstructible& operator=(NoMoveConstructible const&) = default;
@@ -89,18 +89,18 @@ struct Guard
 struct ExplicitStr
 {
     std::string s;
-    explicit ExplicitStr(const char* chp) : s(chp) {};
+    explicit ExplicitStr(const char* chp) : s(chp) {}
 };
 
 struct Date
 {
     int i;
     Date() = delete;
-    Date(int i) : i{i} {};
+    Date(int i) : i{i} {}
     Date(Date&& d) : i(d.i) { d.i = 0; }
     Date(const Date&) = delete;
     Date& operator=(const Date&) = delete;
-    Date& operator=(Date&& d) { i = d.i; d.i = 0; return *this;};
+    Date& operator=(Date&& d) { i = d.i; d.i = 0; return *this;}
 };
 
 template <class T>

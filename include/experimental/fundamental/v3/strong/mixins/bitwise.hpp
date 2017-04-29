@@ -29,7 +29,7 @@ namespace std
         template <class IntegralType, typename = enable_if<is_integral<IntegralType>::value>>
         friend constexpr Final operator<<(Final const&x, IntegralType y) noexcept
         {
-          return Final(x._backdoor()._underlying() << y);
+          return Final(typename Final::underlying_t(x._backdoor()._underlying() << y));
         }
         template <class IntegralType, typename = enable_if<is_integral<IntegralType>::value>>
         friend constexpr Final operator>>(Final const&x, IntegralType y) noexcept

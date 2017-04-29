@@ -106,7 +106,7 @@ inline namespace fundamental_v3
       constexpr strong_bool() noexcept = default;
       // If Bool is not bool, we want an explicit conversion from bool but not Bool.
       constexpr explicit strong_bool (Bool) = delete;
-      constexpr explicit strong_bool (bool b) : base_type(b) {};
+      constexpr explicit strong_bool (bool b) : base_type(b) {}
 
       // unwanted conversions
       // Now that we have a safe_bool, we don't want to restrict the representation to an integral type

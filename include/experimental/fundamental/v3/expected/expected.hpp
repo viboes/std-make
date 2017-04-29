@@ -281,7 +281,7 @@ union no_trivial_expected_storage
   : _val(constexpr_forward<Args>(args)...)
   {}
 
-  ~no_trivial_expected_storage() {};
+  ~no_trivial_expected_storage() {}
 };
 
 template <typename E>
@@ -328,7 +328,7 @@ union no_trivial_expected_storage<void, E>
   : dummy(0)
   {}
 
-  ~no_trivial_expected_storage() {};
+  ~no_trivial_expected_storage() {}
 };
 
 

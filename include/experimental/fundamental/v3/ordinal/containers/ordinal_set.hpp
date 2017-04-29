@@ -84,24 +84,13 @@ inline namespace fundamental_v3
         { }
       public:
         ~reference() noexcept = default;
+        reference(reference const& x) noexcept  = default;
+        reference& operator=(const reference& x) noexcept = default;
 
         //! assignement from bool
         reference& operator=(bool x) noexcept
         {
           ref_->set(pos_,x);
-          return *this;
-        }
-
-        reference(reference const& x)
-          : ref_(x.ref_), pos_(x.pos_)
-        {
-
-        }
-        //! assignement from another reference
-        reference& operator=(const reference& x) noexcept
-        {
-          ref_ = x.ref_;
-          pos_ = x.pos_;
           return *this;
         }
 

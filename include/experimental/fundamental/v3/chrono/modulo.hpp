@@ -70,11 +70,11 @@ namespace chrono
       constexpr modulo(modulo<Duration, SuperDuration, Rep2> const& v) : m_value(v.m_value) {}
 
       //! @par Effects:<br> constructs a modulo doing the modulo of the representation
-      constexpr explicit modulo(duration_t v) : m_value(v.count() % cardinal) {}
+      constexpr explicit modulo(duration_t v) : m_value(static_cast<rep>(v.count()) % cardinal) {}
 
       //! @par Returns:<br> conversion to duration
-      constexpr explicit operator duration_t() { return duration_t(this->m_value); }
-      constexpr duration_t to_duration() { return duration_t(this->m_value); }
+      constexpr explicit operator duration_t() const { return duration_t(this->m_value); }
+      constexpr duration_t to_duration() const { return duration_t(this->m_value); }
 
       //! @par Returns:<br> conversion to the representation
       constexpr explicit operator Rep() const noexcept {return m_value;}
@@ -93,11 +93,11 @@ namespace chrono
 
       //! @par Returns:
       //!   *this.
-      constexpr modulo operator+() noexcept
+      constexpr modulo operator+() const noexcept
           { return *this; }
       //fixme: Is this really needed
       //! @par Returns:<br> modulo{-Rep(*this)}.
-      constexpr modulo operator-() noexcept
+      constexpr modulo operator-() const noexcept
           { return modulo(-m_value); }
 
       //! @par Effects: <br>If m_value < candinal, ++m_value. Otherwise sets m_value to 0.

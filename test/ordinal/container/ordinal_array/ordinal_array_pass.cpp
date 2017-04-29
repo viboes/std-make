@@ -23,11 +23,11 @@ int main()
   }
   // fixme: shouldn't {1, 2, 3.5} work?
   {
-    stde::ordinal_array<float,Indx> c {{1, 2, 3.5}};
+    stde::ordinal_array<int,Indx> c {{1, 2, 3}};
     BOOST_TEST(c.size() == 3);
     BOOST_TEST(c[Indx{1}] == 1);
     BOOST_TEST(c[Indx{2}] == 2);
-    BOOST_TEST(c[Indx{3}] == 3.5);
+    BOOST_TEST(c[Indx{3}] == 3);
   }
   return ::boost::report_errors();
 }

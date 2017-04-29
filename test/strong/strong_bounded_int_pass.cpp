@@ -66,7 +66,7 @@ int main()
     try {
       Slot oc{-1};
       BOOST_TEST(false);
-    } catch(stdex::bad_bounded_int_cast& ex) {
+    } catch(stdex::bad_bounded_int_cast& ) {
     }
   }
   { // copy constructor
@@ -80,7 +80,7 @@ int main()
     oc2 = oc1;
     BOOST_TEST(oc2 == oc1);
   }
-#if COMPILE_ERROR
+#if defined COMPILE_ERROR
   { // assignment from UT
     Frame oc1{1};
     oc1 = 2; // error

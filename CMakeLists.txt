@@ -4,14 +4,14 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 project(Jasel CXX)
 
-#find_package(Boost)
-#
-#if (NOT BOOST_FOUND)
-#    message(WARNING "Boost was not found; Forcing directory.")
-#    set(Boost_INCLUDE_DIRS "$ENV{BOOST_ROOT}")
-#    message("${Boost_INCLUDE_DIRS}")
-#    
-#endif()
+find_package(Boost)
+
+if (NOT BOOST_FOUND)
+    message(WARNING "Boost was not found; Forcing directory.")
+    set(Boost_INCLUDE_DIRS "$ENV{BOOST_ROOT}")
+    message("${Boost_INCLUDE_DIRS}")
+    
+endif()
 
 find_package(Git)
 
@@ -63,6 +63,8 @@ if("x${CMAKE_CXX_COMPILER_ID}" MATCHES "x.*Clang")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-missing-prototypes -Wno-missing-variable-declarations")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-shadow -Wno-old-style-cast")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-documentation -Wno-documentation-unknown-command")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-reserved-id-macro -Wno-disabled-macro-expansion -Wno-missing-noreturn")
+  
   if(CMAKE_SYSTEM_NAME MATCHES "Darwin")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-global-constructors -Wno-exit-time-destructors")
   endif()

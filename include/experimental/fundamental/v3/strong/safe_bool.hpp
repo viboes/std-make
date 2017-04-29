@@ -93,7 +93,7 @@ inline namespace fundamental_v3
       constexpr safe_bool() noexcept = default;
       // Implicitly convertible from bool
       // maybe we need a template here and only_when<B, is_same> so that we other implicit conversions
-      constexpr safe_bool (bool b) : base_type(b) {};
+      constexpr safe_bool (bool b) : base_type(b) {}
 
       constexpr safe_bool (safe_bool const& b) noexcept = default;
       template <class B>
@@ -131,7 +131,7 @@ inline namespace fundamental_v3
 
       // copy constructor/assignment default
       safe_bool() noexcept = default;
-      constexpr safe_bool (bool b) : base_type(b) {};
+      constexpr safe_bool (bool b) : base_type(b) {}
 
       // unwanted conversions
       constexpr explicit safe_bool (int) = delete;

@@ -67,8 +67,8 @@ inline namespace fundamental_v3
             typedef typename base_t::difference_type difference_type;
             typedef typename base_t::reference reference;
 
-            ordinal_iterator() : index_(0) {}
-            explicit ordinal_iterator(int x) : index_(x) {}
+            ordinal_iterator() : index_(0u) {}
+            explicit ordinal_iterator(size_t x) : index_(x) {}
 
         private:
             void increment()
@@ -102,7 +102,7 @@ inline namespace fundamental_v3
             }
 
             friend class ::boost::iterator_core_access;
-            int index_;
+            size_t index_;
         };
     } // namespace ordinal_detail
     #endif

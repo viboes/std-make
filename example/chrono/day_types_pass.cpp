@@ -91,11 +91,11 @@ int main()
     BOOST_TEST(arr.size() == 7);
   }
   {
-    stdex::ordinal_array<float, weekday> c {{0, 1, 2, 3.5, 4, 5, 6}};
+    stdex::ordinal_array<int, weekday> c {{0, 1, 2, 3, 4, 5, 6}};
     BOOST_TEST(c.size() == 7);
     BOOST_TEST(c[weekday{1}] == 1);
     BOOST_TEST(c[weekday{2}] == 2);
-    BOOST_TEST(c[weekday{3}] == 3.5);
+    BOOST_TEST(c[weekday{3}] == 3);
   }
   {
     stdex::ordinal_range<weekday> rng;

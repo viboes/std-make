@@ -78,8 +78,8 @@ void accept_nullptr_t(std::nullptr_t) {
 struct nullopt_t2
 {
   struct init{};
-  constexpr nullopt_t2(init){};
-  //constexpr nullopt_t2(){};
+  constexpr nullopt_t2(init){}
+  //constexpr nullopt_t2(){}
 };
 constexpr nullopt_t2 nullopt2{nullopt_t2::init{}};
 

@@ -48,7 +48,7 @@ inline namespace fundamental_v3
       size_t pos(Bool val)    {
         switch (val) {
         case Bool::False: return 0;
-        default:  return 1;
+        case Bool::True: return 1;
         }
       }
     };

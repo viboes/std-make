@@ -59,7 +59,7 @@ inline namespace fundamental_v3
       constexpr strict_bool() noexcept = default;
       // If Bool is not bool, we want an explicit conversion from bool but not Bool.
       constexpr explicit strict_bool (Bool) = delete;
-      constexpr explicit strict_bool (bool b) : base_type(b) {};
+      constexpr explicit strict_bool (bool b) : base_type(b) {}
 
       // unwanted conversions
       constexpr explicit strict_bool (int) = delete;

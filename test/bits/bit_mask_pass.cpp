@@ -66,7 +66,7 @@ int main()
     BitMask bm{};
     bm.set();
     BOOST_TEST_EQ( 0xf , int(bm.to_integer()) );
-    BOOST_TEST_EQ( 4 , std::experimental::bit_ops::popcount(0xf0) );
+    BOOST_TEST_EQ( 4 , std::experimental::bit_ops::popcount(0xf0u) );
     BOOST_TEST_EQ( 4U , bm.count() );
     BOOST_TEST( bm.all() );
     BOOST_TEST(bm[UInt{0}]);
