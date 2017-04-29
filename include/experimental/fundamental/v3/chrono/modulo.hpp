@@ -40,11 +40,15 @@ namespace chrono
   //!   using weekday = modulo<days,   weeks,    std::uint8_t>; //7
   //! @endcode
 
+  //fixme:: Couldn't the representation be deduced from the cardinality?
   template <class Duration, class SuperDuration, class Rep>
   class modulo final
   {
       Rep m_value;
   public:
+      //fixme:: shouldn't the representation be unsigned?
+      //fixme:: shouldn't the representation be able to represent all the values in 0..cardinal?
+      // Otherwise we need to upcast it before increasing
       using period = typename ratio_divide<typename SuperDuration::period, typename Duration::period>::type;
       static_assert(period::den==1, "SuperDuration must be a multiple of Duration");
       static const constexpr intmax_t cardinal = period::num;
@@ -55,6 +59,8 @@ namespace chrono
 
       explicit modulo() = default;
 
+      //! @par Pre-condition:
+      //!   v is in the range [0,cardinal)
       //! @par Effects:<br> constructs a modulo from its representations
       constexpr explicit modulo(Rep v) : m_value(v) {}
 
@@ -75,7 +81,8 @@ namespace chrono
       constexpr Rep value() const noexcept {return m_value;}
       constexpr Rep count() const noexcept {return m_value;}
 
-      //! @par Returns:<br> min() <= conut() && conut() <= max()
+      //! @par Returns:
+      //!   0 <= count() && count() < cardinal
       bool valid() const { return m_value >= 0 && m_value < cardinal; }
 
       template <class OSTREAM>
@@ -84,9 +91,11 @@ namespace chrono
           return os;
       }
 
-      //! @par Returns:<br> *this.
+      //! @par Returns:
+      //!   *this.
       constexpr modulo operator+() noexcept
           { return *this; }
+      //fixme: Is this really needed
       //! @par Returns:<br> modulo{-Rep(*this)}.
       constexpr modulo operator-() noexcept
           { return modulo(-m_value); }
@@ -94,7 +103,7 @@ namespace chrono
       //! @par Effects: <br>If m_value < candinal, ++m_value. Otherwise sets m_value to 0.
       //! @par Returns:<br> *this.
       JASEL_MUTABLE_CONSTEXPR modulo& operator++() noexcept
-          { if (++m_value == cardinal) m_value=0; return *this; }
+          { if (m_value == cardinal-1) m_value=0; else ++m_value; return *this; }
 
       //! @par Effects: <br>++(*this).
       //! @par Returns:<br> Returns: A copy of *this as it existed on entry to this member function.
