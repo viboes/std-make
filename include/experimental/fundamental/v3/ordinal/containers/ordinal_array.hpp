@@ -27,6 +27,7 @@ We can say that
 #include <cassert>
 #include <iterator>
 #include <algorithm>
+#include <stdexcept>
 
 namespace std
 {
