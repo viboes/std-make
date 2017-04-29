@@ -30,42 +30,42 @@ namespace detail
           using type = F;
           type f;
 
-          /* Perfect forwardign constructor */
+          /* Perfect forwarding constructor */
           template<typename U,
                    /* Make sure that it does not act as copy constructor for wrap_call& */
-                   std::enable_if_t<!std::is_base_of<wrap_call, std::decay_t<U>>::value
+                   enable_if_t<!is_base_of<wrap_call, decay_t<U>>::value
                    /* require that F can be constructed from U&& */
-                   && std::is_constructible<F, U>::value, bool> = true>
-          constexpr wrap_call(U&& fct) : f(std::forward<U>(fct)) { }
+                   && is_constructible<F, U>::value, bool> = true>
+          constexpr wrap_call(U&& fct) : f(forward<U>(fct)) { }
 
-          /* You may want to use std::invoke to handle member pointers here */
+          /* You may want to use invoke to handle member pointers here */
           template< class ...Xs >
           constexpr auto operator () (Xs &&... xs) const &
-            noexcept(noexcept( f(std::forward<Xs>(xs)...) ))
-            -> decltype(f(std::forward<Xs>(xs)...))
+            noexcept(noexcept( f(forward<Xs>(xs)...) ))
+            -> decltype(f(forward<Xs>(xs)...))
           {
-              return f(std::forward<Xs>(xs)...);
+              return f(forward<Xs>(xs)...);
           }
           template< class ...Xs >
           constexpr auto operator () (Xs &&... xs) const &&
-            noexcept(noexcept( std::move(f)(std::forward<Xs>(xs)...) ))
-            -> decltype(std::move(f)(std::forward<Xs>(xs)...))
+            noexcept(noexcept( move(f)(forward<Xs>(xs)...) ))
+            -> decltype(move(f)(forward<Xs>(xs)...))
           {
-              return std::move(f)(std::forward<Xs>(xs)...);
+              return move(f)(forward<Xs>(xs)...);
           }
           template< class ...Xs >
           constexpr auto operator () (Xs &&... xs) &
-            noexcept(noexcept( f(std::forward<Xs>(xs)...) ))
-            -> decltype(f(std::forward<Xs>(xs)...))
+            noexcept(noexcept( f(forward<Xs>(xs)...) ))
+            -> decltype(f(forward<Xs>(xs)...))
           {
-              return f(std::forward<Xs>(xs)...);
+              return f(forward<Xs>(xs)...);
           }
           template< class ...Xs >
           constexpr auto operator () (Xs &&... xs) &&
-            noexcept(noexcept( std::move(f)(std::forward<Xs>(xs)...) ))
-            -> decltype(std::move(f)(std::forward<Xs>(xs)...))
+            noexcept(noexcept( move(f)(forward<Xs>(xs)...) ))
+            -> decltype(move(f)(forward<Xs>(xs)...))
           {
-              return std::move(f)(std::forward<Xs>(xs)...);
+              return move(f)(forward<Xs>(xs)...);
           }
       };
 
@@ -84,12 +84,12 @@ namespace detail
           constexpr R operator()(Args... args)
           {
               /* Esentially does an move for values and rvalue reference, normal operation otherwise */
-              return f(std::forward<Args>(args)...);
+              return f(forward<Args>(args)...);
           }
           #endif
           constexpr R operator()(Args... args) const
           {
-              return f(std::forward<Args>(args)...);
+              return f(forward<Args>(args)...);
           }
       };
       template<typename R, typename... Args>
@@ -105,13 +105,13 @@ namespace detail
           constexpr R operator()(Args... args)
           {
               /* Esentially does an move for values and rvalue reference, normal operation otherwise */
-              return f(std::forward<Args>(args)...);
+              return f(forward<Args>(args)...);
           }
           #endif
 
           constexpr R operator()(Args... args) const
           {
-              return f(std::forward<Args>(args)...);
+              return f(forward<Args>(args)...);
           }
       };
 
@@ -126,26 +126,26 @@ namespace detail
           constexpr function_member_wrapper(type fct) : f(fct) {}
 
           template<typename U,
-                   std::enable_if_t<std::is_base_of<Clazz, std::decay_t<U>>::value
-                                 && std::is_convertible<decltype((std::declval<U>().*f)(std::declval<Args>()...)), R>::value, bool> = true>
+                   enable_if_t<is_base_of<Clazz, decay_t<U>>::value
+                                 && is_convertible<decltype((declval<U>().*f)(declval<Args>()...)), R>::value, bool> = true>
           constexpr R operator()(U&& obj, Args... args) const
           {
-             return (std::forward<U>(obj).*f)(std::forward<Args>(args)...);
+             return (forward<U>(obj).*f)(forward<Args>(args)...);
           }
 
           template<typename U,
-                   std::enable_if_t<std::is_convertible<decltype((std::declval<U&>().*f)(std::declval<Args>()...)), R>::value, bool> = true>
-          constexpr R operator()(std::reference_wrapper<U> ref, Args... args) const
+                   enable_if_t<is_convertible<decltype((declval<U&>().*f)(declval<Args>()...)), R>::value, bool> = true>
+          constexpr R operator()(reference_wrapper<U> ref, Args... args) const
           {
-             return (ref.get().*f)(std::forward<Args>(args)...);
+             return (ref.get().*f)(forward<Args>(args)...);
           }
 
           template<typename U,
-                   std::enable_if_t<!std::is_base_of<Clazz, std::decay_t<U>>::value
-                                 && std::is_convertible<decltype(((*std::declval<U>()).*f)(std::declval<Args>()...)), R>::value, bool> = true>
+                   enable_if_t<!is_base_of<Clazz, decay_t<U>>::value
+                                 && is_convertible<decltype(((*declval<U>()).*f)(declval<Args>()...)), R>::value, bool> = true>
           constexpr R operator()(U&& ptr, Args... args) const
           {
-             return ((*std::forward<U>(ptr)).*f)(std::forward<Args>(args)...);
+             return ((*forward<U>(ptr)).*f)(forward<Args>(args)...);
           }
 
       };
@@ -184,7 +184,7 @@ namespace detail
          Notice that both F and wrap_call<F> will be constructible from same object (prefect forwarding constructor) */
       template<typename F>
       struct overload_storage
-         : std::conditional<std::is_class<F>::value && !std::is_final<F>::value, F, wrap_call<F>>
+         : conditional<is_class<F>::value && !is_final<F>::value, F, wrap_call<F>>
       {};
 
       template<typename F>
@@ -201,7 +201,7 @@ namespace detail
       public:
           template<typename U1>
           constexpr explicit overloader(U1&& fct1)
-              : base1(std::forward<U1>(fct1))
+              : base1(forward<U1>(fct1))
           {}
 
           using base1::operator();
@@ -215,8 +215,8 @@ namespace detail
       public:
           template<typename U1, typename U2, typename ...Us>
           constexpr explicit overloader(U1&& fct1, U2&& fct2, Us&& ...fcts)
-              : base1(std::forward<U1>(fct1))
-              , bases(std::forward<U2>(fct2), std::forward<Us>(fcts)...)
+              : base1(forward<U1>(fct1))
+              , bases(forward<U2>(fct2), forward<Us>(fcts)...)
           {}
 
           using base1::operator();
@@ -230,21 +230,21 @@ namespace detail
         using overloader<Fs...>::operator();
 
         template <class ...OFs>
-        constexpr explicit_overloader(OFs&& ...fs) : overloader<Fs...>(std::forward<OFs>(fs)...) {}
+        constexpr explicit_overloader(OFs&& ...fs) : overloader<Fs...>(forward<OFs>(fs)...) {}
       };
 
 }
       template<typename F1, typename ...Fs>
       constexpr auto overload(F1&& f1, Fs&& ...fs)
       {
-          return detail::overloader<std::decay_t<F1>, std::decay_t<Fs>...>(std::forward<F1>(f1), std::forward<Fs>(fs)...);
+          return detail::overloader<decay_t<F1>, decay_t<Fs>...>(forward<F1>(f1), forward<Fs>(fs)...);
       }
 
       template <class R, class F1, class ... Fs>
       constexpr auto overload(F1 && f1, Fs &&... fcts)
       {
-        return detail::explicit_overloader<R, std::decay_t<F1>, std::decay_t<Fs>...>(
-          std::forward<F1>(f1), std::forward<Fs>(fcts)...);
+        return detail::explicit_overloader<R, decay_t<F1>, decay_t<Fs>...>(
+          forward<F1>(f1), forward<Fs>(fcts)...);
       }
 
 }}}

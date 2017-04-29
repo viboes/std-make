@@ -32,9 +32,21 @@ struct Y {
 struct final_function_object_const final {
   void operator ()(int arg) const { }
 };
-
+struct final_function_object_const2 final {
+  void operator ()(Y arg) const { }
+};
 struct final_function_object_non_const final {
   void operator ()(int arg) { }
+};
+
+struct YYYY {};
+struct Foo final
+{
+  void operator()(int i) const { std::cout << "Foo int: " << i << "\n"; }
+};
+struct Bar final
+{
+  void operator()(double) const { std::cout << "Bar int: " << "\n"; }
 };
 
 
@@ -102,6 +114,8 @@ int nonMember( float ) {
 int nonMember_throw( float ) {
   throw 1;;
 }
+struct XXXX {};
+void freefnx(XXXX x) {  std::cout <<"X\n"; }
 
 
 namespace cppljevans {
@@ -196,6 +210,8 @@ namespace cppljevans {
   };
 #endif
 }
+
+
 int main()
 {
   {
@@ -244,6 +260,14 @@ int main()
       return 1;
     }
     );
+    f(1);
+
+  }
+  {
+    final_function_object_const foo;
+    final_function_object_const2 bar;
+
+    auto f = overload(foo, bar);
     f(1);
 
   }
@@ -313,6 +337,28 @@ int main()
     );
     f(1);
 
+  }
+  {
+    function_without_state foo;
+
+    auto f = overload(foo,  // foo should be copied
+        [](std::string str) {
+      BOOST_TEST(false);
+    },
+    freefnx
+    );
+    f(XXXX());
+
+  }
+  {
+    auto ol = overload(
+        [](int i) { printf("int: %d\n", i); },
+        [](const char* s) { printf("cc*: %s\n", s); },
+        [](double d) { printf("double: %f\n", d); },
+        &freefnx
+      );
+    XXXX x;
+    ol(x);
   }
   {
     function_without_state foo;
@@ -696,6 +742,17 @@ int main()
   {
     BOOST_TEST(0 ==overload(function_with_cv_q{})(1));
   }
+#if 0
+  // This couldn't work :(
+  {
+    const auto ol = std::experimental::overload(
+          Foo()
+          , Bar()
+        );
+
+    ol(1234);
+  }
+#endif
   return boost::report_errors();
 }
 #else
