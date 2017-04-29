@@ -7,7 +7,6 @@
 
 #include <utility>
 #include <memory>
-#include <cassert>
 #include <chrono>
 #include <tuple>
 #include <typeinfo>
@@ -186,9 +185,9 @@ namespace std {
       class tuple_element<I, T [N] > { public: using type = T; };
 
 //    template <size_t I, class T, size_t N>
-//      constexpr T&& get(T v[N]>&&) noexcept {Êreturn c[I]; }
+//      constexpr T&& get(T v[N]>&&) noexcept {ï¿½return c[I]; }
 //    template <size_t I, class T, size_t N>
-//      constexpr const T& get(const T v[N]) noexcept {Êreturn c[I]; }
+//      constexpr const T& get(const T v[N]) noexcept {ï¿½return c[I]; }
 
 
 }
@@ -433,8 +432,8 @@ struct Derived
         int i;
         S() : i(0) {}
         S(int j) : i(j) {}
-        S * operator& () { assert(false); return this; }
-        S const * operator& () const { assert(false); return this; }
+        S * operator& () { BOOST_TEST(false); return this; }
+        S const * operator& () const { BOOST_TEST(false); return this; }
         bool operator==(int x) const { return i == x; }
         };
 
@@ -568,8 +567,8 @@ int main()
     energy e1{1.0};
     energy e2{1.0};
     energy e3 = e1 + e2;
-    assert(e3.get_value() == 2.0);
-    //assert(e3.value == 2.0); // value is protected
+    BOOST_TEST(e3.get_value() == 2.0);
+    //BOOST_TEST(e3.value == 2.0); // value is protected
 
   }
   {
@@ -595,8 +594,8 @@ int main()
 //      return {1, 2};
 //    };
 //    auto p = aPair();
-//    assert(p.first == 1);
-//    assert(p.second == 2);
+//    BOOST_TEST(p.first == 1);
+//    BOOST_TEST(p.second == 2);
 //
 //  }
   {
@@ -634,8 +633,8 @@ int main()
     X p;
     p.first=1;
     p.second= 2;
-    assert(p.first == 1);
-    assert(p.second == 2);
+    BOOST_TEST(p.first == 1);
+    BOOST_TEST(p.second == 2);
   }
 //  {
 //    auto p =(struct {
@@ -650,16 +649,16 @@ int main()
     } p;
     p.first=1;
     p.second= 2;
-    assert(p.first == 1);
-    assert(p.second == 2);
+    BOOST_TEST(p.first == 1);
+    BOOST_TEST(p.second == 2);
   }
   {
     struct {
         int first;
         int second;
     } p {1, 2};
-    assert(p.first == 1);
-    assert(p.second == 2);
+    BOOST_TEST(p.first == 1);
+    BOOST_TEST(p.second == 2);
   }
 //  {
 //    struct {
@@ -670,8 +669,8 @@ int main()
 //        int first;
 //        int second;
 //    } p (q);
-//    assert(p.first == 1);
-//    assert(p.second == 2);
+//    BOOST_TEST(p.first == 1);
+//    BOOST_TEST(p.second == 2);
 //  }
 //  {
 //    short p;
@@ -683,8 +682,8 @@ int main()
         double first;
         const char* second;
     } p {};
-    assert(p.first == 0.0f);
-    assert(p.second == nullptr);
+    BOOST_TEST(p.first == 0.0f);
+    BOOST_TEST(p.second == nullptr);
   }
   {
     struct {
@@ -692,8 +691,8 @@ int main()
         const char* second;
     } p, q{};
     p = q;
-    assert(p.first == 0.0f);
-    assert(p.second == nullptr);
+    BOOST_TEST(p.first == 0.0f);
+    BOOST_TEST(p.second == nullptr);
   }
   {
     struct {
@@ -701,8 +700,8 @@ int main()
         const char* second;
     } q{}, p(q);
     p = q;
-    assert(p.first == 0.0f);
-    assert(p.second == nullptr);
+    BOOST_TEST(p.first == 0.0f);
+    BOOST_TEST(p.second == nullptr);
   }
   {
     struct {
@@ -710,8 +709,8 @@ int main()
         std::unique_ptr<int> second;
     } p, q{};
     p = std::move(q);
-    assert(p.first == 0.0f);
-    assert(p.second == nullptr);
+    BOOST_TEST(p.first == 0.0f);
+    BOOST_TEST(p.second == nullptr);
   }
   {
     struct {
@@ -719,8 +718,8 @@ int main()
         std::unique_ptr<int> second;
     } q{}, p(std::move(q));
     p = std::move(q);
-    assert(p.first == 0.0f);
-    assert(p.second == nullptr);
+    BOOST_TEST(p.first == 0.0f);
+    BOOST_TEST(p.second == nullptr);
   }
 
   {
@@ -737,43 +736,43 @@ int main()
   {
   typedef pair<Im, Im> P;
   P p{1, 2};
-  assert(p.first.value == 1);
-  assert(p.second.value == 2);
+  BOOST_TEST(p.first.value == 1);
+  BOOST_TEST(p.second.value == 2);
   }
   {
     typedef pair<int, int> Q;
     Q q { 1, 2 };
     typedef pair<Im, Im> P;
     P p(q);
-    assert(p.first.value == 1);
-    assert(p.second.value == 2);
+    BOOST_TEST(p.first.value == 1);
+    BOOST_TEST(p.second.value == 2);
   }
 
 //  {
 //  typedef pair<Ex, Ex> P;
 //  P p{1, 2};
-//  assert(p.first.value == 1);
-//  assert(p.second.value == 2);
+//  BOOST_TEST(p.first.value == 1);
+//  BOOST_TEST(p.second.value == 2);
 //  }
 
   {
   //typedef pair<std::chrono::hours, std::chrono::minutes> P;
   //P p{1,2};
-  //assert(p.first == 0.0f);
-  //assert(p.second == nullptr);
+  //BOOST_TEST(p.first == 0.0f);
+  //BOOST_TEST(p.second == nullptr);
   }
 
   {
   typedef pair2<float, short*> P;
   P p;
-  assert(p.value.first == 0.0f);
-  assert(p.value.second == nullptr);
+  BOOST_TEST(p.value.first == 0.0f);
+  BOOST_TEST(p.value.second == nullptr);
   }
   {
   typedef pair<float, short*> P;
   P p{};
-  assert(p.first == 0.0f);
-  assert(p.second == nullptr);
+  BOOST_TEST(p.first == 0.0f);
+  BOOST_TEST(p.second == nullptr);
   }
 
   {
@@ -786,21 +785,21 @@ int main()
   {
       typedef pair<float, short*> P;
       P p{3.5f, 0};
-      assert(p.first == 3.5f);
-      assert(p.second == nullptr);
+      BOOST_TEST(p.first == 3.5f);
+      BOOST_TEST(p.second == nullptr);
   }
 
   {
       typedef pair<double, short*> P;
       P p{3.5f, 0};
-      assert(p.first == 3.5f);
-      assert(p.second == nullptr);
+      BOOST_TEST(p.first == 3.5f);
+      BOOST_TEST(p.second == nullptr);
   }
   {
       typedef pair<A, short> P;
       P p{1, 2};
-      assert(p.first == A(1));
-      assert(p.second == 2);
+      BOOST_TEST(p.first == A(1));
+      BOOST_TEST(p.second == 2);
   }
 
   {
@@ -821,16 +820,16 @@ int main()
       P1 p1{3, 4};
       //P2 p2 = p1;
       P1 p2 = p1;
-      assert(p2.first == 3);
-      assert(p2.second == 4);
+      BOOST_TEST(p2.first == 3);
+      BOOST_TEST(p2.second == 4);
   }
   {
       typedef pair<int, short> P1;
       //typedef pair<double, long> P2;
       P1 p2;
       p2 = {3, 4};
-      assert(p2.first == 3);
-      assert(p2.second == 4);
+      BOOST_TEST(p2.first == 3);
+      BOOST_TEST(p2.second == 4);
   }
 
   {
@@ -848,29 +847,29 @@ int main()
         typedef pair<int, short> P1;
         typedef pair<double, long> P2;
         //P1 p1(3, 4);
-        //erreur: no matching function for call to Ôpair<int, short int>::pair(int, int)Õ
+        //erreur: no matching function for call to ï¿½pair<int, short int>::pair(int, int)ï¿½
         //         P1 p1(3, 4);
         P1 p1{3, 4};
         //P1 p2;
         P2 p2;
         p2 = p1;
-        //erreur: no match for Ôoperator=Õ (operand types are ÔP2 {aka pair<double, long int>}Õ and ÔP1 {aka pair<int, short int>}Õ)
+        //erreur: no match for ï¿½operator=ï¿½ (operand types are ï¿½P2 {aka pair<double, long int>}ï¿½ and ï¿½P1 {aka pair<int, short int>}ï¿½)
         //         p2 = p1;
 
-        assert(p2.first == 3);
-        assert(p2.second == 4);
+        BOOST_TEST(p2.first == 3);
+        BOOST_TEST(p2.second == 4);
     }
     // assign_rv_pair
     {
         typedef pair<std::unique_ptr<int>, short> P;
         P p1{std::unique_ptr<int>(new int(3)), 4};
         //P p1(std::unique_ptr<int>(new int(3)), 4);
-        //erreur: no matching function for call to Ôpair<std::unique_ptr<int>, short int>::pair(std::unique_ptr<int>, int)Õ
+        //erreur: no matching function for call to ï¿½pair<std::unique_ptr<int>, short int>::pair(std::unique_ptr<int>, int)ï¿½
         //         P p1(std::unique_ptr<int>(new int(3)), 4);
         P p2;
         p2 = std::move(p1);
-        assert(*p2.first == 3);
-        assert(p2.second == 4);
+        BOOST_TEST(*p2.first == 3);
+        BOOST_TEST(p2.second == 4);
     }
     // assign_rv_pair_U_V
     {
@@ -878,23 +877,23 @@ int main()
         //typedef pair<std::unique_ptr<Base>, long> P2;
         P1 p1{std::unique_ptr<Derived>(), 4};
         //P1 p1(std::unique_ptr<Derived>(), 4);
-        //erreur: no matching function for call to Ôpair<std::unique_ptr<Derived>, short int>::pair(std::unique_ptr<Derived>, int)Õ
+        //erreur: no matching function for call to ï¿½pair<std::unique_ptr<Derived>, short int>::pair(std::unique_ptr<Derived>, int)ï¿½
         //         P1 p1(std::unique_ptr<Derived>(), 4);
         P1 p2;
         //P2 p2;
         p2 = std::move(p1);
-        //erreur: no match for Ôoperator=Õ (operand types are ÔP2 {aka pair<std::unique_ptr<Base>, long int>}Õ and Ôstd::remove_reference<pair<std::unique_ptr<Derived>, int>&>::type {aka pair<std::unique_ptr<Derived>, int>}Õ)
+        //erreur: no match for ï¿½operator=ï¿½ (operand types are ï¿½P2 {aka pair<std::unique_ptr<Base>, long int>}ï¿½ and ï¿½std::remove_reference<pair<std::unique_ptr<Derived>, int>&>::type {aka pair<std::unique_ptr<Derived>, int>}ï¿½)
         //         p2 = std::move(p1);
 
-        assert(p2.first == nullptr);
-        assert(p2.second == 4);
+        BOOST_TEST(p2.first == nullptr);
+        BOOST_TEST(p2.second == 4);
     }
 
     {
         typedef pair<std::unique_ptr<int>, short*> P;
         P p{std::unique_ptr<int>(new int(3)), nullptr};
-        assert(*p.first == 3);
-        assert(p.second == nullptr);
+        BOOST_TEST(*p.first == 3);
+        BOOST_TEST(p.second == nullptr);
     }
 
     {
@@ -902,20 +901,20 @@ int main()
         P1 p1{3, 4};
         P1 p2{5, 6};
         std::swap(p1,p2);
-        assert(p1.first == 5);
-        assert(p1.second == 6);
-        assert(p2.first == 3);
-        assert(p2.second == 4);
+        BOOST_TEST(p1.first == 5);
+        BOOST_TEST(p1.second == 6);
+        BOOST_TEST(p2.first == 3);
+        BOOST_TEST(p2.second == 4);
     }
     {
         typedef pair<int, S> P1;
         P1 p1{3, S(4)};
         P1 p2{5, S(6)};
         std::swap(p1,p2);
-        assert(p1.first == 5);
-        assert(p1.second == 6);
-        assert(p2.first == 3);
-        assert(p2.second == 4);
+        BOOST_TEST(p1.first == 5);
+        BOOST_TEST(p1.second == 6);
+        BOOST_TEST(p2.first == 3);
+        BOOST_TEST(p2.second == 4);
     }
 
     {
@@ -923,10 +922,10 @@ int main()
         typedef pair<int*, int> P2;
         typedef pair<P1, P2> P3;
         P3 p3{{3, nullptr}, {nullptr, 4}};
-        assert(p3.first.first == 3);
-        assert(p3.first.second == nullptr);
-        assert(p3.second.first == nullptr);
-        assert(p3.second.second == 4);
+        BOOST_TEST(p3.first.first == 3);
+        BOOST_TEST(p3.first.second == nullptr);
+        BOOST_TEST(p3.second.first == nullptr);
+        BOOST_TEST(p3.second.second == 4);
     }
     {
 //      auto st = &directory_entry::status;
@@ -940,18 +939,18 @@ int main()
     {
       N0::A a;
       using namespace N1;
-      assert(1==f(a));
+      BOOST_TEST(1==f(a));
     }
     {
       N2::A a;
       using namespace N0;
-      assert(0==f(a));
+      BOOST_TEST(0==f(a));
     }
     {
       N2::A a;
       using N0::f;
       //using namespace N1;
-      assert(0==f(a));
+      BOOST_TEST(0==f(a));
     }
     {
       N2::A a;
@@ -959,14 +958,14 @@ int main()
       //using namespace disable;
       using disable::f;
       //using namespace N1;
-      assert(2==f(a));
+      BOOST_TEST(2==f(a));
     }
     {
       N3::A a;
       //using N1::f;
       //using namespace N1;
       using namespace N2;
-      assert(3==f(a));
+      BOOST_TEST(3==f(a));
     }
     {
       static_assert(std::is_standard_layout<int>::value, "hrrr");
@@ -976,11 +975,11 @@ int main()
     }
     {
       XXX::XA as;
-      assert(as.get(XXX::B{}) == 0);
+      BOOST_TEST(as.get(XXX::B{}) == 0);
     }
     {
       //constexpr int v[3]= {1,2,3};
-      //assert(get<0>(v) == 1);
+      //BOOST_TEST(get<0>(v) == 1);
       static_assert(std::tuple_size<int [3]>::value == 3, "hehe");
       static_assert(std::is_same<std::tuple_element_t<1,int [3]>, int>::value, "hehe");
     }

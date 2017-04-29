@@ -12,7 +12,6 @@
 #include <iostream>
 #include <string>
 #include <vector>
-#include <cassert>
 
 #include <boost/detail/lightweight_test.hpp>
 

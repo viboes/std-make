@@ -7,7 +7,6 @@
 
 #include <experimental/strong_bool.hpp>
 #include <sstream>
-#include <cassert>
 
 #include <boost/detail/lightweight_test.hpp>
 

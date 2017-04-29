@@ -6,7 +6,6 @@
 #include <boost/detail/lightweight_test.hpp>
 
 #include <functional>
-#include <cassert>
 #include <iostream>
 
 #include <experimental/fundamental/v2/callable_wrapper.hpp>
@@ -96,49 +95,49 @@ int main() {
   using namespace std;
   namespace stde = std::experimental;
 
-    assert(f_fptr(fX) == 0);
+    BOOST_TEST(f_fptr(fX) == 0);
 
     X x;
-    assert(f_orig(x) == 0);
+    BOOST_TEST(f_orig(x) == 0);
 
     static_assert(is_same<typename result_of<X(int)>::type, int>::value, "");
-    assert(x(1) == 1);
+    BOOST_TEST(x(1) == 1);
 
     stde::callable_wrapper<X, typename result_of<X(int)>::type(int)>c {x};
-    assert(c(1) == 1);
-    assert(f_aux(c) == 0);
-    assert(f(x) == 0);
-    assert(f(c) == 0);
-    assert(f(fX) == 0);
+    BOOST_TEST(c(1) == 1);
+    BOOST_TEST(f_aux(c) == 0);
+    BOOST_TEST(f(x) == 0);
+    BOOST_TEST(f(c) == 0);
+    BOOST_TEST(f(fX) == 0);
 
     {
     static_assert(is_optional<typename result_of<XO(int)>::type>::value, "");
     XO xo;
     stde::optional<int> o{1};
-    assert(*mbind(o, xo) == 1);
-    assert(*mbind(o, fXo) == 2);
+    BOOST_TEST(*mbind(o, xo) == 1);
+    BOOST_TEST(*mbind(o, fXo) == 2);
     }
     {
     stde::optional<int> o;
-    assert(mbind(o, fXo) == stde::nullopt);
+    BOOST_TEST(mbind(o, fXo) == stde::nullopt);
     }
     {
     stde::optional<int> o{1};
-    assert(*fmap(x, o) == 1);
-    assert(*fmap(fX, o) == 2);
+    BOOST_TEST(*fmap(x, o) == 1);
+    BOOST_TEST(*fmap(fX, o) == 2);
     }
     {
     stde::optional<short> o{1};
-    assert(*fmap(x, o) == 2);
+    BOOST_TEST(*fmap(x, o) == 2);
     }
     {
     const X xc;
     stde::optional<short> o{1};
-    assert(*fmap(xc, o) == 2);
+    BOOST_TEST(*fmap(xc, o) == 2);
     }
     {
     stde::optional<int> o;
-    assert(fmap(x, o) == stde::nullopt);
+    BOOST_TEST(fmap(x, o) == stde::nullopt);
     }
 
 

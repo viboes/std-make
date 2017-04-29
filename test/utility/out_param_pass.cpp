@@ -27,7 +27,7 @@ int main()
   {
     std::string s;
     assign(stdex::out(s), "value");
-    assert (s == "value");
+    BOOST_TEST (s == "value");
   }
 
   return ::boost::report_errors();
