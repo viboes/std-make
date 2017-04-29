@@ -261,16 +261,16 @@ int main()
   }
   {
     using Bool = stdex::boolean;
-    assert(stdex::ordinal::size<Bool>() == 2);
-    assert(stdex::ordinal::traits<Bool>::pos(Bool{false}) == 0);
-    assert(stdex::ordinal::pos(Bool{false}) == 0);
-    assert(stdex::ordinal::pos(Bool{true}) == 1);
-    assert(stdex::ordinal::val<Bool>(0) == Bool{false});
-    assert(stdex::ordinal::val<Bool>(1) == Bool{true});
-    assert(stdex::ordinal::first<Bool>() == Bool{false});
-    assert(stdex::ordinal::last<Bool>() == Bool{true});
-    assert(stdex::ordinal::succ(Bool{false}) == Bool{true});
-    assert(stdex::ordinal::pred(Bool{true}) == Bool{false});
+    BOOST_TEST(stdex::ordinal::size<Bool>() == 2);
+    BOOST_TEST(stdex::ordinal::traits<Bool>::pos(Bool{false}) == 0);
+    BOOST_TEST(stdex::ordinal::pos(Bool{false}) == 0);
+    BOOST_TEST(stdex::ordinal::pos(Bool{true}) == 1);
+    BOOST_TEST(stdex::ordinal::val<Bool>(0) == Bool{false});
+    BOOST_TEST(stdex::ordinal::val<Bool>(1) == Bool{true});
+    BOOST_TEST(stdex::ordinal::first<Bool>() == Bool{false});
+    BOOST_TEST(stdex::ordinal::last<Bool>() == Bool{true});
+    BOOST_TEST(stdex::ordinal::succ(Bool{false}) == Bool{true});
+    BOOST_TEST(stdex::ordinal::pred(Bool{true}) == Bool{false});
   }
   {
     //stdex::boolean b{&S::foo}; // this fails as expected

@@ -252,16 +252,16 @@ int main()
   }
   {
     using Bounded = Slot;
-    assert(stdex::ordinal::size<Bounded>() == 7);
-    assert(stdex::ordinal::traits<Bounded>::pos(Bounded{0}) == 0);
-    assert(stdex::ordinal::pos(Bounded{4}) == 4);
-    assert(stdex::ordinal::pos(Bounded{1}) == 1);
-    assert(stdex::ordinal::val<Bounded>(0) == Bounded{0});
-    assert(stdex::ordinal::val<Bounded>(1) == Bounded{1});
-    assert(stdex::ordinal::first<Bounded>() == Bounded{0});
-    assert(stdex::ordinal::last<Bounded>() == Bounded{6});
-    assert(stdex::ordinal::succ(Bounded{2}) == Bounded{3});
-    assert(stdex::ordinal::pred(Bounded{3}) == Bounded{2});
+    BOOST_TEST(stdex::ordinal::size<Bounded>() == 7);
+    BOOST_TEST(stdex::ordinal::traits<Bounded>::pos(Bounded{0}) == 0);
+    BOOST_TEST(stdex::ordinal::pos(Bounded{4}) == 4);
+    BOOST_TEST(stdex::ordinal::pos(Bounded{1}) == 1);
+    BOOST_TEST(stdex::ordinal::val<Bounded>(0) == Bounded{0});
+    BOOST_TEST(stdex::ordinal::val<Bounded>(1) == Bounded{1});
+    BOOST_TEST(stdex::ordinal::first<Bounded>() == Bounded{0});
+    BOOST_TEST(stdex::ordinal::last<Bounded>() == Bounded{6});
+    BOOST_TEST(stdex::ordinal::succ(Bounded{2}) == Bounded{3});
+    BOOST_TEST(stdex::ordinal::pred(Bounded{3}) == Bounded{2});
   }
   return ::boost::report_errors();
 }
