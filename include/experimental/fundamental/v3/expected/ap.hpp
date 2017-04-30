@@ -39,7 +39,6 @@ namespace expected_helpers
   // && is_type_constructible_v<decay_t<N>>
   //>
   >
-  //expected<int>
   auto
   ap(F&& f, N&& n)
   -> decltype(meta::rebind_t<decay_t<N>, decltype(
