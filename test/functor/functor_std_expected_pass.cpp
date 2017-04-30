@@ -48,17 +48,32 @@ int main()
     x = 2;
     BOOST_TEST(*x == 2);
   }
-  // fixme should transform be const? How the move can be done then? Or should expected don't do a move?
-#if 0
   {
     int v=1;
     const stde::expected<int> x = stde::make_expected(v);
     BOOST_TEST(*x == 1);
 
+    stde::expected<int> y = x.map(twice);
+    BOOST_TEST(*y == 2);
+  }
+  {
+    int v=1;
+    const stde::expected<int> x = stde::make_expected(v);
+    BOOST_TEST(*x == 1);
+
+
     stde::expected<int> y = stde::functor::transform(x, twice);
     BOOST_TEST(*y == 2);
   }
-#endif
+  {
+    int v=1;
+    const stde::expected<int> x = stde::make_expected(v);
+    BOOST_TEST(*x == 1);
+
+    stde::expected<int> y = stde::functor::map(twice, x);
+    BOOST_TEST(*y == 2);
+  }
+  // fixme should transform be const? How the move can be done then? Or should expected don't do a move?
 #if defined __clang__ && __clang_major__ >= 4 && __cplusplus > 201402L
   {
     auto x = stde::make_expected<const int>(1);

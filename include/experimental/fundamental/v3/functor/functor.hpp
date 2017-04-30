@@ -66,7 +66,7 @@ namespace functor
    auto
      map(F&& f, T&& x)
         JASEL_DECLTYPE_RETURN_NOEXCEPT(
-            functor::transform(forward<F>(f), forward<T>(x))
+            functor::transform(forward<T>(x), forward<F>(f))
         )
 }
 

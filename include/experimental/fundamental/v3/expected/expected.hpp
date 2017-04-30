@@ -1715,13 +1715,13 @@ public:
 
   template <typename F>
   typename rebind<void>::type
-  catch_all_type_void(F&& f)
+  catch_all_type_void(F&& f) const
   {
     typedef typename rebind<void>::type result_type;
 #if defined JASEL_CATCH_EXCEPTIONS
     try {
 #endif
-      f(move(**this));
+      f(**this);
       return result_type(in_place);
 #if defined JASEL_CATCH_EXCEPTIONS
     } catch (...) {
@@ -1732,12 +1732,12 @@ public:
 
   template <typename F>
   typename result_of<F(value_type)>::type
-  catch_all_type_type(F&& f)
+  catch_all_type_type(F&& f) const
   {
 #if defined JASEL_CATCH_EXCEPTIONS
     try {
 #endif
-      return f(move(**this));
+      return f(**this);
 #if defined JASEL_CATCH_EXCEPTIONS
     } catch (...) {
       return make_unexpected(error_traits<error_type>::make_error_from_current_exception());
@@ -1746,13 +1746,13 @@ public:
   }
   template <typename F>
   typename rebind<typename result_of<F(value_type)>::type>::type
-  catch_all_type_etype(F&& f)
+  catch_all_type_etype(F&& f) const
   {
 #if defined JASEL_CATCH_EXCEPTIONS
     //typedef typename rebind<typename result_of<F(value_type)>::type>::type result_type;
     try {
 #endif
-      return f(move(**this));
+      return f(**this);
 #if defined JASEL_CATCH_EXCEPTIONS
     } catch (...) {
       return make_unexpected(error_traits<error_type>::make_error_from_current_exception());
@@ -1812,6 +1812,7 @@ public:
   typename rebind<void>::type
   map(F&& f,
     JASEL_REQUIRES(is_same<typename result_of<F(value_type)>::type, void>::value))
+  const
   {
 #if ! defined BOOST_NO_CXX14_CONSTEXPR
     if(valid())
@@ -1832,6 +1833,7 @@ public:
   typename rebind<typename result_of<F(value_type)>::type>::type
   map(F&& f,
     JASEL_REQUIRES(!is_same<typename result_of<F(value_type)>::type, void>::value))
+  const
   {
 #if ! defined BOOST_NO_CXX14_CONSTEXPR
     if(valid())
@@ -2445,6 +2447,7 @@ public:
   typename rebind<typename result_of<F(value_type)>::type>::type
   map(F&& f,
     JASEL_REQUIRES(!is_same<typename result_of<F(value_type)>::type, void>::value))
+  const
   {
 #if ! defined BOOST_NO_CXX14_CONSTEXPR
     if(valid())
