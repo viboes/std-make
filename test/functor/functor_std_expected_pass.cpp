@@ -17,15 +17,23 @@ int twice(int i) {
 
 int main()
 {
-#if __cplusplus >= 201402L
   namespace stde = std::experimental;
 
-  static_assert(stde::is_type_constructible_v<stde::expected<int>>, "ERROR");
+  static_assert(stde::is_type_constructible<stde::expected<int>>::value, "ERROR");
   static_assert(std::is_base_of<stde::functor::tag, stde::functor::traits<stde::expected<stde::_t>>> ::value, "ERROR");
   static_assert(stde::is_functor<stde::expected<stde::_t>>::value, "ERROR");
 
+  std::error_code ec = std::make_error_code(std::errc(1));
+
   {
-    stde::expected<int> x = stde::make_unexpected(1);
+    stde::exception_or<int> x = stde::make_unexpected(1);
+    BOOST_TEST(! x);
+
+    stde::exception_or<int> y = stde::functor::transform(x, twice);
+    BOOST_TEST(! y);
+  }
+  {
+    stde::expected<int> x = stde::make_unexpected(ec);
     BOOST_TEST(! x);
 
     stde::expected<int> y = stde::functor::transform(x, twice);
@@ -35,7 +43,6 @@ int main()
     int v=1;
     stde::expected<int> x = stde::make_expected(v);
     BOOST_TEST(*x == 1);
-    //stde::expected<int> y = x.map(twice);
     stde::expected<int> y = stde::functor::transform(x, twice);
     BOOST_TEST(*y == 2);
     x = 2;
@@ -51,7 +58,6 @@ int main()
     stde::expected<int> y = stde::functor::transform(x, twice);
     BOOST_TEST(*y == 2);
   }
-#endif
 #endif
 
   return ::boost::report_errors();

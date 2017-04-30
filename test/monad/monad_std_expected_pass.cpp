@@ -11,21 +11,25 @@
 #include <boost/detail/lightweight_test.hpp>
 
 std::experimental::expected<int> twice(int i) {
-  if (i==0) return std::experimental::make_unexpected(1);
+  if (i==0)
+  {
+    std::error_code ec = std::make_error_code(std::errc(1));
+    return std::experimental::make_unexpected(ec);
+  }
   return std::experimental::make_expected(2*i);
 }
 
 int main()
 {
-#if __cplusplus >= 201402L
   namespace stde = std::experimental;
 
-  static_assert(stde::is_type_constructible_v<stde::expected<int>>, "ERROR");
+  static_assert(stde::is_type_constructible<stde::expected<int>>::value, "ERROR");
   static_assert(std::is_base_of<stde::monad::tag, stde::monad::traits<stde::expected<stde::_t>>> ::value, "ERROR");
   static_assert(stde::is_monad<stde::expected<stde::_t>>::value, "ERROR");
 
   {
-    stde::expected<int> x = stde::make_unexpected(1);
+    std::error_code ec = std::make_error_code(std::errc(1));
+    stde::expected<int> x = stde::make_unexpected(ec);
     stde::expected<int> y = stde::monad::bind(x,twice);
     BOOST_TEST(! y);
   }
@@ -42,7 +46,6 @@ int main()
     stde::expected<int> y = stde::monad::bind(x,twice);
     BOOST_TEST(! y);
   }
-#endif
 
   return ::boost::report_errors();
 }

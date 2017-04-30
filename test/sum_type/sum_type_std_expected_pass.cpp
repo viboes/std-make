@@ -21,23 +21,26 @@ int main()
 int main()
 {
   namespace stde = std::experimental;
-  using error_t = stde::unexpected_type<std::exception_ptr>;
-  auto error = stde::unexpected_type<std::exception_ptr>(1);
+  using error_t = stde::unexpected_type<std::error_code>;
+  auto error = stde::unexpected_type<std::error_code>(std::make_error_code(std::errc(1)));
 
   static_assert(stde::is_sum_type<stde::expected<int>>::value, "ERROR");
   static_assert(std::is_same<stde::sum_type::alternative_t<0,stde::expected<int>>, int>::value, "ERROR");
   static_assert(std::is_same<stde::sum_type::alternative_t<1,stde::expected<int>>, error_t>::value, "ERROR");
   static_assert(2 == stde::sum_type::size<stde::expected<int>>::value, "ERROR");
 
+  std::error_code ec = std::make_error_code(std::errc(1));
+
   {
-    stde::expected<int> o = stde::make_unexpected(1);
+    stde::expected<int> o = stde::make_unexpected(ec);
     auto v = stde::overload<bool>([](error_t){ return true;}, [](int){ return false;});
     BOOST_TEST( true == v(error));
     BOOST_TEST( true == stde::sum_type::traits<stde::expected<int>>::visit(v, o));
     BOOST_TEST( true == stde::sum_type::match<bool>(o, [](error_t){ return true;}, [](int){ return false;}));
   }
   {
-    stde::expected<int> o1= stde::make_unexpected(1), o2= stde::make_unexpected(1);
+    stde::expected<int> o1= stde::make_unexpected(ec);
+    stde::expected<int> o2= stde::make_unexpected(ec);
 
     auto v = stde::overload(
         [](error_t, error_t){ return true;},

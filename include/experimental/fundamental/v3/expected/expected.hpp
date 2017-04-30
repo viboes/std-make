@@ -7,11 +7,9 @@
 // todo
 // * add noexcept
 // * fix never empty implementation
-// * remove exception_ptr
 // * adapt to std::optional (c++17)
-
-// pod::expected?
-// expected_view?
+// * pod::expected?
+// * expected_view?
 
 
 #ifndef JASEL_EXPERIMENTAL_V3_EXPECTED_EXPECTED_HPP
@@ -25,17 +23,6 @@
 #include <experimental/fundamental/v3/expected/bad_expected_access.hpp>
 #include <experimental/fundamental/v3/in_place.hpp>
 #include <experimental/type_constructible.hpp>
-
-#ifdef JASEL_EXPERIMENTAL_V3_EXPECTED_USE_BOOST_HPP
-#include <boost/exception_ptr.hpp>
-#include <boost/move/move.hpp>
-#include <boost/throw_exception.hpp>
-#include <boost/type_traits.hpp>
-#include <boost/utility/enable_if.hpp>
-#include <boost/utility/result_of.hpp>
-#include <boost/utility/swap.hpp>
-#include <boost/static_assert.hpp>
-#endif
 
 #include <stdexcept>
 #include <utility>
@@ -1213,7 +1200,7 @@ template <typename T, typename E, bool AreCopyConstructible, bool AreMoveConstru
 } // namespace detail
 
 struct holder;
-template <typename ValueType=holder, typename ErrorType=exception_ptr>
+template <typename ValueType=holder, typename ErrorType=error_code>
 class expected;
 
 namespace expected_detail
@@ -1308,11 +1295,6 @@ private:
   value_type& contained_val() { return base_type::storage.val(); }
   BOOST_CONSTEXPR const error_type& contained_err() const { return base_type::storage.err(); }
   error_type& contained_err() { return base_type::storage.err(); }
-#endif
-
-#ifdef JASEL_EXPECTED_USE_BOOST_HPP
-  // C++03 movable support
-  BOOST_COPYABLE_AND_MOVABLE(this_type)
 #endif
 
 public:
@@ -2137,11 +2119,6 @@ private:
   error_type& contained_err() { return base_type::storage.err(); }
 #endif
 
-#ifdef JASEL_EXPECTED_USE_BOOST_HPP
-  // C++03 movable support
-  BOOST_COPYABLE_AND_MOVABLE(this_type)
-#endif
-
 public:
 
   // Using a template alias here causes an ICE in VS2013 and VS14 CTP 3
@@ -2884,12 +2861,23 @@ void swap(expected<T,E>& x, expected<T,E>& y) BOOST_NOEXCEPT_IF(BOOST_NOEXCEPT_E
 // Factories
 
 template <typename T>
-BOOST_CONSTEXPR expected<typename decay<T>::type, exception_ptr> make_expected(T&& v)
+BOOST_CONSTEXPR expected<typename decay<T>::type, error_code> make_expected(T&& v)
 {
-  return expected<typename decay<T>::type, exception_ptr>(constexpr_forward<T>(v));
+  return expected<typename decay<T>::type, error_code>(constexpr_forward<T>(v));
 }
 
-BOOST_FORCEINLINE expected<void, exception_ptr> make_expected()
+BOOST_FORCEINLINE expected<void, error_code> make_expected()
+{
+  return expected<void, error_code>(in_place);
+}
+
+template <typename T>
+BOOST_CONSTEXPR exception_or<typename decay<T>::type> make_exception_or(T&& v)
+{
+  return exception_or<typename decay<T>::type>(constexpr_forward<T>(v));
+}
+
+BOOST_FORCEINLINE exception_or<void> make_exception_or()
 {
   return expected<void, exception_ptr>(in_place);
 }
@@ -2903,13 +2891,13 @@ BOOST_FORCEINLINE expected<T, exception_ptr> make_expected_from_current_exceptio
 template <typename T>
 BOOST_FORCEINLINE expected<T, exception_ptr> make_expected_from_exception(exception_ptr e) BOOST_NOEXCEPT
 {
-  return expected<T, exception_ptr>(unexpected_type<>(e));
+  return expected<T, exception_ptr>(unexpected_type<exception_ptr>(e));
 }
 
 template <class T, class E>
 BOOST_FORCEINLINE expected<T, exception_ptr> make_expected_from_exception(E&& e) BOOST_NOEXCEPT
 {
-  return expected<T, exception_ptr>(unexpected_type<>(constexpr_forward<E>(e)));
+  return expected<T, exception_ptr>(unexpected_type<exception_ptr>(constexpr_forward<E>(e)));
 }
 
 template <class T, class E>
@@ -2934,7 +2922,7 @@ BOOST_FORCEINLINE make_expected_from_call(F funct
 {
   try
   {
-    return make_expected(funct());
+    return make_exception_or(funct());
   }
   catch (...)
   {
@@ -2951,7 +2939,7 @@ make_expected_from_call(F funct
   try
   {
     funct();
-    return make_expected();
+    return make_exception_or();
   }
   catch (...)
   {

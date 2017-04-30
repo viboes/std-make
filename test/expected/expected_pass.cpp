@@ -238,7 +238,7 @@ void expected_from_in_place_value()
 void expected_from_exception()
 {
   // From stde::unexpected_type constructor.
-  stde::expected<int> e(stde::make_unexpected(test_exception()));
+  stde::exception_or<int> e(stde::make_unexpected(test_exception()));
   BOOST_TEST_THROWS(e.value(), test_exception);
   BOOST_TEST_EQ(e.valid(), false);
   BOOST_TEST_EQ(static_cast<bool>(e), false);
@@ -259,8 +259,8 @@ void expected_from_copy_value()
 void expected_from_copy_exception()
 {
   // From stde::unexpected_type constructor.
-  stde::expected<int> ef(stde::make_unexpected(test_exception()));
-  stde::expected<int> e(ef);
+  stde::exception_or<int> ef(stde::make_unexpected(test_exception()));
+  stde::exception_or<int> e(ef);
   BOOST_TEST_THROWS(e.value(), test_exception);
   BOOST_TEST_EQ(e.valid(), false);
   BOOST_TEST_EQ(static_cast<bool>(e), false);
@@ -280,7 +280,7 @@ void expected_from_in_place()
 void expected_from_exception_ptr()
 {
   // From exception_ptr constructor.
-  stde::expected<int> e(stde::make_unexpected(std::make_exception_ptr(test_exception())));
+  stde::exception_or<int> e(stde::make_unexpected(std::make_exception_ptr(test_exception())));
   BOOST_TEST_THROWS(e.value(), test_exception);
   BOOST_TEST_EQ(e.valid(), false);
   BOOST_TEST_EQ(static_cast<bool>(e), false);
@@ -307,7 +307,7 @@ void expected_from_catch_block()
   }
   catch(...)
   {
-    stde::expected<int> e(stde::make_unexpected(std::current_exception()));
+    stde::exception_or<int> e(stde::make_unexpected(std::current_exception()));
 
     BOOST_TEST_THROWS(e.value(), std::exception);
     BOOST_TEST_EQ(e.valid(), false);
@@ -487,7 +487,7 @@ void expected_from_exception_catch()
   }
   catch(...)
   {
-    stde::expected<int> e = stde::make_unexpected(std::current_exception());
+    stde::exception_or<int> e = stde::make_unexpected(std::current_exception());
 
     BOOST_TEST_THROWS(e.value(), std::exception);
     BOOST_TEST_EQ(e.valid(), false);
@@ -534,7 +534,7 @@ void expected_from_exception2()
 void expected_from_exception_ptr2()
 {
   // From exception_ptr constructor.
-  auto e = stde::expected<int>(stde::make_unexpected(test_exception()));
+  auto e = stde::exception_or<int>(stde::make_unexpected(test_exception()));
   BOOST_TEST_THROWS(e.value(), test_exception);
   BOOST_TEST_EQ(e.valid(), false);
   BOOST_TEST_EQ(static_cast<bool>(e), false);
@@ -549,7 +549,7 @@ void make_expected_from_call_fun()
   {
     BOOST_TEST(false);
   }
-  stde::expected<int> e = stde::make_expected_from_call(throwing_fun);
+  stde::exception_or<int> e = stde::make_expected_from_call(throwing_fun);
   BOOST_TEST_THROWS(e.value(), std::exception);
   BOOST_TEST_EQ(e.valid(), false);
   BOOST_TEST_EQ(static_cast<bool>(e), false);
@@ -637,8 +637,8 @@ void expected_swap_value()
 void expected_swap_exception()
 {
   // From value constructor.
-  stde::expected<int> e = stde::make_unexpected(std::invalid_argument("e"));
-  stde::expected<int> e2 = stde::make_unexpected(std::invalid_argument("e2"));
+  stde::exception_or<int> e = stde::make_unexpected(std::invalid_argument("e"));
+  stde::exception_or<int> e2 = stde::make_unexpected(std::invalid_argument("e2"));
 
   e.swap(e2);
 
@@ -704,15 +704,19 @@ int main()
 
   static_assert(! std::is_copy_constructible<NoCopyConstructible>::value, "");
   static_assert(! std::is_constructible<stde::expected<NoCopyConstructible>, NoCopyConstructible const& >::value, "");
-  static_assert(! std::is_constructible<stde::expected<NoCopyConstructible>, stde::expected<NoCopyConstructible> const& >::value, "");
-  static_assert(! std::is_copy_constructible<stde::expected<NoCopyConstructible>>::value, "");
+  static_assert(! std::is_constructible<stde::exception_or<NoCopyConstructible>, stde::exception_or<NoCopyConstructible> const& >::value, "");
+  static_assert(! std::is_copy_constructible<stde::exception_or<NoCopyConstructible>>::value, "");
 
+#if 0
+  //fixme
   {
     NoMoveConstructible nmc;
     //NoMoveConstructible nmc2 = std::move(nmc); // FAILS as expected
 
     stde::expected<NoMoveConstructible> x = std::move(nmc); // DOESN'T FAIL as copy is selected instead
+    (void)x;
   }
+#endif
   static_assert(! std::is_move_constructible<NoMoveConstructible>::value, "");
   static_assert( std::is_constructible<stde::expected<NoMoveConstructible>, NoMoveConstructible && >::value, "");
   static_assert( std::is_move_constructible<stde::expected<NoMoveConstructible>>::value, "");

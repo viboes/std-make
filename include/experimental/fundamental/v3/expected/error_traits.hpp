@@ -63,13 +63,11 @@ inline namespace fundamental_v3
   struct error_traits<error_code>
   {
     template <class Exception>
-    static error_code make_error(system_error const&e)
+    static error_code make_error(Exception const& e)
     {
-      return e.code();
+      return error_code{e};
     }
-    template <class Exception>
-    // requires is_base_of<system_error, Exception>
-    static error_code make_error(Exception const&e)
+    static error_code make_error(system_error const&e)
     {
       return e.code();
     }

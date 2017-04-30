@@ -5,7 +5,6 @@
 // (See accompanying file // LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 //////////////////////////////////////////////////////////////////////////////
-#if __cplusplus >= 201402L
 
 #ifndef JASEL_FUNDAMENTAL_V3_EXPECTED_AP_HPP
 #define JASEL_FUNDAMENTAL_V3_EXPECTED_AP_HPP
@@ -69,17 +68,16 @@ struct traits<expected<T,E>> : applicative::tag
 {
   template <class Expected, class F>
     static auto ap(F&& f, Expected&& x)
-    {
-      return expected_helpers::ap(forward<F>(f), forward<Expected>(x));
-    }
+      JASEL_DECLTYPE_RETURN_NOEXCEPT(
+        expected_helpers::ap(forward<F>(f), forward<Expected>(x))
+      )
   template <class Expected, class U>
     static auto pure(U&& x)
-    {
-      return make<Expected>(forward<U>(x));
-    }
+      JASEL_DECLTYPE_RETURN_NOEXCEPT(
+        make<Expected>(forward<U>(x))
+      )
 };
 }
 }}
 }
 #endif // header
-#endif

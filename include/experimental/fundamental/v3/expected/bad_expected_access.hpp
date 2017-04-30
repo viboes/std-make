@@ -14,6 +14,7 @@ namespace experimental
 {
 inline namespace fundamental_v3
 {
+  // bad_expected_access base exception class.
   class bad_expected_access_base : public std::logic_error
   {
   public:
@@ -21,6 +22,7 @@ inline namespace fundamental_v3
     : std::logic_error(msg)
     {}
   };
+
   // bad_expected_access exception class.
   template <class Error>
   class bad_expected_access : public bad_expected_access_base

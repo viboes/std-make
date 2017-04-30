@@ -5,7 +5,7 @@
 // (See accompanying file // LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 //////////////////////////////////////////////////////////////////////////////
-#if __cplusplus >= 201402L
+#if __cplusplus >= 201002L
 
 #ifndef JASEL_FUNDAMENTAL_V3_EXPECTED_BIND_HPP
 #define JASEL_FUNDAMENTAL_V3_EXPECTED_BIND_HPP
@@ -32,9 +32,9 @@ struct traits<expected<T,E>> : monad::tag
 {
   template <class M, class F>
     static constexpr auto bind(M&& x, F&& f)
-    {
-      return x.bind(forward<F>(f));
-    }
+      JASEL_DECLTYPE_RETURN_NOEXCEPT(
+        x.bind(forward<F>(f))
+      )
 };
 }
 }}

@@ -10,14 +10,10 @@
 #include <experimental/fundamental/v3/config/requires.hpp>
 #include <experimental/utility.hpp>
 
-#ifdef JASEL_EXPECTED_USE_BOOST_HPP
-#include <boost/exception_ptr.hpp>
-//#include <boost/type_traits.hpp>
-#endif
-
 #include <exception>
 #include <utility>
 #include <type_traits>
+#include <system_error>
 
 namespace std
 {
@@ -26,7 +22,7 @@ namespace experimental
 inline namespace fundamental_v3
 {
 
-  template <typename ErrorType = exception_ptr>
+  template <typename ErrorType = error_code>
   class unexpected_type
   {
     ErrorType error_;
@@ -78,36 +74,6 @@ inline namespace fundamental_v3
   {
     return unexpected_type<typename decay<E>::type> (forward<E>(ex));
   }
-
-#ifdef JASEL_EXPECTED_USE_BOOST_HPP
-  template <>
-  struct unexpected_type<boost::exception_ptr>
-  {
-    boost::exception_ptr error_;
-  public:
-    unexpected_type() = delete;
-
-    BOOST_FORCEINLINE explicit unexpected_type(boost::exception_ptr const& e) :
-      error_(e)
-    {
-    }
-    BOOST_FORCEINLINE explicit unexpected_type(boost::exception_ptr&& e) :
-      error_(move(e))
-    {
-    }
-
-    template <class E>
-    BOOST_FORCEINLINE explicit unexpected_type(E e) :
-      error_(boost::copy_exception(e))
-    {
-    }
-
-    BOOST_FORCEINLINE boost::exception_ptr const& value() const
-    {
-      return error_;
-    }
-  };
-#endif
 
   template <>
   struct unexpected_type<exception_ptr>
@@ -188,25 +154,6 @@ inline namespace fundamental_v3
   {
     return x==y;
   }
-
-#ifdef JASEL_EXPECTED_USE_BOOST_HPP
-  inline BOOST_CONSTEXPR bool operator<(const unexpected_type<boost::exception_ptr>& x, const unexpected_type<boost::exception_ptr>& y)
-  {
-    return false;
-  }
-  inline BOOST_CONSTEXPR bool operator>(const unexpected_type<boost::exception_ptr>& x, const unexpected_type<boost::exception_ptr>& y)
-  {
-    return false;
-  }
-  inline BOOST_CONSTEXPR bool operator<=(const unexpected_type<boost::exception_ptr>& x, const unexpected_type<boost::exception_ptr>& y)
-  {
-    return x==y;
-  }
-  inline BOOST_CONSTEXPR bool operator>=(const unexpected_type<boost::exception_ptr>& x, const unexpected_type<boost::exception_ptr>& y)
-  {
-    return x==y;
-  }
-#endif
 
   template <typename E>
   struct is_unexpected : false_type {};

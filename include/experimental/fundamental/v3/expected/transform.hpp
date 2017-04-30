@@ -5,7 +5,6 @@
 // (See accompanying file // LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 //////////////////////////////////////////////////////////////////////////////
-#if __cplusplus >= 201402L
 
 #ifndef JASEL_FUNDAMENTAL_V3_EXPECTED_TRANSFORM_HPP
 #define JASEL_FUNDAMENTAL_V3_EXPECTED_TRANSFORM_HPP
@@ -25,7 +24,6 @@ namespace experimental
 {
 inline  namespace fundamental_v3
 {
-
 namespace functor
 {
   template <class T, class E>
@@ -33,13 +31,12 @@ namespace functor
   {
     template <class Expected, class F>
       static constexpr auto transform(Expected&& x, F&& f)
-      {
-        return x.map(forward<F>(f));
-      }
+        JASEL_DECLTYPE_RETURN_NOEXCEPT(
+          x.map(forward<F>(f))
+        )
   };
 }
 
 }}
 }
 #endif // header
-#endif
