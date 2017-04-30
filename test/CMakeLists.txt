@@ -204,7 +204,7 @@ jasel_add_tests(
     strict_bool_pass
     strong_bool_pass
     strong_bounded_int_pass
-    #strong_counter_pass
+    #strong_counter_pass # #369
     #strong_enums_pass
     strong_id_pass
     strong_ints_pass
