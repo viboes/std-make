@@ -18,11 +18,10 @@ int twice(int i) {
 
 int main()
 {
-#if __cplusplus >= 201402L
   namespace stde = std::experimental;
 
-  static_assert(stde::is_nullable_v<std::shared_ptr<int>>, "ERROR");
-  static_assert(stde::is_type_constructible_v<std::shared_ptr<int>>, "ERROR");
+  static_assert(stde::is_nullable<std::shared_ptr<int>>::value, "ERROR");
+  static_assert(stde::is_type_constructible<std::shared_ptr<int>>::value, "ERROR");
   static_assert(std::is_base_of<stde::functor::tag, stde::functor::traits<std::shared_ptr<stde::_t>>> ::value, "ERROR");
   static_assert(stde::is_functor<std::shared_ptr<stde::_t>>::value, "ERROR");
 
@@ -58,7 +57,6 @@ int main()
     std::shared_ptr<int> y = stde::functor::transform(x, twice);
     BOOST_TEST(stde::deref(y) == 2);
   }
-#endif
 
   return ::boost::report_errors();
 }

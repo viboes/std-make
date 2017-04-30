@@ -46,12 +46,11 @@ namespace nullable {
   template <class T>
   struct traits<shared_ptr<T>> : traits_pointer_like {};
 }
-#if __cplusplus >= 201402L || defined JASEL_DOXYGEN_INVOKED
+
 namespace functor {
   template <>
   struct traits<shared_ptr<_t>> : nullable::as_functor {};
 }
-#endif
 }
 }
 }

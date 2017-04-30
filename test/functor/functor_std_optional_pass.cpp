@@ -64,6 +64,23 @@ int main()
     stde::optional<int> y = stde::functor::transform(x, twice);
     BOOST_TEST(stde::deref(y) == 2);
   }
+  {
+    int v=1;
+    const stde::optional<int> x = stde::make_optional(v);
+    BOOST_TEST(*x == 1);
+
+
+    stde::optional<int> y = stde::functor::transform(x, twice);
+    BOOST_TEST(*y == 2);
+  }
+  {
+    int v=1;
+    const stde::optional<int> x = stde::make_optional(v);
+    BOOST_TEST(*x == 1);
+
+    stde::optional<int> y = stde::functor::map(twice, x);
+    BOOST_TEST(*y == 2);
+  }
   return ::boost::report_errors();
 }
 #endif
