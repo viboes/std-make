@@ -14,9 +14,16 @@ namespace experimental
 {
 inline namespace fundamental_v3
 {
+  class bad_expected_access_base : public std::logic_error
+  {
+  public:
+    bad_expected_access_base(const char* msg)
+    : std::logic_error(msg)
+    {}
+  };
   // bad_expected_access exception class.
   template <class Error>
-  class bad_expected_access : public std::logic_error
+  class bad_expected_access : public bad_expected_access_base
   {
     public:
       typedef Error error_type;
@@ -24,12 +31,13 @@ inline namespace fundamental_v3
       error_type error_value;
     public:
       bad_expected_access(const Error& e)
-      : std::logic_error("Found an error instead of the expected value.")
+      : bad_expected_access_base("Found an error instead of the expected value.")
       , error_value(e)
       {}
 
-      error_type& error() { return error_value; }
-      const error_type& error() const { return error_value; }
+      error_type&& error() && { return move(error_value); }
+      error_type& error() & { return error_value; }
+      const error_type& error() const& { return error_value; }
 
       // todo - Add implicit/explicit conversion to error_type ?
   };
