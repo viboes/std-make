@@ -332,8 +332,8 @@ void make_expected_const_from_value()
 }
 void make_expected_from_U_value()
 {
-  stde::expected<short> e = stde::make_expected<short>( short(5) );
-  static_assert(std::is_same<decltype(e), stde::expected<short>>{}, "");
+  stde::expected<int> e = stde::make_expected<int>( short(5) );
+  static_assert(std::is_same<decltype(e), stde::expected<int>>{}, "");
   BOOST_TEST_EQ(e.valid(), true);
 }
 void make_expected_from_U_value2()
