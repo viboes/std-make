@@ -321,6 +321,15 @@ void make_expected_E_from_value()
   //auto e = stde::make_expected<std::string>( 5 );
   //BOOST_TEST_EQ(e.valid(), false);
 }
+void make_expected_const_from_value()
+{
+#if defined __clang__ && __clang_major__ >= 4 && __cplusplus > 201402L
+  const int i=0;
+  auto e = stde::make_expected<const int>( i );
+  static_assert(std::is_same<decltype(e), stde::expected<const int>>::value, "");
+  BOOST_TEST_EQ(e.valid(), true);
+#endif
+}
 void make_expected_from_U_value()
 {
   stde::expected<short> e = stde::make_expected<short>( 5 );
@@ -707,8 +716,15 @@ int main()
   static_assert(! std::is_constructible<stde::exception_or<NoCopyConstructible>, stde::exception_or<NoCopyConstructible> const& >::value, "");
   static_assert(! std::is_copy_constructible<stde::exception_or<NoCopyConstructible>>::value, "");
 
-#if 0
-  //fixme
+  // fixme
+  {
+    NoMoveConstructible nmc;
+    //NoMoveConstructible nmc2 = std::move(nmc); // FAILS as expected
+
+    stde::expected<NoMoveConstructible> x{ std::move(nmc) }; // DOESN'T FAIL as copy is selected instead
+    (void)x;
+  }
+#if defined __clang__ && __clang_major__ >= 4 && __cplusplus > 201402L
   {
     NoMoveConstructible nmc;
     //NoMoveConstructible nmc2 = std::move(nmc); // FAILS as expected
@@ -717,6 +733,7 @@ int main()
     (void)x;
   }
 #endif
+
   static_assert(! std::is_move_constructible<NoMoveConstructible>::value, "");
   static_assert( std::is_constructible<stde::expected<NoMoveConstructible>, NoMoveConstructible && >::value, "");
   static_assert( std::is_move_constructible<stde::expected<NoMoveConstructible>>::value, "");
@@ -736,6 +753,7 @@ int main()
   expected_from_moved_value();
   expected_from_catch_block();
   make_expected_E_from_value();
+  make_expected_const_from_value();
   make_expected_from_U_value2();
   expected_from_value_error_condition();
   expected_from_error_error_condition();
