@@ -59,6 +59,15 @@ int main()
     BOOST_TEST(*y == 2);
   }
 #endif
+#if defined __clang__ && __clang_major__ >= 4 && __cplusplus > 201402L
+  {
+    auto x = stde::make_expected<const int>(1);
+    static_assert(std::is_same<decltype(x), stde::expected<const int>>::value, "");
+    BOOST_TEST(*x == 1);
+    stde::expected<int> y = stde::functor::transform(x, twice);
+    BOOST_TEST(*y == 2);
+  }
+#endif
 
   return ::boost::report_errors();
 }

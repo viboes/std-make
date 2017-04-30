@@ -2865,6 +2865,11 @@ BOOST_CONSTEXPR expected<typename decay<T>::type, error_code> make_expected(T&& 
 {
   return expected<typename decay<T>::type, error_code>(constexpr_forward<T>(v));
 }
+template <typename T, class U>
+BOOST_CONSTEXPR expected<T, error_code> make_expected(U&& v)
+{
+  return expected<T, error_code>(constexpr_forward<T>(v));
+}
 
 BOOST_FORCEINLINE expected<void, error_code> make_expected()
 {
