@@ -55,7 +55,7 @@ struct OracleVal
 {
     State s;
     int i;
-    OracleVal(int i = 0) : s(sValueConstructed), i(i) {}
+    constexpr OracleVal(int i = 0) : s(sValueConstructed), i(i) {}
 };
 
 struct Oracle
@@ -1642,6 +1642,30 @@ void ValueOr()
   BOOST_TEST (os.value()=="");
 
   BOOST_TEST (os.value_or(std::string("BBB")) == "");
+  {
+    constexpr stde::expected<int> e = 1;
+    static_assert(e.has_value(), "");
+    static_assert(*e==1, "");
+    static_assert(e.value()==1, "");
+  }
+  {
+    constexpr std::error_code ec = std::make_error_code(std::errc(1));
+    constexpr stde::expected<int> e = stde::make_unexpected(ec);
+    static_assert(!e.has_value(), "");
+    static_assert(e.error()==ec, "");
+  }
+  {
+    constexpr stde::expected<OracleVal> e = 1;
+    static_assert(e.has_value(), "");
+    static_assert(*e==1, "");
+    static_assert(e.value()==1, "");
+  }
+  {
+    constexpr std::error_code ec = std::make_error_code(std::errc(1));
+    constexpr stde::expected<OracleVal> e = stde::make_unexpected(ec);
+    static_assert(!e.has_value(), "");
+    static_assert(e.error()==ec, "");
+  }
 }
 
 //////////////////////////////////////////////////
