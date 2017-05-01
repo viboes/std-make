@@ -27,11 +27,11 @@ OrangeCount add(OrangeCount x, OrangeCount y){
 }
 
 struct X {
-    operator int() { return true; }
+    operator int() { return 1; }
 };
 
 struct Y {
-    explicit operator int() { return true; }
+    explicit operator int() { return 1; }
 };
 
 int main()

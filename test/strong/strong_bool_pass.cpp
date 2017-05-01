@@ -45,6 +45,8 @@ struct S {
 
 int main()
 {
+  bool True =  true;
+  bool False =  false;
 
 #if defined COMPILER_ERROR
   {
@@ -115,43 +117,43 @@ int main()
   }
   {
       EngineStarted es1 {true};
-      auto b = es1 || false;
-      BOOST_TEST(b==true);
+      auto b = es1 || False;
+      BOOST_TEST(b==True);
   }
   {
       EngineStarted es1 {false};
-      auto b = es1 || false;
-      BOOST_TEST(b==false);
+      auto b = es1 || False;
+      BOOST_TEST(b==False);
   }
   {
       EngineStarted es1 {true};
-      auto b = false || es1;
-      BOOST_TEST(b==true);
+      auto b = False || es1;
+      BOOST_TEST(b);
   }
   {
       EngineStarted es1 {false};
-      auto b = false || es1;
-      BOOST_TEST(b==false);
+      auto b = False || es1;
+      BOOST_TEST(b==False);
   }
   {
       EngineStarted es1 {true};
-      auto b = es1 || true;
-      BOOST_TEST(b==true);
+      auto b = es1 || True;
+      BOOST_TEST(b==True);
   }
   {
       EngineStarted es1 {false};
-      auto b = es1 || true;
-      BOOST_TEST(b==true);
+      auto b = es1 || True;
+      BOOST_TEST(b==True);
   }
   {
       EngineStarted es1 {true};
       auto b = (true) || es1 ;
-      BOOST_TEST(b==true);
+      BOOST_TEST(b==True);
   }
   {
       EngineStarted es1 {false};
       auto b = (true) || es1 ;
-      BOOST_TEST(b==true);
+      BOOST_TEST(b==True);
   }
   {
       EngineStarted es2 {false};
@@ -166,22 +168,22 @@ int main()
   }
   {
       EngineStarted es1 {true};
-      auto b = es1 && false;
+      auto b = es1 && False;
       BOOST_TEST(!b);
   }
   {
       EngineStarted es1 {false};
-      auto b = es1 && false;
+      auto b = es1 && False;
       BOOST_TEST(!b);
   }
   {
       EngineStarted es1 {true};
-      auto b = es1 && true;
+      auto b = es1 && True;
       BOOST_TEST(b);
   }
   {
       EngineStarted es1 {false};
-      auto b = es1 && true;
+      auto b = es1 && True;
       BOOST_TEST(!b);
   }
   {

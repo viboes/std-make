@@ -29,7 +29,7 @@ inline namespace fundamental_v3
   public:
     explicit out_param(T& ref) : _ref(ref) {}
     // assign and get access to the reference
-    T& operator=(T value)
+    T& operator=(T value) // NOLINT cppcoreguidelines-c-copy-assignment-signature
     {
       _ref = move(value);
       return ref;

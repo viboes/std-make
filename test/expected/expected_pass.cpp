@@ -78,7 +78,7 @@ struct Oracle
 struct Guard
 {
     std::string val;
-    Guard() : val{} {}
+    Guard() {}
     explicit Guard(std::string s, int = 0) : val(s) {}
     Guard(const Guard&) = delete;
     Guard(Guard&&) = delete;

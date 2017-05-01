@@ -47,9 +47,10 @@ namespace nullable
 
   {
     if (nullable::has_value(forward<M>(m)))
+    {
       return JASEL_INVOKE(std::forward<F>(f), nullable::deref(forward<M>(m)));
-    else
-      return nullable::deref_none(forward<M>(m));
+    }
+    return nullable::deref_none(forward<M>(m));
   }
   struct as_monad: monad::tag
   {

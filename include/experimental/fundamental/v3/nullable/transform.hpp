@@ -43,11 +43,12 @@ namespace nullable
   transform(N&& n, F&& f)
   {
     if (nullable::has_value(forward<N>(n)))
+    {
       return make<TypeConstructor<decay_t<N>>>(
           JASEL_INVOKE(std::forward<F>(f), nullable::deref(forward<N>(n)))
       );
-    else
-      return nullable::deref_none(forward<N>(n));
+    }
+    return nullable::deref_none(forward<N>(n));
   }
 
   struct as_functor: functor::tag

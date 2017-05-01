@@ -25,7 +25,7 @@ inline namespace v1
     template < class F, class ...Args >
     using result_type_t = eval<result_type<F, Args...> >;
     template < class F, class ...Args >
-    using ResultType = eval<result_type<F, Args...> >;
+    using ResultType = eval<result_type<F, Args...> >;  // NOLINT
 }
 }
 }

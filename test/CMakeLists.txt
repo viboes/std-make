@@ -86,9 +86,28 @@ endfunction()
 #=============================================================================
 
 jasel_add_tests(
+    applicative applicative
+    ######
+    #applicative_pass
+    applicative_std_array_pass
+    applicative_std_expected_pass
+    #applicative_std_optional_pass
+    #applicative_std_pair_pass
+    #applicative_std_shared_ptr_pass
+    applicative_std_tuple_pass
+    #applicative_std_unique_ptr_pass
+)
+
+jasel_add_tests(
     bits bits
     ######
     bit_mask_pass
+)
+
+jasel_add_tests(
+    callable_wrapper callable_wrapper
+    ######
+    #ex_pass # optional
 )
 
 jasel_add_tests(
@@ -141,6 +160,24 @@ jasel_add_tests(
 )
 
 jasel_add_tests(
+    n_applicative n_applicative
+    ######
+    #n_applicative_pass
+    #n_applicative_std_array_pass
+    #n_applicative_std_pair_pass
+    n_applicative_std_tuple_pass
+)
+
+jasel_add_tests(
+    n_functor n_functor
+    ######
+    n_functor_pass
+    #n_functor_std_array_pass
+    n_functor_std_pair_pass
+    n_functor_std_tuple_pass
+)
+
+jasel_add_tests(
     nullable nullable
     ######
     nullable_pass
@@ -168,6 +205,47 @@ jasel_add_tests(
 )
 
 jasel_add_tests(
+    ordinal.set ordinal/container/ordinal_set
+    ######
+    ordinal_set_pass
+)
+
+jasel_add_tests(
+    optionals optionals
+    ######
+    #optionals_pass # optional
+)
+
+jasel_add_tests(
+    p_applicative p_applicative
+    ######
+    #p_applicative_pass
+    #p_applicative_std_array_pass
+    #p_applicative_std_pair_pass
+    p_applicative_std_tuple_pass
+)
+
+jasel_add_tests(
+    p_functor p_functor
+    ######
+    p_functor_pass
+    #p_functor_std_array_pass
+    p_functor_std_pair_pass
+    p_functor_std_tuple_pass
+)
+jasel_add_tests(
+    pod.optional pod/optional
+    ######
+    optional_pass
+)
+
+jasel_add_tests(
+    pod.optionals pod/optionals
+    ######
+    #pod_optionals_pass # optional
+)
+
+jasel_add_tests(
     product_type product_type
     ######
     c_array_pass
@@ -176,13 +254,6 @@ jasel_add_tests(
     std_tuple_pass
     struct_pass
 )
-
-jasel_add_tests(
-    pod.optional pod/optional
-    ######
-    optional_pass
-)
-
 
 jasel_add_tests(
     range range
@@ -204,8 +275,8 @@ jasel_add_tests(
     strict_bool_pass
     strong_bool_pass
     strong_bounded_int_pass
-    #strong_counter_pass # #369
-    #strong_enums_pass
+    #strong_counter_pass #fixme #369
+    #strong_enums_pass #fixme
     strong_id_pass
     strong_ints_pass
 )

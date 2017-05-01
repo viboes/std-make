@@ -103,7 +103,7 @@ struct unrestricted_union_emulation_err_tag
   }
 };
 #else
-#define boost_expected_unrestricted_union_emulation_default_tag(...) // chances of collision are low
+#define boost_expected_unrestricted_union_emulation_default_tag(...) // NONLINT chances of collision are low
 #endif // JASEL_NO_CXX11_UNRESTRICTED_UNIONS
 
 template <class T, class E>

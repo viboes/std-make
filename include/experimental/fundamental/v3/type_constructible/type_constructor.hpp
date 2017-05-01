@@ -47,7 +47,7 @@ inline namespace fundamental_v3
   template <class M >
   using type_constructor_t = meta::eval<type_constructor<M>>;
   template <class M >
-  using TypeConstructor = meta::eval<type_constructor<M>>;
+  using TypeConstructor = meta::eval<type_constructor<M>>; // NOLINT
 
   namespace detail {
     template <class TC, class = void>

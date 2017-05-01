@@ -131,6 +131,8 @@ int main()
     accept_nullptr_t(ip);
     accept_nullptr_t(nullptr);
     ip = nullptr;
+    BOOST_TEST(ip == nullptr);
+
   }
   {
     auto np = std::nullptr_t{}; // shouldn't compile fails :(

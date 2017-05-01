@@ -45,7 +45,7 @@ int main()
     BitMask bm(std::experimental::pos_tag_t{}, UInt{2});
     BOOST_TEST( 1 == bm.count() );
     BOOST_TEST( bm.any() );
-    BOOST_TEST(bm[UInt{2}]==true);
+    BOOST_TEST(bm[UInt{2}]);
   }
 #if __cplusplus >= 201402L
   { // Constructible from UInt
