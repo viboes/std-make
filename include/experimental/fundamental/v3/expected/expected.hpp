@@ -164,6 +164,10 @@ union trivial_expected_storage
   : _val(constexpr_forward<Args>(args)...)
   {}
 
+  trivial_expected_storage(trivial_expected_storage const&) = default;
+  trivial_expected_storage(trivial_expected_storage &&) = default;
+  trivial_expected_storage& operator=(trivial_expected_storage const&) = default;
+  trivial_expected_storage& operator=(trivial_expected_storage &&) = default;
   ~trivial_expected_storage() = default;
 };
 
@@ -210,7 +214,12 @@ union trivial_expected_storage<void, E>
   BOOST_CONSTEXPR trivial_expected_storage(in_place_t)
   : dummy(0)
   {}
-  ~trivial_expected_storage() = default;
+
+//  trivial_expected_storage(trivial_expected_storage const&) = default;
+//  trivial_expected_storage(trivial_expected_storage &&) = default;
+//  trivial_expected_storage& operator=(trivial_expected_storage const&) = default;
+//  trivial_expected_storage& operator=(trivial_expected_storage &&) = default;
+//  ~trivial_expected_storage() = default;
 };
 
 template <typename T, typename E >
@@ -289,6 +298,11 @@ union no_trivial_expected_storage
   : _val(constexpr_forward<Args>(args)...)
   {}
 
+  no_trivial_expected_storage(no_trivial_expected_storage const&) = default;
+  no_trivial_expected_storage(no_trivial_expected_storage &&) = default;
+  no_trivial_expected_storage& operator=(no_trivial_expected_storage const&) = default;
+  no_trivial_expected_storage& operator=(no_trivial_expected_storage &&) = default;
+
   ~no_trivial_expected_storage() {}
 };
 
@@ -338,6 +352,11 @@ union no_trivial_expected_storage<void, E>
   BOOST_CONSTEXPR no_trivial_expected_storage(in_place_t)
   : dummy(0)
   {}
+
+  no_trivial_expected_storage(no_trivial_expected_storage const&) = default;
+  no_trivial_expected_storage(no_trivial_expected_storage &&) = default;
+  no_trivial_expected_storage& operator=(no_trivial_expected_storage const&) = default;
+  no_trivial_expected_storage& operator=(no_trivial_expected_storage &&) = default;
 
   ~no_trivial_expected_storage() {}
 };
@@ -399,21 +418,38 @@ struct trivial_expected_base
   {}
 
   // Access
-  value_type* dataptr() { return addressof(storage.val()); }
-  BOOST_CONSTEXPR const value_type* dataptr() const { return detail::static_addressof(storage.val()); }
-  error_type* errorptr() { return addressof(storage.err()); }
+  value_type* dataptr()
+  { return addressof(storage.val()); // NOLINT cppcoreguidelines-pro-type-union-access
+  }
+  BOOST_CONSTEXPR const value_type* dataptr() const
+  {
+    return detail::static_addressof(storage.val()); // NOLINT cppcoreguidelines-pro-type-union-access
+  }
+  error_type* errorptr()
+  {
+    return addressof(storage.err()); // NOLINT cppcoreguidelines-pro-type-union-access
+  }
   BOOST_CONSTEXPR const error_type* errorptr() const { return detail::static_addressof(storage.err()); }
-  unexpected_t* unexpectedptr() { return addressof(storage.unexpected()); }
+  unexpected_t* unexpectedptr()
+  {
+    return addressof(storage.unexpected()); // NOLINT cppcoreguidelines-pro-type-union-access
+  }
   BOOST_CONSTEXPR const unexpected_t* unexpectedptr() const { return detail::static_addressof(storage.unexpected()); }
 
 #if ! defined JASEL_NO_CXX11_RVALUE_REFERENCE_FOR_THIS
   BOOST_CONSTEXPR const value_type& contained_val() const& { return storage.val(); }
   JASEL_CONSTEXPR_IF_MOVE_ACCESSORS
-  value_type& contained_val() & { return storage.val(); }
+  value_type& contained_val() &
+  {
+    return storage.val(); // NOLINT cppcoreguidelines-pro-type-union-access
+  }
   JASEL_CONSTEXPR_IF_MOVE_ACCESSORS
   value_type&& contained_val() && { return move(storage.val()); }
 
-  BOOST_CONSTEXPR const unexpected_t& contained_unexpected() const& { return storage.unexpected(); }
+  BOOST_CONSTEXPR const unexpected_t& contained_unexpected() const&
+  {
+    return storage.unexpected(); // NOLINT cppcoreguidelines-pro-type-union-access
+  }
   JASEL_CONSTEXPR_IF_MOVE_ACCESSORS
   unexpected_t& contained_unexpected_t() & { return storage.unexpected(); }
   JASEL_CONSTEXPR_IF_MOVE_ACCESSORS
@@ -476,6 +512,10 @@ struct trivial_expected_base
       }
       has_value = rhs.has_value;
     }
+
+  // fixme: define these operations
+//   trivial_expected_base& operator=(trivial_expected_base const&) = default;
+//   trivial_expected_base& operator=(trivial_expected_base &&) = default;
 
    ~trivial_expected_base() = default;
 };
@@ -575,6 +615,10 @@ struct trivial_expected_base<void, E, AreCopyConstructible, AreMoveConstructible
       has_value = rhs.has_value;
     }
 
+  // fixme: define these operations
+//   trivial_expected_base& operator=(trivial_expected_base const&) = default;
+//   trivial_expected_base& operator=(trivial_expected_base &&) = default;
+
    ~trivial_expected_base() = default;
 };
 
@@ -634,24 +678,35 @@ struct no_trivial_expected_base
   {}
 
   // Access
-  value_type* dataptr() { return addressof(storage.val()); }
+  value_type* dataptr()
+  {
+    return addressof(storage.val()); // NOLINT cppcoreguidelines-pro-type-union-access
+  }
   BOOST_CONSTEXPR const value_type* dataptr() const { return detail::static_addressof(storage.val()); }
   error_type* errorptr() { return addressof(storage.err()); }
   BOOST_CONSTEXPR const error_type* errorptr() const { return detail::static_addressof(storage.err()); }
-  unexpected_t* unexpectedptr() { return addressof(storage.unexpected()); }
+  unexpected_t* unexpectedptr() {
+    return addressof(storage.unexpected()); // NOLINT cppcoreguidelines-pro-type-union-access
+  }
   BOOST_CONSTEXPR const unexpected_t* unexpectedptr() const { return detail::static_addressof(storage.unexpected()); }
 
 #if ! defined JASEL_NO_CXX11_RVALUE_REFERENCE_FOR_THIS
 
   BOOST_CONSTEXPR const value_type& contained_val() const& { return storage.val(); }
   JASEL_CONSTEXPR_IF_MOVE_ACCESSORS
-  value_type& contained_val() & { return storage.val(); }
+  value_type& contained_val() &
+  {
+    return storage.val(); // NOLINT cppcoreguidelines-pro-type-union-access
+  }
   JASEL_CONSTEXPR_IF_MOVE_ACCESSORS
   value_type&& contained_val() && { return move(storage.val()); }
 
   BOOST_CONSTEXPR const unexpected_t& contained_unexpected() const& { return storage.unexpected(); }
   JASEL_CONSTEXPR_IF_MOVE_ACCESSORS
-  unexpected_t& contained_unexpected() & { return storage.unexpected(); }
+  unexpected_t& contained_unexpected() &
+  {
+    return storage.unexpected(); // NOLINT cppcoreguidelines-pro-type-union-access
+  }
   JASEL_CONSTEXPR_IF_MOVE_ACCESSORS
   unexpected_t&& contained_unexpected() && { return move(storage.unexpected()); }
 
@@ -706,10 +761,14 @@ struct no_trivial_expected_base
       //has_value = rhs.has_value;
     }
 
+  // fixme: define these operations
+  //no_trivial_expected_base& operator=(no_trivial_expected_base const&) = default;
+  //no_trivial_expected_base& operator=(no_trivial_expected_base &&) = default;
+
   ~no_trivial_expected_base()
   {
-    if (has_value) storage.val().~value_type();
-    else storage.unexpected().~unexpected_t();
+    if (has_value) contained_val().~value_type();
+    else contained_unexpected().~unexpected_t();
   }
 };
 
@@ -824,6 +883,10 @@ struct no_trivial_expected_base<T, E, false, AreMoveConstructible>
       }
       //has_value = rhs.has_value;
     }
+
+  // fixme: define these operations
+  //no_trivial_expected_base& operator=(no_trivial_expected_base const&) = delete;
+  //no_trivial_expected_base& operator=(no_trivial_expected_base &&) = delete;
 
   ~no_trivial_expected_base()
   {
@@ -942,7 +1005,10 @@ struct no_trivial_expected_base<T, E, AreCopyConstructible, false>
       //has_value = rhs.has_value;
     }
 
+  // fixme: define these operations
   no_trivial_expected_base(no_trivial_expected_base&& rhs) = delete;
+  //no_trivial_expected_base& operator=(no_trivial_expected_base const&) = default;
+  //no_trivial_expected_base& operator=(no_trivial_expected_base &&) = default;
 
   ~no_trivial_expected_base()
   {
@@ -1043,9 +1109,11 @@ struct no_trivial_expected_base<T, E, false, false>
   unexpected_t& contained_unexpected() { return storage.unexpected(); }
 #endif
 
-  no_trivial_expected_base(const no_trivial_expected_base& rhs) = delete;
-
-  no_trivial_expected_base(no_trivial_expected_base&& rhs) = delete;
+  // fixme: define these operations
+//  no_trivial_expected_base(no_trivial_expected_base const&) = default;
+//  no_trivial_expected_base(no_trivial_expected_base &&) = default;
+//  no_trivial_expected_base& operator=(no_trivial_expected_base const&) = default;
+//  no_trivial_expected_base& operator=(no_trivial_expected_base &&) = default;
 
   ~no_trivial_expected_base()
   {
@@ -1090,7 +1158,10 @@ struct no_trivial_expected_base<void, E, AreCopyConstructible, AreMoveConstructi
   // Access
   error_type* errorptr() { return addressof(storage.err()); }
   BOOST_CONSTEXPR const error_type* errorptr() const { return detail::static_addressof(storage.err()); }
-  unexpected_t* unexpectedptr() { return addressof(storage.unexpected()); }
+  unexpected_t* unexpectedptr()
+  {
+    return addressof(storage.unexpected()); // NOLINT cppcoreguidelines-pro-type-union-access
+  }
   BOOST_CONSTEXPR const unexpected_t* unexpectedptr() const { return detail::static_addressof(storage.unexpected()); }
 
 #if ! defined JASEL_NO_CXX11_RVALUE_REFERENCE_FOR_THIS
@@ -1103,13 +1174,17 @@ struct no_trivial_expected_base<void, E, AreCopyConstructible, AreMoveConstructi
 
   BOOST_CONSTEXPR const unexpected_t& contained_unexpected() const& { return storage.unexpected(); }
   JASEL_CONSTEXPR_IF_MOVE_ACCESSORS
-  unexpected_t& contained_unexpected() & { return storage.unexpected(); }
+  unexpected_t& contained_unexpected() &
+  {
+    return storage.unexpected(); // NOLINT cppcoreguidelines-pro-type-union-access
+  }
   JASEL_CONSTEXPR_IF_MOVE_ACCESSORS
   unexpected_t&& contained_unexpected() && { return move(storage.unexpected()); }
 
 #else
   BOOST_CONSTEXPR const error_type& contained_err() const { return storage.err(); }
   error_type& contained_err() { return storage.err(); }
+
   BOOST_CONSTEXPR const unexpected_t& contained_unexpected() const { return storage.unexpected(); }
   unexpected_t& contained_unexpected() { return storage.unexpected(); }
 #endif
@@ -1144,9 +1219,15 @@ struct no_trivial_expected_base<void, E, AreCopyConstructible, AreMoveConstructi
       has_value = rhs.has_value;
     }
 
+  // fixme: define these operations
+  //no_trivial_expected_base& operator=(no_trivial_expected_base const&) = default;
+  //no_trivial_expected_base& operator=(no_trivial_expected_base &&) = default;
+
   ~no_trivial_expected_base() {
     if (! has_value)
-      storage.unexpected().~unexpected_t();
+    {
+      contained_unexpected().~unexpected_t();
+    }
   }
 };
 
@@ -1209,6 +1290,7 @@ struct no_trivial_expected_base<void, E, false, AreMoveConstructible> {
   unexpected_t& contained_unexpected() { return storage.unexpected(); }
 #endif
 
+  // fixme: define these operations
   no_trivial_expected_base(const no_trivial_expected_base& rhs) = delete;
 
   no_trivial_expected_base(no_trivial_expected_base&& rhs)
@@ -1225,6 +1307,10 @@ struct no_trivial_expected_base<void, E, false, AreMoveConstructible> {
       }
       has_value = rhs.has_value;
     }
+
+  // fixme: define these operations
+  //no_trivial_expected_base& operator=(no_trivial_expected_base const&) = delete;
+  //no_trivial_expected_base& operator=(no_trivial_expected_base &&) = delete;
 
   ~no_trivial_expected_base() {
     if (! has_value)
@@ -1306,7 +1392,10 @@ struct no_trivial_expected_base<void, E, AreCopyConstructible, false> {
       has_value = rhs.has_value;
     }
 
+  // fixme: define these operations
   no_trivial_expected_base(no_trivial_expected_base&& rhs) = delete;
+//  no_trivial_expected_base& operator=(no_trivial_expected_base const&) = delete;
+//  no_trivial_expected_base& operator=(no_trivial_expected_base &&) = delete;
 
   ~no_trivial_expected_base() {
     if (! has_value)
@@ -1387,11 +1476,17 @@ private:
   typedef is_same<error_type, expect_t> is_same_error_expect_t;
   static_assert( !is_same_error_expect_t::value, "bad ErrorType" );
 
-  value_type* dataptr() { return addressof(base_type::storage.val()); }
+  value_type* dataptr()
+  {
+    return addressof(base_type::storage.val()); // NOLINT cppcoreguidelines-pro-type-union-access
+  }
   BOOST_CONSTEXPR const value_type* dataptr() const { return detail::static_addressof(base_type::storage.val()); }
   error_type* errorptr() { return addressof(base_type::storage.err()); }
   BOOST_CONSTEXPR const error_type* errorptr() const { return detail::static_addressof(base_type::storage.err()); }
-  unexpected_t* unexpectedptr() { return addressof(base_type::storage.unexpected()); }
+  unexpected_t* unexpectedptr()
+  {
+    return addressof(base_type::storage.unexpected()); // NOLINT cppcoreguidelines-pro-type-union-access
+  }
   BOOST_CONSTEXPR const unexpected_t* unexpectedptr() const { return detail::static_addressof(base_type::storage.unexpected()); }
 
 #if ! defined JASEL_NO_CXX11_RVALUE_REFERENCE_FOR_THIS
@@ -1401,9 +1496,15 @@ private:
   JASEL_CONSTEXPR_IF_MOVE_ACCESSORS
   bool&& contained_has_value() && { return move(base_type::has_value); }
 
-  BOOST_CONSTEXPR const value_type& contained_val() const& { return base_type::storage.val(); }
+  BOOST_CONSTEXPR const value_type& contained_val() const&
+  {
+    return base_type::storage.val(); // NOLINT cppcoreguidelines-pro-type-union-access
+  }
   JASEL_CONSTEXPR_IF_MOVE_ACCESSORS
-  value_type& contained_val() & { return base_type::storage.val(); }
+  value_type& contained_val() &
+  {
+    return base_type::storage.val(); // NOLINT cppcoreguidelines-pro-type-union-access
+  }
   JASEL_CONSTEXPR_IF_MOVE_ACCESSORS
   value_type&& contained_val() && { return move(base_type::storage.val()); }
 
@@ -1413,9 +1514,15 @@ private:
   JASEL_CONSTEXPR_IF_MOVE_ACCESSORS
   error_type&& contained_err() && { return move(base_type::storage.err()); }
 
-  BOOST_CONSTEXPR const unexpected_t& contained_unexpected() const& { return base_type::storage.unexpected(); }
+  BOOST_CONSTEXPR const unexpected_t& contained_unexpected() const&
+  {
+    return base_type::storage.unexpected();  // NOLINT cppcoreguidelines-pro-type-union-access
+  }
   JASEL_CONSTEXPR_IF_MOVE_ACCESSORS
-  unexpected_t& contained_unexpected() & { return base_type::storage.unexpected(); }
+  unexpected_t& contained_unexpected() &
+  {
+    return base_type::storage.unexpected();  // NOLINT cppcoreguidelines-pro-type-union-access
+  }
   JASEL_CONSTEXPR_IF_MOVE_ACCESSORS
   unexpected_t&& contained_unexpected() && { return move(base_type::storage.unexpected()); }
 
