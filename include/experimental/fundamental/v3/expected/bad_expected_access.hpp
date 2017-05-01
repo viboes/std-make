@@ -18,7 +18,7 @@ inline namespace fundamental_v3
   class bad_expected_access_base : public std::logic_error
   {
   public:
-    bad_expected_access_base(const char* msg)
+    explicit bad_expected_access_base(const char* msg)
     : std::logic_error(msg)
     {}
   };
@@ -32,7 +32,7 @@ inline namespace fundamental_v3
     private:
       error_type error_value;
     public:
-      bad_expected_access(const Error& e)
+      explicit bad_expected_access(const Error& e)
       : bad_expected_access_base("Found an error instead of the expected value.")
       , error_value(e)
       {}

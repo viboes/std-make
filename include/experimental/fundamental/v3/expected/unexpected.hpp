@@ -87,6 +87,7 @@ inline namespace fundamental_v3
     {
     }
 
+    // fixme: warning: passing result of std::move() as a const reference argument; no move will actually happen [misc-move-const-arg]
     BOOST_FORCEINLINE explicit unexpected_type(exception_ptr &&e) :
       error_(move(e))
     {

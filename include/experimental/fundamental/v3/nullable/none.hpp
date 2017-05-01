@@ -88,7 +88,8 @@ inline namespace fundamental_v3
   struct none_t {
     explicit none_t() = default;
     template <class T>
-    operator T*() const noexcept { return nullptr; }
+    operator T*() const noexcept // NOLINT google-explicit-constructor
+    { return nullptr; }
   };
   constexpr bool operator==(none_t, none_t) noexcept { return true; }
   constexpr bool operator!=(none_t, none_t) noexcept { return false; }

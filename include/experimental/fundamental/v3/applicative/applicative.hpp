@@ -36,7 +36,7 @@ inline namespace fundamental_v3
 
 namespace applicative
 {
-  using namespace functor;
+  using namespace functor; // NOLINT google-build-using-namespace
   //using namespace type_constructible;
 
   struct tag{};

@@ -43,7 +43,8 @@ namespace std
     public:
 
       template <typename U, enable_if_t<detail::_is_lvalue_ref_or_wrapper<T, U>::value, bool> = true>
-      lvalue_ref(U&& ref) : _ref(forward<U>(ref))
+      lvalue_ref(U&& ref) // NOLINT google-explicit-constructor
+      : _ref(forward<U>(ref))
       {}
 
       template <typename U, enable_if_t<!detail::_is_lvalue_ref_or_wrapper<T, U>::value, bool> = true>
@@ -51,7 +52,7 @@ namespace std
 
       T& get() const
       { return _ref;}
-      operator T& () const
+      operator T& () const // NOLINT google-explicit-constructor
       { return _ref;}
     };
 

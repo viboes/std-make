@@ -18,7 +18,7 @@ inline namespace fundamental_v3
   // this should be moved away (meta?)
   struct swallow {
     template <class ... Ts>
-    swallow(Ts&&...) {  }
+    explicit swallow(Ts&&...) {  }
   };
 
 }}}

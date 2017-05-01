@@ -142,32 +142,32 @@ union trivial_expected_storage
   : _val(boost_expected_unrestricted_union_emulation_default_tag())
   {}
 
-  BOOST_CONSTEXPR trivial_expected_storage(unexpected_t const& e)
+  BOOST_CONSTEXPR explicit trivial_expected_storage(unexpected_t const& e)
   : _unexpected(e)
   {}
 
-  BOOST_CONSTEXPR trivial_expected_storage(unexpected_t && e)
+  BOOST_CONSTEXPR explicit trivial_expected_storage(unexpected_t && e)
   : _unexpected(move(e))
   {}
 
   template <class Err>
-  BOOST_CONSTEXPR trivial_expected_storage(unexpected_type<Err> const& e)
+  BOOST_CONSTEXPR explicit trivial_expected_storage(unexpected_type<Err> const& e)
   : _unexpected(error_traits<error_type>::make_error(e.value()))
   {}
 
-  BOOST_CONSTEXPR trivial_expected_storage(in_place_t)
+  BOOST_CONSTEXPR explicit trivial_expected_storage(in_place_t)
   : _val(boost_expected_unrestricted_union_emulation_default_tag())
   {}
 
   template <class... Args>
-  BOOST_CONSTEXPR trivial_expected_storage(in_place_t, Args&&... args)
+  BOOST_CONSTEXPR explicit trivial_expected_storage(in_place_t, Args&&... args)
   : _val(constexpr_forward<Args>(args)...)
   {}
 
   trivial_expected_storage(trivial_expected_storage const&) = default;
-  trivial_expected_storage(trivial_expected_storage &&) = default;
+  trivial_expected_storage(trivial_expected_storage &&) noexcept = default;
   trivial_expected_storage& operator=(trivial_expected_storage const&) = default;
-  trivial_expected_storage& operator=(trivial_expected_storage &&) = default;
+  trivial_expected_storage& operator=(trivial_expected_storage &&) noexcept = default;
   ~trivial_expected_storage() = default;
 };
 
@@ -199,19 +199,19 @@ union trivial_expected_storage<void, E>
   //: _err(boost_expected_unrestricted_union_emulation_default_tag())
   {}
 
-  BOOST_CONSTEXPR trivial_expected_storage(unexpected_t const& e)
+  BOOST_CONSTEXPR explicit trivial_expected_storage(unexpected_t const& e)
   : _unexpected(e)
   {}
-  BOOST_CONSTEXPR trivial_expected_storage(unexpected_t && e)
+  BOOST_CONSTEXPR explicit trivial_expected_storage(unexpected_t && e)
   : _unexpected(move(e))
   {}
 
   template <class Err>
-  BOOST_CONSTEXPR trivial_expected_storage(unexpected_type<Err> const& e)
+  BOOST_CONSTEXPR explicit trivial_expected_storage(unexpected_type<Err> const& e)
   : _unexpected(error_traits<error_type>::make_error(e.value()))
   {}
 
-  BOOST_CONSTEXPR trivial_expected_storage(in_place_t)
+  BOOST_CONSTEXPR explicit trivial_expected_storage(in_place_t)
   : dummy(0)
   {}
 
@@ -260,7 +260,7 @@ union no_trivial_expected_storage
   value_type &val() { return _val; }
 #endif
 
-  BOOST_CONSTEXPR no_trivial_expected_storage(only_set_initialized_t)
+  BOOST_CONSTEXPR explicit no_trivial_expected_storage(only_set_initialized_t)
   : dummy(0)
   {}
   JASEL_0_REQUIRES(
@@ -270,38 +270,38 @@ union no_trivial_expected_storage
   : _val(boost_expected_unrestricted_union_emulation_default_tag())
   {}
 
-  BOOST_CONSTEXPR no_trivial_expected_storage(value_type const& v)
+  BOOST_CONSTEXPR explicit no_trivial_expected_storage(value_type const& v)
   : _val(v)
   {}
-  BOOST_CONSTEXPR no_trivial_expected_storage(value_type && v)
+  BOOST_CONSTEXPR explicit no_trivial_expected_storage(value_type && v)
   : _val(move(v))
   {}
 
-  BOOST_CONSTEXPR no_trivial_expected_storage(unexpected_t const& e)
+  BOOST_CONSTEXPR explicit no_trivial_expected_storage(unexpected_t const& e)
   : _unexpected(e)
   {}
-  BOOST_CONSTEXPR no_trivial_expected_storage(unexpected_t && e)
+  BOOST_CONSTEXPR explicit no_trivial_expected_storage(unexpected_t && e)
   : _unexpected(move(e))
   {}
 
   template <class Err>
-  BOOST_CONSTEXPR no_trivial_expected_storage(unexpected_type<Err> const& e)
+  BOOST_CONSTEXPR explicit no_trivial_expected_storage(unexpected_type<Err> const& e)
   : _unexpected(error_traits<error_type>::make_error(e.value()))
   {}
 
-  BOOST_CONSTEXPR no_trivial_expected_storage(in_place_t) //BOOST_NOEXCEPT_IF()
+  BOOST_CONSTEXPR explicit no_trivial_expected_storage(in_place_t) //BOOST_NOEXCEPT_IF()
   : _val(boost_expected_unrestricted_union_emulation_default_tag())
   {}
 
   template <class... Args>
-  BOOST_CONSTEXPR no_trivial_expected_storage(in_place_t, Args&&... args) //BOOST_NOEXCEPT_IF()
+  BOOST_CONSTEXPR explicit no_trivial_expected_storage(in_place_t, Args&&... args) //BOOST_NOEXCEPT_IF()
   : _val(constexpr_forward<Args>(args)...)
   {}
 
   no_trivial_expected_storage(no_trivial_expected_storage const&) = default;
-  no_trivial_expected_storage(no_trivial_expected_storage &&) = default;
+  no_trivial_expected_storage(no_trivial_expected_storage &&) noexcept = default;
   no_trivial_expected_storage& operator=(no_trivial_expected_storage const&) = default;
-  no_trivial_expected_storage& operator=(no_trivial_expected_storage &&) = default;
+  no_trivial_expected_storage& operator=(no_trivial_expected_storage &&) noexcept = default;
 
   ~no_trivial_expected_storage() {}
 };
@@ -329,7 +329,7 @@ union no_trivial_expected_storage<void, E>
   error_type &err() { return unexpected().value(); }
 #endif
 
-  BOOST_CONSTEXPR no_trivial_expected_storage(only_set_initialized_t)
+  BOOST_CONSTEXPR explicit no_trivial_expected_storage(only_set_initialized_t)
   : dummy(0)
   {}
   BOOST_CONSTEXPR no_trivial_expected_storage()
@@ -337,26 +337,26 @@ union no_trivial_expected_storage<void, E>
   //: _err(boost_expected_unrestricted_union_emulation_default_tag())
   {}
 
-  BOOST_CONSTEXPR no_trivial_expected_storage(unexpected_t const& e)
+  BOOST_CONSTEXPR explicit no_trivial_expected_storage(unexpected_t const& e)
   : _unexpected(e)
   {}
-  BOOST_CONSTEXPR no_trivial_expected_storage(unexpected_t && e)
+  BOOST_CONSTEXPR explicit no_trivial_expected_storage(unexpected_t && e)
   : _unexpected(move(e))
   {}
 
   template <class Err>
-  BOOST_CONSTEXPR no_trivial_expected_storage(unexpected_type<Err> const& e)
+  BOOST_CONSTEXPR explicit no_trivial_expected_storage(unexpected_type<Err> const& e)
   : _unexpected(error_traits<error_type>::make_error(e.value()))
   {}
 
-  BOOST_CONSTEXPR no_trivial_expected_storage(in_place_t)
+  BOOST_CONSTEXPR explicit no_trivial_expected_storage(in_place_t)
   : dummy(0)
   {}
 
   no_trivial_expected_storage(no_trivial_expected_storage const&) = default;
-  no_trivial_expected_storage(no_trivial_expected_storage &&) = default;
+  no_trivial_expected_storage(no_trivial_expected_storage &&) noexcept = default;
   no_trivial_expected_storage& operator=(no_trivial_expected_storage const&) = default;
-  no_trivial_expected_storage& operator=(no_trivial_expected_storage &&) = default;
+  no_trivial_expected_storage& operator=(no_trivial_expected_storage &&) noexcept = default;
 
   ~no_trivial_expected_storage() {}
 };
@@ -380,28 +380,28 @@ struct trivial_expected_base
   : has_value(true)
   {}
 
-  BOOST_CONSTEXPR trivial_expected_base(const value_type& v)
+  BOOST_CONSTEXPR explicit trivial_expected_base(const value_type& v)
   : has_value(true), storage(in_place, v)
   {}
 
-  BOOST_CONSTEXPR trivial_expected_base(value_type&& v)
+  BOOST_CONSTEXPR explicit trivial_expected_base(value_type&& v)
   : has_value(true), storage(in_place, constexpr_move(v))
   {}
 
-  BOOST_CONSTEXPR trivial_expected_base(unexpected_type<error_type> const& e)
+  BOOST_CONSTEXPR explicit trivial_expected_base(unexpected_type<error_type> const& e)
   : has_value(false), storage(e)
   {}
 
-  BOOST_CONSTEXPR trivial_expected_base(unexpected_type<error_type> && e)
+  BOOST_CONSTEXPR explicit trivial_expected_base(unexpected_type<error_type> && e)
   : has_value(false), storage(constexpr_forward<unexpected_type<error_type>>(e))
   {}
 
   template <class Err>
-  BOOST_CONSTEXPR trivial_expected_base(unexpected_type<Err> const& e)
+  BOOST_CONSTEXPR explicit trivial_expected_base(unexpected_type<Err> const& e)
   : has_value(false), storage(e)
   {}
   template <class Err>
-  BOOST_CONSTEXPR trivial_expected_base(unexpected_type<Err> && e)
+  BOOST_CONSTEXPR explicit trivial_expected_base(unexpected_type<Err> && e)
   : has_value(false), storage(constexpr_forward<unexpected_type<Err>>(e))
   {}
 
@@ -533,21 +533,21 @@ struct trivial_expected_base<void, E, AreCopyConstructible, AreMoveConstructible
   BOOST_CONSTEXPR trivial_expected_base()
   : has_value(true) {}
 
-  BOOST_CONSTEXPR trivial_expected_base(unexpected_type<error_type> const& e)
+  BOOST_CONSTEXPR explicit trivial_expected_base(unexpected_type<error_type> const& e)
   : has_value(false), storage(e)
   {}
-  BOOST_CONSTEXPR trivial_expected_base(unexpected_type<error_type> && e)
+  BOOST_CONSTEXPR explicit trivial_expected_base(unexpected_type<error_type> && e)
   : has_value(false), storage(constexpr_forward<unexpected_type<error_type>>(e))
   {}
   template <class Err>
-  BOOST_CONSTEXPR trivial_expected_base(unexpected_type<Err> const& e)
+  BOOST_CONSTEXPR explicit trivial_expected_base(unexpected_type<Err> const& e)
   : has_value(false), storage(e)
   {}
   template <class Err>
-  BOOST_CONSTEXPR trivial_expected_base(unexpected_type<Err> && e)
+  BOOST_CONSTEXPR explicit trivial_expected_base(unexpected_type<Err> && e)
   : has_value(false), storage(constexpr_forward<unexpected_type<Err>>(e))
   {}
-  BOOST_CONSTEXPR trivial_expected_base(in_place_t)
+  BOOST_CONSTEXPR explicit trivial_expected_base(in_place_t)
   : has_value(true), storage(in_place)
   {}
 
@@ -640,28 +640,28 @@ struct no_trivial_expected_base
   : has_value(true)
   {}
 
-  BOOST_CONSTEXPR no_trivial_expected_base(const value_type& v)
+  BOOST_CONSTEXPR explicit no_trivial_expected_base(const value_type& v)
   : has_value(true), storage(in_place, v)
   {}
 
-  BOOST_CONSTEXPR no_trivial_expected_base(value_type&& v)
+  BOOST_CONSTEXPR explicit no_trivial_expected_base(value_type&& v)
   : has_value(true), storage(in_place, constexpr_move(v))
   {}
 
-  BOOST_CONSTEXPR no_trivial_expected_base(unexpected_type<error_type> const& e)
+  BOOST_CONSTEXPR explicit no_trivial_expected_base(unexpected_type<error_type> const& e)
   : has_value(false), storage(e)
   {}
 
-  BOOST_CONSTEXPR no_trivial_expected_base(unexpected_type<error_type> && e)
+  BOOST_CONSTEXPR explicit no_trivial_expected_base(unexpected_type<error_type> && e)
   : has_value(false), storage(constexpr_forward<unexpected_type<error_type>>(e))
   {}
 
   template <class Err>
-  BOOST_CONSTEXPR no_trivial_expected_base(unexpected_type<Err> const& e)
+  BOOST_CONSTEXPR explicit no_trivial_expected_base(unexpected_type<Err> const& e)
   : has_value(false), storage(e)
   {}
   template <class Err>
-  BOOST_CONSTEXPR no_trivial_expected_base(unexpected_type<Err> && e)
+  BOOST_CONSTEXPR explicit no_trivial_expected_base(unexpected_type<Err> && e)
   : has_value(false), storage(constexpr_forward<unexpected_type<Err>>(e))
   {}
 
@@ -790,28 +790,28 @@ struct no_trivial_expected_base<T, E, false, AreMoveConstructible>
   : has_value(true)
   {}
 
-  BOOST_CONSTEXPR no_trivial_expected_base(const value_type& v)
+  BOOST_CONSTEXPR explicit no_trivial_expected_base(const value_type& v)
   : has_value(true), storage(in_place, v)
   {}
 
-  BOOST_CONSTEXPR no_trivial_expected_base(value_type&& v)
+  BOOST_CONSTEXPR explicit no_trivial_expected_base(value_type&& v)
   : has_value(true), storage(in_place, constexpr_move(v))
   {}
 
-  BOOST_CONSTEXPR no_trivial_expected_base(unexpected_type<error_type> const& e)
+  BOOST_CONSTEXPR explicit no_trivial_expected_base(unexpected_type<error_type> const& e)
   : has_value(false), storage(e)
   {}
 
-  BOOST_CONSTEXPR no_trivial_expected_base(unexpected_type<error_type> && e)
+  BOOST_CONSTEXPR explicit no_trivial_expected_base(unexpected_type<error_type> && e)
   : has_value(false), storage(constexpr_forward<unexpected_type<error_type>>(e))
   {}
 
   template <class Err>
-  BOOST_CONSTEXPR no_trivial_expected_base(unexpected_type<Err> const& e)
+  BOOST_CONSTEXPR explicit no_trivial_expected_base(unexpected_type<Err> const& e)
   : has_value(false), storage(e)
   {}
   template <class Err>
-  BOOST_CONSTEXPR no_trivial_expected_base(unexpected_type<Err> && e)
+  BOOST_CONSTEXPR explicit no_trivial_expected_base(unexpected_type<Err> && e)
   : has_value(false), storage(constexpr_forward<unexpected_type<Err>>(e))
   {}
 
@@ -913,28 +913,28 @@ struct no_trivial_expected_base<T, E, AreCopyConstructible, false>
   : has_value(true)
   {}
 
-  BOOST_CONSTEXPR no_trivial_expected_base(const value_type& v)
+  BOOST_CONSTEXPR explicit no_trivial_expected_base(const value_type& v)
   : has_value(true), storage(in_place, v)
   {}
 
-  BOOST_CONSTEXPR no_trivial_expected_base(value_type&& v)
+  BOOST_CONSTEXPR explicit no_trivial_expected_base(value_type&& v)
   : has_value(true), storage(in_place, constexpr_move(v))
   {}
 
-  BOOST_CONSTEXPR no_trivial_expected_base(unexpected_type<error_type> const& e)
+  BOOST_CONSTEXPR explicit no_trivial_expected_base(unexpected_type<error_type> const& e)
   : has_value(false), storage(e)
   {}
 
-  BOOST_CONSTEXPR no_trivial_expected_base(unexpected_type<error_type> && e)
+  BOOST_CONSTEXPR explicit no_trivial_expected_base(unexpected_type<error_type> && e)
   : has_value(false), storage(constexpr_forward<unexpected_type<error_type>>(e))
   {}
 
   template <class Err>
-  BOOST_CONSTEXPR no_trivial_expected_base(unexpected_type<Err> const& e)
+  BOOST_CONSTEXPR explicit no_trivial_expected_base(unexpected_type<Err> const& e)
   : has_value(false), storage(e)
   {}
   template <class Err>
-  BOOST_CONSTEXPR no_trivial_expected_base(unexpected_type<Err> && e)
+  BOOST_CONSTEXPR explicit no_trivial_expected_base(unexpected_type<Err> && e)
   : has_value(false), storage(constexpr_forward<unexpected_type<Err>>(e))
   {}
 
@@ -1035,28 +1035,28 @@ struct no_trivial_expected_base<T, E, false, false>
   : has_value(true)
   {}
 
-  BOOST_CONSTEXPR no_trivial_expected_base(const value_type& v)
+  BOOST_CONSTEXPR explicit no_trivial_expected_base(const value_type& v)
   : has_value(true), storage(in_place, v)
   {}
 
-  BOOST_CONSTEXPR no_trivial_expected_base(value_type&& v)
+  BOOST_CONSTEXPR explicit no_trivial_expected_base(value_type&& v)
   : has_value(true), storage(in_place, constexpr_move(v))
   {}
 
-  BOOST_CONSTEXPR no_trivial_expected_base(unexpected_type<error_type> const& e)
+  BOOST_CONSTEXPR explicit no_trivial_expected_base(unexpected_type<error_type> const& e)
   : has_value(false), storage(e)
   {}
 
-  BOOST_CONSTEXPR no_trivial_expected_base(unexpected_type<error_type> && e)
+  BOOST_CONSTEXPR explicit no_trivial_expected_base(unexpected_type<error_type> && e)
   : has_value(false), storage(constexpr_forward<unexpected_type<error_type>>(e))
   {}
 
   template <class Err>
-  BOOST_CONSTEXPR no_trivial_expected_base(unexpected_type<Err> const& e)
+  BOOST_CONSTEXPR explicit no_trivial_expected_base(unexpected_type<Err> const& e)
   : has_value(false), storage(e)
   {}
   template <class Err>
-  BOOST_CONSTEXPR no_trivial_expected_base(unexpected_type<Err> && e)
+  BOOST_CONSTEXPR explicit no_trivial_expected_base(unexpected_type<Err> && e)
   : has_value(false), storage(constexpr_forward<unexpected_type<Err>>(e))
   {}
 
@@ -1135,23 +1135,23 @@ struct no_trivial_expected_base<void, E, AreCopyConstructible, AreMoveConstructi
   BOOST_CONSTEXPR no_trivial_expected_base()
   : has_value(true) {}
 
-  BOOST_CONSTEXPR no_trivial_expected_base(unexpected_type<error_type> const& e)
+  BOOST_CONSTEXPR explicit no_trivial_expected_base(unexpected_type<error_type> const& e)
   : has_value(false), storage(e)
   {}
-  BOOST_CONSTEXPR no_trivial_expected_base(unexpected_type<error_type> && e)
+  BOOST_CONSTEXPR explicit no_trivial_expected_base(unexpected_type<error_type> && e)
   : has_value(false), storage(constexpr_forward<unexpected_type<error_type>>(e))
   {}
 
   template <class Err>
-  BOOST_CONSTEXPR no_trivial_expected_base(unexpected_type<Err> const& e)
+  BOOST_CONSTEXPR explicit no_trivial_expected_base(unexpected_type<Err> const& e)
   : has_value(false), storage(e)
   {}
   template <class Err>
-  BOOST_CONSTEXPR no_trivial_expected_base(unexpected_type<Err> && e)
+  BOOST_CONSTEXPR explicit no_trivial_expected_base(unexpected_type<Err> && e)
   : has_value(false), storage(constexpr_forward<unexpected_type<Err>>(e))
   {}
 
-  BOOST_CONSTEXPR no_trivial_expected_base(in_place_t)
+  BOOST_CONSTEXPR explicit no_trivial_expected_base(in_place_t)
   : has_value(true), storage(in_place)
   {}
 
@@ -1243,23 +1243,23 @@ struct no_trivial_expected_base<void, E, false, AreMoveConstructible> {
   BOOST_CONSTEXPR no_trivial_expected_base()
   : has_value(true) {}
 
-  BOOST_CONSTEXPR no_trivial_expected_base(unexpected_type<error_type> const& e)
+  BOOST_CONSTEXPR explicit no_trivial_expected_base(unexpected_type<error_type> const& e)
   : has_value(false), storage(e)
   {}
-  BOOST_CONSTEXPR no_trivial_expected_base(unexpected_type<error_type> && e)
+  BOOST_CONSTEXPR explicit no_trivial_expected_base(unexpected_type<error_type> && e)
   : has_value(false), storage(constexpr_forward<unexpected_type<error_type>>(e))
   {}
 
   template <class Err>
-  BOOST_CONSTEXPR no_trivial_expected_base(unexpected_type<Err> const& e)
+  BOOST_CONSTEXPR explicit no_trivial_expected_base(unexpected_type<Err> const& e)
   : has_value(false), storage(e)
   {}
   template <class Err>
-  BOOST_CONSTEXPR no_trivial_expected_base(unexpected_type<Err> && e)
+  BOOST_CONSTEXPR explicit no_trivial_expected_base(unexpected_type<Err> && e)
   : has_value(false), storage(constexpr_forward<unexpected_type<Err>>(e))
   {}
 
-  BOOST_CONSTEXPR no_trivial_expected_base(in_place_t)
+  BOOST_CONSTEXPR explicit no_trivial_expected_base(in_place_t)
   : has_value(true), storage(in_place)
   {}
 
@@ -1330,23 +1330,23 @@ struct no_trivial_expected_base<void, E, AreCopyConstructible, false> {
   BOOST_CONSTEXPR no_trivial_expected_base()
   : has_value(true) {}
 
-  BOOST_CONSTEXPR no_trivial_expected_base(unexpected_t const& e)
+  BOOST_CONSTEXPR explicit no_trivial_expected_base(unexpected_t const& e)
   : has_value(false), storage(e)
   {}
-  BOOST_CONSTEXPR no_trivial_expected_base(unexpected_t && e)
+  BOOST_CONSTEXPR explicit no_trivial_expected_base(unexpected_t && e)
   : has_value(false), storage(constexpr_forward<unexpected_t>(e))
   {}
 
   template <class Err>
-  BOOST_CONSTEXPR no_trivial_expected_base(unexpected_type<Err> const& e)
+  BOOST_CONSTEXPR explicit no_trivial_expected_base(unexpected_type<Err> const& e)
   : has_value(false), storage(e)
   {}
   template <class Err>
-  BOOST_CONSTEXPR no_trivial_expected_base(unexpected_type<Err> && e)
+  BOOST_CONSTEXPR explicit no_trivial_expected_base(unexpected_type<Err> && e)
   : has_value(false), storage(constexpr_forward<unexpected_type<Err>>(e))
   {}
 
-  BOOST_CONSTEXPR no_trivial_expected_base(in_place_t)
+  BOOST_CONSTEXPR explicit no_trivial_expected_base(in_place_t)
   : has_value(true), storage(in_place)
   {}
 
@@ -1565,7 +1565,7 @@ public:
   JASEL_0_REQUIRES(
       is_copy_constructible<value_type>::value
   )
-  BOOST_CONSTEXPR expected(const value_type& v)
+  BOOST_CONSTEXPR expected(const value_type& v) // NOLINT google-explicit-constructor
       BOOST_NOEXCEPT_IF(
           is_nothrow_copy_constructible<value_type>::value
       )
@@ -1575,7 +1575,7 @@ public:
   JASEL_0_REQUIRES(
     is_move_constructible<value_type>::value
   )
-  BOOST_CONSTEXPR expected(value_type&& v  )
+  BOOST_CONSTEXPR expected(value_type&& v  ) // NOLINT google-explicit-constructor
       BOOST_NOEXCEPT_IF(
             is_nothrow_move_constructible<value_type>::value
       )
@@ -1583,42 +1583,43 @@ public:
   {}
 
   expected(const expected& rhs) = default;
-  expected(expected&& rhs) = default;
+  expected(expected&& rhs) noexcept = default;
 
   JASEL_0_REQUIRES(
       is_copy_constructible<error_type>::value
   )
-  expected(unexpected_type<error_type> const& e)
+  expected(unexpected_type<error_type> const& e) // NOLINT google-explicit-constructor
       BOOST_NOEXCEPT_IF(
         is_nothrow_copy_constructible<error_type>::value
       )
   : base_type(e)
   {}
   JASEL_0_REQUIRES(is_move_constructible<error_type>::value)
-  expected(unexpected_type<error_type> && e)
+  expected(unexpected_type<error_type> && e) // NOLINT google-explicit-constructor
       BOOST_NOEXCEPT_IF(
         is_nothrow_move_constructible<error_type>::value
-      )
+      ) // NOLINT google-explicit-constructor
   : base_type(forward<unexpected_type<error_type>>(e))
   {}
 
   template <class Err
     , JASEL_T_REQUIRES(is_constructible<error_type, Err>::value)
   >
-  expected(unexpected_type<Err> const& e)
+  expected(unexpected_type<Err> const& e) // NOLINT google-explicit-constructor
       BOOST_NOEXCEPT_IF((
         is_nothrow_constructible<error_type, Err>::value
-      ))
+      )) // NOLINT google-explicit-constructor
   : base_type(e)
   {}
   template <class Err
     //, JASEL_T_REQUIRES(is_constructible<error_type, Err&&>::value)
   >
-  expected(unexpected_type<Err> && e
+  expected(unexpected_type<Err> && e // NOLINT google-explicit-constructor
   )
   //BOOST_NOEXCEPT_IF(
     //is_nothrow_constructible<error_type, Err&&>::value
   //)
+  // NOLINT google-explicit-constructor
   : base_type(forward<unexpected_type<Err>>(e))
   {}
 
@@ -1627,7 +1628,7 @@ public:
   , JASEL_T_REQUIRES(is_constructible<error_type, Args&...>::value)
 #endif
   >
-  expected(unexpect_t, Args&&... args
+  expected(unexpect_t, Args&&... args // NOLINT google-explicit-constructor
   )
   BOOST_NOEXCEPT_IF(
     is_nothrow_copy_constructible<error_type>::value
@@ -1681,7 +1682,7 @@ public:
     return *this;
   }
 
-  expected& operator=(expected&& e)
+  expected& operator=(expected&& e) noexcept
   {
     this_type(move(e)).swap(*this);
     return *this;
@@ -1697,7 +1698,7 @@ public:
   template <class U, JASEL_T_REQUIRES(is_same<typename decay<U>::type, value_type>::value)>
   expected& operator=(U&& value)
   {
-    this_type(move(value)).swap(*this);
+    this_type(forward<U>(value)).swap(*this);
     return *this;
   }
 
@@ -1915,7 +1916,7 @@ public:
   JASEL_CONSTEXPR_IF_MOVE_ACCESSORS value_type value_or(V&& v) &&
   {
     return *this
-      ? constexpr_move(const_cast<typename rebind<value_type>::type&>(*this).contained_val())
+      ? constexpr_move(this->contained_val())
       : static_cast<value_type>(constexpr_forward<V>(v));
   }
 
@@ -1931,7 +1932,7 @@ public:
   JASEL_CONSTEXPR_IF_MOVE_ACCESSORS value_type value_or_throw() &&
   {
     return *this
-      ? constexpr_move(const_cast<typename rebind<value_type>::type&>(*this).contained_val())
+        ? constexpr_move(this->contained_val())
       : throw Exception(contained_err());
   }
 
@@ -2420,7 +2421,7 @@ public:
 
 
   JASEL_0_REQUIRES(is_copy_constructible<error_type>::value)
-  expected(unexpected_type<error_type> const& e)
+  expected(unexpected_type<error_type> const& e) // NOLINT google-explicit-constructor
   BOOST_NOEXCEPT_IF(
     is_nothrow_copy_constructible<error_type>::value
   )
@@ -2428,7 +2429,7 @@ public:
   {}
 
   JASEL_0_REQUIRES(is_move_constructible<error_type>::value)
-  expected(unexpected_type<error_type> && e
+  expected(unexpected_type<error_type> && e // NOLINT google-explicit-constructor
   )
   BOOST_NOEXCEPT_IF(
     is_nothrow_move_constructible<error_type>::value
@@ -2439,7 +2440,7 @@ public:
   template <class Err
   , JASEL_T_REQUIRES(is_constructible<error_type, Err>::value)
   >
-  expected(unexpected_type<Err> const& e
+  expected(unexpected_type<Err> const& e // NOLINT google-explicit-constructor
   )
   BOOST_NOEXCEPT_IF((
     is_nothrow_constructible<error_type, Err>::value
@@ -2448,7 +2449,7 @@ public:
   {}
 
   template <class Err>
-  expected(unexpected_type<Err> && e
+  expected(unexpected_type<Err> && e // NOLINT google-explicit-constructor
 //    , JASEL_REQUIRES(is_copy_constructible<error_type, Err&&>::value)
   )
 //  BOOST_NOEXCEPT_IF(
@@ -2462,7 +2463,7 @@ public:
   , JASEL_T_REQUIRES(is_constructible<error_type, Args&...>::value)
 #endif
   >
-  expected(unexpect_t, Args&&... args
+  expected(unexpect_t, Args&&... args // NOLINT google-explicit-constructor
   )
   BOOST_NOEXCEPT_IF(
       is_nothrow_copy_constructible<error_type>::value
@@ -2479,7 +2480,7 @@ public:
     return *this;
   }
 
-  expected& operator=(expected&& e)
+  expected& operator=(expected&& e) noexcept
   {
     this_type(move(e)).swap(*this);
     return *this;

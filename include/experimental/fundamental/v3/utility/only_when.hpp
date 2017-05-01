@@ -27,7 +27,8 @@ namespace std
 
     public:
       template <typename U, JASEL_ENABLE_IF(TypePred<T, U>::value)>
-      only_when (U&& v) : _val(forward<U>(v))
+      only_when (U&& v) // NOLINT google-explicit-constructor
+      : _val(forward<U>(v))
       {}
 
       template <typename U, JASEL_ENABLE_IF(!TypePred<T, U>::value)>
@@ -47,7 +48,7 @@ namespace std
           false_type>;
 
       template <typename I, typename T>
-      std::false_type _test_no_narrowing(long long);
+      std::false_type _test_no_narrowing(long long); // NOLINT google-runtime-int
 
       template <typename I, typename T>
       auto _test_no_narrowing(int) -> decltype(I
@@ -57,10 +58,10 @@ namespace std
       template <typename I>
       struct _int_no_double_test
       {
-        _int_no_double_test(I)
+        _int_no_double_test(I) // NOLINT google-explicit-constructor
         {}
         _int_no_double_test(long double) = delete;
-        _int_no_double_test(unsigned long long) = delete;
+        _int_no_double_test(unsigned long long) = delete; // NOLINT google-runtime-int
       };
 # if defined __GNUC__ && ! defined __clang__
       template <typename I, typename T>

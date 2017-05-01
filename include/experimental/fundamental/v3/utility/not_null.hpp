@@ -56,7 +56,8 @@ inline  namespace fundamental_v3
       {
         //Expects(_ptr != nullptr);
       }
-      not_null(T& r) : _ptr(&r) {}
+      not_null(T& r) // NOLINT google-explicit-constructor
+      : _ptr(&r) {}
       explicit not_null(nullptr_t) = delete;
       T*& underlying() { return _ptr; }
       T* const& underlying() const { return _ptr; }

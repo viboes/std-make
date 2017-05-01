@@ -37,7 +37,7 @@ inline namespace fundamental_v3
 
 namespace monad
 {
-  using namespace applicative;
+  using namespace applicative; // NOLINT google-build-using-namespace
 
   struct tag{};
 
