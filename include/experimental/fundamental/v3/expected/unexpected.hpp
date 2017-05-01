@@ -25,8 +25,8 @@ inline namespace fundamental_v3
   template <typename ErrorType = error_code>
   class unexpected_type
   {
-    ErrorType error_;
   public:
+    ErrorType error_;
     unexpected_type() = delete;
 
     JASEL_0_REQUIRES(is_copy_constructible<ErrorType>::value)
@@ -41,12 +41,12 @@ inline namespace fundamental_v3
     }
 #if ! defined JASEL_NO_CXX11_RVALUE_REFERENCE_FOR_THIS
 
-    BOOST_CONSTEXPR
+    BOOST_CXX14_CONSTEXPR
     BOOST_FORCEINLINE ErrorType const& value() const&
     {
       return error_;
     }
-    JASEL_CONSTEXPR_IF_MOVE_ACCESSORS
+    BOOST_CXX14_CONSTEXPR
     BOOST_FORCEINLINE ErrorType& value() &
     {
       return error_;
