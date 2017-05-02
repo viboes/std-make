@@ -91,74 +91,14 @@ namespace nullable
   };
 }
 
-
-namespace functor {
-template <>
-struct traits<optional<_t>> : nullable::as_functor {};
-}
-
 #if __cplusplus >= 201402L  || defined JASEL_DOXYGEN_INVOKED
-namespace applicative {
-template <>
-struct traits<optional<_t>> : nullable::as_applicative {};
-}
-
-namespace monad {
-template <>
-struct traits<optional<_t>> : nullable::as_monad {};
-}
-
-#if 1
 namespace sum_type
 {
   template <class T>
   struct traits<optional<T>> : nullable::as_sum_type<optional<T>> {};
 }
-#else
-namespace sum_type
-{
-namespace detail {
-  template <size_t I>
-  struct optional_get;
-  template <>
-  struct optional_get<0> {
-    template <class ST>
-    static constexpr decltype(auto) get(ST&& st) noexcept
-    {
-      return nullopt;
-    }
-  };
-  template <>
-  struct optional_get<1> {
-    template <class ST>
-    static constexpr decltype(auto) get(ST&& st) noexcept
-    {
-      return *(forward<ST>(st));
-    }
-  };
-}
-  template <class T>
-  struct traits<optional<T>> : tag {
-    using size = integral_constant<size_t, 2>;
-
-    template <size_t I>
-    using alternative = tuple_element<I, meta::types<nullopt_t, T>>;
-
-    template <size_t I, class ST2, class= std::enable_if_t< I < size::value > >
-      static constexpr decltype(auto) get(ST2&& st) noexcept
-      {
-        return detail::optional_get<I>::get(forward<ST2>(st));
-      }
-    template <class V, class ST2>
-      static constexpr decltype(auto) visit(V&& v, ST2&& st) noexcept
-      {
-        if (st) return forward<V>(v)(*forward<ST2>(st));
-        else  return forward<V>(v)(nullopt);
-      }
-  };
-}
 #endif
-#endif
+
 }
 }
 }

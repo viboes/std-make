@@ -47,10 +47,6 @@ namespace nullable {
   struct traits<shared_ptr<T>> : traits_pointer_like {};
 }
 
-namespace functor {
-  template <>
-  struct traits<shared_ptr<_t>> : nullable::as_functor {};
-}
 }
 }
 }

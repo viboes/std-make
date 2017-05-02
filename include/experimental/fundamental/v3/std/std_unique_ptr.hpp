@@ -82,10 +82,6 @@ namespace nullable {
   struct traits<unique_ptr<T, D>> : traits_pointer_like {};
 }
 
-namespace functor {
-  template <class D>
-  struct traits<unique_ptr<_t, D>> : nullable::as_functor {};
-}
 }
 }
 }

@@ -75,6 +75,7 @@ namespace type_constructible {
 
   namespace functor {
     template <>
+    // fixme when product_type::transform is defined if all the element are the same
     //struct traits<array_tc>
     //: product_type::as_functor {};
     struct traits<array_tc> : functor::tag

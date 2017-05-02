@@ -70,19 +70,15 @@ namespace nullable
 /**
  */
 
-//namespace applicative {
-//template <class N>
-//struct traits<N, meta::when<
-//    is_nullable_v<N> && is_type_constructible_v<N>
-//>> : tag
-//{
-//  template <class T, class F>
-//    static constexpr auto ap(F&& f, T&& x)
-//    {
-//      return nullable::ap(forward<F>(f), forward<T>(x));
-//    }
-//};
-//}
+namespace applicative {
+
+template <class N>
+struct traits<N, meta::when<
+    is_nullable<N>::value && is_type_constructible<N>::value
+>> : nullable::as_applicative {};
+
+}
+
 }}
 }
 #endif // header

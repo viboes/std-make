@@ -63,21 +63,15 @@ namespace nullable
 
 /**
  */
-#if 0
 namespace functor {
+
 template <class N>
 struct traits<N, meta::when<
-  is_nullable_v<N> && is_type_constructible_v<N>
->> : tag
-{
-  template <class T, class F>
-    static constexpr auto transform(T&& x, F&& f)
-      JASEL_DECLTYPE_RETURN_NOEXCEPT(
-          nullable::transform(forward<T>(x), forward<F>(f));
-      )
-};
+  is_nullable<N>::value && is_type_constructible<N>::value
+>> : nullable::as_functor {};
+
 }
-#endif
+
 }}
 }
 #endif // header

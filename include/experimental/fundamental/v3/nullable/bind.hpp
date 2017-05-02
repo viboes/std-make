@@ -61,6 +61,15 @@ namespace nullable
         )
   };
 }
+namespace monad {
+
+template <class N>
+struct traits<N, meta::when<
+    is_nullable<N>::value && is_type_constructible<N>::value
+>> : nullable::as_monad {};
+
+}
+
 }}
 }
 #endif // header
