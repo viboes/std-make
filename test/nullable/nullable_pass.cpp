@@ -67,14 +67,12 @@ constexpr nullopt_t2 nullopt2{nullopt_t2::init{}};
 
 void accept_nullopt_t2(nullopt_t2) {
 }
-#if __cplusplus >= 201402L
-
 template <template <class ...> class TC, class T>
 TC<T> make_none(T) {
   //return TC{};
   return std::add_pointer_t<T>{};
 }
-#endif
+
 template <template <class ...> class TC, class T>
 TC<T> make_none3(T) {
   return std::experimental::none<TC>();
@@ -103,13 +101,10 @@ int main()
 {
   namespace stde = std::experimental;
 
-#if __cplusplus >= 201402L
   {
     auto ip = make_none<std::add_pointer_t>(0);
     BOOST_TEST(ip == nullptr);
   }
-#endif
-#if __cplusplus >= 201402L
   // no type named 'type' in 'std::__1::add_pointer<experimental::_t>'
   static_assert(std::is_same<
       stde::meta::invoke<stde::add_pointer_f, int>,
@@ -123,14 +118,11 @@ int main()
     auto ip = make_none5<stde::add_pointer_f>(0);
     BOOST_TEST(ip == nullptr);
   }
-#endif
-#if __cplusplus >= 201402L
   // no type named 'type' in 'std::__1::add_pointer<experimental::_t>'
   {
     auto ip = make_none4<std::add_pointer_t>(0);
     BOOST_TEST(ip == nullptr);
   }
-#endif
 #if JASEL_HAS_EXPERIMENTAL_ANY
   {
     std::experimental::any a,b;
