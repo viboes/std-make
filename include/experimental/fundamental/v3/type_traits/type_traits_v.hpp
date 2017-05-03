@@ -18,7 +18,7 @@ namespace experimental
 inline namespace fundamental_v3
 {
 
-#if __cplusplus >= 201402L
+#if __cplusplus == 201402L
   template <class R1, class R2>
   //inline C++17
   constexpr bool is_constructible_v = is_constructible<R1,R2>::value;

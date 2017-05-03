@@ -11,6 +11,7 @@
 
 #include <experimental/fundamental/v3/type_traits/type_traits_t.hpp>
 
+#if __cplusplus <= 201402L
 namespace std
 {
 namespace experimental
@@ -32,5 +33,8 @@ inline namespace fundamental_v3
 
 }
 }
+using experimental::disjunction;
+
 }
+#endif
 #endif // header

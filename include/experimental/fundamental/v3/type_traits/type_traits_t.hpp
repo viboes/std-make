@@ -11,14 +11,11 @@
 
 #include <type_traits>
 
+#if __cplusplus == 201103L
 namespace std
 {
-namespace experimental
-{
-inline namespace fundamental_v3
-{
-
-#if __cplusplus == 201103L
+  template< class T >
+  using add_pointer_t = typename add_pointer<T>::type;
 
   template< class... T >
   using common_type_t = typename common_type<T...>::type;
@@ -38,11 +35,6 @@ inline namespace fundamental_v3
   template< class T >
   using remove_cv_t = typename remove_cv<T>::type;
 
-
-
+}
 #endif
-
-}
-}
-}
 #endif // header

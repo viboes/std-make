@@ -11,6 +11,7 @@
 
 #include <type_traits>
 
+#if __cplusplus <= 201402L
 namespace std
 {
 namespace experimental
@@ -29,5 +30,8 @@ inline namespace fundamental_v3
 
 }
 }
+using experimental::negation;
+
 }
+#endif
 #endif // header

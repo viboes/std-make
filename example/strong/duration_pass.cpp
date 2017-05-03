@@ -29,13 +29,13 @@ struct duration_domain
 {
   template <class T, class P, class U
           , typename std::enable_if <
-              stdex::conjunction <
+              std::conjunction <
                 std::is_convertible<U, T>, // no overflow
-                stdex::disjunction<
+                std::disjunction<
                       std::chrono::treat_as_floating_point<T>,
-                      stdex::conjunction<
+                      std::conjunction<
                           std::integral_constant<bool, std::ratio_divide<P, Period>::den == 1>,
-                          stdex::negation< std::chrono::treat_as_floating_point<U> >
+                          std::negation< std::chrono::treat_as_floating_point<U> >
                       >
                   >
               >::value
@@ -56,11 +56,11 @@ struct duration_domain
   }
   template <class T, class U
           , typename std::enable_if <
-              stdex::conjunction <
+              std::conjunction <
                 std::is_convertible<U, T>,
-                stdex::disjunction<
+                std::disjunction<
                       std::chrono::treat_as_floating_point<T>,
-                      stdex::negation< std::chrono::treat_as_floating_point<U> >
+                      std::negation< std::chrono::treat_as_floating_point<U> >
                 >
               >::value
           >::type* = nullptr

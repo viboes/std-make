@@ -13,11 +13,15 @@
 #include <experimental/meta.hpp>
 
 namespace std {
-  namespace experimental {
+//  namespace experimental {
+//#if __cplusplus <= 201402L
+//    using std::experimental::meta::void_t;
+//#endif
+//  }
 #if __cplusplus <= 201402L
     using std::experimental::meta::void_t;
 #endif
-  }
+
 }
 
 #endif // header
