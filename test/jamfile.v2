@@ -222,6 +222,11 @@ test-suite monad
       [ run monad/monad_std_expected_pass.cpp  ]
     ;
 
+test-suite monad_error
+    : 
+      [ run monad_error/monad_error_std_expected_pass.cpp  ]
+    ;
+
 test-suite frames
     : 
       [ run ../example/chrono/frame_types_pass.cpp  ]

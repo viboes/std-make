@@ -3261,7 +3261,9 @@ namespace expected_detail
 #endif
 
   template <class E>
-  struct expected<_t, E>: std::experimental::meta::bind_back<expected, E> {};
+  struct expected<_t, E>: std::experimental::meta::bind_back<expected, E> {
+    using error_type = E;
+  };
 
   namespace type_constructible
   {
