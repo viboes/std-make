@@ -9,7 +9,7 @@
 #ifndef JASEL_FUNDAMENTAL_V3_SUM_TYPE_PRODUCT_TYPE_HPP
 #define JASEL_FUNDAMENTAL_V3_SUM_TYPE_PRODUCT_TYPE_HPP
 #define YAFPL_X1
-#if __cplusplus >= 201002L || defined JASEL_DOXYGEN_INVOKED
+#if __cplusplus >= 201402L || defined JASEL_DOXYGEN_INVOKED
 
 
 ///////////////////////////////////////////////////////////////////////////////////////
@@ -37,8 +37,13 @@
 
 // 20.7.3, variant helper classes
 template <class T> struct variant_size; // undefined template <class T> struct variant_size<const T>;
-template <class T> struct variant_size<volatile T>; template <class T> struct variant_size<const volatile T>; template <class T> constexpr size_t variant_size_v
+template <class T> struct variant_size<volatile T>;
+template <class T> struct variant_size<const volatile T>;
+
+#if __cplusplus >= 201402L || defined JASEL_DOXYGEN_INVOKED
+template <class T> constexpr size_t variant_size_v
       = variant_size<T>::value;
+#endif
 
 template <size_t I, class T> struct variant_alternative; // undefined
 template <size_t I, class T> struct variant_alternative<I, const T>;
@@ -177,6 +182,7 @@ namespace sum_type {
         template <class T>
           static constexpr auto get(T&& x) =delete;
 #else
+        //fixme this consider any type as a sum_type if not specialized with a single alternative, it self.
         using size = integral_constant<size_t, 1>;
 
         template <size_t I>

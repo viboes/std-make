@@ -70,7 +70,7 @@ namespace std
                 > >
               : true_type {};
 
-#if __cplusplus >= 201402L
+#if __cplusplus >= 201402L || defined JASEL_DOXYGEN_INVOKED
           template <class T>
             constexpr bool has_adl_begin_end_v = has_adl_begin_end<T>::value;
 #endif
