@@ -52,11 +52,11 @@ namespace type_constructible
     struct traits<boost::expected<T,E>> : traits_constructor<boost::expected<T,E>> {
       using traits_constructor<boost::expected<T,E>>::make;
 
-      template <class ...Xs>
+      template <class M, class ...Xs>
       static constexpr
-      boost::expected<T,E> make(std::experimental::in_place_t, Xs&& ...xs)
+      M make(std::experimental::in_place_t, Xs&& ...xs)
       {
-        return boost::expected<T, E>(boost::in_place_t{}, std::forward<Xs>(xs)...);
+        return M(boost::in_place_t{}, std::forward<Xs>(xs)...);
       }
     };
 

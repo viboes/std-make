@@ -33,9 +33,9 @@ namespace type_constructible {
   struct traits<shared_ptr<T>> : tag
   {
 
-    template <class ...Xs>
+    template <class M, class ...Xs>
     static //constexpr
-    shared_ptr<T> make(Xs&& ...xs)
+    M make(Xs&& ...xs)
     {
       return make_shared<T>(forward<Xs>(xs)...);
     }

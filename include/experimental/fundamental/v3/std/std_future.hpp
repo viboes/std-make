@@ -21,7 +21,7 @@ namespace std
   struct future<experimental::_t&>
   {
     template<class ...T>
-    using invoke = future<T& ...>;
+    using invoke = future<remove_reference_t<T>& ...>;
   };
 
   // Holder specialization
@@ -48,40 +48,41 @@ inline namespace concurrency_v1
     return p.get_future();
   }
 
+  // deduced type
   template <int = 0, int..., class T>
-    future<experimental::meta::decay_unwrap_t<T>> make_ready_future(T&& x)
+  future<experimental::meta::decay_unwrap_t<T>> make_ready_future(T&& x)
   {
     promise<experimental::meta::decay_unwrap_t<T>> p;
     p.set_value(forward<T>(x));
     return p.get_future();
   }
 
-  // explicit overloads
-  template <class T>
-    future<T> make_ready_future(typename remove_reference<T>::type const& x)
+  // forced type
+  template <class T, int = 0, int..., class U, typename = enable_if_t<is_same<T,U>::value> >
+  future<T> make_ready_future(U x)
   {
     promise<T> p;
-    p.set_value(x);
+    p.set_value(forward<T>(x));
     return p.get_future();
   }
 
-  template <class T>
-    future<T> make_ready_future(typename remove_reference<T>::type&& x)
-  {
-    promise<T> p;
-    p.set_value(forward<typename remove_reference<T>::type>(x));
-    return p.get_future();
-  }
-
-  // variadic overload
-  template <class T, class ...Args>
-    future<T> make_ready_future(Args&&... args)
+  // emplace variadic overload - non-deduced
+  template <class T, int = 0, int..., class ...Args>
+    future<T> emplace_ready_future(Args&&... args)
   {
     promise<T> p;
     p.set_value(T(forward<Args>(args)...));
     return p.get_future();
 
   }
+//  template <class T, class ...Args>
+//    future<T> make_ready_future(Args&&... args)
+//  {
+//    promise<T> p;
+//    p.set_value(T(forward<Args>(args)...));
+//    return p.get_future();
+//
+//  }
 }
 
   // type_constructor customization
@@ -100,17 +101,30 @@ namespace type_constructible {
 
   template <class T>
   struct traits<future<T>> {
-    template <class ...Xs>
+    template <class M, class ...Xs>
     static
-    future<T> make(Xs&& ...xs)
+    auto make(Xs&& ...xs)
+    JASEL_DECLTYPE_RETURN_NOEXCEPT(
+      make_ready_future(forward<Xs>(xs)...)
+    )
+    template <class M, class ...Xs>
+    static
+    M emplace(Xs&& ...xs)
     {
-      return make_ready_future<T>(forward<Xs>(xs)...);
+      return emplace_ready_future<T>(forward<Xs>(xs)...);
     }
   };
   template <>
   struct traits<future<void>> {
+    template <class M>
     static
-    future<void> make()
+    M make()
+    {
+      return make_ready_future();
+    }
+    template <class M>
+    static
+    M emplace()
     {
       return make_ready_future();
     }
@@ -119,23 +133,33 @@ namespace type_constructible {
 
   template <class T>
   struct traits<shared_future<T>> {
-    template <class ...Xs>
+    template <class M, class ...Xs>
     static
-    shared_future<T> make(Xs&& ...xs)
+    M make(Xs&& ...xs)
     {
-      promise<T> p;
-      p.set_value(T(forward<Xs>(xs)...));
-      return p.get_future().share();
+      return make_ready_future(forward<Xs>(xs)...).share();
+    }
+    template <class M, class ...Xs>
+    static
+    M emplace(Xs&& ...xs)
+    {
+      return emplace_ready_future<T>(forward<Xs>(xs)...).share();
     }
   };
+
   template <>
   struct traits<shared_future<void>> {
+    template <class M>
     static
-    shared_future<void> make()
+    M make()
     {
-      promise<void> p;
-      p.set_value();
-      return p.get_future().share();
+      return make_ready_future().share();
+    }
+    template <class M>
+    static
+    M emplace()
+    {
+      return make_ready_future().share();
     }
   };
 }

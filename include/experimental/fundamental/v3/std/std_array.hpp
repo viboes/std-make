@@ -63,9 +63,9 @@ namespace type_constructible {
   template <class T, size_t N>
   struct traits<array<T, N>> : type_constructible::tag
   {
-    template <class ...Xs>
+    template <class M, class ...Xs>
     static constexpr
-    array<T, sizeof...(Xs)> make(Xs&& ...xs)
+    M make(Xs&& ...xs)
     {
       return {{forward<Xs>(xs)...}};
     }

@@ -68,11 +68,11 @@ namespace type_constructible
   struct traits<boost::optional<T>> : traits_constructor<boost::optional<T>> {
     using traits_constructor<boost::optional<T>>::make;
 
-    template <class ...Xs>
+    template <class M, class ...Xs>
     static JASEL_CXX14_CONSTEXPR
-    boost::optional<T> make(std::experimental::in_place_t, Xs&& ...xs)
+    M make(std::experimental::in_place_t, Xs&& ...xs)
     {
-      boost::optional<T> res;
+      M res;
       res.emplace(std::forward<Xs>(xs)...);
       return std::move(res);
     }

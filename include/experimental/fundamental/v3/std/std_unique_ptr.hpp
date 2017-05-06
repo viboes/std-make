@@ -68,10 +68,11 @@ namespace type_constructible {
   template <class T, class D>
   struct traits<unique_ptr<T, D>> : tag
   {
-    template <class ...Xs>
+    template <class M, class ...Xs>
     static //constexpr
-    unique_ptr<T, D> make(Xs&& ...xs)
+    M make(Xs&& ...xs)
     {
+      // fixme M doesn't works here
       return make_unique<T>(forward<Xs>(xs)...);
     }
   };
