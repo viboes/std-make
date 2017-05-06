@@ -14,6 +14,8 @@
 #include <experimental/fundamental/v3/nullable/ap.hpp>
 #include <experimental/fundamental/v3/nullable/bind.hpp>
 #include <experimental/fundamental/v3/nullable/visit.hpp>
+#include <experimental/fundamental/v3/nullable/value_or.hpp>
+#include <experimental/fundamental/v3/nullable/apply_or.hpp>
 
 // TypeConstructible
 #include <experimental/type_constructible.hpp>
