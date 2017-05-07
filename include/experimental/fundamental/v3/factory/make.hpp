@@ -116,6 +116,25 @@ namespace type_constructible
     return traits<N>::template make<N>(std::forward<Xs>(xs)...);
   }
 
+  // emplace() overload
+  template <class TC, int = 0, int...>
+  constexpr
+  enable_if_t<
+      meta::is_callable<TC(void)>::value,
+      meta::invoke<TC, void>
+  > emplace()
+  {
+    using M = meta::invoke<TC, void>;
+    return traits<M>::template emplace<M>();
+  }
+
+  template <template <class> class TC>
+  constexpr TC<void> emplace()
+  {
+    using M = TC<void>;
+    return traits<M>::template emplace<M>();
+  }
+
   // make overload: requires a type constructor, deduces the underlying type
   template <class TC, int = 0, int..., class ...Xs>
   constexpr enable_if_t<

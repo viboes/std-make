@@ -16,7 +16,6 @@ int main()
   std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
   {
     // This must fail as 1 is not an lvalue.
-    // todo: move to failing tests
     //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 //    error: no matching function for call to 'make_ready_future'
 //        std::future<int&> x = stde::make_ready_future<int&>(1);
