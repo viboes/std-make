@@ -27,7 +27,7 @@ Product-Type algorithms
 
 # Abstract
 
-This paper proposes some *ProductType* algorithms based on [P0327R2] proposal. 
+This paper proposes some *ProductType* algorithms based on [P0327R2] and [P0338R1] proposals. 
 
 # Table of Contents
 
@@ -62,23 +62,9 @@ Take in account the feedback from Kona meeting concerning [P0327R1]. Next follow
 
 # Motivation
 
-## Status-quo
-
-There are a lot of algorithms working on *ProductTYpe*; a lot of the homogeneous container algorithm are applicable to heterogeneous containers and functions, see [Boost.Fusion] and [Boost.Hana]. Some examples of such algorithms are `for_each`, `filter`, `find`, `fold`, `any_of`, `all_of`, `none_of`, `accumulate`, `count`, ...  
+There are a lot of algorithms working on *ProductType* [P0327R2]; a lot of the homogeneous container algorithm are applicable to heterogeneous containers and functions, see [Boost.Fusion] and [Boost.Hana]. Some examples of such algorithms are `for_each`, `filter`, `find`, `fold`, `any_of`, `all_of`, `none_of`, `accumulate`, `count`, ...  
 
 Other algorithms that need in addition that the *ProductType* to be also *TypeConstructible* are e.g. `transform`, `replace`, `join`, `zip`, `flatten`, ... 
-
-# Proposal
-
-This paper proposes some algorithms that can be built on top of the *ProductType* and the *TypeConstructible* requirements.
-
-# Design Rationale
-
-## Locating the interface on a specific namespace
-
-The name of  *product type* interface, `size`, `get`, `element`, are quite common. Nesting them on a specific namespace makes the intent explicit. 
-
-We can also preface them with `product_type_`, but the role of namespaces was to be able to avoid this kind of prefixes.
 
 ## Other functions for *ProductType*
 
@@ -93,21 +79,66 @@ Aside [BPT] there are a lot of useful function associated to product types that 
 
 This is the equivalent of `std::for_each` applicable to product types instead of homogeneous containers or range types.
 
-## `fold_left`/`fold_right`/`accumulate`
+### `fold_left`/`fold_right`/`accumulate`
 
 This is the equivalent of `std::accumulate` applicable to product types instead of homogeneous containers types. 
 
-## `all_of`
+### `all_of`
 
 Checks if n-unary n-predicate `p` returns `true` for all elements in the product type. 
 
-## `any_of`
+### `any_of`
 
 Checks if n-unary n-predicate `p` returns `true` for at least one elements in the product type. 
 
-## `none_of`
+### `none_of`
 
-Checks if n-n-unary predicate `p` returns `true` for no elements in the product type. 
+Checks if n-unary predicate `p` returns `true` for no elements in the product type. 
+
+## Other functions for *TypeConstructible* *ProductTypes*
+
+### `transform`
+
+```c++
+  template <class F, class ProductType>
+    constexpr `see below` transform(F&& f, ProductType&& pt);
+```
+
+This is the equivalent of `std::transform` applicable to product types instead of homogeneous containers types.
+
+This needs in addition that `ProductType` is *TypeConstructible* (See [P0338R0]).
+Note that `std::pair`, `std::tuple` and `std::array` are *TypeConstructible*, but `std::pair` and `std::array` limit either in the number or in the kind of types (all the ame). 
+A c-array is not type *TypeConstructible* as it cannot be returned by value.
+
+
+
+# Proposal
+
+This paper proposes some algorithms that can be built on top of the *ProductType* and the *TypeConstructible* requirements.
+
+# Design Rationale
+
+## Locating the interface on a specific namespace
+
+The name of  *product type* algorithms, `tarnsform`, `replace`, `join`, are quite common. Nesting them on a specific namespace makes the intent explicit. 
+
+We can also preface them with `product_type_`, but the role of namespaces was to be able to avoid this kind of prefixes.
+
+If the user want to use shorter name it has always the possibility to define an namespace alias.
+
+```c++
+namespace stdex = std::experimental;
+```
+
+or import those into his own namespace
+
+```c++
+namespace mns {
+    using namespace std::experimental;
+}
+```
+
+
 
 ## Other functions for *TypeConstructible* *ProductTypes*
 
@@ -125,19 +156,6 @@ We could also add a *TypeConstructible* parameter, as e.g.
 ```
 
 Where `TC` is a variadic template for a *ProductType* as e.g. `std::tuple` or a TypeConstructor [P0343R0]. 
-
-### `transform`
-
-```c++
-  template <class F, class ProductType>
-    constexpr `see below` transform(F&& f, ProductType&& pt);
-```
-
-This is the equivalent of `std::transform` applicable to product types instead of homogeneous containers types.
-
-This needs in addition that `ProductType` is *TypeConstructible* (See [P0338R0]).
-Note that `std::pair`, `std::tuple` and `std::array` are *TypeConstructible*, but `std::pair` and `std::array` limit either in the number or in the kind of types (all the ame). 
-A c-array is not type *TypeConstructible* as it cannot be returned by value.
 
 # Proposed Wording
 
@@ -224,10 +242,9 @@ The authors would like to have an answer to the following points if there is any
 
 ## Add other algorithms on *Product Types* 
 
-
 ## *Product Types* views and lazy algorithms
 
-Based on Range views for homogeneous Ranges [Range-v3], views for heterogeneous sequences [Boost.Fusion][Boost.Hana] define *Product Types* views, adaptors, ...
+Based on Range views for homogeneous Ranges [Range-v3], views for heterogeneous sequences [Boost.Fusion], [Boost.Hana] define *Product Types* views, adaptors, ...
 
 ## Tagged *Product Types*
 
@@ -241,8 +258,14 @@ Special thanks and recognition goes to Technical Center of Nokia - Lannion for s
 
 # References
 
+[Boost.Fusion]: http://www.boost.org/doc/libs/1_60_0/libs/fusion/doc/html/index.html "Boost.Fusion 2.2 library"
+
+[Boost.Hana]: http://boostorg.github.io/hana/index.html "Boost.Hana library"
+
 
 [N4564]: http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/n4564.pdf "N4564 - Working Draft, C++ Extensions for Library Fundamentals, Version 2 PDTS"
+
+[N4569]: http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/n4569.pdf "Proposed Ranges TS working draft"
 
 [P0327R1]: http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0327r1.pdf  "Product Type Access (Revision 1)"   
 
@@ -256,10 +279,22 @@ Special thanks and recognition goes to Technical Center of Nokia - Lannion for s
 
 [Range-v3]: https://github.com/ericniebler/range-v3 "range-v3"
 
+* [Boost.Fusion] Boost.Fusion 2.2 library
+
+    http://www.boost.org/doc/libs/1_60_0/libs/fusion/doc/html/index.html
+
+* [Boost.Hana] Boost.Hana library
+
+    http://boostorg.github.io/hana/index.html
 
 * [N4564] N4564 - Working Draft, C++ Extensions for Library Fundamentals, Version 2 PDTS
 
     http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/n4564.pdf
+
+* [N4569] Proposed Ranges TS working draft
+ 
+    http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/n4569.pdf
+
 
 * [P0327R1] Product Type Access (Revision 1)
 

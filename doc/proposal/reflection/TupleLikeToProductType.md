@@ -64,16 +64,27 @@ There are some algorithms working almost on *tuple-like* types that can be exten
 
 # Motivation
 
-## Status-quo
+## Adaptation
 
-Algorithms such as `std::tuple_cat` and `std::experimental::apply` that work well with *tuple-like* types, should work also for *ProductType* types. There are many more of them [BPTA] and [OPTA] that takes in account some of the algorithms that work well with *ProductTypes*. .  
+Algorithms such as `std::tuple_cat` and `std::experimental::apply` that work well with *tuple-like* types, should work also for any *ProductType* types. There are many more of them [BPTA] and [OPTA] that takes in account some of the algorithms that work well with *ProductTypes*.   
+
+## Reuse
+
+The definition of the existing functions will surely be implemented using the same algorithm generalized for any *ProductType*. This paper proposes only the algorithms that could be needed to implement the current *tuple-like* interface. 
+
+## Deprecation
+
+Some of the old algorithms could be deprecated in favor of the new ones.
+
+## Extension
+
+There are many more of them [BPTA] and [OPTA] that takes in account some of the algorithms that work well with *ProductTypes*.   
 
 
 # Proposal
 
 
-
-## Algorithms and function adaptation
+## *tuple-like* algorithms and function adaptation
 
 ### <tuple>
 
@@ -119,16 +130,10 @@ Similar to the `tuple` constructor from `pair`.
 
 This simplifies a lot the `std::pair` interface (See [N4387]).
 
-
-# Design Rationale
-
-
-## Namespace `product_type`
-
-
 ## Functions for *ProductType*
 
-There are a lot of useful function associated to product types that make use only of the product type access traits and functions.
+The definition of the existing function will surely be implemented using the same algorithm generalized for any *ProductType*.
+
 
 ### `product_type::apply`
 
@@ -242,6 +247,18 @@ Where `TC` is a variadic template for a *ProductType* as e.g. `std::tuple` or a 
 Note that `std::pair`, `std::tuple` and `std::array` are *TypeConstructible*, but `std::pair` and `std::array` limit either in the number or in the kind of types (all the same). 
 
 A c-array is not type *TypeConstructible* as it cannot be returned by value.
+
+
+# Design Rationale
+
+
+## Locating the interface on a specific namespace
+
+The name of  *product type* interface, `size`, `get`, `element`, are quite common. Nesting them on a specific namespace makes the intent explicit. 
+
+We can also preface them with `product_type_`, but the role of namespaces was to be able to avoid this kind of prefixes.
+
+
 
 # Proposed Wording
 
