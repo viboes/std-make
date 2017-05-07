@@ -20,18 +20,9 @@
 #include <boost/detail/lightweight_test.hpp>
 #include <iostream>
 
-struct A
-{
-  int v;
-  A(): v(3) {}
-  A(int v): v(std::move(v)) {}
-  A(int v1, int v2): v(v1+v2) {}
-};
-
 int main()
 {
   namespace stde = std::experimental;
-
   std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
   {
     // This must fail as 1 is not an lvalue.
@@ -41,9 +32,14 @@ int main()
 //        std::future<int&> x = stde::make_ready_future<int&>(1);
     std::future<int&> x = stde::make_ready_future<int&>(1);
   }
+
 #if 0
   std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
   {
+    // This must fail as 1 is not an lvalue.
+    //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+//    error: no matching function for call to 'make_ready_future'
+//        std::future<int&> x = stde::make_ready_future<int&>(1);
     int v=0;
     std::future<int&> x = stde::make_ready_future<int>(v);
     BOOST_TEST(&x.get() == &v);

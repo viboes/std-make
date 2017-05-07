@@ -66,6 +66,7 @@ test-suite make_ready_future
     : 
       [ run make/make_ready_future_pass.cpp  ]
       [ compile-fail make/make_ready_future_ref_lit_fail.cpp  ]
+      [ compile-fail make/make_ready_future_ref_lvalue_fail.cpp  ]
     ;
 
 test-suite emplace_ready_future
