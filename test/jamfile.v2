@@ -62,6 +62,18 @@ test-suite std_expected
       [ run make/make_std_expected_pass.cpp  ]
     ;
 
+test-suite make_ready_future
+    : 
+      [ run make/make_ready_future_pass.cpp  ]
+      [ compile-fail make/make_ready_future_ref_lit_fail.cpp  ]
+    ;
+
+test-suite emplace_ready_future
+    : 
+      [ run make/emplace_ready_future_pass.cpp  ]
+      [ compile-fail make/emplace_ready_future_ref_lit_fail.cpp  ]
+    ;
+
 test-suite std_future
     : 
       [ run make/make_std_future_pass.cpp  ]

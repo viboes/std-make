@@ -31,67 +31,6 @@ struct A
 int main()
 {
   namespace stde = std::experimental;
-  std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
-  {
-    std::future<void> x = stde::make_ready_future();
-    std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
-    x.get();
-    std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
-  }
-  std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
-  {
-    int v=0;
-    std::future<int> x = stde::make_ready_future(v);
-    BOOST_TEST(x.get() == 0);
-  }
-  std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
-  {
-    int v=0;
-    std::future<int&> x = stde::make_ready_future(std::ref(v));
-    BOOST_TEST(&x.get() == &v);
-  }
-#if 0
-  std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
-  {
-    // This must fail as 1 is not an lvalue.
-    // todo: move to failing tests
-    //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    std::future<int&> x = stde::make_ready_future<int&>(1);
-  }
-#endif
-
-
-  std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
-  {
-    std::future<A> x = stde::emplace_ready_future<A>();
-    BOOST_TEST(x.get().v == 3);
-  }
-  std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
-  {
-    int v=1;
-    std::future<A> x = stde::emplace_ready_future<A>(v,v);
-    BOOST_TEST(x.get().v == 2);
-  }
-  std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
-  {
-    int v=0;
-    std::future<int> x = stde::emplace_ready_future<int>(v);
-    BOOST_TEST(x.get() == 0);
-  }
-  std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
-  {
-    std::future<int> x = stde::emplace_ready_future<int>();
-    BOOST_TEST_EQ(x.get(),  0);
-  }
-  std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
-  {
-    int v=0;
-    std::future<int&> x = stde::emplace_ready_future<int&>(v);
-    BOOST_TEST(&x.get() == &v);
-  }
-
-
-
 
   std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
   {
@@ -121,12 +60,22 @@ int main()
     std::future<int> x = stde::make<std::future<int>>(v);
     BOOST_TEST(x.get() == 0);
   }
+#if 0
+  std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
+  {
+    // fixme
+    short v=0;
+    std::future<int> x = stde::make<std::future<int>>(v);
+    BOOST_TEST(x.get() == 0);
+  }
+#endif
   std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
   {
     int v=0;
     std::future<int> x = stde::make<std::future<stde::_t>>(v);
     BOOST_TEST(x.get() == 0);
   }
+
 
   std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
   {
@@ -146,10 +95,16 @@ int main()
     std::future<int&> x = stde::make<std::future<int&>>(std::ref(v));
     BOOST_TEST(x.get() == 0);
   }
+  std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
+  {
+    int v=0;
+    std::future<int&> x = stde::make<std::future<int&>>(std::ref(v));
+    BOOST_TEST(&x.get() == &v);
+  }
 #if 0
   std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
   {
-    //this fail as v is deduce as int
+    //this fail as v is deduced as int
     // todo: move to failing tests
     int v=0;
     std::future<int&> x = stde::make<std::future<int&>>(v);
@@ -159,12 +114,6 @@ int main()
   std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
   {
     int v=0;
-    std::future<int&> x = stde::make<std::future<int&>>(std::ref(v));
-    BOOST_TEST(&x.get() == &v);
-  }
-  std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
-  {
-    int v=0;
     std::future<int&> x = stde::make<std::future<stde::_t>>(std::ref(v));
     BOOST_TEST(&x.get() == &v);
   }
@@ -177,7 +126,7 @@ int main()
 #if 0
   std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
   {
-    //this fail as v is deduce as int
+    //this fail as v is deduced as int
     // todo: move to failing tests
     int v=0;
     std::future<int&> x = stde::make<std::future<stde::_t&>>(v);
@@ -185,12 +134,53 @@ int main()
   }
 #endif
 
+#if 0
+  std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
+  {
+    //this fail as 1 is not an lvalue
+    // todo: move to failing tests
+    std::future<int&> x = stde::make<std::future<stde::_t&>>(1);
+  }
+#endif
 
+
+  std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
+  {
+    std::future<void> x = stde::emplace<std::future<void>>();
+    //BOOST_TEST(x.is_ready());
+    x.wait();
+  }
   std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
   {
     std::future<int> x = stde::emplace<std::future<int>>();
     BOOST_TEST_EQ(x.get(),  0);
   }
+
+  std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
+  {
+    int v=0;
+    std::future<int> x = stde::emplace<std::future>(v);
+    BOOST_TEST(x.get() == 0);
+  }
+  std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
+  {
+    int v=0;
+    std::future<int> x = stde::emplace<std::future<int>>(v);
+    BOOST_TEST(x.get() == 0);
+  }
+  std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
+  {
+    short v=0;
+    std::future<int> x = stde::emplace<std::future<int>>(v);
+    BOOST_TEST(x.get() == 0);
+  }
+  std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
+  {
+    int v=0;
+    std::future<int> x = stde::emplace<std::future<stde::_t>>(v);
+    BOOST_TEST(x.get() == 0);
+  }
+
   std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
   {
     int v=0;
@@ -207,20 +197,6 @@ int main()
   {
     int v=0;
     std::future<int&> x = stde::emplace<std::future<stde::_t&>>(v);
-    BOOST_TEST(&x.get() == &v);
-  }
-#if 0
-  std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
-  {
-    //this fail as 1 is not an lvalue
-    // todo: move to failing tests
-    std::future<int&> x = stde::make<std::future<stde::_t&>>(1);
-  }
-#endif
-  std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
-  {
-    int v=0;
-    auto x = stde::make<std::future<stde::_t>>(std::ref(v));
     BOOST_TEST(&x.get() == &v);
   }
   return ::boost::report_errors();
