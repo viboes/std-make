@@ -16,10 +16,9 @@ int main()
 
   std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
   {
-    // This must fail as 1 is not an lvalue.
-    // todo: move to failing tests
-    //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    std::future<int&> x = stde::emplace_ready_future<int&>(1);
+    int v=0;
+    std::future<int&> x = stde::make_ready_future<int&>(v);
+    BOOST_TEST(&x.get() == &v);
   }
 
   return ::boost::report_errors();

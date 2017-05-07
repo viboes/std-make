@@ -19,7 +19,7 @@ int main()
     // This must fail as 1 is not an lvalue.
     // todo: move to failing tests
     //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    std::future<int&> x = stde::emplace_ready_future<int&>(1);
+    std::future<int&> x = stde::emplace_ready_future<int&>();
   }
 
   return ::boost::report_errors();
