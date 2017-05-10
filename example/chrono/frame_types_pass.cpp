@@ -17,63 +17,197 @@ using symbols      = std::chrono::duration<uint32_t,  std::ratio_divide<slots::p
 
 using bi_frames     = std::chrono::duration<uint32_t,  std::ratio_multiply<std::ratio<2>,    frames::period>::type>;
 using x_frames     = std::chrono::duration<uint32_t,  std::ratio_multiply<std::ratio<1024>, frames::period>::type>;
+using h_frames     = std::chrono::duration<uint32_t,  std::ratio_multiply<std::ratio<1024>, x_frames::period>::type>;
 using bi_slots      = std::chrono::duration<uint32_t,  std::ratio_multiply<std::ratio<2>,    slots::period>::type>;
 
 // relative numbers
+using h_frame_number    = stdex::chrono::modulo<x_frames,  h_frames,  uint16_t>; //1024
 using frame_number      = stdex::chrono::modulo<frames,    x_frames,  uint16_t>; //1024
+using x_frame_number    = frame_number;
+
+using hx_frame_number    = stdex::chrono::modulo<frames,  h_frames,  uint16_t>; //1024*1024
+
 using subframe_number   = stdex::chrono::modulo<subframes, frames,     uint8_t>; //10
 using slot_number       = stdex::chrono::modulo<slots,     subframes,  uint8_t>; //2
 using symbol_number     = stdex::chrono::modulo<symbols,   slots,      uint8_t>; //7
 using bi_frame_number    = stdex::chrono::modulo<frames,    bi_frames,   uint8_t>; //2
 
-using x_subframe_number = stdex::chrono::modulo<subframes, x_frames, uint16_t>; // 10240
-using bi_subframe_number = stdex::chrono::modulo<subframes, bi_frames, uint8_t>; // 20
-using bi_symbol_number = stdex::chrono::modulo<symbols, bi_slots, uint8_t>;      // 14
+using h_subframe_number = stdex::chrono::modulo<subframes, h_frames, uint16_t>; // 10*1240*1024
+using x_subframe_number = stdex::chrono::modulo<subframes, x_frames, uint16_t>; // 10*1240
+using bi_subframe_number = stdex::chrono::modulo<subframes, bi_frames, uint8_t>; // 10*2
+using bi_symbol_number = stdex::chrono::modulo<symbols, bi_slots, uint8_t>;      // 7*2
 
-x_subframe_number make_x_subframe_number(frame_number fn, subframe_number sfn) {
-       return x_subframe_number(fn.to_duration()+sfn.to_duration()) ;
+
+inline constexpr h_subframe_number make_h_subframe_number(h_frame_number hfn, x_frame_number xfn, subframe_number sfn) {
+       return h_subframe_number(hfn.to_duration() + xfn.to_duration() + sfn.to_duration()) ;
 }
 
-bi_subframe_number make_bi_subframe_number(bi_frame_number fn, subframe_number sfn) {
-       return bi_subframe_number(fn.to_duration()+sfn.to_duration()) ;
+
+inline constexpr x_subframe_number make_x_subframe_number(frame_number fn, subframe_number sfn) {
+       return x_subframe_number(fn.to_duration() + sfn.to_duration()) ;
 }
 
-bi_symbol_number make_bi_subframe_number(slot_number sn, symbol_number syn) {
+inline constexpr bi_subframe_number make_bi_subframe_number(bi_frame_number fn, subframe_number sfn) {
+       return bi_subframe_number(fn.to_duration() + sfn.to_duration()) ;
+}
+
+inline constexpr bi_symbol_number make_bi_subframe_number(slot_number sn, symbol_number syn) {
        return bi_symbol_number(sn.to_duration() + syn.to_duration()) ;
 }
 
-template <class ModuloFrom>
-frame_number to_frame_number(ModuloFrom m)
+template <class SubDuration, class Duration, class Rep>
+constexpr x_frames to_x_frames(stdex::chrono::modulo<SubDuration, Duration, Rep> m)
 {
-    return stdex::chrono::to_modulo<frame_number>(m);
+    using ModuloToA = stdex::chrono::modulo<SubDuration,   h_frames,    std::uint16_t>;
+    auto s = stdex::chrono::to_modulo<ModuloToA>(m);
+
+    using ModuloTo = stdex::chrono::modulo<x_frames,   h_frames,    std::uint8_t>;
+    return stdex::chrono::to_modulo<ModuloTo>(s).to_duration();
 }
 
-template <class ModuloFrom>
-subframe_number to_subframe_number(ModuloFrom m)
+template <class SubDuration, class Duration, class Rep>
+constexpr x_frame_number to_x_frame_number(stdex::chrono::modulo<SubDuration, Duration, Rep> m)
 {
-    return stdex::chrono::to_modulo<subframe_number>(m);
+  return x_frame_number(to_x_frames(m));
 }
 
-template <class ModuloFrom>
-slot_number to_slot_number(ModuloFrom m)
+template <class SubDuration, class Duration, class Rep>
+constexpr frames to_frames(stdex::chrono::modulo<SubDuration, Duration, Rep> m)
 {
-    return stdex::chrono::to_modulo<slot_number>(m);
+  using ModuloToA = stdex::chrono::modulo<SubDuration,   h_frames,    std::uint16_t>;
+  auto s = stdex::chrono::to_modulo<ModuloToA>(m);
+
+  using F = stdex::chrono::modulo<frames,   h_frames,    std::int32_t>;
+
+  auto x_frames =  to_x_frames(s);
+  return stdex::chrono::to_modulo<F>(m).to_duration()-x_frames;
+
+}
+template <class SubDuration, class Duration, class Rep>
+constexpr frame_number to_frame_number(stdex::chrono::modulo<SubDuration, Duration, Rep> m)
+{
+    return frame_number(to_frames(m));
 }
 
-template <class ModuloFrom>
-symbol_number to_symbol_number(ModuloFrom m)
+template <class SubDuration, class Duration, class Rep>
+constexpr subframes to_subframes(stdex::chrono::modulo<SubDuration, Duration, Rep> m)
 {
-    return stdex::chrono::to_modulo<slot_number>(m);
+  using ModuloToA = stdex::chrono::modulo<SubDuration,   h_frames,    std::uint16_t>;
+  auto s = stdex::chrono::to_modulo<ModuloToA>(m);
+
+  using SF = stdex::chrono::modulo<subframes,   h_frames,    std::int32_t>;
+
+  auto x_frames =  to_x_frames(s);
+  auto frames =  to_frames(s);
+  return stdex::chrono::to_modulo<SF>(m).to_duration() - x_frames - frames;
+}
+template <class SubDuration, class Duration, class Rep>
+constexpr subframe_number to_subframe_number(stdex::chrono::modulo<SubDuration, Duration, Rep> m)
+{
+  return subframe_number(to_subframes(m));
+}
+
+template <class SubDuration, class Duration, class Rep>
+constexpr slots to_slots(stdex::chrono::modulo<SubDuration, Duration, Rep> m)
+{
+  using ModuloToA = stdex::chrono::modulo<SubDuration,   h_frames,    std::uint16_t>;
+  auto s = stdex::chrono::to_modulo<ModuloToA>(m);
+
+  using S = stdex::chrono::modulo<slots,   h_frames,    std::int32_t>;
+
+  auto x_frames =  to_x_frames(s);
+  auto frames =  to_frames(s);
+  auto subframes =  to_subframes(s);
+  return stdex::chrono::to_modulo<S>(m).to_duration() - x_frames - frames - subframes;
+}
+template <class SubDuration, class Duration, class Rep>
+constexpr slot_number to_slot_number(stdex::chrono::modulo<SubDuration, Duration, Rep> m)
+{
+  return slot_number(to_slots(m));
+}
+
+template <class SubDuration, class Duration, class Rep>
+constexpr symbols to_symbols(stdex::chrono::modulo<SubDuration, Duration, Rep> m)
+{
+  using ModuloToA = stdex::chrono::modulo<SubDuration,   h_frames,    std::uint16_t>;
+  auto s = stdex::chrono::to_modulo<ModuloToA>(m);
+
+  using S = stdex::chrono::modulo<symbols,   h_frames,    std::int32_t>;
+
+  auto x_frames =  to_x_frames(s);
+  auto frames =  to_frames(s);
+  auto subframes =  to_subframes(s);
+  auto slots =  to_slots(s);
+  return stdex::chrono::to_modulo<S>(m).to_duration() - x_frames - frames - subframes - slots;
+}
+
+template <class SubDuration, class Duration, class Rep>
+constexpr symbol_number to_symbol_number(stdex::chrono::modulo<SubDuration, Duration, Rep> m)
+{
+  return symbol_number(to_symbols(m));
 }
 
 struct x_subframe_numbers {
     frame_number fn;
     subframe_number sfn;
     x_subframe_numbers() = default;
-    x_subframe_numbers(frame_number fn, subframe_number sfn) : fn(fn), sfn(sfn) {}
-    operator x_subframe_number() { return make_x_subframe_number(fn, sfn); }
+    constexpr x_subframe_numbers(frame_number fn, subframe_number sfn) : fn(fn), sfn(sfn) {}
+    constexpr operator x_subframe_number() { return make_x_subframe_number(fn, sfn); }
     //explicit operator bi_subframe_number() { return make_bi_subframe_number(fn, sfn); }
 };
+
+// Should the following be members?
+// No because for modulo types it is a non-member function
+inline constexpr h_frame_number to_h_frame_number(x_subframe_numbers xsfn)
+{
+    return h_frame_number(0);
+}
+inline constexpr frame_number to_frame_number(x_subframe_numbers xsfn)
+{
+    return xsfn.fn;
+}
+inline constexpr subframe_number to_subframe_number(x_subframe_numbers xsfn)
+{
+    return xsfn.sfn;
+}
+inline constexpr slot_number to_slot_number(x_subframe_numbers xsfn)
+{
+    return slot_number(0);
+}
+inline constexpr symbol_number to_symbol_number(x_subframe_numbers xsfn)
+{
+    return symbol_number(0);
+}
+
+struct h_subframe_numbers {
+    h_frame_number hfn;
+    x_frame_number xfn;
+    subframe_number sfn;
+    h_subframe_numbers() = default;
+    constexpr h_subframe_numbers(h_frame_number hfn, x_frame_number xfn, subframe_number sfn) : hfn(hfn), xfn(xfn) , sfn(sfn) {}
+    constexpr operator h_subframe_number() { return make_h_subframe_number(hfn, xfn, sfn); }
+};
+
+inline constexpr h_frame_number to_h_frame_number(h_subframe_numbers hsfn)
+{
+    return hsfn.hfn;
+}
+inline constexpr frame_number to_frame_number(h_subframe_numbers hsfn)
+{
+    return hsfn.xfn;
+}
+inline constexpr subframe_number to_subframe_number(h_subframe_numbers hsfn)
+{
+    return hsfn.sfn;
+}
+inline constexpr slot_number to_slot_number(h_subframe_numbers hsfn)
+{
+    return slot_number(0);
+}
+inline constexpr symbol_number to_symbol_number(h_subframe_numbers hsfn)
+{
+    return symbol_number(0);
+}
 
 static_assert(frame_number::cardinal  == 1024, "1024 frames are not a x_frame");
 static_assert(subframe_number::cardinal  == 10, "10 sub frames are not a frame");
@@ -85,15 +219,32 @@ static_assert(symbols::period::num  == 1, "");
 static_assert(symbols::period::den  == 7*2000, "");
 
 //! Auxiliary functions
-inline bool parity(bi_subframe_number x) {
+inline constexpr bool parity(bi_subframe_number x) {
   return to_frame_number(x) == frame_number{0};
 }
+
+// todo Add literals
+// h_frames -> _hfs
+// frames -> _xfs
+// subframes -> _sfs
+
+// frame_number -> _fn
+// subframe_number -> _sfn
+// slot_number -> _sn
+// symbol_number -> _syn
+
+
 
 #include <boost/detail/lightweight_test.hpp>
 #include <iostream>
 
 int main()
 {
+  {
+    constexpr   x_subframe_number xsfn =  make_x_subframe_number(frame_number{5}, subframe_number{3});
+    static_assert(xsfn.count()  == 53, "");
+
+  }
   subframes num_of_sfs{4};
   num_of_sfs++;
   frames num_of_fs{2};
@@ -103,10 +254,14 @@ int main()
   {
       x_subframe_number xsfn {x};
       std::cout << "xsfn = " << xsfn << "\n";
+      slot_number slotn =  to_slot_number(xsfn);
+      std::cout << "slotn = " << slotn << "\n";
       subframe_number sfn =  to_subframe_number(xsfn);
       std::cout << "sfn = " << sfn << "\n";
       frame_number fn =  to_frame_number(xsfn);
       std::cout << "fn = " << fn << "\n";
+      x_frame_number xfn =  to_x_frame_number(xsfn);
+      std::cout << "xfn = " << xfn << "\n";
 
       {
           x_subframe_number x { frames(fn) + subframes(sfn) };
@@ -137,7 +292,7 @@ int main()
 
   std::cout << "==================\n";
 
-  x_subframe_number  x2 =make_x_subframe_number( fn, sfn );
+  x_subframe_number  x2 = make_x_subframe_number( fn, sfn );
   std::cout << "xsfn2= " << x2 << "\n";
   bi_subframe_number bsfn2 = stdex::chrono::to_modulo<bi_subframe_number>(x2) ;
       std::cout << "bsfn2= " << bsfn2 << "\n";
