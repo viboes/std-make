@@ -31,59 +31,33 @@ using second = stdex::chrono::modulo<std::chrono::seconds, std::chrono::minutes,
 template <class Duration>
 using time_of_day = stdex::chrono::modulo<Duration, days, std::int32_t >;
 
-
-template <class Duration>
-std::chrono::hours to_hours(time_of_day<Duration> m)
-{
-    using ModuloTo = stdex::chrono::modulo<std::chrono::hours,   days,    std::uint8_t>;
-    return stdex::chrono::to_modulo<ModuloTo>(m).to_duration();
-}
-
-template <class ModuloFrom>
-std::chrono::minutes to_minutes(ModuloFrom m)
-{
-    using MinuteDay = stdex::chrono::modulo<std::chrono::minutes,   days,    std::int32_t>;
-
-    auto _hours =  to_hours(m);
-    return stdex::chrono::to_modulo<MinuteDay>(m).to_duration()-_hours;
-}
-
-template <class ModuloFrom>
-std::chrono::seconds to_seconds(ModuloFrom m)
-{
-  using SecondDay   = stdex::chrono::modulo<std::chrono::seconds,   days,    std::int32_t>;
-
-  auto _hours =  to_hours(m);
-  auto _min =  to_minutes(m);
-  return stdex::chrono::to_modulo<SecondDay>(m).to_duration() - _min - _hours;
-}
-
 template <class ModuloFrom>
 hour to_hour(ModuloFrom m)
 {
-    return hour(to_hours(m));
+    return stdex::chrono::modulo_cast<hour, days>(m);
 }
+
 template <class ModuloFrom>
 am_pm to_am_pm(ModuloFrom m)
 {
-    return stdex::chrono::to_modulo<am_pm>(m);
+  return stdex::chrono::modulo_cast<am_pm, days>(m);
 }
 template <class ModuloFrom>
 am_pm_hour to_am_pm_hour(ModuloFrom m)
 {
-    return stdex::chrono::to_modulo<am_pm_hour>(m);
+  return stdex::chrono::modulo_cast<am_pm_hour, days>(m);
 }
 
 template <class ModuloFrom>
 minute to_minute(ModuloFrom m)
 {
-  return minute(to_minutes(m));
+  return stdex::chrono::modulo_cast<minute, days>(m);
 }
 
 template <class ModuloFrom>
 second to_second(ModuloFrom m)
 {
-  return second(to_seconds(m));
+  return stdex::chrono::modulo_cast<second, days>(m);
 }
 static_assert(am_pm_hour::cardinal  == 12, "12 hours are not a half-day");
 static_assert(am_pm::cardinal  == 2, "2 half-days are not a day");
@@ -100,20 +74,20 @@ int main()
 {
   {
                                             //   ms        sec       min  h
-    time_of_day<std::chrono::milliseconds> t2{ 234+ 1000*(2 + 60 * ( 4 + 8 * 60 ) )};
-    std::cout << "t2 = " << t2.count() << "\n";
+      time_of_day<std::chrono::milliseconds> t2{ 234+ 1000*(2 + 60 * ( 4 + 8 * 60 ) )};
+      std::cout << "t2 = " << t2.count() << "\n";
       time_of_day<std::chrono::milliseconds> t{ std::chrono::milliseconds(234)+ std::chrono::seconds(2) + std::chrono::minutes(4) + std::chrono::hours(20)};
       std::cout << "t = " << t.count() << "\n";
 
       std::cout << "am_pm = " << int(to_am_pm(t).count()) << "\n";
       std::cout << "am_pm_hour = " << int(to_am_pm_hour(t).count()) << "\n";
-      std::cout << "hour = " << int(to_hours(t).count()) << "\n";
-      std::cout << "minute = " << int(to_minutes(t).count()) << "\n";
-      std::cout << "second = " << int(to_seconds(t).count()) << "\n";
+      std::cout << "hour = " << int(to_hour(t).count()) << "\n";
+      std::cout << "minute = " << int(to_minute(t).count()) << "\n";
+      std::cout << "second = " << int(to_second(t).count()) << "\n";
 
       BOOST_TEST(to_am_pm(t).count() == 1);
       BOOST_TEST(to_am_pm_hour(t).count() == 8);
-      BOOST_TEST(to_hour(t).count() == 20);
+      BOOST_TEST_EQ(to_hour(t).count(), 20);
       BOOST_TEST_EQ(to_minute(t).count(), 4);
       BOOST_TEST_EQ(to_second(t).count(), 2);
   }

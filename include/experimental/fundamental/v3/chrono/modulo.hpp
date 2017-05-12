@@ -45,6 +45,7 @@ namespace chrono
   class modulo final
   {
       Rep m_value;
+
   public:
       //fixme:: shouldn't the representation be unsigned?
       //fixme:: shouldn't the representation be able to represent all the values in 0..cardinal?
@@ -67,7 +68,7 @@ namespace chrono
       //! @par Requires:<br> is_convertible<Rep2, Rep>
       //! @par Effects:<br> constructs a modulo converting the representations
       template <class Rep2>
-      constexpr modulo(modulo<Duration, SuperDuration, Rep2> const& v) : m_value(v.m_value) {}
+      constexpr modulo(modulo<Duration, SuperDuration, Rep2> const& v) : m_value(v.count()) {}
 
       //! @par Effects:<br> constructs a modulo doing the modulo of the representation
       constexpr explicit modulo(duration_t v) : m_value(static_cast<rep>(v.count()) % cardinal) {}
@@ -172,6 +173,35 @@ namespace chrono
         return modulo(cardinal-1);
       }
   };
+  // fixme: do we want to be able to add two modulo, e.g.
+  // hour + minute?
+  // frame_number + subframe_number?
+  // What will be the result? x_subframe_number. Can it be deduced?
+  // frame_number -> frames
+  // subframe_number -> subframes
+  // common_type subframes
+  // so the result must be modulo<subframes, XXX, RRR>
+  // XXX must be the super duration => frames
+  // RRR must be the
+
+  // bi_frame_number + subframe_number?
+  // What will be the result? bi_subframe_number. Can it be deduced?
+  // by_frame_number -> bi_frames
+  // subframe_number -> subframes
+  // common_type subframes
+  // so the result must be modulo<subframes, XXX, RRR>
+  // XXX must be the super duration => bi_frames
+  // RRR must be the
+
+  // frame_number + bi_subframe_number?
+  // What will be the result? bi_subframe_number. Can it be deduced?
+  // frame_number -> frames
+  // bi_subframe_number -> bi_subframes
+  // common_type bi_subframes
+  // so the result must be modulo<subframes, XXX, RRR>
+  // XXX must be the super duration => frames
+  // RRR must be the
+
 #if ! defined JASEL_DOXYGEN_INVOKED
 
   namespace  chrono_detail
@@ -180,8 +210,7 @@ namespace chrono
     struct is_modulo : false_type {};
     template <class D, class SD, class R>
     struct is_modulo<modulo<D,SD,R>> : true_type{};
-  }
-#endif
+
   //! @par Requires:<br> modulo<D,SD,R> is more fine grained than ModuloTo
   //! @par Returns:<br> The ModuloTo of the duration_cast<typename ModuloTo::duration_t>()
   //! @par Note:<br> The duration cast is needed because the representation
@@ -190,7 +219,9 @@ namespace chrono
   ModuloTo
 #else
   enable_if_t <
-    chrono_detail::is_modulo<ModuloTo>::value, ModuloTo
+    chrono_detail::is_modulo<ModuloTo>::value
+    && (is_same<SD, typename ModuloTo::super_duration_t>::value || is_same<D, typename ModuloTo::duration_t>::value)
+    , ModuloTo
   >
 #endif
   to_modulo(modulo<D,SD,R> m)
@@ -200,11 +231,36 @@ namespace chrono
           std::chrono::duration_cast<duration_to>(m.to_duration())
           );
   }
+}
+#endif
+
+  template <class ModuloTo, class SuperDuration, class SubDuration, class Duration, class Rep>
+  constexpr
+#if defined JASEL_DOXYGEN_INVOKED
+  ModuloTo
+#else
+  enable_if_t <
+    chrono_detail::is_modulo<ModuloTo>::value
+  , ModuloTo
+  >
+#endif
+  modulo_cast(modulo<SubDuration, Duration, Rep> m)
+  {
+    using SubDurationSuperDuration = modulo<SubDuration,   SuperDuration,    std::uint64_t>;
+    using SubModSuperDuration = modulo<typename ModuloTo::duration_t,   SuperDuration,    std::uint64_t>;
+    using ModuloToX = modulo<typename ModuloTo::duration_t,   typename ModuloTo::super_duration_t,    std::uint64_t>;
+
+    return chrono_detail::to_modulo<ModuloToX>(
+              chrono_detail::to_modulo<SubModSuperDuration>(
+                 chrono_detail::to_modulo<SubDurationSuperDuration>(m)
+              )
+           );
+  }
 
 } //chrono
 
 namespace ordinal {
-  //! chrono::moduloD,SD,R> is a -n ordinal type that can be used with the ordinal containers
+  //! chrono::moduloD,SD,R> is an ordinal type that can be used with the ordinal containers
   template <class D, class SD, class R>
   struct traits<chrono::modulo<D,SD,R>> : ordinal::tag
   {
