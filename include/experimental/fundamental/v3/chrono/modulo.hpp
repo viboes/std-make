@@ -68,7 +68,7 @@ namespace chrono
       //! @par Requires:<br> is_convertible<Rep2, Rep>
       //! @par Effects:<br> constructs a modulo converting the representations
       template <class Rep2>
-      constexpr modulo(modulo<Duration, SuperDuration, Rep2> const& v) : m_value(v.count()) {}
+      constexpr modulo(modulo<Duration, SuperDuration, Rep2> const& v) : m_value(static_cast<rep>(v.count())) {}
 
       //! @par Effects:<br> constructs a modulo doing the modulo of the representation
       constexpr explicit modulo(duration_t v) : m_value(static_cast<rep>(v.count()) % cardinal) {}
