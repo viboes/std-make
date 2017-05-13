@@ -5,7 +5,7 @@
     </tr>
     <tr>
         <td width="172" align="left" valign="top">Date:</td>
-        <td width="435">2016-10-16</td>
+        <td width="435">2017-05-13</td>
     </tr>
     <tr>
         <td width="172" align="left" valign="top">Project:</td>
@@ -31,30 +31,28 @@ This paper proposes some *ProductType* algorithms based on [P0327R2] and [P0338R
 
 # Table of Contents
 
-[History](#history)
-[Introduction](#introduction)
-[Motivation](#motivation)
-[Proposal](#proposal)
-[Design Rationale](#design-rationale)
-[Proposed Wording](#proposed-wording)
-[Implementability](#implementability)
-[Open points](#open-points)
-[Future work](#future-work)
-[Acknowledgements](#acknowledgements)
-[References](#references)
+* [History](#history)
+* [Introduction](#introduction)
+* [Motivation](#motivation)
+* [Proposal](#proposal)
+* [Design Rationale](#design-rationale)
+* [Proposed Wording](#proposed-wording)
+* [Implementability](#implementability)
+* [Open points](#open-points)
+* [Future work](#future-work)
+* [Acknowledgements](#acknowledgements)
+* [References](#references)
 
 # History
 ## R0
 
-Take in account the feedback from Kona meeting concerning [P0327R1]. Next follows the direction of the committee: 
+Take in account the feedback from Kona meeting concerning [P0327R1]. Next follows the direction of the committee: Split the proposal into 3 documents
 
-* Split the proposal into 3 documents
-    * Product Type access
-    * Adaptation of current tuple-like algorithms to *ProductType*
-    * Basic *ProductType* algorithms
-    * Other *ProductType* algorithms
+* Product Type Access
+* Adaptation of current tuple-like algorithms to *ProductType*
+* Basic *ProductType* algorithms
      
-* In this document, we describe more algorithms applicable to *ProductTypes.  
+In this document, we describe some additional basic algorithms applicable to *ProductTypes*.  
 
 
 # Introduction
