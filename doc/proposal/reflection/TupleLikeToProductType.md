@@ -5,7 +5,7 @@
     </tr>
     <tr>
         <td width="172" align="left" valign="top">Date:</td>
-        <td width="435">2016-10-16</td>
+        <td width="435">2017-05-13</td>
     </tr>
     <tr>
         <td width="172" align="left" valign="top">Project:</td>
@@ -33,16 +33,17 @@ This paper proposes to adapt the algorithms and interfaces working today with *t
 
 # Table of Contents
 
-1. [Introduction](#introduction)
-2. [Motivation](#motivation)
-3. [Proposal](#proposal)
-4. [Design Rationale](#design-rationale)
-5. [Proposed Wording](#proposed-wording)
-6. [Implementability](#implementability)
-7. [Open points](#open-points)
-8. [Future work](#future-work)
-9. [Acknowledgements](#acknowledgements)
-10. [References](#references)
+* [History](#history)
+* [Introduction](#introduction)
+* [Motivation](#motivation)
+* [Proposal](#proposal)
+* [Design Rationale](#design-rationale)
+* [Proposed Wording](#proposed-wording)
+* [Implementability](#implementability)
+* [Open points](#open-points)
+* [Future work](#future-work)
+* [Acknowledgements](#acknowledgements)
+* [References](#references)
 
 # History
 ## R0
@@ -50,36 +51,35 @@ This paper proposes to adapt the algorithms and interfaces working today with *t
 Take in account the feedback from Kona meeting concerning [P0327R1]. Next follows the direction of the committee: 
 
 * Split the proposal into 3 documents
-    * Product Type access
-    * Adaptation of current tuple-like algorithms to *ProductType*
+    * Product Type Access
+    * Extension of current tuple-like algorithms to *ProductType*
     * Basic *ProductType* algorithms
     * Other *ProductType* algorithms
      
-* In this document, we describe the adaptation of the current tuple-like algorithms to the proposed *ProductType* requirements. 
- 
+In this document, we describe the extension of the current tuple-like algorithms to the proposed *ProductType* requirements. 
 
 # Introduction
 
-There are some algorithms working almost on *tuple-like* types that can be extended to *ProductTypes*. Some examples of such algorithms are `swap`, `lexicographical_compare`, `cat`, `assign`, `move`, ...  
+There are some algorithms working almost on *tuple-like* types that can be extended to *ProductTypes*. Some examples of such algorithms are `apply`, `swap`, `lexicographical_compare`, `cat`, `assign`, `move`, ...  
 
 # Motivation
 
-## Adaptation
+## Extension
 
-Algorithms such as `std::tuple_cat` and `std::experimental::apply` that work well with *tuple-like* types, should work also for any *ProductType* types. There are many more of them [BPTA] and [OPTA] that takes in account some of the algorithms that work well with *ProductTypes*.   
+Algorithms such as `std::tuple_cat` and `std::apply` that work well with *tuple-like* types, should work also for any *ProductType* types. 
+
 
 ## Reuse
 
-The definition of the existing functions will surely be implemented using the same algorithm generalized for any *ProductType*. This paper proposes only the algorithms that could be needed to implement the current *tuple-like* interface. 
+The definition of some the existing functions and assignment operators will surely be implemented using the same algorithm generalized for any *ProductType*. This paper proposes only the algorithms that could be needed to implement the current *tuple-like* interface. 
 
 ## Deprecation
 
-Some of the old algorithms could be deprecated in favor of the new ones.
+Some of the old algorithms could be deprecated in favor of the new ones. E.g. we could deprecate `std::apply` in favor of `std::product_type::apply`. 
 
 ## Extension
 
-There are many more of them [BPTA] and [OPTA] that takes in account some of the algorithms that work well with *ProductTypes*.   
-
+There are many more of them. [BPTA] and [OPTA] takes in account some of the algorithms that work well with *ProductTypes*.
 
 # Proposal
 
@@ -90,10 +90,9 @@ There are many more of them [BPTA] and [OPTA] that takes in account some of the 
 
 #### `std::tuple_cat`
 
-**Adapt the definition of `std::tuple_cat` in [tuple.creation] to take care of product type**
+Adapt the definition of `std::tuple_cat` in [tuple.creation] to take care of *ProductType*.
 
-**NOTE: This algorithm could be moved to a *product type* specific algorithms file**. 
-
+Note: The single difference between `std::tuple_cat` and `std::product_type::cat` is that `std::tuple_cat` forces `std::tuple<>` as result type. 
 
 #### Constructor from a product type with the same number of elements as the tuple
 
@@ -103,21 +102,25 @@ This simplifies a lot the `std::tuple` interface (See [N4387]).
 
 #### `std::apply`
 
-**Adapt the definition of `std::apply` in [xxx] to take care of product type**
+Adapt the definition of `std::apply` in [xxx] to take care of *ProductType*.
 
-**NOTE: This algorithm could be moved to a *product type* specific algorithms file**. 
+NOTE: This algorithm could just forward to `product_type::apply`. 
 
 ### <utility> `std::pair`
 
 #### piecewise constructor
 
-The following constructor could also be generalized to *product types*
+The following constructor could also be generalized to *ProductTypes*.
+
+Instead of 
 
 ```c++
 template <class... Args1, class... Args2>
     pair(piecewise_construct_t,
         tuple<Args1...> first_args, tuple<Args2...> second_args);
 ```
+
+we could have
 
 ```c++
 template <class PT1, class PT2>
@@ -146,7 +149,7 @@ This is the equivalent of `std::apply` applicable to product types instead of tu
 
 `std::apply` could be defined in function of it.
 
-## `product_type::assign`
+### `product_type::assign`
     
 ```c++
     template <class PT1, class PT2>
@@ -158,7 +161,7 @@ Assignment from another product type with the same number of elements and conver
 This function can be used while defining the `operator=` on product types.
 See the wording changes for `std::tuple`,`std::pair` and `std::array`. 
 
-## `product_type::make_from`        
+### `product_type::make_from`        
 
 ```c++
     template <class T, class ProductType>
@@ -171,7 +174,7 @@ This is the equivalent of `std::make_from_tuple` applicable to product types ins
 
 This function is similar to `apply` when applied with a specific `construct<T>` function.
 
-## `product_type::swap` 
+### `product_type::swap` 
        
 ```c++
     template <class PT>
@@ -182,9 +185,9 @@ Swap of two product types.
 
 This function can be used while defining the `swap` on the namespace associated to the product type.
 
-If we adopt were able to customize `swap` for concepts as in [SWAPPABlE][PT_SWAP] we could even be able to customize the swap operation for *ProductTypes*.
+If we adopted the possibility to customize customization points for concepts we  could even be able to customize the swap operation for *ProductTypes*.
 
-## `product_type::to_tuple`
+### `product_type::to_tuple`
         
 ```c++
     template <class ProductType>
@@ -193,8 +196,7 @@ If we adopt were able to customize `swap` for concepts as in [SWAPPABlE][PT_SWAP
 
 `std::tuple` is the more generic product type. Some functions could expect a specific `std::tuple` product type.
 
-
-## `product_type::lexicographical_compare`
+### `product_type::lexicographical_compare`
 
 This is the equivalent of `std::lexicographical_compare` applicable to product types instead of homogeneous containers types.
 
@@ -219,7 +221,7 @@ We could also add a *TypeConstructible* parameter, as e.g.
 
 Where `TC` is a variadic template for a *ProductType* as e.g. `std::tuple` or a TypeConstructor [P0343R0]. 
 
-## `product_type::cat`
+### `product_type::cat`
         
 ```c++
     template <class ...ProductTypes>
@@ -228,9 +230,9 @@ Where `TC` is a variadic template for a *ProductType* as e.g. `std::tuple` or a 
 
 This is the equivalent of `std::tuple_cat` applicable to product types instead of tuple-like types. This function requires the first *Product Type* to be *Type Constructible*.
 
-An alternative is to use `std::tuple` when the first *Product Type* is not *Type Constructible*. 
+An alternative is to use `std::tuple` when the first *Product Type* is not *Type Constructible* but this creates a cycle. 
 
-We could also have 
+We could also have an additional parameter stating which will be the result
 
 ```c++
     template <template <class...> TC, class ...ProductTypes>
@@ -239,8 +241,7 @@ We could also have
         constexpr `see below` cat(ProductTypes&& ...pts);
 ```
 
-Where `TC` is a variadic template for a *ProductType* as e.g. `std::tuple` or a TypeConstructor [TypeConstructor]. 
-
+Where `TC` is a variadic template for a *ProductType* as e.g. `std::tuple` or a *TypeConstructor* [P0343R0]. 
 
 `std::tuple_cat` could be defined in function of one of the alternatives.
 
@@ -254,11 +255,9 @@ A c-array is not type *TypeConstructible* as it cannot be returned by value.
 
 ## Locating the interface on a specific namespace
 
-The name of  *product type* interface, `size`, `get`, `element`, are quite common. Nesting them on a specific namespace makes the intent explicit. 
+The name of *product type* algorithms, `cat`, `apply`, `swap`, `assign` or `move` are quite common. Nesting them on a specific namespace makes the intent explicit. 
 
 We can also preface them with `product_type_`, but the role of namespaces was to be able to avoid this kind of prefixes.
-
-
 
 # Proposed Wording
 
@@ -312,7 +311,9 @@ template <class F, class PT>
         product_type::get<I>(std::forward<Tuple>(
 }
 ```*Equivalent to*:
-  return apply_impl(std::forward<F>(f), std::forward<PT>(t),                    product_type::element_sequence_for<PT>{});
+
+```c++  return apply_impl(std::forward<F>(f), std::forward<PT>(t),                    product_type::element_sequence_for<PT>{});
+```
 
 Let `Ui` is `product_type::element_t<i, remove_cv_t<remove_reference_t<<PT>>>`.
 
