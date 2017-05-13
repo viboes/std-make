@@ -15,7 +15,10 @@
 #include <experimental/fundamental/v3/nullable/bind.hpp>
 #include <experimental/fundamental/v3/nullable/visit.hpp>
 #include <experimental/fundamental/v3/nullable/value_or.hpp>
+#include <experimental/fundamental/v3/nullable/error_or.hpp>
+#include <experimental/fundamental/v3/nullable/has_error.hpp>
 #include <experimental/fundamental/v3/nullable/apply_or.hpp>
+#include <experimental/fundamental/v3/nullable/monad_error.hpp>
 
 // TypeConstructible
 #include <experimental/type_constructible.hpp>

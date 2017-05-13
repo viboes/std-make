@@ -58,6 +58,9 @@
 
 //! <end_code>
 
+
+// Should we name this MonadError or MonadException
+
 namespace std
 {
 namespace experimental
@@ -92,7 +95,7 @@ namespace monad_error
   {
 #if __cplusplus >= 201402L || defined JASEL_DOXYGEN_INVOKED
 
-    // make_error<M>: E -> error_type<M,E> where E = error_type<M>
+    // make_error<M>: E -> unexpected_type<E> where E is error_type<M>
     template <class M, class ...Xs>
      constexpr
      auto make_error(Xs&& ...xs) = delete;
@@ -102,6 +105,15 @@ namespace monad_error
       static auto catch_error(M&& x, F&& y) = delete;
 #endif
   };
+
+  template <class M>
+  struct error_type
+  {
+    using type = typename traits<M>::template error_type<M>;
+  };
+
+  template <class M>
+  using error_type_t = typename error_type<M>::type;
 
   template <class M, class F>
   auto
@@ -127,6 +139,7 @@ namespace monad_error
     JASEL_DECLTYPE_RETURN_NOEXCEPT(
       traits<type_constructor_t<meta::quote<TC>>>::template make_error<type_constructor_t<meta::quote<TC>>>(std::forward<Xs>(xs)...)
     )
+
 }
 
   template <class T>

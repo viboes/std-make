@@ -29,6 +29,9 @@ namespace monad_error
 template <class T, class E>
 struct traits<expected<T,E>> : monad_error::tag
 {
+  template <class M>
+  using error_type = typename M::error_type;
+
   template <class M, class ...Xs>
     static constexpr auto make_error(Xs&& ...xs)
     JASEL_DECLTYPE_RETURN_NOEXCEPT(

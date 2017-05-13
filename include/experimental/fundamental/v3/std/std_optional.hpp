@@ -16,6 +16,7 @@
 #include <experimental/functor.hpp>
 #include <experimental/applicative.hpp>
 #include <experimental/monad.hpp>
+#include <experimental/monad_error.hpp>
 
 #if defined JASEL_FUNDAMENTAL_EXTENDED
 #include <experimental/fundamental/v2/possible_valued/mcd/pointer_like_mcd.hpp>

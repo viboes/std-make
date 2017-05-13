@@ -17,6 +17,10 @@
 #include <utility>
 #include <experimental/type_traits.hpp>
 
+
+// the operation deref_none make Nullable something more like Error-able.
+// It allows to forward errors from one Nullable to another.
+
 namespace std
 {
 namespace experimental

@@ -240,6 +240,8 @@ test-suite monad
 test-suite monad_error
     : 
       [ run monad_error/monad_error_std_expected_pass.cpp  ]
+      [ run monad_error/monad_error_std_optional_pass.cpp  ]
+      [ run monad_error/monad_error_std_unique_ptr_pass.cpp  ]
     ;
 
 test-suite frames
