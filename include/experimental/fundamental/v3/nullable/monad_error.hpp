@@ -40,7 +40,7 @@ inline  namespace fundamental_v3
       using error_type = none_type_t<M>;
 
       template <class M, class ...Xs>
-        static constexpr auto make_error(Xs&& ...xs)
+        static constexpr auto make_error(Xs&& ...)
         JASEL_DECLTYPE_RETURN_NOEXCEPT(
           none<M>()
         )

@@ -91,13 +91,13 @@ struct x_subframe_numbers {
     subframe_number sfn;
     x_subframe_numbers() = default;
     constexpr x_subframe_numbers(frame_number fn, subframe_number sfn) : fn(fn), sfn(sfn) {}
-    constexpr operator x_subframe_number() { return make_x_subframe_number(fn, sfn); }
+    constexpr operator x_subframe_number() const { return make_x_subframe_number(fn, sfn); }
     //explicit operator bi_subframe_number() { return make_bi_subframe_number(fn, sfn); }
 };
 
 // Should the following be members?
 // No because for modulo types it is a non-member function
-inline constexpr h_frame_number to_h_frame_number(x_subframe_numbers xsfn)
+inline constexpr h_frame_number to_h_frame_number(x_subframe_numbers )
 {
     return h_frame_number(0);
 }
@@ -109,11 +109,11 @@ inline constexpr subframe_number to_subframe_number(x_subframe_numbers xsfn)
 {
     return xsfn.sfn;
 }
-inline constexpr slot_number to_slot_number(x_subframe_numbers xsfn)
+inline constexpr slot_number to_slot_number(x_subframe_numbers )
 {
     return slot_number(0);
 }
-inline constexpr symbol_number to_symbol_number(x_subframe_numbers xsfn)
+inline constexpr symbol_number to_symbol_number(x_subframe_numbers )
 {
     return symbol_number(0);
 }
@@ -124,7 +124,7 @@ struct h_subframe_numbers {
     subframe_number sfn;
     h_subframe_numbers() = default;
     constexpr h_subframe_numbers(h_frame_number hfn, x_frame_number xfn, subframe_number sfn) : hfn(hfn), xfn(xfn) , sfn(sfn) {}
-    constexpr operator h_subframe_number() { return make_h_subframe_number(hfn, xfn, sfn); }
+    constexpr operator h_subframe_number() const { return make_h_subframe_number(hfn, xfn, sfn); }
 };
 
 inline constexpr h_frame_number to_h_frame_number(h_subframe_numbers hsfn)
@@ -139,11 +139,11 @@ inline constexpr subframe_number to_subframe_number(h_subframe_numbers hsfn)
 {
     return hsfn.sfn;
 }
-inline constexpr slot_number to_slot_number(h_subframe_numbers hsfn)
+inline constexpr slot_number to_slot_number(h_subframe_numbers )
 {
     return slot_number(0);
 }
-inline constexpr symbol_number to_symbol_number(h_subframe_numbers hsfn)
+inline constexpr symbol_number to_symbol_number(h_subframe_numbers )
 {
     return symbol_number(0);
 }
