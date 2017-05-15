@@ -5,7 +5,7 @@ Experimental library for C++11/14/17.
 
 # Proposals
 
-This code form the basis of several formal proposal to the C++ standard library
+This code forms the basis of several formal proposal to the C++ standard library
 
 * P0051R2 - C++ generic overload function (http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0051r2.pdf)
 * P0196R1 - Generic none() factories for Nullable types (http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0196r1.pdf)
@@ -30,8 +30,11 @@ This code form the basis of several formal proposal to the C++ standard library
 
 * DXXXX - Adapting the standard tuple-like function to Product types
 * DXXXX - Product types algorithms
+* DXXXX - Sum types
 * DXXXX - C++ Monadic inteface 
 * DXXXX - C++ Ordinal types
+* DXXXX - C++ Strong types and mixins
+* DXXXX - `chrono::modulo types
 
 # Overrriden proposals
 
