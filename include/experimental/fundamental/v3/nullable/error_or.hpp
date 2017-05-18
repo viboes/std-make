@@ -28,11 +28,11 @@ namespace nullable
    *  The contained value or the parameter
    */
   template <class N, class E
-  // todo add constraint on E
-  //, class = enable_if_t<
-  //    is_nullable_v<meta::uncvref_t<N>>
-  // && is_convertible_v< E, error_type_t<meta::uncvref_t<N>> >
-  //>
+  // constraint on E
+    , class = enable_if_t<
+          is_nullable< meta::uncvref_t<N> >::value
+          && is_convertible< E, none_type_t< meta::uncvref_t<N> > >::value
+    >
   >
   BOOST_CXX14_CONSTEXPR
   none_type_t<meta::uncvref_t<N>>

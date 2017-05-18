@@ -64,6 +64,10 @@ void h1(T const &x) {
   g1(x);
 }
 
+int res(std::experimental::nullopt_t) {
+  return -1;
+}
+
 
 int main()
 {
@@ -320,8 +324,6 @@ int main()
     BOOST_TEST(stde::none() < x);
   }
 
-#if __cplusplus >= 201402L
-
  // nullable::transform
   {
     stde::optional<int> x = stde::none<stde::optional>();
@@ -366,7 +368,50 @@ int main()
     stde::optional<int> y = stde::nullable::ap(f, x);
     BOOST_TEST(stde::deref(y) == 2);
   }
-#endif
+  //nullable::value_or
+  {
+    stde::optional<int> x = stde::none<stde::optional>();
+    int y = stde::nullable::value_or(x, 1);
+    BOOST_TEST(y == 1);
+  }
+  {
+    stde::optional<int> x = stde::make<stde::optional>(1);
+    int y = stde::nullable::value_or(x, 2);
+    BOOST_TEST(y == 1);
+  }
+  //nullable::apply_or
+  {
+    stde::optional<int> x = stde::none<stde::optional>();
+    int y = stde::nullable::apply_or(x, twice, 1);
+    BOOST_TEST(y == 1);
+  }
+  {
+    stde::optional<int> x = stde::make<stde::optional>(1);
+    int y = stde::nullable::apply_or(x, twice, -1);
+    BOOST_TEST(y == 2);
+  }
+  //nullable::has_error
+  {
+    stde::optional<int> x = stde::none<stde::optional>();
+    BOOST_TEST(stde::nullable::has_error(x, stde::nullopt));
+  }
+  {
+    stde::optional<int> x = stde::make<stde::optional>(1);
+    BOOST_TEST(! stde::nullable::has_error(x, stde::nullopt));
+  }
+
+  //nullable::resolve
+  {
+    stde::optional<int> x = stde::none<stde::optional>();
+    int y = stde::nullable::resolve(x, res);
+    BOOST_TEST(y == -1);
+  }
+  {
+    stde::optional<int> x = stde::make<stde::optional>(1);
+    int y = stde::nullable::resolve(x, res);
+    BOOST_TEST(y == 1);
+  }
+
   return ::boost::report_errors();
 }
 #endif

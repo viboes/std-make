@@ -26,6 +26,9 @@ namespace nullable
    * nullable::value_or
    * @par Returns
    *  The contained value or the parameter
+   *
+   * @par Note
+   *  value_or(n, v) == resolve(n, always(v))
    */
   template <class N, class T
   // todo add constraint on T

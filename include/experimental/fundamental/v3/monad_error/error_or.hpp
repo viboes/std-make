@@ -1,6 +1,6 @@
 //////////////////////////////////////////////////////////////////////////////
 //
-// (C) Copyright Vicente J. Botet Escriba 2016.
+// (C) Copyright Vicente J. Botet Escriba 2017.
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file // LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
@@ -28,15 +28,15 @@ namespace monad_error
    *  The monad error if it contains an error or the same monad error with the `e` parameter
    */
 
-   // It will be great to be able to return the error itself, but monad_error, doesn't allows to extract the error
-   // We need it to be Nullable
+  // It will be great to be able to return the error itself, but monad_error, doesn't allows to extract the error
+  // We need either to be Nullable or Errorable
 
   template <class M, class E
-  // todo add constraint on T
-  //, class = enable_if_t<
-  //    is_monad_error_v<meta::uncvref_t<N>>
-  // && is_convertible_v< E, error_type_t<meta::uncvref_t<N>> >
-  //>
+  // constraints on M and E
+    , class = enable_if_t<
+        is_monad_error_v<meta::uncvref_t<N>>
+      && is_convertible_v< E, error_type_t<meta::uncvref_t<N>> >
+    >
   >
   BOOST_CXX14_CONSTEXPR
   M
