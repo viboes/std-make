@@ -40,7 +40,7 @@ namespace nullable
   {
     if (nullable::has_value(forward<N>(n)))
     {
-      return nullable::deref_none(forward<N>(n));
+      return nullable::none<meta::uncvref_t<N>>();
     }
     return forward<E>(e);
   }

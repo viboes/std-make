@@ -34,6 +34,10 @@ int twice(int i) {
   return 2*i;
 }
 
+std::experimental::optional<int> mtwice(int i) {
+  return std::experimental::make_optional(2*i);
+}
+
 std::experimental::optional<double> inverse(double x) {
   if (x==0) return std::experimental::nullopt;
   return 1/x;
@@ -182,7 +186,7 @@ int main()
     BOOST_TEST(! has_value(x));
   }
   // fixme: do we want this to work. See https://github.com/viboes/std-make/issues/14
-#if 1
+#if 0
   {
     stde::optional<stde::optional<int>> x = stde::none<stde::optional<int>>() ;
     BOOST_TEST(x);
@@ -249,7 +253,6 @@ int main()
     stde::optional<int> x = stde::make_optional(v);
     BOOST_TEST(*x == 0);
     BOOST_TEST(deref(x) == 0);
-    //check<decltype(deref(stde::make_optional(v)))> xx;
     static_assert(std::is_same<int&, decltype(deref(x))>::value, "a");
   }
   {
@@ -323,6 +326,13 @@ int main()
     BOOST_TEST(x > stde::none());
     BOOST_TEST(stde::none() < x);
   }
+  {
+    stde::optional<int> x=stde::make_optional(1);
+    BOOST_TEST(x != stde::none<stde::optional<int>>());
+    BOOST_TEST(stde::none() != x);
+    BOOST_TEST(x > stde::none());
+    BOOST_TEST(stde::none() < x);
+  }
 
  // nullable::transform
   {
@@ -334,6 +344,11 @@ int main()
     int v=1;
     stde::optional<int> x = stde::make_optional(v);
     stde::optional<int> y = stde::nullable::transform(x, twice);
+    BOOST_TEST(stde::deref(y) == 2);
+  }
+  {
+    int v=1;
+    stde::optional<int> y = stde::nullable::transform(stde::make_optional(v), twice);
     BOOST_TEST(stde::deref(y) == 2);
   }
   {
@@ -356,6 +371,17 @@ int main()
     BOOST_TEST(! stde::has_value(y));
   }
   {
+    const stde::optional<int> x = stde::make<stde::optional>(1);
+    const stde::optional<int(*)(int)> f = stde::none<stde::optional>();
+    stde::optional<int> y = stde::nullable::ap(f, x);
+    BOOST_TEST(! stde::has_value(y));
+  }
+  {
+    stde::optional<int(*)(int)> f = stde::none<stde::optional>();
+    stde::optional<int> y = stde::nullable::ap(f, stde::make<stde::optional>(1));
+    BOOST_TEST(! stde::has_value(y));
+  }
+  {
     stde::optional<int> x = stde::none<stde::optional>();
     stde::optional<int(*)(int)> f = stde::make<stde::optional>(twice);
     stde::optional<int> y = stde::nullable::ap(f, x);
@@ -368,6 +394,36 @@ int main()
     stde::optional<int> y = stde::nullable::ap(f, x);
     BOOST_TEST(stde::deref(y) == 2);
   }
+  {
+    int v=1;
+    stde::optional<int(*)(int)> f = stde::make<stde::optional>(twice);
+    stde::optional<int> y = stde::nullable::ap(f, stde::make<stde::optional>(v));
+    BOOST_TEST(stde::deref(y) == 2);
+  }
+  // nullable::bind
+   {
+     stde::optional<int> x = stde::none<stde::optional>();
+     stde::optional<int> y = stde::nullable::bind(x, mtwice);
+     BOOST_TEST(! stde::has_value(y));
+   }
+   {
+     int v=1;
+     stde::optional<int> x = stde::make_optional(v);
+     stde::optional<int> y = stde::nullable::bind(x, mtwice);
+     BOOST_TEST(stde::deref(y) == 2);
+   }
+   {
+     int v=1;
+     stde::optional<int> y = stde::nullable::bind(stde::make_optional(v), mtwice);
+     BOOST_TEST(stde::deref(y) == 2);
+   }
+   {
+     int v=1;
+     const stde::optional<int> x = stde::make_optional(v);
+     stde::optional<int> y = stde::nullable::bind(x, mtwice);
+     BOOST_TEST(stde::deref(y) == 2);
+   }
+
   //nullable::value_or
   {
     stde::optional<int> x = stde::none<stde::optional>();

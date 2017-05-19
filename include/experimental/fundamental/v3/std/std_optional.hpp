@@ -59,36 +59,10 @@ inline namespace fundamental_v3
 {
 namespace nullable
 {
-  template <>
-  struct traits<optional<_t>> : traits_pointer_like {
-    static constexpr
-    nullopt_t none() { return nullopt; }
-
-    template <class U>
-    static constexpr
-    nullopt_t deref_none(U &&)
-      { return nullopt; }
-
-  };
-  //  See https://github.com/viboes/std-make/issues/14
-  // We would need to specialize differently traits<optional<T>> traits<optional<T>> traits<optional<_t>>
-  // and define none_type differently
-
-  template <class T>
-  struct none_type<optional<T>> {
-    using type = nullopt_t;
-  };
-
   template <class T>
   struct traits<optional<T>> : traits_pointer_like {
     static constexpr
-    optional<T> none() { return nullopt; }
-
-    template <class U>
-    static constexpr
-    nullopt_t deref_none(U &&)
-      { return nullopt; }
-
+    nullopt_t none() { return nullopt; }
   };
 }
 

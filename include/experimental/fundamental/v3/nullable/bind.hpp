@@ -50,7 +50,8 @@ namespace nullable
     {
       return JASEL_INVOKE(std::forward<F>(f), nullable::deref(forward<M>(m)));
     }
-    return nullable::deref_none(forward<M>(m));
+    return nullable::none<meta::uncvref_t<M>>();
+
   }
   struct as_monad: monad::tag
   {

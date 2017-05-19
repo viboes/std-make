@@ -42,7 +42,7 @@ namespace nullable
     {
       return false;
     }
-    return nullable::deref_none(forward<N>(n)) == forward<E>(e);
+    return nullable::none<meta::uncvref_t<N>>() == forward<E>(e);
   }
 
 } // nullable

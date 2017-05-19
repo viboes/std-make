@@ -48,7 +48,7 @@ namespace nullable
           JASEL_INVOKE(std::forward<F>(f), nullable::deref(forward<N>(n)))
       );
     }
-    return nullable::deref_none(forward<N>(n));
+    return nullable::none<meta::uncvref_t<N>>();
   }
 
   struct as_functor: functor::tag

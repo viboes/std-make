@@ -54,9 +54,6 @@ inline namespace fundamental_v3
       static
       auto deref(U && ptr) = delete;
 
-      template <class U>
-      static
-      std::nullptr_t deref_none(U &&) = delete;
 #endif
     };
 
@@ -75,12 +72,6 @@ inline namespace fundamental_v3
         JASEL_DECLTYPE_RETURN (
             *(forward<U>(ptr))
         )
-
-      template <class U>
-      static constexpr
-      std::nullptr_t deref_none(U &&)
-        { return nullptr; }
-
     };
 
     template <>
@@ -145,11 +136,10 @@ inline namespace fundamental_v3
 
   template <class T>
   constexpr
-  auto deref(T&& x)
+  auto deref(T && x)
     JASEL_DECLTYPE_RETURN (
       traits<decay_t<T>>::deref(x)
     )
-
 
   template <class T>
   constexpr
@@ -169,7 +159,7 @@ inline namespace fundamental_v3
   constexpr
   auto deref_none(T&& x)
     JASEL_DECLTYPE_RETURN (
-      traits<decay_t<T>>::deref_none(x)
+      none<decay_t<T>>()
     )
 
   template <class T>

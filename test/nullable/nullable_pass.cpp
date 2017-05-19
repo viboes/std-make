@@ -18,6 +18,13 @@
 #endif
 #include <boost/detail/lightweight_test.hpp>
 
+int twice(int i) {
+  return 2*i;
+}
+
+template <class T>
+struct check;
+
 template <class T>
 struct A
 {
@@ -166,7 +173,6 @@ int main()
     BOOST_TEST(! stde::has_value(x));
     BOOST_TEST(x == stde::none());
     BOOST_TEST(stde::none() == x);
-    BOOST_TEST(nullptr == nullptr);
     BOOST_TEST(stde::deref_none(x) == nullptr);
   }
   {
@@ -217,6 +223,7 @@ int main()
     BOOST_TEST(x != stde::none());
     BOOST_TEST(stde::none() != x);
     BOOST_TEST(stde::deref(x) == 1);
+    delete x;
   }
   {
     const int * x = new int(1);
@@ -224,6 +231,31 @@ int main()
     BOOST_TEST(x != stde::none());
     BOOST_TEST(stde::none()  != x);
     BOOST_TEST(stde::deref(x) == 1);
+    delete x;
+  }
+  //nullable::value_or
+  {
+    int * x = nullptr;
+    auto y = stde::nullable::value_or(x, 1);
+    BOOST_TEST_EQ(y, 1);
+  }
+  {
+    int * x = new int(1);
+    int y = stde::nullable::value_or(x, 2);
+    delete x;
+    BOOST_TEST(y == 1);
+  }
+  //nullable::apply_or
+  {
+    int * x = nullptr;
+    int y = stde::nullable::apply_or(x, twice, 1);
+    BOOST_TEST(y == 1);
+  }
+  {
+    int * x = new int(1);
+    int y = stde::nullable::apply_or(x, twice, -1);
+    delete x;
+    BOOST_TEST(y == 2);
   }
   return ::boost::report_errors();
 }

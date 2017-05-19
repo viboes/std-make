@@ -42,7 +42,7 @@ namespace nullable
     {
       return nullable::deref(forward<N>(n));
     }
-    return JASEL_INVOKE(std::forward<F>(f),  nullable::deref_none(forward<N>(n)) );
+    return JASEL_INVOKE(std::forward<F>(f),  nullable::none<meta::uncvref_t<N>>() );
   }
 
 } // nullable
