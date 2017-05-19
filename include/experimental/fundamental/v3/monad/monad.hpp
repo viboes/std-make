@@ -59,6 +59,11 @@ namespace monad
 #endif
   };
 
+  struct id {
+    template <class T>
+    decay_t<T> operator()(T&& x)  { return forward<T>(x); }
+  };
+
   template <class M, class F>
   auto
     bind(M&& x, F&& f)
@@ -66,6 +71,12 @@ namespace monad
           traits<type_constructor_t<decay_t<M>>>::bind(forward<M>(x), forward<F>(f))
        )
 
+   template <class M>
+   auto
+     unwrap(M&& x)
+        JASEL_DECLTYPE_RETURN_NOEXCEPT(
+           bind(forward<M>(x), id{})
+        )
 }
 
   template <class T>
