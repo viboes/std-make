@@ -18,6 +18,7 @@
 #include <experimental/meta.hpp>
 #include <experimental/type_constructible.hpp>
 #include <experimental/fundamental/v2/config.hpp>
+#include <functional> // std::invoke
 
 namespace std
 {
@@ -68,6 +69,37 @@ namespace functor
         JASEL_DECLTYPE_RETURN_NOEXCEPT(
             functor::transform(forward<T>(x), forward<F>(f))
         )
+
+#if __cplusplus >= 201402L || defined JASEL_DOXYGEN_INVOKED
+  namespace detail {
+
+    template <class Pred_T, class Callable_T_U>
+    struct adjust_if_helper
+    {
+      template <class T>
+      auto
+      //decltype(fct(declval<T>()))
+      operator()(T && x) const
+      // todo deduce the result type to be portable to c++11
+      //-> decltype(fct(x))
+      {
+        return (JASEL_INVOKE(pred,forward<T>(x)))
+          ? JASEL_INVOKE(fct,forward<T>(x))
+          : decltype(fct(x))(x)
+          ;
+      }
+      Pred_T pred;
+      Callable_T_U fct;
+    };
+  }
+
+  template <class Functor_T, class Pred_T, class Callable_T_U>
+    auto adjust_if(Functor_T && xs, Pred_T  p, Callable_T_U  f)
+        JASEL_DECLTYPE_RETURN_NOEXCEPT(
+            transform(xs, detail::adjust_if_helper<Pred_T, Callable_T_U>{p, f})
+        )
+#endif
+
 }
 
   template <class T>

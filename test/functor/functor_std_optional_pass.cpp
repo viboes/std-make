@@ -16,13 +16,16 @@ int main()
 #define JASEL_STD_EXPERIMENTAL_FACTORIES_USE_OPTIONAL
 
 #include <experimental/optional.hpp>
-
 #include <boost/detail/lightweight_test.hpp>
+
 
 int twice(int i) {
   return 2*i;
 }
 
+bool even(int i) {
+  return i%2==0;
+}
 int main()
 {
   namespace stde = std::experimental;
@@ -81,6 +84,20 @@ int main()
     stde::optional<int> y = stde::functor::map(twice, x);
     BOOST_TEST(*y == 2);
   }
+#if __cplusplus >= 201402L
+  {
+    int v=1;
+    stde::optional<int> x = stde::make_optional(v);
+
+    stde::optional<int> y = stde::functor::adjust_if(x, even, twice);
+    BOOST_TEST(*y == 1);
+    *x=2;
+    y = stde::functor::adjust_if(x, even, twice);
+    std::cout << *y << std::endl;
+    BOOST_TEST(*y == 4);
+
+  }
+#endif
   return ::boost::report_errors();
 }
 #endif

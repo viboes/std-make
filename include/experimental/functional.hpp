@@ -7,6 +7,9 @@
 #ifndef JASEL_EXPERIMENTAL_FUNCTIONAL_HPP
 #define JASEL_EXPERIMENTAL_FUNCTIONAL_HPP
 
+#include <experimental/fundamental/v3/functional/always.hpp>
+#include <experimental/fundamental/v3/functional/identity.hpp>
 #include <experimental/fundamental/v3/functional/overload.hpp>
+#include <functional>
 
 #endif // header

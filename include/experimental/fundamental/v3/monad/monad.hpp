@@ -19,6 +19,7 @@
 #include <experimental/type_constructible.hpp>
 #include <experimental/fundamental/v2/config.hpp>
 #include <experimental/applicative.hpp>
+#include <experimental/functional.hpp>
 
 namespace std
 {
@@ -59,11 +60,6 @@ namespace monad
 #endif
   };
 
-  struct id {
-    template <class T>
-    decay_t<T> operator()(T&& x)  { return forward<T>(x); }
-  };
-
   template <class M, class F>
   auto
     bind(M&& x, F&& f)
@@ -75,7 +71,7 @@ namespace monad
    auto
      unwrap(M&& x)
         JASEL_DECLTYPE_RETURN_NOEXCEPT(
-           bind(forward<M>(x), id{})
+           bind(forward<M>(x), identity{})
         )
 }
 

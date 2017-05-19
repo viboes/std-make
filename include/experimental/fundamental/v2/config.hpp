@@ -70,6 +70,8 @@
 #define JASEL_ENABLE_IF(...) typename ::std::enable_if<(__VA_ARGS__), bool>::type = true
 
 #ifdef JASEL_HAS_INVOKE
+#include <functional>
+
 #define JASEL_INVOKE(F, ...) std::invoke((F), __VA_ARGS__)
 #else
 #define JASEL_INVOKE(F, ...) F(__VA_ARGS__)
