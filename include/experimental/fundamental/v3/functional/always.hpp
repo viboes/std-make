@@ -25,7 +25,7 @@ inline namespace fundamental_v3
   struct always {
     constexpr  always(U val) : value(move(val)) {}
     template <class T>
-    constexpr U operator()(T&& x) const { return value; }
+    constexpr U operator()(T&& ) const { return value; }
   private:
     U value;
 

@@ -157,7 +157,7 @@ inline namespace fundamental_v3
 
   template <class T>
   constexpr
-  auto deref_none(T&& x)
+  auto deref_none(T&& )
     JASEL_DECLTYPE_RETURN (
       none<decay_t<T>>()
     )
