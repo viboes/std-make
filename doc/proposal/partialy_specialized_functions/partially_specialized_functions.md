@@ -46,12 +46,64 @@ This paper proposes to partially specialize template functions on the non-deduce
 
 # Motivation and Scope
 
-Currently (C++14) we cannot partially specialize a function, we overload it. However a template unctions can have additional parameters that are not deduced from the function parameters and we cannot overload on these parameters as they can not be deduced.
+Currently (C++14) we cannot partially specialize a function, we overload it. However a template function can have additional parameters that are not deduced from the function arguments and we cannot overload on these parameters as they cannot be deduced.
+
+In the following example T is deduced, but TC not.
+
+```c++
+template <template <class> class TC, class T>
+TC<T> make(T);
+```
+
+intended usage
+
+```c++
+auto x = make<optional>(1);
+```
 
 In order to obtain something similar without changes to C++14 there are two alternatives: 
 
-* add a parameter that coveys the non-deduced types so that we can overload, or 
+* add a parameter that coveys the non-deduced types so that we can overload on them,  
+
+```c++
+template <template <class> class TC, class T>
+TC<T> make(type<TC>, T);
+template <template <class> class TC, class T>
+TC<T> make(T v) { return make(type<TC>{}, v); }
+```
+
+customization
+
+```c++
+template <class T>
+optional<T> make(type<optional>, T);
+```
+
+usage unchanged.
+
+
 * use a helper trait or function object class that can be partially specialized.
+
+```c++
+template <template <class> class TC>
+struct make_trait;
+template <template <class> class TC, class T>
+TC<T> make(T v) { return make_trait<TC>::apply(v); }
+```
+
+customization
+
+```c++
+template <>
+struct make_trait<optional>
+{
+    template <class T>
+    static optional<T> apply(T);
+}
+```
+
+usage unchanged
+
 
 The author is not a compiler guy, but wonder if partially specializing the non-deduced template parameters of a function is something that could fill in the current C++ language philosophy. 
 
@@ -79,7 +131,7 @@ auto make(T v) { return apply<TC,T>(v); }
 
 What we want is to partially specialize the non-deduced parameter `TC`.
 
-If we adopt partial specialization for template functions for these non-deduced type, we can refine the overload of the template class for the class template future as follows
+If we adopted partial specialization for template functions for these non-deduced type, we can refine the overload of the template class for the class template future as follows
 
 ```c++
 template <class T>
@@ -150,8 +202,6 @@ constexpr nullptr_t none<weak_ptr<T>>() { return nullptr; }
 template <class T>
 constexpr nullopt_t none<optional<T>>() { return nullopt; }
 template <class ...Ts>
-constexpr nullvar_t none<nullable_variant<Ts...>>() { return nullvar; }
-template <class ...Ts>
 constexpr nullvar_t none<variant<nullvar_t, Ts...>>() { return nullvar; }
 ```
 
@@ -185,7 +235,7 @@ constexpr nullvar_t none<variant<nullvar_t>> = nullvar;
 
 A possible alternative using current C++14: Forward to a function that has an additional parameter that conveys the non deduced types that needs to be partially specialized.
 
-We need first a trampoline that would introduce the non-decuded type as function argument
+We need first a trampoline that would introduce the non-deduced type as function argument
 
 ```c++
 template <template <class ...> class TC, class T>
@@ -193,7 +243,6 @@ auto make(T v) { return make(template_<TC>{}, <T>(v); }
 ```
 
 Now we need to define the default customization point
-
 
 ```c++
 template <template <class ...> class TC, class T>
