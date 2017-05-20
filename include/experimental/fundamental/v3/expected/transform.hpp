@@ -27,7 +27,7 @@ inline  namespace fundamental_v3
 namespace functor
 {
   template <class T, class E>
-  struct traits<expected<T,E>> : functor::tag
+  struct traits<expected<T,E>> : functor::mcd_transform
   {
     template <class Expected, class F>
       static constexpr auto transform(Expected&& x, F&& f)

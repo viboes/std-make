@@ -51,7 +51,7 @@ namespace nullable
     return nullable::none<meta::uncvref_t<N>>();
   }
 
-  struct as_functor: functor::tag
+  struct as_functor: functor::mcd_transform
   {
     template <class T, class F>
       static constexpr auto transform(T&& x, F&& f)

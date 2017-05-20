@@ -196,7 +196,7 @@ namespace functor {
 template <class N>
 struct traits<N, meta::when<
   is_product_type_v<N> && is_type_constructible_v<N>
->> : tag
+>> : functor::mcd_transform
 {
   template <class T, class F>
     static constexpr auto transform(T&& x, F&& f)

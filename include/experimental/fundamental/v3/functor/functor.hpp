@@ -19,6 +19,7 @@
 #include <experimental/type_constructible.hpp>
 #include <experimental/fundamental/v2/config.hpp>
 #include <functional> // std::invoke
+#include <experimental/functional.hpp>
 
 namespace std
 {
@@ -87,6 +88,24 @@ namespace functor
             functor::transform(forward<T>(x), forward<F>(f))
         )
 
+
+
+  //! Applies the `Callable_T_U` `f` over the elements of `Functor_T` `xs` satisfying the predicate `Pred_T` `p`.
+  //! @tparam Functor_T the Functor [T]
+  //! @tparam Pred_T the Predicate<T>
+  //! @tparam Callable_T_U the Callable map to apply to the elements
+  //! @par Equivalent To
+  //!   Forward to in the customization point
+  //! @par Remark
+  //!   This function shouldn't participate in overload resolution until `T` be convertible to `U`.
+  // fixme Should `U` be convertible to `T` instead and return a Functor_T instead of a Functor_U?
+
+  template <class Functor_T, class Pred_T, class Callable_T_U>
+    auto adjust_if(Functor_T && xs, Pred_T  p, Callable_T_U  f)
+        JASEL_DECLTYPE_RETURN_NOEXCEPT(
+            traits<type_constructor_t<meta::uncvref_t<Functor_T>>>::adjust_if(forward<Functor_T>(xs),p, f)
+        )
+
 #if ! defined JASEL_DOXYGEN_INVOKED
   namespace detail {
 
@@ -107,22 +126,34 @@ namespace functor
   }
 #endif
 
-  //! Applies the `Callable_T_U` `f` over the elements of `Functor_T` `xs` satisfying the predicate `Pred_T` `p`.
-  //! @tparam Functor_T the Functor [T]
-  //! @tparam Pred_T the Predicate<T>
-  //! @tparam Callable_T_U the Callable map to apply to the elements
-  //! @par Equivalent To
-  //!   transform(x, [&](auto x) { if pred(x) then return f(x) else return x; })
-  //! @par Remark
-  //!   This function shouldn't participate in overload resolution until `T` be convertible to `U`.
-  // fixme Should `U` be convertible to `T` instead and return a Functor_T instead of a Functor_U?
+  //! minimal complete definition based on transform
+  struct mcd_transform : functor::tag
+  {
+    //! Applies the `Callable_T_U` `f` over the elements of `Functor_T` `xs` satisfying the predicate `Pred_T` `p`.
+    //! @tparam Functor_T the Functor [T]
+    //! @tparam Pred_T the Predicate<T>
+    //! @tparam Callable_T_U the Callable map to apply to the elements
+    //! @par Equivalent To
+    //!   transform(x, [&](auto x) { if pred(x) then return f(x) else return x; })
+    //! @par Remark
+    //!   This function shouldn't participate in overload resolution until `T` be convertible to `U`.
+    // fixme Should `U` be convertible to `T` instead and return a Functor_T instead of a Functor_U?
 
-  template <class Functor_T, class Pred_T, class Callable_T_U>
-    auto adjust_if(Functor_T && xs, Pred_T  p, Callable_T_U  f)
-        JASEL_DECLTYPE_RETURN_NOEXCEPT(
-            transform(xs, detail::adjust_if_helper<Pred_T, Callable_T_U>{p, f})
-        )
-
+    template <class Functor_T, class Pred_T, class Callable_T_U>
+    static auto adjust_if(Functor_T && xs, Pred_T  p, Callable_T_U  f)
+      JASEL_DECLTYPE_RETURN_NOEXCEPT(
+          transform(forward<Functor_T>(xs), detail::adjust_if_helper<Pred_T, Callable_T_U>{p, f})
+      )
+  };
+  //! minimal complete definition based on adjust_if
+  struct mcd_adjust_if : functor::tag
+  {
+    template <class Functor_T, class Callable_T_U>
+    static auto transform(Functor_T && xs, Callable_T_U  f)
+      JASEL_DECLTYPE_RETURN_NOEXCEPT(
+          adjust_if(forward<Functor_T>(xs), always<bool>(true), f)
+      )
+  };
 }
 
   template <class T>

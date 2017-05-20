@@ -78,7 +78,7 @@ namespace type_constructible {
     // fixme when product_type::transform is defined if all the element are the same
     //struct traits<array_tc>
     //: product_type::as_functor {};
-    struct traits<array_tc> : functor::tag
+    struct traits<array_tc> : functor::mcd_transform
     {
       template <class Array, class F>
         static auto transform(Array&& x, F&& f)
