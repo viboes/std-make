@@ -53,7 +53,7 @@ namespace nullable
     return nullable::none<meta::uncvref_t<M>>();
 
   }
-  struct as_monad: monad::tag
+  struct as_monad: monad::mcd_bind
   {
     template <class M, class F>
       static constexpr auto bind(M&& x, F&& f)

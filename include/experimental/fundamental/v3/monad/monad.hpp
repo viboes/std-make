@@ -56,7 +56,10 @@ namespace monad
 #if __cplusplus >= 201402L || defined JASEL_DOXYGEN_INVOKED
     // bind:: [T] x [T->[U]] -> [U]
     template <class M, class F>
-      static auto bind(M&& x, F&& y) =delete;
+      static auto bind(M&& x, F&& y) = delete;
+    template <class M, class F>
+      static auto unwrap(M&& x) = delete;
+
 #endif
   };
 
@@ -67,12 +70,35 @@ namespace monad
           traits<type_constructor_t<decay_t<M>>>::bind(forward<M>(x), forward<F>(f))
        )
 
-   template <class M>
-   auto
-     unwrap(M&& x)
-        JASEL_DECLTYPE_RETURN_NOEXCEPT(
-           bind(forward<M>(x), identity{})
-        )
+  template <class M>
+  auto
+   unwrap(M&& x)
+      JASEL_DECLTYPE_RETURN_NOEXCEPT(
+          traits<type_constructor_t<decay_t<M>>>::unwrap(forward<M>(x))
+         //bind(forward<M>(x), identity{})
+      )
+
+  //! minimal complete definition based on transform
+  struct mcd_bind : monad::tag
+  {
+    template <class M>
+    static auto unwrap(M&& x)
+         JASEL_DECLTYPE_RETURN_NOEXCEPT(
+            monad::bind(forward<M>(x), identity{})
+         )
+  };
+
+  //! minimal complete definition based on transform
+  struct mcd_unwrap : monad::tag
+  {
+    template <class M, class F>
+    auto
+      bind(M&& x, F&& f)
+         JASEL_DECLTYPE_RETURN_NOEXCEPT(
+             monad::unwrap(functor::transform(forward<M>(x), forward<F>(f)))
+         )
+  };
+
 }
 
   template <class T>

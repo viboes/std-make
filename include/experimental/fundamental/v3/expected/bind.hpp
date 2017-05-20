@@ -27,7 +27,7 @@ inline  namespace fundamental_v3
 namespace monad
 {
 template <class T, class E>
-struct traits<expected<T,E>> : monad::tag
+struct traits<expected<T,E>> : monad::mcd_bind
 {
   template <class M, class F>
     static constexpr auto bind(M&& x, F&& f)

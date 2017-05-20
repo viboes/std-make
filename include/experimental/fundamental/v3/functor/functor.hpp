@@ -60,7 +60,10 @@ namespace functor
   {
 #if __cplusplus >= 201402L || defined JASEL_DOXYGEN_INVOKED
       template <class T, class F>
-        static auto transform(T&& x, F&& y) =delete;
+        static auto transform(T&& x, F&& y) = delete;
+
+      template <class Functor_T, class Pred_T, class Callable_T_U>
+        static auto adjust_if(Functor_T && xs, Pred_T  p, Callable_T_U  f) = delete;
 #endif
   };
 
@@ -142,7 +145,7 @@ namespace functor
     template <class Functor_T, class Pred_T, class Callable_T_U>
     static auto adjust_if(Functor_T && xs, Pred_T  p, Callable_T_U  f)
       JASEL_DECLTYPE_RETURN_NOEXCEPT(
-          transform(forward<Functor_T>(xs), detail::adjust_if_helper<Pred_T, Callable_T_U>{p, f})
+          functor::transform(forward<Functor_T>(xs), detail::adjust_if_helper<Pred_T, Callable_T_U>{p, f})
       )
   };
   //! minimal complete definition based on adjust_if
@@ -151,7 +154,7 @@ namespace functor
     template <class Functor_T, class Callable_T_U>
     static auto transform(Functor_T && xs, Callable_T_U  f)
       JASEL_DECLTYPE_RETURN_NOEXCEPT(
-          adjust_if(forward<Functor_T>(xs), always<bool>(true), f)
+          functor::adjust_if(forward<Functor_T>(xs), always<bool>(true), f)
       )
   };
 }
