@@ -5,7 +5,7 @@
     </tr>
     <tr>
         <td width="172" align="left" valign="top">Date:</td>
-        <td width="435">2017-05-13</td>
+        <td width="435">2017-05-20</td>
     </tr>
     <tr>
         <td width="172" align="left" valign="top">Project:</td>
@@ -83,15 +83,27 @@ This is the equivalent of `std::accumulate` applicable to product types instead 
 
 ### `all_of`
 
-Checks if n-unary n-predicate `p` returns `true` for all elements in the product type. 
+Checks if n-unary predicate `p` returns `true` for all elements in the product type. 
+
+Checks if 1-unary p-predicate `p` returns `true` for all elements in the product type. 
+
+A p-predicate is a polymorphic predicate, that is an overload set.
 
 ### `any_of`
 
-Checks if n-unary n-predicate `p` returns `true` for at least one elements in the product type. 
+Checks if n-unary predicate `p` returns `true` for at least one elements in the product type. 
+
+Checks if 1-unary p-predicate `p` returns `true` for at least one elements in the product type. 
 
 ### `none_of`
 
 Checks if n-unary predicate `p` returns `true` for no elements in the product type. 
+
+Checks if 1-unary predicate `p` returns `true` for no elements in the product type. 
+
+### `hash_value`
+
+This would depend on the new hash_value interface as proposed in [P0029R0].
 
 ## Other functions for *TypeConstructible* *ProductTypes*
 
@@ -118,7 +130,7 @@ This paper proposes some algorithms that can be built on top of the *ProductType
 
 ## Locating the interface on a specific namespace
 
-The name of  *product type* algorithms, `tarnsform`, `replace`, `join`, are quite common. Nesting them on a specific namespace makes the intent explicit. 
+The name of  *product type* algorithms, `transform`, `replace`, `join`, are quite common. Nesting them on a specific namespace makes the intent explicit. 
 
 We can also preface them with `product_type_`, but the role of namespaces was to be able to avoid this kind of prefixes.
 
@@ -250,7 +262,7 @@ Based on the work [N4569] for tagged tuples, associative sequences in [Boost.Fus
 
 # Acknowledgments
 
-Thanks to all those that help on [P0327R1]. 
+Thanks to all those that helped on [P0327R1]. 
 
 Special thanks and recognition goes to Technical Center of Nokia - Lannion for supporting in part the production of this proposal.
 
