@@ -20,18 +20,18 @@ This code forms the basis of several formal proposal to the C++ standard library
 
 # Ongoing new revisions proposals
 
-* D0196R2 - Generic none() factories for Nullable types
-* D0319R1 - Adding Emplace functions for `promise<T>`/`future<T>  
-* D0323R2 - A proposal to add a utility class to represent expected monad (Revision 4) 
-* D0327R2 - Product types access
-* D0338R2 - C++ generic factories
+* D0196R2 - Generic none() factories for Nullable types - https://github.com/viboes/std-make/blob/master/doc/proposal/nullable/D0196R3.md
+* D0319R1 - Adding Emplace functions for `promise<T>`/`future<T>  - https://github.com/viboes/std-make/blob/master/doc/proposal/future/d0319r1.md
+* D0323R2 - A proposal to add a utility class to represent expected monad (Revision 4) - https://github.com/viboes/std-make/blob/master/doc/proposal/expected/d0323r2.md
+* D0327R2 - Product types access - https://github.com/viboes/std-make/blob/master/doc/proposal/reflection/d0327r2.md
+* D0338R2 - C++ generic factories - https://github.com/viboes/std-make/blob/master/doc/proposal/factories/d0338r2.md
 
 # Ongoing New proposals
 
-* DXXXX - Adapting the standard tuple-like function to Product types
-* DXXXX - Product types algorithms
+* DXXXX - Adapting the standard tuple-like function to Product types - https://github.com/viboes/std-make/blob/master/doc/proposal/reflection/TupleLikeToProductType.md
+* DXXXX - Product types algorithms - https://github.com/viboes/std-make/blob/master/doc/proposal/reflection/ProductTypeAlgorithms.md
+* DXXXX - C++ Monadic inteface - https://github.com/viboes/std-make/blob/master/doc/proposal/monads/Monads.md
 * DXXXX - Sum types
-* DXXXX - C++ Monadic inteface 
 * DXXXX - C++ Ordinal types
 * DXXXX - C++ Strong types and mixins
 * DXXXX - `chrono::modulo types
@@ -49,27 +49,39 @@ This code is undocumented (other than via the proposals), not fully tested, cons
 
 # License
 
-Most of the source code in this project are mine, and those are under the Boost Software License. I have borrowed the `hana::type` class.
+Most of the source code in this project are mine, and those are under the Boost Software License. I have borrowed a lot from Hana original editions, before itbecomes Boost.Hana. A lot of code is inspired from the library Meta.
 
 # Supported Compilers
 
 The code is known to work with the following compilers:
 
-* Clang 3.7.0 `-std=c++11 -std=c++14 -std=c++1y`
 * Clang 3.9.0 `-std=c++11 -std=c++14 -std=c++1y`
-* GCC 5.2.1   `-std=c++11 -std=c++14 -std=c++1z`
+* Clang 4.4.0 `-std=c++11 -std=c++14 -std=c++1y`
 * GCC 6.1.1   `-std=c++11 -std=c++14 -std=c++1z`
 
+
+Other compiler and older versions could works as well, but are not tested regularly
+
 *Development Status:* The aim of the library is to be portable on comforming C++11/14/17 compilers.
-However some parts require a C++14 (`product_type` and `swappable`).
+However some modules require C++14:
+
+* product_type
+* sum_type, 
+* functional/overload
+* swappable
+
 Hopefully this will change in the future.
 
 # Header only library
 
-# How to test
+# Dependencies
 
 Some parts of the code use other repositories as Boost, Optional and Expected.
 You will need to set some environment variable to be able to build the test.
+
+* BOOST_ROOT : https://github.com/boostorg
+* BOOST_EXPECTED : https://github.com/ptal/expected/
+* STD_OPTIONAL : https://github.com/viboes/Optional/include
 
 Next follows the repositories and the required variable pointing to them:
 
@@ -77,6 +89,50 @@ Next follows the repositories and the required variable pointing to them:
 * Optional : https://github.com/viboes/Optional STD_OPTIONAL
 * Expected : https://github.com/ptal/expected BOOST_EXPECTED
 
+# How to test
+
+You can either use CMAKE or Boost.Build.
+
+## Boost.Build
+
+You need to have installed The 3 dependent repositories and define the variable described above. In order to run the tests go to the test folder and do
+
+```
+b2 toolset=<your tool set>
+``` 
+
+## CMAKE
+
+The CMAKE build doesn't use the additional repositories Optional and Expected, and so there are less test.
+
+You need to install Boost and define the variable described above.
+
+Do as you will do with CMAKE, make a build directory associated to your tool set and
+
+```
+mkdir build
+cd build
+cmake -C <toolset-file> <jasel-root-directory>
+``` 
+ 
+
+Then you can build the tests
+
+```
+make -j8
+``` 
+
+and run the test
+
+```
+make -j8 test
+``` 
+
+
+You can as well use CTEST.
+
+
 # Acknowledgements
 
-Many thanks to Agustín K-ballo Bergé for his help.
+Many thanks to Agustín K-ballo Bergé, David Sankel for his help, and pertinent feedback.
+
