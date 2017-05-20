@@ -84,7 +84,6 @@ int main()
     stde::optional<int> y = stde::functor::map(twice, x);
     BOOST_TEST(*y == 2);
   }
-#if __cplusplus >= 201402L
   {
     int v=1;
     stde::optional<int> x = stde::make_optional(v);
@@ -97,7 +96,6 @@ int main()
     BOOST_TEST(*y == 4);
 
   }
-#endif
   return ::boost::report_errors();
 }
 #endif

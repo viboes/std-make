@@ -37,8 +37,14 @@ inline namespace fundamental_v3
 
 namespace functor
 {
+  //! Functor tag
   struct tag{};
 
+  //! Functor tag
+  //! This class must be specialized by the user
+  //! @tparam F the Functor to specialize
+  //! @tparam Enabler SFINAE enabler condition
+  //! By default ot forwards to thesame template specialized with `when<true>`.
   template <class F, class Enabler=void>
     struct traits
 #if  ! defined JASEL_DOXYGEN_INVOKED
@@ -46,7 +52,8 @@ namespace functor
 #endif
         ;
 
-  // Default failing specialization
+  //! Default failing specialization
+  //! It doesn't inherits from the functor::tag and deletes any signature to make the code more explicit
   template <typename U, bool condition>
   struct traits<U, meta::when<condition>>
   {
@@ -56,6 +63,11 @@ namespace functor
 #endif
   };
 
+  //! Applies the `Callable` `F` over the `Functor` `T`
+  //! @tparam T the Functor
+  //! @tparam F the callable map to apply to the elements
+  //! @par Equivalent To
+  //!   Forward to in the customization point
   template <class T, class F>
   auto
     transform(T&& x, F&& f)
@@ -63,6 +75,11 @@ namespace functor
             traits<type_constructor_t<meta::uncvref_t<T>>>::transform(forward<T>(x),forward<F>(f))
         )
 
+  //! Applies the `Callable` `F` over the `Functor` `T`. This the equivalent to transform but the argument are flip.
+  //! @tparam T the Functor
+  //! @tparam F the Callable map to apply to the elements
+  //! @par Equivalent To
+  //!   transform(x,f)
   template <class F, class T>
    auto
      map(F&& f, T&& x)
@@ -70,35 +87,41 @@ namespace functor
             functor::transform(forward<T>(x), forward<F>(f))
         )
 
-#if __cplusplus >= 201402L || defined JASEL_DOXYGEN_INVOKED
+#if ! defined JASEL_DOXYGEN_INVOKED
   namespace detail {
 
     template <class Pred_T, class Callable_T_U>
     struct adjust_if_helper
     {
+      Pred_T pred;
+      Callable_T_U fct;
       template <class T>
-      auto
-      //decltype(fct(declval<T>()))
-      operator()(T && x) const
-      // todo deduce the result type to be portable to c++11
-      //-> decltype(fct(x))
+      auto operator()(T && x) const -> decltype(this->fct(forward<T>(x)))
       {
         return (JASEL_INVOKE(pred,forward<T>(x)))
           ? JASEL_INVOKE(fct,forward<T>(x))
-          : decltype(fct(x))(x)
+          : decltype(this->fct(forward<T>(x)))(forward<T>(x))
           ;
       }
-      Pred_T pred;
-      Callable_T_U fct;
     };
   }
+#endif
+
+  //! Applies the `Callable_T_U` `f` over the elements of `Functor_T` `xs` satisfying the predicate `Pred_T` `p`.
+  //! @tparam Functor_T the Functor [T]
+  //! @tparam Pred_T the Predicate<T>
+  //! @tparam Callable_T_U the Callable map to apply to the elements
+  //! @par Equivalent To
+  //!   transform(x, [&](auto x) { if pred(x) then return f(x) else return x; })
+  //! @par Remark
+  //!   This function shouldn't participate in overload resolution until `T` be convertible to `U`.
+  // fixme Should `U` be convertible to `T` instead and return a Functor_T instead of a Functor_U?
 
   template <class Functor_T, class Pred_T, class Callable_T_U>
     auto adjust_if(Functor_T && xs, Pred_T  p, Callable_T_U  f)
         JASEL_DECLTYPE_RETURN_NOEXCEPT(
             transform(xs, detail::adjust_if_helper<Pred_T, Callable_T_U>{p, f})
         )
-#endif
 
 }
 
