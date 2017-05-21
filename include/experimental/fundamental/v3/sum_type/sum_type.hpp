@@ -14,17 +14,12 @@
 
 ///////////////////////////////////////////////////////////////////////////////////////
 ///
-/// A type ST is a model of a ProductType if given variable st of type ST
+/// A type ST is a model of a SumType if given variable st of type ST
 ///
 ///   sum_type::size<ST>::value
 ///   sum_type::alternative<I,ST>::type
 ///   sum_type::get<I>(st)
 ///
-/// The definition of these traits/functions depend on whether P0327 is adopted by the standard and
-/// can be implemented only by the compiler, as it does for Range-based for loops.
-///
-/// What follows is just an emulation for the cases 1 (c-arrays) and 2 (variant-like types).
-/// The case 3 can be implemented only by the compiler.
 ///////////////////////////////////////////////////////////////////////////////////////
 
 #include <cstddef>
