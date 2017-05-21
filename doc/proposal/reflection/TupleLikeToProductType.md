@@ -1,11 +1,11 @@
 <table border="0" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="607">
     <tr>
         <td width="172" align="left" valign="top">Document number:</td>
-        <td width="435"><span style="background-color: #FFFF00">D0XXXR0</span></td>
+        <td width="435"><span style="background-color: #FFFF00">D0648R0</span></td>
     </tr>
     <tr>
         <td width="172" align="left" valign="top">Date:</td>
-        <td width="435">2017-05-13</td>
+        <td width="435">2017-05-21</td>
     </tr>
     <tr>
         <td width="172" align="left" valign="top">Project:</td>
@@ -51,10 +51,9 @@ This paper proposes to adapt the algorithms and interfaces working today with *t
 Take in account the feedback from Kona meeting concerning [P0327R1]. Next follows the direction of the committee: 
 
 * Split the proposal into 3 documents
-    * Product Type Access
-    * Extension of current tuple-like algorithms to *ProductType*
-    * Basic *ProductType* algorithms
-    * Other *ProductType* algorithms
+    * [P0327R2] Product Type Access
+    * [P0648R0] Extension of current tuple-like algorithms to *ProductType*
+    * [P0649R0] Other *ProductType* algorithms
      
 In this document, we describe the extension of the current tuple-like algorithms to the proposed *ProductType* requirements. 
 
@@ -64,25 +63,23 @@ There are some algorithms working almost on *tuple-like* types that can be exten
 
 # Motivation
 
-## Extension
+## Adaptation
 
 Algorithms such as `std::tuple_cat` and `std::apply` that work well with *tuple-like* types, should work also for any *ProductType* types. 
 
-
 ## Reuse
 
-The definition of some the existing functions and assignment operators will surely be implemented using the same algorithm generalized for any *ProductType*. This paper proposes only the algorithms that could be needed to implement the current *tuple-like* interface. 
+The definition of some the existing functions and assignment operators will surely be implemented using the same algorithm generalized for any *ProductType*. This paper proposes only the algorithms that could be needed to implement (or define) the current *tuple-like* interface extended to *ProductTypes*. 
 
 ## Deprecation
 
-Some of the old algorithms could be deprecated in favor of the new ones. E.g. we could deprecate `std::apply` in favor of `std::product_type::apply`. 
+Some of the current algorithms could be deprecated in favor of the new ones. E.g. we could deprecate `std::apply` in favor of `std::product_type::apply`. 
 
 ## Extension
 
-There are many more of them. [BPTA] and [OPTA] takes in account some of the algorithms that work well with *ProductTypes*.
+There are many more of them. [P0649R0] takes in account some of the algorithms that work well with *ProductTypes*.
 
 # Proposal
-
 
 ## *tuple-like* algorithms and function adaptation
 
@@ -92,7 +89,7 @@ There are many more of them. [BPTA] and [OPTA] takes in account some of the algo
 
 Adapt the definition of `std::tuple_cat` in [tuple.creation] to take care of *ProductType*.
 
-Note: The single difference between `std::tuple_cat` and `std::product_type::cat` is that `std::tuple_cat` forces `std::tuple<>` as result type. 
+Note: The single difference between `std::tuple_cat` and `std::product_type::cat` is `std::tuple_cat` forces `std::tuple<>` as result type. 
 
 #### Constructor from a product type with the same number of elements as the tuple
 
@@ -102,7 +99,7 @@ This simplifies a lot the `std::tuple` interface (See [N4387]).
 
 #### `std::apply`
 
-Adapt the definition of `std::apply` in [xxx] to take care of *ProductType*.
+Adaptation of the definition of `std::apply` to take care of *ProductType*.
 
 NOTE: This algorithm could just forward to `product_type::apply`. 
 
@@ -247,11 +244,10 @@ Where `TC` is a variadic template for a *ProductType* as e.g. `std::tuple` or a 
 
 Note that `std::pair`, `std::tuple` and `std::array` are *TypeConstructible*, but `std::pair` and `std::array` limit either in the number or in the kind of types (all the same). 
 
-A c-array is not type *TypeConstructible* as it cannot be returned by value.
+A c-array is not *TypeConstructible* as it cannot be returned by value.
 
 
 # Design Rationale
-
 
 ## Locating the interface on a specific namespace
 
@@ -264,6 +260,8 @@ We can also preface them with `product_type_`, but the role of namespaces was to
 The proposed changes are expressed as edits to 
 [N4564] Working Draft, C++ Extensions for Library Fundamentals, Version 2.
 
+If [P0550R0] is accepted, any use of `remove_cv_t<remove_reference_t<T>>` should be replaced by `uncvref_t<PT2>
+
 **Add the following section in [N4564]**
 
 ## Product type algorithms
@@ -271,8 +269,8 @@ The proposed changes are expressed as edits to
 ### Product type algorithms synopsis
 
 ```c++
-namespace std {
-
+namespace std::experimental {
+inline namespace fundamental_v3 {
 namespace product_type {
     
     template <class F, class ProductType>
@@ -296,9 +294,8 @@ namespace product_type {
     template <class PT>
        void swap(PT& x, PT& y) noexcept(`see below`);        
                    
-}}
+}}}
 ```
-
 
 ### Function Template `product_type::apply `
 
@@ -323,11 +320,10 @@ Let `Ui` is `product_type::element_t<i, remove_cv_t<remove_reference_t<<PT>>>`.
 template <class PT1, class PT2>
     PT1& assign(PT1& pt1, PT2&& pt2);
 ```
-In the following paragraphs, let `VPT2` be `remove_cv_t<remove_reference_t<PT2>>`, `Ti` be `product_type::element<i, PT1>` and `Ui` `product_type::element<i, VPT2>`. 
+In the following paragraphs, let `VPT2` be `remove_cv_t<remove_reference_t<PT2>>`, `Ti` be `product_type::element_t<i, PT1>` and `Ui` be `product_type::element_t<i, VPT2>`. 
 *Requires*: both `PT1` and `VPT2` are *ProductTypes* with the same size, `product_type::size<PT1>::value==product_type::size<VPT2>::value` and `is_assignable_v<Ti&, const Ui&>` is true for all `i`.
 
 *Effects*: Assigns each element of `pt2` to the corresponding element of `pt1`.
-
                    
 ### Function Template `product_type::cat`
 
@@ -336,11 +332,10 @@ template <template <class...> TC, class ...PTs>
     constexpr TC<CTypes> cat(PTs&& ...pts);
 ```
 
-In the following paragraphs, let `Ti` be the `i`th type in `PTs`, `Ui` be `remove_reference_t<Ti>`, `pti` be the `i`th parameter in the function parameter pack `pts `, where all indexing is zero-based and *Requires*: For all `i`, `Ui` shall be the type `cvi PTi`, where `cvi` is the (possibly empty) `i`th cv-qualifier-seq. Let `Aik` be `product_type::element<ki, PTi>`, the `ki`th type in `PTi`. For all `Aik` the following requirements shall be satisfied: If `Ti` is deduced as an lvalue reference type, then `is_constructible_v<Aik , cvi Aik &> == true`, otherwise `is_constructible_v<Aik, cviAik&&> == true`.
+In the following paragraphs, let `Ti` be the `i`th type in `PTs`, `Ui` be `remove_reference_t<Ti>`, `pti` be the `i`th parameter in the function parameter pack `pts `, where all indexing is zero-based and *Requires*: For all `i`, `Ui` shall be the type `cvi PTi`, where `cvi` is the (possibly empty) `i`th cv-qualifier-seq. Let `Aik` be `product_type::element_t<ki, PTi>`, the `ki`th type in `PTi`. For all `Aik` the following requirements shall be satisfied: If `Ti` is deduced as an lvalue reference type, then `is_constructible_v<Aik , cvi Aik &> == true`, otherwise `is_constructible_v<Aik, cviAik&&> == true`.
 
 **TODO: reword this paragraph***Remarks*: The types in `Ctypes` shall be equal to the ordered sequence of the extended types `Args0..., Args1..., ... Argsn−1...`, where `n` is equal to `sizeof...(PTs)`. Let `ei`... be the `i`th ordered sequence of tuple elements of the resulting tuple object corresponding to the type sequence `Argsi`.
 **TODO: reword this paragraph***Returns*: A tuple object constructed by initializing the `ki`th type element `eik` in `ei...` with `get<ki>(std::forward<Ti>(pti))` for each valid `ki` and each group `ei` in order.*Note*: An implementation may support additional types in the parameter pack `Tuples` that support the tuple-like protocol, such as pair and array.
-
 
 ### Function Template `product_type::make_from`
 
@@ -366,7 +361,7 @@ template <class T, class PT>
 template <class PT1, class PT2>
     PT1& move(PT1& pt1, PT2&& pt2);
 ```
-In the following paragraphs, let `VPT2` be `remove_cv_t<remove_reference_t<PT2>>`, `Ti` be `product_type::element<i, PT1>` and `Ui` `product_type::element<i, VPT2>`. 
+In the following paragraphs, let `VPT2` be `remove_cv_t<remove_reference_t<PT2>>`, `Ti` be `product_type::element_t<i, PT1>` and `Ui` `product_type::element_t<i, VPT2>`. 
 *Requires*: both `PT1` and `VPT2` are *ProductTypes* with the same size, `product_type::size<PT1>::value==product_type::size<VPT2>::value` and `is_assignable_v<Ti&, Ui&&>` is true for all `i`.
 
 *Effects*: Moves each element of `pt2` to the corresponding element of `pt1`.
@@ -378,7 +373,7 @@ template <class PT>
     void swap(PT& x, PT& y) noexcept(`see below`);       
 ```
 
-*Remark*: The expression inside `noexcept` is equivalent to the logical and of the following expressions: `is_nothrow_swappable_v<Ti>` where `Ti` is `product_type::element<i, PT>`.
+*Remark*: The expression inside `noexcept` is equivalent to the logical and of the following expressions: `is_nothrow_swappable_v<Ti>` where `Ti` is `product_type::element_t<i, PT>`.
 *Requires*: Each element in `x` shall be swappable with (17.6.3.2) the corresponding element in `y`. 
 
 *Effects*: Calls `swap` for each element in `x` and its corresponding element in `y`.*Throws*: Nothing unless one of the element-wise `swap` calls throws an exception.
@@ -391,6 +386,10 @@ template <class PT>
 ```
 
 *Effects*: Equivalent to ......
+
+```c++
+    product_type::make_from<tuple<product_type::element_t<0, PT>,...>>(pt);       
+```
 
 
 ## <tuple>
@@ -500,7 +499,7 @@ Let `Ui` is `product_type::element_t<i, remove_cv_t<remove_reference_t<<PT>>>`.
 
 *Remarks*: This function shall not participate in overload resolution unless `PT` is a *product type* with the same number elements than this tuple and `is_assignable<Ti&, const Ui&>::value` is true for all `i`.
 
-[Note: - We could as well say equivalent to `product_type::copy(std::forward<PT>(u), *this); return *this`. end note ]
+[Note: - We could as well say equivalent to `product_type::assign(std::forward<PT>(u), *this); return *this`. end note ]
 
 ### Allocator-extended constructors from a product type  
 
@@ -592,8 +591,6 @@ template <class PT1, class PT2>
     pair(piecewise_construct_t, PT1 first_args, PT2 second_args);
 ```
 
-
-
 ### Constructor from a product type
 
 **Add**
@@ -623,9 +620,9 @@ Let `Ui` is `product_type::element_t<i, remove_cv_t<remove_reference_t<<PT>>>`.
 
 *Returns*: `*this`
 
-*Remarks*: This function shall not participate in overload resolution unless `PT` is a *product type* with 2 elements and`is_assignable<Ti&, const Ui&>::value` is true for all `i`.
+*Remarks*: This function shall not participate in overload resolution unless `PT` is a *product type* with 2 elements and `is_assignable<Ti&, const Ui&>::value` is true for all `i`.
 
-[Note: - We could as well say equivalent to `product_type::copy(std::forward<PT>(u), *this); return *this`. end note ]
+[Note: - We could as well say equivalent to `product_type::assign(std::forward<PT>(u), *this); return *this`. end note ]
 
 ## <array> `std::array`
 
@@ -647,7 +644,7 @@ Let `Ui` is `product_type::element_t<i, remove_cv_t<remove_reference_t<<PT>>>`.
 
 *Remarks*: This function shall not participate in overload resolution unless `PT` is a *product type* with `N` elements and `is_assignable<T&, const Ui&>::value` is true for all `i`.
 
-[Note: - We could as well say equivalent to `product_type::copy(std::forward<PT>(u), *this); return *this`. end note ]
+[Note: - We could as well say equivalent to `product_type::assign(std::forward<PT>(u), *this); return *this`. end note ]
 
              
 # Implementability
