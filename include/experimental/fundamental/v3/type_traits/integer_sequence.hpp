@@ -10,11 +10,12 @@
 #define JASEL_V3_FUNDAMENTAL_TYPE_TRAITS_INTEGER_SEQUENCE_HPP
 
 #include <type_traits>
-
-#if __cplusplus == 201103L
+#include <utility>
 
 namespace std
 {
+#if __cplusplus == 201103L
+
 namespace experimental
 {
 inline namespace fundamental_v3
@@ -166,6 +167,8 @@ namespace integer_sequence_detail {
 
   template <typename... T>
   using index_sequence_for = make_index_sequence<sizeof...(T)>;
+
+
 }
 }
 
@@ -173,6 +176,23 @@ using experimental::integer_sequence;
 using experimental::make_integer_sequence;
 using experimental::index_sequence_for;
 
-}
 #endif
+
+namespace experimental
+{
+inline namespace fundamental_v3
+{
+  template <size_t N, class IS>
+  struct add_index_sequence;
+  template <size_t N, size_t ...Is>
+  struct add_index_sequence<N, index_sequence<Is...>>
+  {
+    using type = index_sequence<N+Is...>;
+  };
+
+  template <size_t N, size_t M>
+  using make_index_sequence_for_range = typename add_index_sequence<N, make_index_sequence<M-N+1>>::type;
+}
+}
+}
 #endif // header

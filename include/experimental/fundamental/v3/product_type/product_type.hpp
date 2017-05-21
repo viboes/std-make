@@ -333,12 +333,6 @@ constexpr size_t get_size(PT &&pt) noexcept
 }
 
 template <class PT>
-constexpr size_t is_empty(PT &&pt) noexcept
-{
-	return product_type::empty_v<remove_reference_t<PT>>;
-}
-
-template <class PT>
 using element_sequence_for =
         make_index_sequence<product_type::size_v<remove_reference_t<PT>>>;
 }

@@ -1,0 +1,39 @@
+//////////////////////////////////////////////////////////////////////////////
+//
+// (C) Copyright Vicente J. Botet Escriba 2017.
+// Distributed under the Boost Software License, Version 1.0.
+// (See accompanying file // LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+//
+//////////////////////////////////////////////////////////////////////////////
+
+#ifndef JASEL_FUNDAMENTAL_V3_PRODUCT_TYPE_FRONT_HPP
+#define JASEL_FUNDAMENTAL_V3_PRODUCT_TYPE_FRONT_HPP
+
+#include <experimental/fundamental/v3/product_type/product_type.hpp>
+#include <tuple>
+#include <utility>
+
+namespace std
+{
+namespace experimental
+{
+inline  namespace fundamental_v3
+{
+
+namespace product_type
+{
+  template <class ProductType
+#if ! defined JASEL_DOXYGEN_INVOKED
+  , class = enable_if_t< is_product_type_v<meta::uncvref_t<ProductType>>  >
+#endif
+  >
+  constexpr auto front(ProductType&& pt)
+    JASEL_DECLTYPE_RETURN_NOEXCEPT(
+      product_type::get<0>(forward<ProductType>(pt))
+    )
+
+}
+}}
+}
+
+#endif // header

@@ -82,6 +82,18 @@ OSTREAM& operator<<(OSTREAM& os, PT const& pt) {
 int main()
 {
   namespace stde = std::experimental;
+  auto to_string = [](auto const& x) {
+      std::ostringstream ss;
+      ss << x;
+      return ss.str();
+  };
+  auto sep_to_string = [&](auto i, std::string s, auto const& element) {
+      if (decltype(i)::value>0) s+= ", ";
+      return  s + to_string(element) ;
+  };
+  auto pt_to_string = [&](auto const& pt) {
+    return std::string("{") + stde::product_type::fold_left_index(pt,std::string{}, sep_to_string) + "}";
+  };
   {
       using T = std::array<int,3>;
       static_assert(stde::product_type_detail::has_tuple_like_size_access<T>::value, "Hrr");
@@ -261,11 +273,11 @@ int main()
     stde::product_type::for_each(p,[](auto& v) {std::cout << v << "\n";});
   }
   {
-    auto to_string = [](auto x) {
-        std::ostringstream ss;
-        ss << x;
-        return ss.str();
-    };
+//    auto to_string = [](auto x) {
+//        std::ostringstream ss;
+//        ss << x;
+//        return ss.str();
+//    };
 
     using T = std::array<int,2>;
     T p  = { {0,1} };
@@ -281,11 +293,11 @@ int main()
     );
   }
   {
-    auto to_string = [](auto x) {
-        std::ostringstream ss;
-        ss << x;
-        return ss.str();
-    };
+//    auto to_string = [](auto x) {
+//        std::ostringstream ss;
+//        ss << x;
+//        return ss.str();
+//    };
 
     using T = std::array<int,2>;
     T p  = { {0,1} };
@@ -303,11 +315,11 @@ int main()
     );
   }
   {
-    auto to_string = [](auto x) {
-        std::ostringstream ss;
-        ss << x;
-        return ss.str();
-    };
+//    auto to_string = [](auto x) {
+//        std::ostringstream ss;
+//        ss << x;
+//        return ss.str();
+//    };
     auto f = [=](std::string s, auto element) {
         return "f(" + s + ", " + to_string(element) + ")";
     };
@@ -330,18 +342,7 @@ int main()
     );
   }
   {
-    auto to_string = [](auto const& x) {
-        std::ostringstream ss;
-        ss << x;
-        return ss.str();
-    };
-    auto sep_to_string = [=](auto i, std::string s, auto const& element) {
-        if (decltype(i)::value>0) s+= ", ";
-        return  s + to_string(element) ;
-    };
-    auto pt_to_string = [=](auto const& pt) {
-      return std::string("{") + stde::product_type::fold_left_index(pt,std::string{}, sep_to_string) + "}";
-    };
+
     std::cout << "===========\n";
     using U = std::array<int, 5>;
     U q  = { {1, 2, 3, 4, 5} };
@@ -362,6 +363,73 @@ int main()
 
     //std::experimental::product_type::fold_left_index(pt,std::string{}, sepc<OSTREAM, int>) ;
     std::cout << q<<"\n";
+  }
+  {
+    std::cout << "===========\n";
+    using U = std::array<int, 5>;
+    U q  = { {1, 2, 3, 4, 5} };
+    BOOST_TEST( ! stde::product_type::is_empty(q) );
+    BOOST_TEST_EQ(stde::product_type::front(q), 1);
+    BOOST_TEST_EQ(stde::product_type::back(q), 5);
+    {
+      BOOST_TEST_EQ(
+          pt_to_string(stde::product_type::drop_back<2>(q))
+              ,
+          "{1, 2, 3}"
+      );
+    }
+    {
+      BOOST_TEST_EQ(
+          pt_to_string(stde::product_type::drop_back<0>(q))
+              ,
+          "{1, 2, 3, 4, 5}"
+      );
+    }
+#if 0
+    //This fails we can not create an array<T,0> :(
+    {
+      BOOST_TEST_EQ(
+          pt_to_string(stde::product_type::drop_back<5>(q))
+              ,
+          "{}"
+      );
+    }
+#endif
+    {
+      BOOST_TEST_EQ(
+          pt_to_string(stde::product_type::drop_front<2>(q))
+              ,
+          "{3, 4, 5}"
+      );
+    }
+    {
+      BOOST_TEST_EQ(
+          pt_to_string(stde::product_type::drop_front<0>(q))
+              ,
+          "{1, 2, 3, 4, 5}"
+      );
+    }
+    {
+
+      std::cout << "=====================\n";
+      auto a = stde::product_type::insert<2>(q, 10);
+      BOOST_TEST_EQ(a[0], 1);
+      BOOST_TEST_EQ(a[1], 2);
+      BOOST_TEST_EQ(a[2], 10);
+      BOOST_TEST_EQ(a[3], 3);
+      BOOST_TEST_EQ(a[4], 4);
+      BOOST_TEST_EQ(a[5], 5);
+      BOOST_TEST_EQ(stde::product_type::size<decltype(a)>(), 6);
+      std::cout << "=====================\n";
+      // fixme
+      //std::cout << pt_to_string(a) << std::endl;
+//      BOOST_TEST_EQ(
+//          pt_to_string(a)
+//              ,
+//          "{1, 2, 10, 3, 4, 5}"
+//      );
+    }
+
   }
   return ::boost::report_errors();
 }

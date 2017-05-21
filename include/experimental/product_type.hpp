@@ -22,6 +22,13 @@
 #include <experimental/fundamental/v3/product_type/to_tuple.hpp>
 #include <experimental/fundamental/v3/product_type/ap.hpp>
 
+#include <experimental/fundamental/v3/product_type/front.hpp>
+#include <experimental/fundamental/v3/product_type/back.hpp>
+#include <experimental/fundamental/v3/product_type/is_empty.hpp>
+
+#include <experimental/fundamental/v3/product_type/insert.hpp>
+#include <experimental/fundamental/v3/product_type/drop_back.hpp>
+
 #endif
 
 #endif // header

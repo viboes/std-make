@@ -12,6 +12,7 @@
 #include <experimental/fundamental/v3/product_type/product_type.hpp>
 #include <utility>
 #include <functional>
+#include <experimental/type_traits.hpp>
 
 namespace std
 {
