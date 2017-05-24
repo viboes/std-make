@@ -40,7 +40,7 @@ namespace product_type
   , class = enable_if_t< is_product_type_v<meta::uncvref_t<ProductType>>  >
 #endif
   >
-  constexpr decltype(auto) drop_back(ProductType&& pt)
+  constexpr auto drop_back(ProductType&& pt)
   JASEL_DECLTYPE_RETURN_NOEXCEPT(
       product_type_detail::select_impl<N>(forward<ProductType>(pt),
           make_index_sequence<product_type::size<meta::uncvref_t<ProductType>>::value-N>{}
@@ -52,7 +52,7 @@ namespace product_type
   , class = enable_if_t< is_product_type_v<meta::uncvref_t<ProductType>>  >
 #endif
   >
-  constexpr decltype(auto) drop_front(ProductType&& pt)
+  constexpr auto drop_front(ProductType&& pt)
   JASEL_DECLTYPE_RETURN_NOEXCEPT(
       product_type_detail::select_impl<N>(forward<ProductType>(pt),
           make_index_sequence_for_range<N, product_type::size<meta::uncvref_t<ProductType>>::value-1>{}
