@@ -23,7 +23,8 @@ inline namespace fundamental_v3
     template <class Exception>
     static Error make_error(Exception const& e)
     {
-      return Error{e};
+      //return Error{e};
+      return static_cast<Error>(e);
     }
     static Error make_error_from_current_exception()
     {

@@ -39,6 +39,37 @@ inline namespace fundamental_v3
       error_(move(e))
     {
     }
+
+    template < class Err >
+    BOOST_FORCEINLINE BOOST_CONSTEXPR explicit unexpected_type(unexpected_type<Err> const& e
+        , JASEL_REQUIRES( is_constructible<ErrorType, Err>::value)
+        ) :
+      error_(e.error_)
+    {
+    }
+    template < class Err >
+    BOOST_FORCEINLINE BOOST_CONSTEXPR explicit unexpected_type(unexpected_type<Err>&& e
+        , JASEL_REQUIRES( is_constructible<ErrorType, Err&&>::value)
+        ) :
+      error_(move(e.error_))
+    {
+    }
+
+    template < class Err >
+    BOOST_FORCEINLINE BOOST_CONSTEXPR explicit unexpected_type(Err const& e
+        , JASEL_REQUIRES( is_constructible<ErrorType, Err>::value)
+        ) :
+      error_(e)
+    {
+    }
+    template < class Err >
+    BOOST_FORCEINLINE BOOST_CONSTEXPR explicit unexpected_type(ErrorType&& e
+        , JASEL_REQUIRES( is_constructible<ErrorType, Err&&>::value)
+        ) :
+      error_(move(e))
+    {
+    }
+
 #if ! defined JASEL_NO_CXX11_RVALUE_REFERENCE_FOR_THIS
 
     BOOST_CXX14_CONSTEXPR

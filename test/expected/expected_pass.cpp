@@ -373,6 +373,24 @@ void expected_from_error_error_condition()
 }
 
 
+void expected_from_error_convertible()
+{
+  {
+    stde::expected<int, short> e1 = stde::make_unexpected(1);
+    stde::expected<int, int> e2(e1);
+    BOOST_TEST_EQ(e2.valid(), false);
+    BOOST_TEST_EQ(static_cast<bool>(e2), false);
+    BOOST_TEST_EQ(e2.error(), 1);
+  }
+  {
+    stde::expected<void, short> e1 = stde::make_unexpected(1);
+    stde::expected<void, int> e2(e1);
+    BOOST_TEST_EQ(e2.valid(), false);
+    BOOST_TEST_EQ(static_cast<bool>(e2), false);
+    BOOST_TEST_EQ(e2.error(), 1);
+  }
+}
+
 void except_valid_constexpr_int()
 {
   // From value constructor.
@@ -760,6 +778,7 @@ int main()
   make_expected_from_U_value2();
   expected_from_value_error_condition();
   expected_from_error_error_condition();
+  expected_from_error_convertible();
   except_valid_constexpr_int();
   except_value_constexpr_int();
   expected_from_value3();

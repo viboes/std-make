@@ -517,6 +517,44 @@ struct trivial_expected_base
 //   trivial_expected_base& operator=(trivial_expected_base const&) = default;
 //   trivial_expected_base& operator=(trivial_expected_base &&) = default;
 
+  template <class Err, bool C, bool M>
+  trivial_expected_base(const trivial_expected_base<value_type, Err, C, M >& rhs
+    //, JASEL_REQUIRES( is_constructible<error_type, Err>::value )
+  )
+  BOOST_NOEXCEPT_IF((
+      is_nothrow_constructible<error_type, Err>::value
+  ))
+  {
+    if (rhs.has_value)
+    {
+      ::new (dataptr()) value_type(rhs.contained_val());
+    }
+    else
+    {
+      ::new (unexpectedptr()) unexpected_t(rhs.contained_unexpected());
+    }
+    has_value = rhs.has_value;
+  }
+
+  template <class Err, bool C, bool M>
+  trivial_expected_base(trivial_expected_base<value_type, Err, C, M >&& rhs
+    , JASEL_REQUIRES( is_constructible<error_type, Err&&>::value)
+  )
+  BOOST_NOEXCEPT_IF((
+    is_nothrow_constructible<error_type, Err&&>::value
+  ))
+  {
+    if (rhs.has_value)
+    {
+      ::new (dataptr()) value_type(move(rhs.contained_val()));
+    }
+    else
+    {
+      ::new (unexpectedptr()) unexpected_t(move(rhs.contained_unexpected()));
+    }
+    has_value = rhs.has_value;
+  }
+
    ~trivial_expected_base() = default;
 };
 
@@ -591,7 +629,7 @@ struct trivial_expected_base<void, E, AreCopyConstructible, AreMoveConstructible
       }
       else
       {
-        ::new (unexpectedptr()) unexpected_t(rhs.contained_unepected());
+        ::new (unexpectedptr()) unexpected_t(rhs.contained_unexpected());
       }
       has_value = rhs.has_value;
     }
@@ -618,6 +656,42 @@ struct trivial_expected_base<void, E, AreCopyConstructible, AreMoveConstructible
   // fixme: define these operations
 //   trivial_expected_base& operator=(trivial_expected_base const&) = default;
 //   trivial_expected_base& operator=(trivial_expected_base &&) = default;
+
+  template <class Err, bool C, bool M>
+  trivial_expected_base(const trivial_expected_base<void, Err, C, M >& rhs
+    //, JASEL_REQUIRES( is_constructible<error_type, Err>::value )
+  )
+  BOOST_NOEXCEPT_IF((
+      is_nothrow_constructible<error_type, Err>::value
+  ))
+  {
+    if (rhs.has_value)
+    {
+    }
+    else
+    {
+      ::new (unexpectedptr()) unexpected_t(rhs.contained_unexpected());
+    }
+    has_value = rhs.has_value;
+  }
+
+  template <class Err, bool C, bool M>
+  trivial_expected_base(trivial_expected_base<void, Err, C, M >&& rhs
+    , JASEL_REQUIRES( is_constructible<error_type, Err&&>::value)
+  )
+  BOOST_NOEXCEPT_IF((
+    is_nothrow_constructible<error_type, Err&&>::value
+  ))
+  {
+    if (rhs.has_value)
+    {
+    }
+    else
+    {
+      ::new (unexpectedptr()) unexpected_t(move(rhs.contained_unexpected()));
+    }
+    has_value = rhs.has_value;
+  }
 
    ~trivial_expected_base() = default;
 };
@@ -765,6 +839,44 @@ struct no_trivial_expected_base
   //no_trivial_expected_base& operator=(no_trivial_expected_base const&) = default;
   //no_trivial_expected_base& operator=(no_trivial_expected_base &&) = default;
 
+  template <class Err, bool C, bool M>
+  no_trivial_expected_base(const no_trivial_expected_base<value_type, Err, C, M >& rhs
+    //, JASEL_REQUIRES( is_constructible<error_type, Err>::value )
+  )
+  BOOST_NOEXCEPT_IF((
+      is_nothrow_constructible<error_type, Err>::value
+  ))
+  {
+    if (rhs.has_value)
+    {
+      ::new (dataptr()) value_type(rhs.contained_val());
+    }
+    else
+    {
+      ::new (unexpectedptr()) unexpected_t(rhs.contained_unexpected());
+    }
+    has_value = rhs.has_value;
+  }
+
+  template <class Err, bool C, bool M>
+  no_trivial_expected_base(no_trivial_expected_base<value_type, Err, C, M >&& rhs
+    , JASEL_REQUIRES( is_constructible<error_type, Err&&>::value)
+  )
+  BOOST_NOEXCEPT_IF((
+    is_nothrow_constructible<error_type, Err&&>::value
+  ))
+  {
+    if (rhs.has_value)
+    {
+      ::new (dataptr()) value_type(move(rhs.contained_val()));
+    }
+    else
+    {
+      ::new (unexpectedptr()) unexpected_t(move(rhs.contained_unexpected()));
+    }
+    has_value = rhs.has_value;
+  }
+
   ~no_trivial_expected_base()
   {
     if (has_value) contained_val().~value_type();
@@ -887,6 +999,26 @@ struct no_trivial_expected_base<T, E, false, AreMoveConstructible>
   // fixme: define these operations
   //no_trivial_expected_base& operator=(no_trivial_expected_base const&) = delete;
   //no_trivial_expected_base& operator=(no_trivial_expected_base &&) = delete;
+
+  template <class Err, bool C, bool M>
+  no_trivial_expected_base(no_trivial_expected_base<value_type, Err, C, M >&& rhs
+    , JASEL_REQUIRES( is_constructible<error_type, Err&&>::value)
+  )
+  BOOST_NOEXCEPT_IF((
+    is_nothrow_constructible<error_type, Err&&>::value
+  ))
+  {
+    if (rhs.has_value)
+    {
+      ::new (dataptr()) value_type(move(rhs.contained_val()));
+    }
+    else
+    {
+      ::new (unexpectedptr()) unexpected_t(move(rhs.contained_unexpected()));
+    }
+    has_value = rhs.has_value;
+  }
+
 
   ~no_trivial_expected_base()
   {
@@ -1223,6 +1355,41 @@ struct no_trivial_expected_base<void, E, AreCopyConstructible, AreMoveConstructi
   //no_trivial_expected_base& operator=(no_trivial_expected_base const&) = default;
   //no_trivial_expected_base& operator=(no_trivial_expected_base &&) = default;
 
+  template <class Err, bool C, bool M>
+  no_trivial_expected_base(const no_trivial_expected_base<void, Err, C, M >& rhs
+    //, JASEL_REQUIRES( is_constructible<error_type, Err>::value )
+  )
+  BOOST_NOEXCEPT_IF((
+      is_nothrow_constructible<error_type, Err>::value
+  ))
+  {
+    if (rhs.has_value)
+    {
+    }
+    else
+    {
+      ::new (unexpectedptr()) unexpected_t(rhs.contained_unexpected());
+    }
+    has_value = rhs.has_value;
+  }
+
+  template <class Err, bool C, bool M>
+  no_trivial_expected_base(no_trivial_expected_base<void, Err, C, M >&& rhs
+    , JASEL_REQUIRES( is_constructible<error_type, Err&&>::value)
+  )
+  BOOST_NOEXCEPT_IF((
+    is_nothrow_constructible<error_type, Err&&>::value
+  ))
+  {
+    if (rhs.has_value)
+    {
+    }
+    else
+    {
+      ::new (unexpectedptr()) unexpected_t(move(rhs.contained_unexpected()));
+    }
+    has_value = rhs.has_value;
+  }
   ~no_trivial_expected_base() {
     if (! has_value)
     {
@@ -1443,7 +1610,7 @@ struct is_expected<expected<T,E>> : true_type {};
 
 template <typename ValueType, typename ErrorType>
 class expected
-: private detail::expected_base<ValueType, ErrorType,
+: public detail::expected_base<ValueType, ErrorType,
     is_copy_constructible<ValueType>::value,
     is_move_constructible<ValueType>::value>
 {
@@ -1584,6 +1751,28 @@ public:
 
   expected(const expected& rhs) = default;
   expected(expected&& rhs) noexcept = default;
+
+  template <class Err>
+  expected(const expected<value_type, Err>& rhs
+    , JASEL_REQUIRES( is_constructible<error_type, Err>::value )
+  )
+  BOOST_NOEXCEPT_IF((
+      is_nothrow_constructible<error_type, Err>::value
+  ))
+  : base_type(rhs)
+  {
+  }
+
+  template <class Err>
+  expected(expected<value_type, Err>&& rhs
+    , JASEL_REQUIRES( is_constructible<error_type, Err&&>::value)
+  )
+  BOOST_NOEXCEPT_IF((
+    is_nothrow_constructible<error_type, Err&&>::value
+  ))
+  : base_type(forward<expected<value_type,Err>>(rhs))
+  {
+  }
 
   JASEL_0_REQUIRES(
       is_copy_constructible<error_type>::value
@@ -2322,7 +2511,7 @@ using exception_or = expected<T, exception_ptr>;
 
 template <typename ErrorType>
 class expected<void,ErrorType>
-: detail::expected_base<void, ErrorType,
+: public detail::expected_base<void, ErrorType,
   true,
   true >
 {
@@ -2384,23 +2573,28 @@ public:
 
   // Constructors/Destructors/Assignments
 
-  expected(const expected& rhs
-    , JASEL_REQUIRES( is_copy_constructible<error_type>::value)
+  expected(const expected& rhs) = default;
+  expected(expected&& rhs) noexcept = default;
+
+  template <class Err>
+  expected(const expected<void, Err>& rhs
+    , JASEL_REQUIRES( is_constructible<error_type, Err>::value )
   )
-  BOOST_NOEXCEPT_IF(
-    is_nothrow_copy_constructible<error_type>::value
-  )
+  BOOST_NOEXCEPT_IF((
+      is_nothrow_constructible<error_type, Err>::value
+  ))
   : base_type(rhs)
   {
   }
 
-  expected(expected&& rhs
-    , JASEL_REQUIRES( is_move_constructible<error_type>::value)
+  template <class Err>
+  expected(expected<void, Err>&& rhs
+    , JASEL_REQUIRES( is_constructible<error_type, Err&&>::value)
   )
-  BOOST_NOEXCEPT_IF(
-    is_nothrow_move_constructible<error_type>::value
-  )
-  : base_type(forward<expected>(rhs))
+  BOOST_NOEXCEPT_IF((
+    is_nothrow_constructible<error_type, Err&&>::value
+  ))
+  : base_type(forward<expected<void,Err>>(rhs))
   {
   }
 
@@ -2450,7 +2644,7 @@ public:
 
   template <class Err>
   expected(unexpected_type<Err> && e // NOLINT google-explicit-constructor
-//    , JASEL_REQUIRES(is_copy_constructible<error_type, Err&&>::value)
+//    , JASEL_REQUIRES(is_constructible<error_type, Err&&>::value)
   )
 //  BOOST_NOEXCEPT_IF(
 //    is_nothrow_constructible<error_type, Err&&>::value
