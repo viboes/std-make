@@ -97,11 +97,22 @@ struct Date
 {
     int i;
     Date() = delete;
-    Date(int i) : i{i} {}
-    Date(Date&& d) : i(d.i) { d.i = 0; }
+    Date(int i) noexcept : i{i} {}
+    Date(Date&& d) noexcept : i(d.i) { d.i = 0; }
     Date(const Date&) = delete;
     Date& operator=(const Date&) = delete;
-    Date& operator=(Date&& d) { i = d.i; d.i = 0; return *this;}
+    Date& operator=(Date&& d) noexcept { i = d.i; d.i = 0; return *this;}
+};
+
+struct TExcept
+{
+    int i;
+    TExcept() = delete;
+    TExcept(int i) : i{i} {}
+    TExcept(TExcept&& d) : i(d.i) { d.i = 0; }
+    TExcept(const TExcept&) = delete;
+    TExcept& operator=(const TExcept&) = delete;
+    TExcept& operator=(TExcept&& d) { i = d.i; d.i = 0; return *this;}
 };
 
 template <class T>
@@ -158,6 +169,7 @@ void except_default_constructor()
   BOOST_TEST( static_cast<bool>(e) );
 }
 
+
 void except_default_constructor_error_code()
 {
   // From value constructor.
@@ -176,6 +188,18 @@ void except_default_constructor_constexpr()
 
 void expected_from_value()
 {
+  using T = int;
+  using E = std::error_code;
+
+  static_assert(noexcept( stde::adl::swap_impl( std::declval<T&>(), std::declval<T&>() ) ), "");
+  static_assert(std::is_nothrow_copy_constructible<E>::value, "");
+  static_assert(noexcept( stde::adl::swap_impl( std::declval<E&>(), std::declval<E&>() ) ), "");
+
+  static_assert(std::is_nothrow_copy_constructible<stde::expected<int>>::value, "");
+  static_assert(std::is_nothrow_copy_assignable<stde::expected<int>>::value, "");
+  static_assert(std::is_nothrow_move_constructible<stde::expected<int>>::value, "");
+  static_assert(std::is_nothrow_move_assignable<stde::expected<int>>::value, "");
+
   // From value constructor.
   stde::expected<int> e(5);
   //BOOST_REQUIRE_NO_THROW(e.value());
@@ -213,6 +237,48 @@ void expected_from_cnv_value()
   BOOST_TEST_EQ(e.value().s, sMoveConstructed);
   BOOST_TEST_EQ(v.s, sMovedFrom);
 
+}
+
+struct NDCE              // no default constructor
+{                        // (no default date exists)
+  explicit NDCE(int) {}
+};
+
+void except_constructor_NDCE()
+{
+  stde::expected<NDCE> e {NDCE{1}};
+  BOOST_TEST( e.valid() );
+
+}
+struct NDC              // no default constructor
+{                        // (no default date exists)
+  NDC(int) {}
+};
+
+void except_constructor_NDC()
+{
+  static_assert(std::is_nothrow_copy_constructible<stde::expected<NDC>>::value, "");
+  static_assert(std::is_nothrow_copy_assignable<stde::expected<NDC>>::value, "");
+  static_assert(std::is_nothrow_move_constructible<stde::expected<NDC>>::value, "");
+  static_assert(std::is_nothrow_move_assignable<stde::expected<NDC>>::value, "");
+  stde::expected<NDC> e {1};
+  BOOST_TEST( e.valid() );
+}
+
+void except_constructor_Date()
+{
+  static_assert(std::is_nothrow_move_constructible<stde::expected<Date>>::value, "");
+  static_assert(std::is_nothrow_move_assignable<stde::expected<Date>>::value, "");
+  stde::expected<Date> e {Date{1}};
+  BOOST_TEST( e.valid() );
+}
+
+void except_constructor_TExcept()
+{
+  static_assert( ! std::is_nothrow_move_constructible<stde::expected<TExcept>>::value, "");
+  static_assert( ! std::is_nothrow_move_assignable<stde::expected<TExcept>>::value, "");
+  stde::expected<TExcept> e {TExcept{1}};
+  BOOST_TEST( e.valid() );
 }
 
 void expected_from_in_place_value()
@@ -735,8 +801,7 @@ int main()
   static_assert(! std::is_constructible<stde::exception_or<NoCopyConstructible>, stde::exception_or<NoCopyConstructible> const& >::value, "");
   static_assert(! std::is_copy_constructible<stde::exception_or<NoCopyConstructible>>::value, "");
 
-  // fixme
-#if 0
+  //fixme
   {
     NoMoveConstructible nmc;
     //NoMoveConstructible nmc2 = std::move(nmc); // FAILS as expected
@@ -744,6 +809,7 @@ int main()
     stde::expected<NoMoveConstructible> x{ std::move(nmc) }; // DOESN'T FAIL as copy is selected instead
     (void)x;
   }
+  //fixme
 #if defined __clang__ && __clang_major__ >= 4 && __cplusplus > 201402L
   {
     NoMoveConstructible nmc;
@@ -757,7 +823,6 @@ int main()
   static_assert(! std::is_move_constructible<NoMoveConstructible>::value, "");
   static_assert( std::is_constructible<stde::expected<NoMoveConstructible>, NoMoveConstructible && >::value, "");
   static_assert( std::is_move_constructible<stde::expected<NoMoveConstructible>>::value, "");
-#endif
 
   except_default_constructor();
   except_default_constructor_error_code();
@@ -765,6 +830,9 @@ int main()
   expected_from_value();
   expected_from_value2();
   expected_from_cnv_value();
+  except_constructor_NDCE();
+  except_constructor_NDC();
+  except_constructor_Date();
   expected_from_in_place_value();
   expected_from_exception();
   expected_from_copy_value();
@@ -1462,8 +1530,6 @@ void movesem_moved_from_state()
   BOOST_TEST (oj);
   BOOST_TEST (!oj->moved);
 
-#if 1
-// fixme needs default constructor for MoveAware<int>
   stde::expected<MoveAware<int>> ok{std::move(oi)};
   BOOST_TEST (ok);
   BOOST_TEST (!ok->moved);
@@ -1476,7 +1542,6 @@ void movesem_moved_from_state()
   BOOST_TEST (oj);
   BOOST_TEST (oj->moved);
 
-#endif
 }
 void movesem_move_only_value()
 {

@@ -37,6 +37,16 @@ namespace experimental
 inline namespace fundamental_v3
 {
 
+  namespace adl
+  {
+    using std::swap;
+    template <class T, class U>
+    void swap_impl(T& x, U& y) noexcept(noexcept(swap(x,y)))
+    {
+      swap(x,y);
+    }
+  }
+
 struct expect_t {};
 BOOST_CONSTEXPR_OR_CONST expect_t expect = {};
 
@@ -165,9 +175,9 @@ union trivial_expected_storage
   {}
 
   trivial_expected_storage(trivial_expected_storage const&) = default;
-  trivial_expected_storage(trivial_expected_storage &&) noexcept = default;
+  trivial_expected_storage(trivial_expected_storage &&)  = default;
   trivial_expected_storage& operator=(trivial_expected_storage const&) = default;
-  trivial_expected_storage& operator=(trivial_expected_storage &&) noexcept = default;
+  trivial_expected_storage& operator=(trivial_expected_storage &&) = default;
   ~trivial_expected_storage() = default;
 };
 
@@ -1615,6 +1625,8 @@ class expected
     is_move_constructible<ValueType>::value>
 {
 public:
+  using T = ValueType;
+  using E = ErrorType;
   typedef ValueType value_type;
   typedef ErrorType error_type;
   using unexpected_t = unexpected_type<error_type>;
@@ -1750,7 +1762,7 @@ public:
   {}
 
   expected(const expected& rhs) = default;
-  expected(expected&& rhs) noexcept = default;
+  expected(expected&& rhs)  = default;
 
   template <class Err>
   expected(const expected<value_type, Err>& rhs
@@ -1865,27 +1877,43 @@ public:
   ~expected() = default;
 
   // Assignments
-  expected& operator=(expected const& e)
+  expected& operator=(expected const& e) noexcept
+  (
+      is_nothrow_move_constructible<T>::value && noexcept( adl::swap_impl( declval<T&>(), declval<T&>() ) ) &&
+      is_nothrow_move_constructible<E>::value && noexcept( adl::swap_impl( declval<E&>(), declval<E&>() ) )
+  )
   {
     this_type(e).swap(*this);
     return *this;
   }
 
   expected& operator=(expected&& e) noexcept
+  (
+      is_nothrow_move_constructible<T>::value && noexcept( adl::swap_impl( declval<T&>(), declval<T&>() ) ) &&
+      is_nothrow_move_constructible<E>::value && noexcept( adl::swap_impl( declval<E&>(), declval<E&>() ) )
+  )
   {
     this_type(move(e)).swap(*this);
     return *this;
   }
 
   template <class U, JASEL_T_REQUIRES(is_same<typename decay<U>::type, value_type>::value)>
-  expected& operator=(U const& value)
+  expected& operator=(U const& value) noexcept
+  (
+      is_nothrow_move_constructible<T>::value && noexcept( adl::swap_impl( declval<T&>(), declval<T&>() ) ) &&
+      is_nothrow_move_constructible<E>::value && noexcept( adl::swap_impl( declval<E&>(), declval<E&>() ) )
+  )
   {
     this_type(value).swap(*this);
     return *this;
   }
 
   template <class U, JASEL_T_REQUIRES(is_same<typename decay<U>::type, value_type>::value)>
-  expected& operator=(U&& value)
+  expected& operator=(U&& value) noexcept
+  (
+      is_nothrow_move_constructible<T>::value && noexcept( adl::swap_impl( declval<T&>(), declval<T&>() ) ) &&
+      is_nothrow_move_constructible<E>::value && noexcept( adl::swap_impl( declval<E&>(), declval<E&>() ) )
+  )
   {
     this_type(forward<U>(value)).swap(*this);
     return *this;
@@ -1896,23 +1924,35 @@ public:
     , JASEL_T_REQUIRES(is_constructible<value_type, Args&...>::value)
 #endif
     >
-  void emplace(Args&&... args)
-    {
-      this_type(in_place, constexpr_forward<Args>(args)...).swap(*this);
-    }
+  void emplace(Args&&... args) noexcept
+  (
+      is_nothrow_move_constructible<T>::value && noexcept( adl::swap_impl( declval<T&>(), declval<T&>() ) ) &&
+      is_nothrow_move_constructible<E>::value && noexcept( adl::swap_impl( declval<E&>(), declval<E&>() ) )
+  )
+  {
+    this_type(in_place, constexpr_forward<Args>(args)...).swap(*this);
+  }
 
     template <class U, class... Args
 #if !defined JASEL_NO_CXX11_FUNCTION_TEMPLATE_DEFAULT_ARGS
       , JASEL_T_REQUIRES(is_constructible<value_type, initializer_list<U>, Args&...>::value)
 #endif
       >
-    void emplace(initializer_list<U> il, Args&&... args)
-    {
+    void emplace(initializer_list<U> il, Args&&... args) noexcept
+      (
+          is_nothrow_move_constructible<T>::value && noexcept( adl::swap_impl( declval<T&>(), declval<T&>() ) ) &&
+          is_nothrow_move_constructible<E>::value && noexcept( adl::swap_impl( declval<E&>(), declval<E&>() ) )
+      )
+      {
       this_type(in_place, il, constexpr_forward<Args>(args)...).swap(*this);
     }
 
   // Modifiers
-  void swap(expected& rhs)
+  void swap(expected& rhs) noexcept
+  (
+      is_nothrow_move_constructible<T>::value && noexcept( adl::swap_impl( declval<T&>(), declval<T&>() ) ) &&
+      is_nothrow_move_constructible<E>::value && noexcept( adl::swap_impl( declval<E&>(), declval<E&>() ) )
+  )
   {
     if (valid())
     {
@@ -2516,6 +2556,7 @@ class expected<void,ErrorType>
   true >
 {
 public:
+  using E = ErrorType;
   typedef void value_type;
   typedef ErrorType error_type;
   using errored_type = unexpected_type<error_type>;
@@ -2669,25 +2710,40 @@ public:
 
   // Assignments
   expected& operator=(expected const& e)
+    noexcept
+        (
+            is_nothrow_move_constructible<E>::value && noexcept( adl::swap_impl( declval<E&>(), declval<E&>() ) )
+        )
   {
     this_type(e).swap(*this);
     return *this;
   }
 
-  expected& operator=(expected&& e) noexcept
+  expected& operator=(expected&& e)
+  noexcept
+      (
+          is_nothrow_move_constructible<E>::value && noexcept( adl::swap_impl( declval<E&>(), declval<E&>() ) )
+      )
+
   {
     this_type(move(e)).swap(*this);
     return *this;
   }
 
 
-  void emplace()
+  void emplace() noexcept
+      (
+          is_nothrow_move_constructible<E>::value && noexcept( adl::swap_impl( declval<E&>(), declval<E&>() ) )
+      )
   {
     this_type(in_place).swap(*this);
   }
 
   // Modifiers
-  void swap(expected& rhs)
+  void swap(expected& rhs) noexcept
+      (
+          is_nothrow_move_constructible<E>::value && noexcept( adl::swap_impl( declval<E&>(), declval<E&>() ) )
+      )
   {
     if (valid())
     {
