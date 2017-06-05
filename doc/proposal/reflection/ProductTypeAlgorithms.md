@@ -5,7 +5,7 @@
     </tr>
     <tr>
         <td width="172" align="left" valign="top">Date:</td>
-        <td width="435">2017-05-21</td>
+        <td width="435">2017-06-05</td>
     </tr>
     <tr>
         <td width="172" align="left" valign="top">Project:</td>
@@ -225,8 +225,8 @@ namespace product_type {
     template <size_t N, class ProductType>
         constexpr auto drop_back(ProductType&& pt);       
 
-    template <class ProductType, class T>
-        constexpr auto insert(ProductType&& pt, size_t i, T&& x);       
+    template <size_t I, class ProductType, class T>
+        constexpr auto insert(ProductType&& pt, T&& x);       
            
     template <class F, class State, class ProductType
         constexpr State fold_left(ProductType&& pt, State&& state, F&& f);
@@ -324,11 +324,11 @@ template <size_t N, class ProductType>
 ### Function Template `product_type::insert`
 
 ```c++
-template <class ProductType, class T>
-  constexpr auto insert(ProductType&& pt, size_t i, T&& x);       
+template <size_t I, class ProductType, class T>
+  constexpr auto insert(ProductType&& pt, T&& x);       
 ```
 
-**Returns**: Insert a value at a given index in a *ProductType*. Given a *ProductType*, an index and an element to insert, insert inserts the element at the given index. 
+**Returns**: Insert a value at a given index in a *ProductType*. Given a *ProductType* `pt`, an index `I` and an element to insert `x`, `insert` inserts the element at the given index. 
 
 **Remarks** This function should not participate in overload resolution if the *ProductType* `ProductType` is not able to rebind with the not resulting elements.
 
@@ -338,7 +338,7 @@ template <class ProductType, class T>
 
 This is a library proposal. There is an implementation [PT_impl] of the basic *ProductType* algorithms. Not all the proposed algorithms have been implemented.
 
-# Open Questions
+# Open Points
 
 The authors would like to have an answer to the following points if there is any interest at all in this proposal:
 
