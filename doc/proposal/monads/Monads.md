@@ -5,7 +5,7 @@
     </tr>
     <tr>
         <td width="172" align="left" valign="top">Date:</td>
-        <td width="435">2017-05-21</td>
+        <td width="435">2017-06-05</td>
     </tr>
     <tr>
         <td width="172" align="left" valign="top">Project:</td>
@@ -1022,6 +1022,15 @@ namespace monad_error {
   template <class TC, class Enabler=void>
     struct traits {};
     
+  template <class M>
+  struct error_type
+  {
+    using type = typename traits<M>::template error_type<M>;
+  };
+
+  template <class M>
+  using error_type_t = typename error_type<M>::type;
+    
   template <class T, class F>
     `see below` catch_error(T&& x, F&& f);    
 }
@@ -1078,8 +1087,59 @@ Let `E` be `error_type<decay_t<M>>`
 * The result of `catch_error` is the result of the invocation of `f` with the error of `x` if any, otherwise `x`.
 
 ```
-catch_error : [T] x E->[T] -> [T]
+catch_error : [T]:E x E->[T] -> [T]:E
 ```
+###  Function Template `recover` [monad_error.recover]
+
+```c++
+namespace monad {
+  template <class M, class F>
+    auto recover(M&& x, F&& f)
+}
+```
+
+Let `TC` be `type_constructor<decay_t<M>>`  
+Let `T` be `value_type<decay_t<M>>`  
+Let `E` be `error_type<decay_t<M>>`  
+
+*Effects*: forward the call to the `traits<TC>::catch_error`. This function must return the result of calling to the `f` parameter with the contained error type, if any; Otherwise it must returns the parameter `x`.  
+
+*Remark*: The previous function shall not participate in overload resolution unless:
+ 
+* `M` has a type constructor `TC` that satisfies *monad*, 
+* `F` satisfies `Callable<F, T(E)>` where `E` is the `ErrorType` of `M` and `T` is the value type of `M`,
+* The result of `recover` is the result of the invocation of `f` with the error of `x` wrapped on a `M` if any, otherwise `x`.
+
+```
+recover : [T]:E x E->T -> [T]:E
+```
+
+
+###  Function Template `adapt_error` [monad_error.adapt_error]
+
+```c++
+namespace monad {
+  template <class M, class F>
+    auto adapt_error(M&& x, F&& f)
+}
+```
+
+Let `TC` be `type_constructor<decay_t<M>>`  
+Let `T` be `value_type<decay_t<M>>`  
+Let `E` be `error_type<decay_t<M>>`  
+
+*Effects*: forward the call to the `traits<TC>::catch_error`. This function must return the result of calling to the `f` parameter with the contained error type, if any; Otherwise it must returns the parameter `x`.  
+
+*Remark*: The previous function shall not participate in overload resolution unless:
+ 
+* `M` has a type constructor `TC` that satisfies *monad*, 
+* `F` satisfies `Callable<F, G(E)>` where `E` is the `ErrorType` of `M` and `G` is another error type,
+* The result of `adapt_error` is the result of the invocation of `f` with the error of `x` wrapped on a `TC` if any, otherwise the value wrapped with `TC`.
+
+```
+catch_error : [T]:E x E->G -> [T]:G
+```
+
 
 
 ###  Template class `is_monad_error` [monad_error.is_monad_error]
