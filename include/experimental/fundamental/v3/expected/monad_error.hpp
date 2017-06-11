@@ -43,6 +43,13 @@ struct traits<expected<T,E>> : monad_error::tag
       JASEL_DECLTYPE_RETURN_NOEXCEPT(
         x.catch_error(forward<F>(f))
       )
+
+  template <class M, class F>
+    static constexpr auto adapt_error(M&& x, F&& f)
+      JASEL_DECLTYPE_RETURN_NOEXCEPT(
+        x.adapt_error(forward<F>(f))
+      )
+
 };
 }
 }}

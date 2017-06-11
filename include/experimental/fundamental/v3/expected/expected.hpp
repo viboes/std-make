@@ -2477,6 +2477,27 @@ public:
 #endif
     }
 
+  // adapt_error factory
+  // [T]:E x (E->G) -> [T]:G
+
+  template <typename F>
+  expected<value_type,  typename result_of<decay_t<F>(error_type)>::type>
+  adapt_error(F&& f)
+  {
+    typedef expected<value_type,  typename result_of<F(error_type)>::type> result_type;
+#if ! defined BOOST_NO_CXX14_CONSTEXPR
+    if(! valid())
+    {
+        return result_type(unexpect, f(contained_err()));
+    }
+    return result_type(contained_val());
+#else
+    return (! valid()
+        ? result_type(unexpect, f(contained_err()))
+        : result_type(contained_val())
+        );
+#endif
+    }
   template <typename Ex, typename F>
   this_type catch_exception(F&& f,
     JASEL_REQUIRES(
@@ -3101,6 +3122,29 @@ public:
         );
 #endif
   }
+
+  // adapt_error factory
+  // [T]:E x (E->G) -> [T]:G
+
+  template <typename F>
+  expected<void,  typename result_of<decay_t<F>(error_type)>::type>
+  adapt_error(F&& f)
+  {
+    typedef expected<void,  typename result_of<F(error_type)>::type> result_type;
+#if ! defined BOOST_NO_CXX14_CONSTEXPR
+    if(! valid())
+    {
+        return result_type(unexpect, f(contained_err()));
+    }
+    return result_type();
+#else
+    return (! valid()
+        ? result_type(unexpect, f(contained_err()))
+        : result_type()
+        );
+#endif
+    }
+
 
   template <typename Ex, typename F>
   this_type catch_exception(F&& f,

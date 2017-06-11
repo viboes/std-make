@@ -21,7 +21,7 @@
 #include <experimental/monad.hpp>
 
 //! Usage
-//! Intendeed usage
+//! Intended usage
 //! <code>
 //! E e;
 //! auto x = monad_error::make_error<expected>(e);
@@ -100,9 +100,14 @@ namespace monad_error
      constexpr
      auto make_error(Xs&& ...xs) = delete;
 
-    // catch_error: [T] x (E->T) -> [T]
+    // catch_error: [T]:E x (E->T) -> [T]:E
+    // catch_error: [T]:E x (E->[T]:E) -> [T]:E
     template <class M, class F>
       static auto catch_error(M&& x, F&& y) = delete;
+
+    // adapt_error: [T]:E x (E->G) -> [T]:G
+    template <class M, class F>
+      static auto adapt_error(M&& x, F&& y) = delete;
 #endif
   };
 
@@ -121,6 +126,13 @@ namespace monad_error
        JASEL_DECLTYPE_RETURN_NOEXCEPT(
           traits<type_constructor_t<decay_t<M>>>::catch_error(forward<M>(x), forward<F>(f))
        )
+
+   template <class M, class F>
+   auto
+   adapt_error(M&& x, F&& f)
+        JASEL_DECLTYPE_RETURN_NOEXCEPT(
+           traits<type_constructor_t<decay_t<M>>>::adapt_error(forward<M>(x), forward<F>(f))
+        )
 
   // make_error overload: requires a type constructor, , deduce the error type associated to the type constructor
   //template <class TC, int = 0, int..., class ...Xs>

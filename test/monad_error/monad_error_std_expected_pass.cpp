@@ -25,6 +25,9 @@ std::experimental::expected<int> recover(std::error_code const& ) {
 std::experimental::expected<int> fwd(std::error_code const& ec) {
   return std::experimental::make_unexpected(ec);
 }
+int adapt(std::error_code const& ) {
+  return -1;
+}
 
 int main()
 {
@@ -44,10 +47,27 @@ int main()
     BOOST_TEST_EQ(*z,-1);
   }
   {
+    std::error_code ec = std::make_error_code(std::errc(1));
+    stde::expected<int> x = stde::monad_error::make_error<stde::expected>(ec);
+    stde::expected<int> y = stde::monad_error::bind(x,twice);
+    BOOST_TEST(! y);
+    stde::expected<int, int> z = stde::monad_error::adapt_error(y,adapt);
+    BOOST_TEST( ! z);
+    BOOST_TEST_EQ(z.error(),-1);
+  }
+  {
     int v=1;
     stde::expected<int> x = stde::make<stde::expected>(v);
     stde::expected<int> y = stde::monad_error::bind(x,twice);
     stde::expected<int> z = stde::monad_error::catch_error(y,fwd);
+    BOOST_TEST(z);
+    BOOST_TEST(*z == 2);
+  }
+  {
+    int v=1;
+    stde::expected<int> x = stde::make<stde::expected>(v);
+    stde::expected<int> y = stde::monad_error::bind(x,twice);
+    stde::expected<int, int> z = stde::monad_error::adapt_error(y,adapt);
     BOOST_TEST(z);
     BOOST_TEST(*z == 2);
   }
