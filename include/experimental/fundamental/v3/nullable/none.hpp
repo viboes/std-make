@@ -182,8 +182,6 @@ inline namespace fundamental_v3
 
   {
     return nullable::has_value(v1) && have_value(v2, vs...);
-    //return nullable::has_value(v1) &&
-    //    nullable::has_value(v2) && (nullable::has_value(vs) && ...);
   }
 
 }
