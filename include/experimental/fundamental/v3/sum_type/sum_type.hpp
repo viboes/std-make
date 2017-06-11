@@ -63,7 +63,7 @@ inline namespace fundamental_v3
 {
 
   template <class V, class T>
-  auto visit(V&& v, T&& x) -> decltype(v(x))
+  auto visit(V&& v, T&& x)  -> decltype(v(x))
   {
     return v(x);
   }
@@ -96,7 +96,7 @@ namespace detail
   namespace variant_get_adl {
     using std::get;
     template <size_t N, class T>
-    auto xget(T&& t) noexcept -> decltype( get<N>(forward<T>(t)) )
+    auto xget(T&& t)  -> decltype( get<N>(forward<T>(t)) )
     {
       return get<N>(forward<T>(t));
     }
@@ -104,7 +104,7 @@ namespace detail
   namespace variant_visit_adl {
     using std::experimental::visit;
     template <class V, class T>
-    auto xvisit(V&& v, T&& t) noexcept -> decltype( visit(forward<V>(v), forward<T>(t)) )
+    auto xvisit(V&& v, T&& t)  -> decltype( visit(forward<V>(v), forward<T>(t)) )
     {
       return visit(forward<V>(v), forward<T>(t));
     }
@@ -162,6 +162,8 @@ namespace detail
       ;
 
 namespace sum_type {
+    struct tag{};
+
     template <class ST, class Enabler=void>
     struct traits
 #if ! defined JASEL_DOXYGEN_INVOKED
@@ -169,35 +171,49 @@ namespace sum_type {
 #endif
         ;
 
-    // Default failing specialization
-    template <class  ST, bool condition>
-    struct traits<ST, meta::when<condition>>
+    // specialization as a single alternative
+    template <class  ST>
+    struct single_traits : tag
     {
-#if 0
-        template <class T>
-          static constexpr auto get(T&& x) =delete;
-#else
-        //fixme this consider any type as a sum_type if not specialized with a single alternative, it self.
         using size = integral_constant<size_t, 1>;
 
         template <size_t I>
         using alternative = ST;
 
         template <size_t I, class ST2, class= std::enable_if_t< I < size::value > >
-          static constexpr decltype(auto) get(ST2&& st) noexcept
+          static constexpr decltype(auto) get(ST2&& st)
           {
             return forward<ST2>(st);
           }
         template <class V, class ST2>
-          static constexpr decltype(auto) visit(V&& v, ST2&& st) noexcept
+          static constexpr decltype(auto) visit(V&& v, ST2&& st)
           {
             return forward<V>(v)(forward<ST2>(st));
           }
-
-#endif
     };
 
-    struct tag{};
+    // failing specialization
+    template <class  ST>
+    struct delete_traits
+    {
+        template <class T>
+          static constexpr auto get(T&& x) = delete;
+        template <class V, class ST2>
+          static constexpr auto visit(V&& v, ST2&& st)  = delete;
+    };
+
+    // Default specialization
+    template <class  ST, bool condition>
+    struct traits<ST, meta::when<condition>>
+    //  fixme this consider any type as a sum_type if not specialized.
+#if 0
+    : delete_traits<ST>
+#else
+    : single_traits<ST>
+#endif
+    {
+    };
+
 
     // Forward to customized class using variant-like access
     template <class ST>
@@ -210,12 +226,12 @@ namespace sum_type {
       using alternative = variant_alternative<I, ST>;
 
       template <size_t I, class ST2, class= std::enable_if_t< I < size::value > >
-        static constexpr decltype(auto) get(ST2&& st) noexcept
+        static constexpr decltype(auto) get(ST2&& st)
         {
           return detail::variant_get_adl::xget<I>(forward<ST2>(st));
         }
       template <class V, class ST2>
-        static constexpr decltype(auto) visit(V&& v, ST2&& st) noexcept
+        static constexpr decltype(auto) visit(V&& v, ST2&& st)
         {
           return detail::variant_visit_adl::xvisit(forward<V>(v), forward<ST2>(st));
         }
@@ -254,16 +270,18 @@ namespace sum_type {
     template <class ST>
     constexpr size_t not_empty_v = not_empty<ST>::value;
 #endif
+
+    // note: this cannot be noexcept as either it can throw as for variant or has a narrow contract
     template <size_t I, class ST
       , class= std::enable_if_t< I < size_v<meta::uncvref_t<ST>> >
     >
-    constexpr decltype(auto) get(ST && st) noexcept
+    constexpr decltype(auto) get(ST && st)
     {
         return traits<meta::uncvref_t<ST>>::template get<I>(forward<ST>(st));
     }
 
     template <class V, class ST>
-    constexpr decltype(auto) visit(V&& v, ST && st) noexcept
+    constexpr decltype(auto) visit(V&& v, ST && st)
     {
         return traits<meta::uncvref_t<ST>>::visit(forward<V>(v), forward<ST>(st));
     }
