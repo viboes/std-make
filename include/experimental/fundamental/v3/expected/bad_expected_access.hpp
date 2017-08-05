@@ -14,18 +14,21 @@ namespace experimental
 {
 inline namespace fundamental_v3
 {
+  template <class Error>
+  class bad_expected_access;
+
   // bad_expected_access base exception class.
-  class bad_expected_access_base : public std::logic_error
+  template <>
+  class bad_expected_access<void> : public std::exception
   {
   public:
-    explicit bad_expected_access_base(const char* msg)
-    : std::logic_error(msg)
-    {}
+    virtual const char* what() const BOOST_NOEXCEPT
+    { return "Bad Expected Access"; }
   };
 
   // bad_expected_access exception class.
   template <class Error>
-  class bad_expected_access : public bad_expected_access_base
+  class bad_expected_access : public bad_expected_access<void>
   {
     public:
       typedef Error error_type;
@@ -33,7 +36,7 @@ inline namespace fundamental_v3
       error_type error_value;
     public:
       explicit bad_expected_access(const Error& e)
-      : bad_expected_access_base("Found an error instead of the expected value.")
+      : bad_expected_access<void>()
       , error_value(e)
       {}
 
