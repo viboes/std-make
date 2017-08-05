@@ -55,7 +55,7 @@ namespace sum_type
     using size = integral_constant<size_t, 2>;
 
     template <size_t I>
-    using alternative = tuple_element<I, meta::types<T, unexpected_type<E> >>;
+    using alternative = tuple_element<I, meta::types<T, unexpected<E> >>;
 
     template <size_t I, class ST, class= std::enable_if_t< I < size::value > >
       static constexpr decltype(auto) get(ST&& st) noexcept

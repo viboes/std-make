@@ -307,7 +307,7 @@ void expected_from_in_place_value()
 
 void expected_from_exception()
 {
-  // From stde::unexpected_type constructor.
+  // From stde::unexpected constructor.
   stde::exception_or<int> e(stde::make_unexpected(test_exception()));
   BOOST_TEST_THROWS(e.value(), test_exception);
   BOOST_TEST_EQ(e.valid(), false);
@@ -328,7 +328,7 @@ void expected_from_copy_value()
 
 void expected_from_copy_exception()
 {
-  // From stde::unexpected_type constructor.
+  // From stde::unexpected constructor.
   stde::exception_or<int> ef(stde::make_unexpected(test_exception()));
   stde::exception_or<int> e(ef);
   BOOST_TEST_THROWS(e.value(), test_exception);
@@ -425,8 +425,8 @@ void expected_from_value_error_condition()
 
 void expected_from_error_error_condition()
 {
-  // From stde::unexpected_type constructor.
-  stde::expected<int, std::error_condition> e(stde::unexpected_type<std::error_condition>(std::make_error_condition(std::errc::invalid_argument)));
+  // From stde::unexpected constructor.
+  stde::expected<int, std::error_condition> e(stde::unexpected<std::error_condition>(std::make_error_condition(std::errc::invalid_argument)));
   auto error_from_except_check = [](const stde::bad_expected_access<std::error_condition>& except)
   {
     return std::errc(except.error().value()) == std::errc::invalid_argument;
@@ -593,7 +593,7 @@ void expected_from_exception_catch()
 
 void expected_from_error()
 {
-  // From stde::unexpected_type constructor.
+  // From stde::unexpected constructor.
   auto e = stde::make_expected_from_error<int>(std::make_error_condition(std::errc::invalid_argument));
   auto error_from_except_check = [](const stde::bad_expected_access<std::error_condition>& except)
   {
@@ -610,7 +610,7 @@ void expected_from_error()
 
 void expected_from_error_U()
 {
-  // From stde::unexpected_type constructor.
+  // From stde::unexpected constructor.
   auto e = stde::make_expected_from_error<int, short>(42);
   static_assert(std::is_same<decltype(e), stde::expected<int, short>>{}, "");
   BOOST_TEST_EQ(e.valid(), false);
@@ -619,9 +619,9 @@ void expected_from_error_U()
 
 void expected_from_exception2()
 {
-  // From stde::unexpected_type constructor.
+  // From stde::unexpected constructor.
   auto e = stde::make_expected_from_exception<int>(test_exception());
-  //auto e = expected_sc<int>(stde::unexpected_type<>(test_exception()));
+  //auto e = expected_sc<int>(stde::unexpected<>(test_exception()));
   BOOST_TEST_THROWS(e.value(), test_exception);
   BOOST_TEST_EQ(e.valid(), false);
   BOOST_TEST_EQ(static_cast<bool>(e), false);
@@ -1343,7 +1343,7 @@ void proposal_ensured_read_ts()
   }
   {
     ensured_read<int> e = make_ensured_read(1);
-    stde::unexpected_type<ensured_read<int>> ue1 = stde::make_unexpected(std::move(e));
+    stde::unexpected<ensured_read<int>> ue1 = stde::make_unexpected(std::move(e));
     BOOST_TEST(ue1.value()==1);
   }
 //  {

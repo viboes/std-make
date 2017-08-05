@@ -25,8 +25,8 @@ using expected_sc = stde::expected<T, std::error_code>;
 int main()
 {
 
-  using error_t = stde::unexpected_type<std::error_code>;
-  auto error = stde::unexpected_type<std::error_code>(std::make_error_code(std::errc(1)));
+  using error_t = stde::unexpected<std::error_code>;
+  auto error = stde::unexpected<std::error_code>(std::make_error_code(std::errc(1)));
 
   static_assert(stde::is_sum_type<expected_sc<int>>::value, "ERROR");
   static_assert(std::is_same<stde::sum_type::alternative_t<0,expected_sc<int>>, int>::value, "ERROR");

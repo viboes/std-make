@@ -23,32 +23,32 @@ inline namespace fundamental_v3
 {
 
   template <typename ErrorType = error_code>
-  class unexpected_type
+  class unexpected
   {
   public:
     ErrorType error_;
-    unexpected_type() = delete;
+    unexpected() = delete;
 
     JASEL_0_REQUIRES(is_copy_constructible<ErrorType>::value)
-    BOOST_FORCEINLINE BOOST_CONSTEXPR explicit unexpected_type(ErrorType const& e) :
+    BOOST_FORCEINLINE BOOST_CONSTEXPR explicit unexpected(ErrorType const& e) :
       error_(e)
     {
     }
     JASEL_0_REQUIRES(is_move_constructible<ErrorType>::value)
-    BOOST_FORCEINLINE BOOST_CONSTEXPR explicit unexpected_type(ErrorType&& e) :
+    BOOST_FORCEINLINE BOOST_CONSTEXPR explicit unexpected(ErrorType&& e) :
       error_(move(e))
     {
     }
 
     template < class Err >
-    BOOST_FORCEINLINE BOOST_CONSTEXPR explicit unexpected_type(unexpected_type<Err> const& e
+    BOOST_FORCEINLINE BOOST_CONSTEXPR explicit unexpected(unexpected<Err> const& e
         , JASEL_REQUIRES( is_constructible<ErrorType, Err>::value)
         ) :
       error_(e.error_)
     {
     }
     template < class Err >
-    BOOST_FORCEINLINE BOOST_CONSTEXPR explicit unexpected_type(unexpected_type<Err>&& e
+    BOOST_FORCEINLINE BOOST_CONSTEXPR explicit unexpected(unexpected<Err>&& e
         , JASEL_REQUIRES( is_constructible<ErrorType, Err&&>::value)
         ) :
       error_(move(e.error_))
@@ -56,14 +56,14 @@ inline namespace fundamental_v3
     }
 
     template < class Err >
-    BOOST_FORCEINLINE BOOST_CONSTEXPR explicit unexpected_type(Err const& e
+    BOOST_FORCEINLINE BOOST_CONSTEXPR explicit unexpected(Err const& e
         , JASEL_REQUIRES( is_constructible<ErrorType, Err>::value)
         ) :
       error_(e)
     {
     }
     template < class Err >
-    BOOST_FORCEINLINE BOOST_CONSTEXPR explicit unexpected_type(ErrorType&& e
+    BOOST_FORCEINLINE BOOST_CONSTEXPR explicit unexpected(ErrorType&& e
         , JASEL_REQUIRES( is_constructible<ErrorType, Err&&>::value)
         ) :
       error_(move(e))
@@ -101,31 +101,31 @@ inline namespace fundamental_v3
   };
 
   template <class E>
-  BOOST_FORCEINLINE BOOST_CONSTEXPR unexpected_type<typename decay<E>::type> make_unexpected(E&& ex)
+  BOOST_FORCEINLINE BOOST_CONSTEXPR unexpected<typename decay<E>::type> make_unexpected(E&& ex)
   {
-    return unexpected_type<typename decay<E>::type> (forward<E>(ex));
+    return unexpected<typename decay<E>::type> (forward<E>(ex));
   }
 
   template <>
-  struct unexpected_type<exception_ptr>
+  struct unexpected<exception_ptr>
   {
     exception_ptr error_;
   public:
-    unexpected_type() = delete;
+    unexpected() = delete;
 
-    BOOST_FORCEINLINE explicit unexpected_type(exception_ptr const& e) :
+    BOOST_FORCEINLINE explicit unexpected(exception_ptr const& e) :
       error_(e)
     {
     }
 
     // fixme: warning: passing result of std::move() as a const reference argument; no move will actually happen [misc-move-const-arg]
-    BOOST_FORCEINLINE explicit unexpected_type(exception_ptr &&e) :
+    BOOST_FORCEINLINE explicit unexpected(exception_ptr &&e) :
       error_(move(e))
     {
     }
 
     template <class E>
-    BOOST_FORCEINLINE explicit unexpected_type(E e) :
+    BOOST_FORCEINLINE explicit unexpected(E e) :
       error_(make_exception_ptr(e))
     {
     }
@@ -136,53 +136,53 @@ inline namespace fundamental_v3
   };
 
   template <class E>
-  BOOST_CONSTEXPR bool operator==(const unexpected_type<E>& x, const unexpected_type<E>& y)
+  BOOST_CONSTEXPR bool operator==(const unexpected<E>& x, const unexpected<E>& y)
   {
     return x.value() == y.value();
   }
   template <class E>
-  BOOST_CONSTEXPR bool operator!=(const unexpected_type<E>& x, const unexpected_type<E>& y)
+  BOOST_CONSTEXPR bool operator!=(const unexpected<E>& x, const unexpected<E>& y)
   {
     return !(x == y);
   }
 
   template <class E>
-  BOOST_CONSTEXPR bool operator<(const unexpected_type<E>& x, const unexpected_type<E>& y)
+  BOOST_CONSTEXPR bool operator<(const unexpected<E>& x, const unexpected<E>& y)
   {
     return x.value() < y.value();
   }
 
   template <class E>
-  BOOST_CONSTEXPR bool operator>(const unexpected_type<E>& x, const unexpected_type<E>& y)
+  BOOST_CONSTEXPR bool operator>(const unexpected<E>& x, const unexpected<E>& y)
   {
     return (y < x);
   }
 
   template <class E>
-  BOOST_CONSTEXPR bool operator<=(const unexpected_type<E>& x, const unexpected_type<E>& y)
+  BOOST_CONSTEXPR bool operator<=(const unexpected<E>& x, const unexpected<E>& y)
   {
     return !(y < x);
   }
 
   template <class E>
-  BOOST_CONSTEXPR bool operator>=(const unexpected_type<E>& x, const unexpected_type<E>& y)
+  BOOST_CONSTEXPR bool operator>=(const unexpected<E>& x, const unexpected<E>& y)
   {
     return !(x < y);
   }
 
-  inline BOOST_CONSTEXPR bool operator<(const unexpected_type<exception_ptr>&, const unexpected_type<exception_ptr>&)
+  inline BOOST_CONSTEXPR bool operator<(const unexpected<exception_ptr>&, const unexpected<exception_ptr>&)
   {
     return false;
   }
-  inline BOOST_CONSTEXPR bool operator>(const unexpected_type<exception_ptr>&, const unexpected_type<exception_ptr>&)
+  inline BOOST_CONSTEXPR bool operator>(const unexpected<exception_ptr>&, const unexpected<exception_ptr>&)
   {
     return false;
   }
-  inline BOOST_CONSTEXPR bool operator<=(const unexpected_type<exception_ptr>& x, const unexpected_type<exception_ptr>& y)
+  inline BOOST_CONSTEXPR bool operator<=(const unexpected<exception_ptr>& x, const unexpected<exception_ptr>& y)
   {
     return x==y;
   }
-  inline BOOST_CONSTEXPR bool operator>=(const unexpected_type<exception_ptr>& x, const unexpected_type<exception_ptr>& y)
+  inline BOOST_CONSTEXPR bool operator>=(const unexpected<exception_ptr>& x, const unexpected<exception_ptr>& y)
   {
     return x==y;
   }
@@ -190,11 +190,11 @@ inline namespace fundamental_v3
   template <typename E>
   struct is_unexpected : false_type {};
   template <typename E>
-  struct is_unexpected<unexpected_type<E>> : true_type {};
+  struct is_unexpected<unexpected<E>> : true_type {};
 
-  BOOST_FORCEINLINE unexpected_type<exception_ptr> make_unexpected_from_current_exception()
+  BOOST_FORCEINLINE unexpected<exception_ptr> make_unexpected_from_current_exception()
   {
-    return unexpected_type<exception_ptr> (current_exception());
+    return unexpected<exception_ptr> (current_exception());
   }
 
 }}

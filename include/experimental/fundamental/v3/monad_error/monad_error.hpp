@@ -95,7 +95,7 @@ namespace monad_error
   {
 #if __cplusplus >= 201402L || defined JASEL_DOXYGEN_INVOKED
 
-    // make_error<M>: E -> unexpected_type<E> where E is error_type<M>
+    // make_error<M>: E -> M
     template <class M, class ...Xs>
      constexpr
      auto make_error(Xs&& ...xs) = delete;
