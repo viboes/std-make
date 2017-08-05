@@ -14,6 +14,8 @@
 #include <boost/detail/lightweight_test.hpp>
 
 namespace stde = std::experimental;
+template <class T>
+using expected_sc = stde::expected<T, std::error_code>;
 
 struct NoDefaultConstructible
 {
@@ -66,17 +68,17 @@ public:
 int main()
 {
   {
-    stde::expected<NoDefaultConstructible> x; // FAILS as expected
+    expected_sc<NoDefaultConstructible> x; // FAILS as expected
   }
 #if 0
   {
     NoCopyConstructible ncc;
-    stde::expected<NoCopyConstructible> x{ncc}; // FAILS as expected
+    expected_sc<NoCopyConstructible> x{ncc}; // FAILS as expected
   }
   {
     NoCopyConstructible ncc;
-    stde::expected<NoCopyConstructible> x{std::move(ncc)};
-    stde::expected<NoCopyConstructible> y{x}; // FAILS as expected
+    expected_sc<NoCopyConstructible> x{std::move(ncc)};
+    expected_sc<NoCopyConstructible> y{x}; // FAILS as expected
 
   }
   {
@@ -84,8 +86,8 @@ int main()
     NoMoveConstructible nmc2 = std::move(nmc); // FAILS as expected
 
     // fixme
-    stde::expected<NoMoveConstructible> x;
-    stde::expected<NoMoveConstructible> y =  std::move(x); // DOESN'T FAIL
+    expected_sc<NoMoveConstructible> x;
+    expected_sc<NoMoveConstructible> y =  std::move(x); // DOESN'T FAIL
   }
 #endif
   {
@@ -93,26 +95,26 @@ int main()
     optional<NoMoveConstructible> y {std::move(x)}; //FAILS as expected
   }
   static_assert(! std::is_default_constructible<NoDefaultConstructible>::value, "");
-  static_assert(! std::is_default_constructible<stde::expected<NoDefaultConstructible>>::value, "");
+  static_assert(! std::is_default_constructible<expected_sc<NoDefaultConstructible>>::value, "");
 
   static_assert(! std::is_copy_constructible<NoCopyConstructible>::value, "");
-  static_assert(! std::is_constructible<stde::expected<NoCopyConstructible>, NoCopyConstructible const& >::value, "");
-  static_assert(! std::is_constructible<stde::expected<NoCopyConstructible>, stde::expected<NoCopyConstructible> const& >::value, "");
-  static_assert(! std::is_copy_constructible<stde::expected<NoCopyConstructible>>::value, "");
+  static_assert(! std::is_constructible<expected_sc<NoCopyConstructible>, NoCopyConstructible const& >::value, "");
+  static_assert(! std::is_constructible<expected_sc<NoCopyConstructible>, expected_sc<NoCopyConstructible> const& >::value, "");
+  static_assert(! std::is_copy_constructible<expected_sc<NoCopyConstructible>>::value, "");
 
   {
     // fixme
-    stde::expected<NoMoveConstructible> x;
-    stde::expected<NoMoveConstructible> y =  std::move(x); // DOESN'T FAIL as copy is used instead
+    expected_sc<NoMoveConstructible> x;
+    expected_sc<NoMoveConstructible> y =  std::move(x); // DOESN'T FAIL as copy is used instead
   }
   {
     // fixme
-    stde::expected<NoMoveConstructible> x;
-    stde::expected<NoMoveConstructible> y {stde::expected<NoMoveConstructible>{}}; // DOESN'T FAIL as copy is used instead
+    expected_sc<NoMoveConstructible> x;
+    expected_sc<NoMoveConstructible> y {expected_sc<NoMoveConstructible>{}}; // DOESN'T FAIL as copy is used instead
   }
   static_assert(! std::is_move_constructible<NoMoveConstructible>::value, "");
-  static_assert( std::is_constructible<stde::expected<NoMoveConstructible>, NoMoveConstructible && >::value, "");
-  static_assert( std::is_move_constructible<stde::expected<NoMoveConstructible>>::value, "");
+  static_assert( std::is_constructible<expected_sc<NoMoveConstructible>, NoMoveConstructible && >::value, "");
+  static_assert( std::is_move_constructible<expected_sc<NoMoveConstructible>>::value, "");
 
 
   return ::boost::report_errors();

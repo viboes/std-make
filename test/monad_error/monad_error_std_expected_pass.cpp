@@ -10,20 +10,24 @@
 
 #include <boost/detail/lightweight_test.hpp>
 
-std::experimental::expected<int> twice(int i) {
+namespace stde = std::experimental;
+template <class T>
+using expected_sc = stde::expected<T, std::error_code>;
+
+expected_sc<int> twice(int i) {
   if (i==0)
   {
     std::error_code ec = std::make_error_code(std::errc(1));
-    return std::experimental::make_unexpected(ec);
+    return stde::make_unexpected(ec);
   }
-  return std::experimental::make_expected(2*i);
+  return stde::make_expected(2*i);
 }
 
-std::experimental::expected<int> recover(std::error_code const& ) {
-  return std::experimental::make_expected(-1);
+expected_sc<int> recover(std::error_code const& ) {
+  return stde::make_expected(-1);
 }
-std::experimental::expected<int> fwd(std::error_code const& ec) {
-  return std::experimental::make_unexpected(ec);
+expected_sc<int> fwd(std::error_code const& ec) {
+  return stde::make_unexpected(ec);
 }
 int adapt(std::error_code const& ) {
   return -1;
@@ -31,25 +35,24 @@ int adapt(std::error_code const& ) {
 
 int main()
 {
-  namespace stde = std::experimental;
 
-  static_assert(stde::is_type_constructible<stde::expected<int>>::value, "ERROR");
-  static_assert(std::is_base_of<stde::monad_error::tag, stde::monad_error::traits<stde::expected<stde::_t>>> ::value, "ERROR");
-  static_assert(stde::is_monad_error<stde::expected<stde::_t>>::value, "ERROR");
+  static_assert(stde::is_type_constructible<expected_sc<int>>::value, "ERROR");
+  static_assert(std::is_base_of<stde::monad_error::tag, stde::monad_error::traits<expected_sc<stde::_t>>> ::value, "ERROR");
+  static_assert(stde::is_monad_error<expected_sc<stde::_t>>::value, "ERROR");
 
   {
     std::error_code ec = std::make_error_code(std::errc(1));
-    stde::expected<int> x = stde::monad_error::make_error<stde::expected>(ec);
-    stde::expected<int> y = stde::monad_error::bind(x,twice);
+    expected_sc<int> x = stde::monad_error::make_error<expected_sc<stde::_t>>(ec);
+    expected_sc<int> y = stde::monad_error::bind(x,twice);
     BOOST_TEST(! y);
-    stde::expected<int> z = stde::monad_error::catch_error(y,recover);
+    expected_sc<int> z = stde::monad_error::catch_error(y,recover);
     BOOST_TEST(z);
     BOOST_TEST_EQ(*z,-1);
   }
   {
     std::error_code ec = std::make_error_code(std::errc(1));
-    stde::expected<int> x = stde::monad_error::make_error<stde::expected>(ec);
-    stde::expected<int> y = stde::monad_error::bind(x,twice);
+    expected_sc<int> x = stde::monad_error::make_error<expected_sc<stde::_t>>(ec);
+    expected_sc<int> y = stde::monad_error::bind(x,twice);
     BOOST_TEST(! y);
     stde::expected<int, int> z = stde::monad_error::adapt_error(y,adapt);
     BOOST_TEST( ! z);
@@ -57,24 +60,24 @@ int main()
   }
   {
     int v=1;
-    stde::expected<int> x = stde::make<stde::expected>(v);
-    stde::expected<int> y = stde::monad_error::bind(x,twice);
-    stde::expected<int> z = stde::monad_error::catch_error(y,fwd);
+    expected_sc<int> x = stde::make<expected_sc<stde::_t>>(v);
+    expected_sc<int> y = stde::monad_error::bind(x,twice);
+    expected_sc<int> z = stde::monad_error::catch_error(y,fwd);
     BOOST_TEST(z);
     BOOST_TEST(*z == 2);
   }
   {
     int v=1;
-    stde::expected<int> x = stde::make<stde::expected>(v);
-    stde::expected<int> y = stde::monad_error::bind(x,twice);
+    expected_sc<int> x = stde::make<expected_sc<stde::_t>>(v);
+    expected_sc<int> y = stde::monad_error::bind(x,twice);
     stde::expected<int, int> z = stde::monad_error::adapt_error(y,adapt);
     BOOST_TEST(z);
     BOOST_TEST(*z == 2);
   }
   {
     int v=0;
-    stde::expected<int> x = stde::make<stde::expected>(v);
-    stde::expected<int> y = stde::monad_error::bind(x,twice);
+    expected_sc<int> x = stde::make<expected_sc<stde::_t>>(v);
+    expected_sc<int> y = stde::monad_error::bind(x,twice);
     BOOST_TEST(! y);
   }
 

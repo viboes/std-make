@@ -16,6 +16,10 @@
 #include <experimental/expected.hpp>
 #include <boost/detail/lightweight_test.hpp>
 
+namespace stde = std::experimental;
+template <class T>
+using expected_sc = stde::expected<T, std::error_code>;
+
 struct A
 {
   int v;
@@ -26,15 +30,14 @@ struct A
 
 int main()
 {
-  namespace stde = std::experimental;
   {
     int v=0;
-    stde::expected<int> x = stde::make<stde::expected>(v);
+    expected_sc<int> x = stde::make<expected_sc<stde::_t>>(v);
     BOOST_TEST(*x == 0);
   }
   {
     int v=0;
-    stde::expected<int> x = stde::make<stde::expected<int>>(v);
+    expected_sc<int> x = stde::make<expected_sc<int>>(v);
     BOOST_TEST(*x == 0);
   }
   {
@@ -44,7 +47,7 @@ int main()
   }
   {
     int v=1;
-    stde::expected<A> x = stde::make<stde::expected<A>>(stde::in_place, v,v);
+    expected_sc<A> x = stde::make<expected_sc<A>>(stde::in_place, v,v);
     BOOST_TEST(x->v == 2);
   }
   {
@@ -53,7 +56,7 @@ int main()
     BOOST_TEST(x->v == 2);
   }
   {
-    stde::expected<int> x = stde::make<stde::expected<int>>(stde::in_place);
+    expected_sc<int> x = stde::make<expected_sc<int>>(stde::in_place);
     BOOST_TEST_EQ(*x,  0);
   }
   {
@@ -62,12 +65,12 @@ int main()
   }
 //  {
 //    int v=0;
-//    stde::expected<int&> x = stde::make<stde::expected<int&>>(v);
+//    expected_sc<int&> x = stde::make<expected_sc<int&>>(v);
 //    BOOST_TEST(&v == &x.value());
 //  }
   {
     int v=0;
-    auto x = stde::make<stde::expected<stde::_t>>(v);
+    auto x = stde::make<expected_sc<stde::_t>>(v);
     BOOST_TEST(*x == 0);
   }
   {

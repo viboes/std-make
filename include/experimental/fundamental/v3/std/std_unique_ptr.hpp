@@ -58,6 +58,11 @@ namespace std
 
 namespace experimental
 {
+  namespace meta
+  {
+    template <class T, class U>
+    struct rebind<default_delete<T>, U> : id<default_delete<U>> {};
+  }
 inline namespace fundamental_v3
 {
   // type_constructor customization

@@ -23,8 +23,9 @@ inline namespace v1
   template <class M, class ...U>
   struct rebind : id<typename M::template rebind<U...>> {};
 
-  template <template<class ...> class TC, class ...Ts, class ...Us>
-  struct rebind<TC<Ts...>, Us...> : id<TC<Us...>> {};
+  // This specialization inhibits specializations for for example rebind<expected<T,E>, U>
+  //template <template<class ...> class TC, class ...Ts, class ...Us>
+  //struct rebind<TC<Ts...>, Us...> : id<TC<Us...>> {};
 
   template <class M, class ...Us>
   using rebind_t = eval<rebind<M, Us...>>;

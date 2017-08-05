@@ -15,13 +15,17 @@ int twice(int i) {
   return 2*i;
 }
 
+namespace stde = std::experimental;
+template <class T>
+using expected_sc = stde::expected<T, std::error_code>;
+
+
 int main()
 {
-  namespace stde = std::experimental;
 
-  static_assert(stde::is_type_constructible<stde::expected<int>>::value, "ERROR");
-  static_assert(std::is_base_of<stde::functor::tag, stde::functor::traits<stde::expected<stde::_t>>> ::value, "ERROR");
-  static_assert(stde::is_functor<stde::expected<stde::_t>>::value, "ERROR");
+  static_assert(stde::is_type_constructible<expected_sc<int>>::value, "ERROR");
+  static_assert(std::is_base_of<stde::functor::tag, stde::functor::traits<expected_sc<stde::_t>>> ::value, "ERROR");
+  static_assert(stde::is_functor<expected_sc<stde::_t>>::value, "ERROR");
 
   std::error_code ec = std::make_error_code(std::errc(1));
 
@@ -33,53 +37,53 @@ int main()
     BOOST_TEST(! y);
   }
   {
-    stde::expected<int> x = stde::make_unexpected(ec);
+    expected_sc<int> x = stde::make_unexpected(ec);
     BOOST_TEST(! x);
 
-    stde::expected<int> y = stde::functor::transform(x, twice);
+    expected_sc<int> y = stde::functor::transform(x, twice);
     BOOST_TEST(! y);
   }
   {
     int v=1;
-    stde::expected<int> x = stde::make_expected(v);
+    expected_sc<int> x = stde::make_expected(v);
     BOOST_TEST(*x == 1);
-    stde::expected<int> y = stde::functor::transform(x, twice);
+    expected_sc<int> y = stde::functor::transform(x, twice);
     BOOST_TEST(*y == 2);
     x = 2;
     BOOST_TEST(*x == 2);
   }
   {
     int v=1;
-    const stde::expected<int> x = stde::make_expected(v);
+    const expected_sc<int> x = stde::make_expected(v);
     BOOST_TEST(*x == 1);
 
-    stde::expected<int> y = x.map(twice);
+    expected_sc<int> y = x.map(twice);
     BOOST_TEST(*y == 2);
   }
   {
     int v=1;
-    const stde::expected<int> x = stde::make_expected(v);
+    const expected_sc<int> x = stde::make_expected(v);
     BOOST_TEST(*x == 1);
 
 
-    stde::expected<int> y = stde::functor::transform(x, twice);
+    expected_sc<int> y = stde::functor::transform(x, twice);
     BOOST_TEST(*y == 2);
   }
   {
     int v=1;
-    const stde::expected<int> x = stde::make_expected(v);
+    const expected_sc<int> x = stde::make_expected(v);
     BOOST_TEST(*x == 1);
 
-    stde::expected<int> y = stde::functor::map(twice, x);
+    expected_sc<int> y = stde::functor::map(twice, x);
     BOOST_TEST(*y == 2);
   }
   // fixme should transform be const? How the move can be done then? Or should expected don't do a move?
 #if defined __clang__ && __clang_major__ >= 4 && __cplusplus > 201402L
   {
-    auto x = stde::make_expected<const int>(1);
-    static_assert(std::is_same<decltype(x), stde::expected<const int>>::value, "");
+    expected_sc<const int> x = stde::make_expected<const int>(1);
+    static_assert(std::is_same<decltype(x), expected_sc<const int>>::value, "");
     BOOST_TEST(*x == 1);
-    stde::expected<int> y = stde::functor::transform(x, twice);
+    expected_sc<int> y = stde::functor::transform(x, twice);
     BOOST_TEST(*y == 2);
   }
 #endif

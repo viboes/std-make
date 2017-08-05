@@ -15,6 +15,9 @@
 
 namespace stde = std::experimental;
 
+template <class T>
+using expected_sc = stde::expected<T, std::error_code>;
+
 struct NoDefaultConstructible
 {
   NoDefaultConstructible() = delete;
@@ -156,7 +159,7 @@ void do_nothing_fun(){}
 void except_default_constructor()
 {
   // From value constructor.
-  stde::expected<int> e {};
+  expected_sc<int> e {};
   try {
     int i = e.value();
     (void)i;
@@ -195,13 +198,13 @@ void expected_from_value()
   static_assert(std::is_nothrow_copy_constructible<E>::value, "");
   static_assert(noexcept( stde::adl::swap_impl( std::declval<E&>(), std::declval<E&>() ) ), "");
 
-  static_assert(std::is_nothrow_copy_constructible<stde::expected<int>>::value, "");
-  static_assert(std::is_nothrow_copy_assignable<stde::expected<int>>::value, "");
-  static_assert(std::is_nothrow_move_constructible<stde::expected<int>>::value, "");
-  static_assert(std::is_nothrow_move_assignable<stde::expected<int>>::value, "");
+  static_assert(std::is_nothrow_copy_constructible<expected_sc<int>>::value, "");
+  static_assert(std::is_nothrow_copy_assignable<expected_sc<int>>::value, "");
+  static_assert(std::is_nothrow_move_constructible<expected_sc<int>>::value, "");
+  static_assert(std::is_nothrow_move_assignable<expected_sc<int>>::value, "");
 
   // From value constructor.
-  stde::expected<int> e(5);
+  expected_sc<int> e(5);
   //BOOST_REQUIRE_NO_THROW(e.value());
   BOOST_TEST_EQ(e.value(), 5);
   BOOST_TEST_EQ(*e, 5);
@@ -212,7 +215,7 @@ void expected_from_value()
 void expected_from_value2()
 {
   // From value constructor.
-  stde::expected<int> e(5);
+  expected_sc<int> e(5);
   e = {};
   BOOST_TEST( e.valid() );
   BOOST_TEST_EQ(e.value(), 0);
@@ -221,7 +224,7 @@ void expected_from_value2()
 void expected_from_cnv_value()
 {
   OracleVal v;
-  stde::expected<Oracle> e(v);
+  expected_sc<Oracle> e(v);
   //BOOST_REQUIRE_NO_THROW(e.value());
   BOOST_TEST(! ! e) ;
   BOOST_TEST(e.valid());
@@ -229,7 +232,7 @@ void expected_from_cnv_value()
   BOOST_TEST_EQ(e.value().s,  sMoveConstructed);
   BOOST_TEST_EQ(v.s, sValueConstructed);
 
-  stde::expected<Oracle> e2(std::move(v));
+  expected_sc<Oracle> e2(std::move(v));
   //BOOST_REQUIRE_NO_THROW(e2.value());
   BOOST_TEST(! ! e2) ;
   BOOST_TEST(e2.valid());
@@ -246,7 +249,7 @@ struct NDCE              // no default constructor
 
 void except_constructor_NDCE()
 {
-  stde::expected<NDCE> e {NDCE{1}};
+  expected_sc<NDCE> e {NDCE{1}};
   BOOST_TEST( e.valid() );
 
 }
@@ -257,34 +260,34 @@ struct NDC              // no default constructor
 
 void except_constructor_NDC()
 {
-  static_assert(std::is_nothrow_copy_constructible<stde::expected<NDC>>::value, "");
-  static_assert(std::is_nothrow_copy_assignable<stde::expected<NDC>>::value, "");
-  static_assert(std::is_nothrow_move_constructible<stde::expected<NDC>>::value, "");
-  static_assert(std::is_nothrow_move_assignable<stde::expected<NDC>>::value, "");
-  stde::expected<NDC> e {1};
+  static_assert(std::is_nothrow_copy_constructible<expected_sc<NDC>>::value, "");
+  static_assert(std::is_nothrow_copy_assignable<expected_sc<NDC>>::value, "");
+  static_assert(std::is_nothrow_move_constructible<expected_sc<NDC>>::value, "");
+  static_assert(std::is_nothrow_move_assignable<expected_sc<NDC>>::value, "");
+  expected_sc<NDC> e {1};
   BOOST_TEST( e.valid() );
 }
 
 void except_constructor_Date()
 {
-  static_assert(std::is_nothrow_move_constructible<stde::expected<Date>>::value, "");
-  static_assert(std::is_nothrow_move_assignable<stde::expected<Date>>::value, "");
-  stde::expected<Date> e {Date{1}};
+  static_assert(std::is_nothrow_move_constructible<expected_sc<Date>>::value, "");
+  static_assert(std::is_nothrow_move_assignable<expected_sc<Date>>::value, "");
+  expected_sc<Date> e {Date{1}};
   BOOST_TEST( e.valid() );
 }
 
 void except_constructor_TExcept()
 {
-  static_assert( ! std::is_nothrow_move_constructible<stde::expected<TExcept>>::value, "");
-  static_assert( ! std::is_nothrow_move_assignable<stde::expected<TExcept>>::value, "");
-  stde::expected<TExcept> e {TExcept{1}};
+  static_assert( ! std::is_nothrow_move_constructible<expected_sc<TExcept>>::value, "");
+  static_assert( ! std::is_nothrow_move_assignable<expected_sc<TExcept>>::value, "");
+  expected_sc<TExcept> e {TExcept{1}};
   BOOST_TEST( e.valid() );
 }
 
 void expected_from_in_place_value()
 {
    OracleVal v;
-   stde::expected<Oracle> e{stde::in_place , v};
+   expected_sc<Oracle> e{stde::in_place , v};
    //BOOST_REQUIRE_NO_THROW(e.value());
    BOOST_TEST(! ! e) ;
    BOOST_TEST(e.valid());
@@ -292,7 +295,7 @@ void expected_from_in_place_value()
    BOOST_TEST_EQ(e.value().s, sValueCopyConstructed);
    BOOST_TEST_EQ(v.s, sValueConstructed);
 
-   stde::expected<Oracle> e2{stde::in_place , std::move(v)};
+   expected_sc<Oracle> e2{stde::in_place , std::move(v)};
    //BOOST_REQUIRE_NO_THROW(e2.value());
    BOOST_TEST(! ! e2) ;
    BOOST_TEST(e2.valid());
@@ -314,8 +317,8 @@ void expected_from_exception()
 void expected_from_copy_value()
 {
   // From copy constructor.
-  stde::expected<int> ef(5);
-  stde::expected<int> e(ef);
+  expected_sc<int> ef(5);
+  expected_sc<int> e(ef);
   //BOOST_REQUIRE_NO_THROW(e.value());
   BOOST_TEST_EQ(e.value(), 5);
   BOOST_TEST_EQ(*e, 5);
@@ -336,7 +339,7 @@ void expected_from_copy_exception()
 void expected_from_in_place()
 {
   // From stde::in_place constructor.
-  stde::expected<std::string> e(stde::in_place, "stde::in_place");
+  expected_sc<std::string> e(stde::in_place, "stde::in_place");
   //BOOST_REQUIRE_NO_THROW(e.value());
   BOOST_TEST_EQ(e.value(), "stde::in_place");
   BOOST_TEST_EQ(*e, "stde::in_place");
@@ -357,7 +360,7 @@ void expected_from_moved_value()
 {
   // From move value constructor.
   std::string value = "my value";
-  stde::expected<std::string> e = std::move(value);
+  expected_sc<std::string> e = std::move(value);
   //BOOST_REQUIRE_NO_THROW(e.value());
   BOOST_TEST_EQ(e.value(), "my value");
   BOOST_TEST_EQ(*e, "my value");
@@ -394,19 +397,18 @@ void make_expected_const_from_value()
   const int i=0;
   auto e = stde::make_expected<const int>( i );
   static_assert(std::is_same<decltype(e), stde::expected<const int>>::value, "");
-  BOOST_TEST_EQ(e.valid(), true);
 #endif
 }
 void make_expected_from_U_value()
 {
-  stde::expected<int> e = stde::make_expected<int>( short(5) );
-  static_assert(std::is_same<decltype(e), stde::expected<int>>{}, "");
+  expected_sc<int> e = stde::make_expected<int>( short(5) );
+  static_assert(std::is_same<decltype(e), expected_sc<int>>{}, "");
   BOOST_TEST_EQ(e.valid(), true);
 }
 void make_expected_from_U_value2()
 {
-  stde::expected<std::string> e = stde::make_expected<std::string>( "aa" );
-  static_assert(std::is_same<decltype(e), stde::expected<std::string>>{}, "");
+  expected_sc<std::string> e = stde::make_expected<std::string>( "aa" );
+  static_assert(std::is_same<decltype(e), expected_sc<std::string>>{}, "");
   BOOST_TEST_EQ(e.valid(), true);
 }
 
@@ -474,7 +476,7 @@ void except_value_constexpr_int()
 
 void expected_from_value3()
 {
-  stde::expected<int> e(5);
+  expected_sc<int> e(5);
   BOOST_TEST_EQ(e.value(), 5);
 
   // From value assignment.
@@ -488,8 +490,8 @@ void expected_from_value3()
 
 void expected_from_copy_expected()
 {
-  stde::expected<int> e(5);
-  stde::expected<int> e2(8);
+  expected_sc<int> e(5);
+  expected_sc<int> e2(8);
 
   // From value assignment.
   e = e2;
@@ -502,8 +504,8 @@ void expected_from_copy_expected()
 
 void expected_from_moved_expected()
 {
-  stde::expected<std::string> e("e");
-  stde::expected<std::string> e2("e2");
+  expected_sc<std::string> e("e");
+  expected_sc<std::string> e2("e2");
 
   // From value assignment.
   e = std::move(e2);
@@ -523,7 +525,7 @@ void expected_from_moved_expected()
 void expected_from_in_place2()
 {
   // From stde::in_place constructor.
-  stde::expected<std::string> e(stde::in_place, "stde::in_place");
+  expected_sc<std::string> e(stde::in_place, "stde::in_place");
   BOOST_TEST_EQ(e.value(), "stde::in_place");
 
   // From emplace method.
@@ -537,7 +539,7 @@ void expected_from_in_place2()
 
 void expected_from_move_value()
 {
-  stde::expected<std::string> e("v");
+  expected_sc<std::string> e("v");
 
   std::string value = "my value";
   // From assignment operator.
@@ -554,7 +556,7 @@ void expected_from_in_place3()
 {
   // From stde::in_place factory.
   //auto e = stde::make_expected<std::string>("stde::in_place");
-  auto e = stde::expected<std::string>("stde::in_place");
+  auto e = expected_sc<std::string>("stde::in_place");
   //BOOST_REQUIRE_NO_THROW(e.value());
   BOOST_TEST_EQ(e.value(), "stde::in_place");
   BOOST_TEST_EQ(*e, "stde::in_place");
@@ -619,7 +621,7 @@ void expected_from_exception2()
 {
   // From stde::unexpected_type constructor.
   auto e = stde::make_expected_from_exception<int>(test_exception());
-  //auto e = stde::expected<int>(stde::unexpected_type<>(test_exception()));
+  //auto e = expected_sc<int>(stde::unexpected_type<>(test_exception()));
   BOOST_TEST_THROWS(e.value(), test_exception);
   BOOST_TEST_EQ(e.valid(), false);
   BOOST_TEST_EQ(static_cast<bool>(e), false);
@@ -678,7 +680,7 @@ void make_expected_from_call_void_fun()
 {
 #if 0
   BOOST_TEST_NO_THROW(stde::make_expected_from_call(void_throwing_fun));
-  stde::expected<void> e = stde::make_expected_from_call(void_throwing_fun);
+  expected_sc<void> e = stde::make_expected_from_call(void_throwing_fun);
   BOOST_TEST_THROWS(e.value(), std::exception);
   BOOST_TEST_EQ(e.valid(), false);
   BOOST_TEST_EQ(static_cast<bool>(e), false);
@@ -697,7 +699,7 @@ void make_expected_from_call_void_fun()
   {
     BOOST_TEST(false);
   }
-  stde::expected<std::error_condition, void> e2 = stde::make_expected_from_call<std::error_condition>(do_nothing_fun);
+  stde::expected<void, std::error_condition> e2 = stde::make_expected_from_call<std::error_condition>(do_nothing_fun);
   try {
     (void)e2.value();
     BOOST_TEST(true);
@@ -714,8 +716,8 @@ void make_expected_from_call_void_fun()
 void expected_swap_value()
 {
   // From value constructor.
-  stde::expected<int> e(5);
-  stde::expected<int> e2(8);
+  expected_sc<int> e(5);
+  expected_sc<int> e2(8);
 
   e.swap(e2);
 
@@ -775,8 +777,8 @@ void expected_swap_exception()
 void expected_swap_function_value()
 {
   // From value constructor.
-  stde::expected<int> e(5);
-  stde::expected<int> e2(8);
+  expected_sc<int> e(5);
+  expected_sc<int> e2(8);
 
   swap(e, e2);
 
@@ -794,10 +796,10 @@ int main()
 {
 
   static_assert(! std::is_default_constructible<NoDefaultConstructible>::value, "");
-  static_assert(! std::is_default_constructible<stde::expected<NoDefaultConstructible>>::value, "");
+  static_assert(! std::is_default_constructible<expected_sc<NoDefaultConstructible>>::value, "");
 
   static_assert(! std::is_copy_constructible<NoCopyConstructible>::value, "");
-  static_assert(! std::is_constructible<stde::expected<NoCopyConstructible>, NoCopyConstructible const& >::value, "");
+  static_assert(! std::is_constructible<expected_sc<NoCopyConstructible>, NoCopyConstructible const& >::value, "");
   static_assert(! std::is_constructible<stde::exception_or<NoCopyConstructible>, stde::exception_or<NoCopyConstructible> const& >::value, "");
   static_assert(! std::is_copy_constructible<stde::exception_or<NoCopyConstructible>>::value, "");
 
@@ -806,7 +808,7 @@ int main()
     NoMoveConstructible nmc;
     //NoMoveConstructible nmc2 = std::move(nmc); // FAILS as expected
 
-    stde::expected<NoMoveConstructible> x{ std::move(nmc) }; // DOESN'T FAIL as copy is selected instead
+    expected_sc<NoMoveConstructible> x{ std::move(nmc) }; // DOESN'T FAIL as copy is selected instead
     (void)x;
   }
   //fixme
@@ -815,14 +817,14 @@ int main()
     NoMoveConstructible nmc;
     //NoMoveConstructible nmc2 = std::move(nmc); // FAILS as expected
 
-    stde::expected<NoMoveConstructible> x = std::move(nmc); // DOESN'T FAIL as copy is selected instead
+    expected_sc<NoMoveConstructible> x = std::move(nmc); // DOESN'T FAIL as copy is selected instead
     (void)x;
   }
 #endif
 
   static_assert(! std::is_move_constructible<NoMoveConstructible>::value, "");
-  static_assert( std::is_constructible<stde::expected<NoMoveConstructible>, NoMoveConstructible && >::value, "");
-  static_assert( std::is_move_constructible<stde::expected<NoMoveConstructible>>::value, "");
+  static_assert( std::is_constructible<expected_sc<NoMoveConstructible>, NoMoveConstructible && >::value, "");
+  static_assert( std::is_move_constructible<expected_sc<NoMoveConstructible>>::value, "");
 
   except_default_constructor();
   except_default_constructor_error_code();
@@ -899,7 +901,7 @@ BOOST_AUTO_TEST_SUITE(expected_map)
 
 void expected_map()
 {
-  auto fun = [](bool b) -> stde::expected<int>
+  auto fun = [](bool b) -> expected_sc<int>
   {
     if(b)
       return stde::make_expected(5);
@@ -917,7 +919,7 @@ void expected_map()
     throw test_exception();
   };
 
-  stde::expected<int> e = fun(true).map(add_five);
+  expected_sc<int> e = fun(true).map(add_five);
   BOOST_TEST_NO_THROW(e.value());
   BOOST_TEST_EQ(*e, 10);
 
@@ -939,7 +941,7 @@ void expected_void_map()
     if(b)
       return stde::make_expected();
     else
-      return stde::expected<void>(stde::make_unexpected(test_exception()));
+      return expected_sc<void>(stde::make_unexpected(test_exception()));
   };
 
   auto launch_except = []() -> void
@@ -949,7 +951,7 @@ void expected_void_map()
 
   auto do_nothing = [](){};
 
-  stde::expected<void> e = fun(true).map(do_nothing);
+  expected_sc<void> e = fun(true).map(do_nothing);
   BOOST_TEST_NO_THROW(e.value());
 
   e = fun(false).map(do_nothing);
@@ -966,7 +968,7 @@ BOOST_AUTO_TEST_SUITE(expected_bind)
 
 void expected_bind()
 {
-  auto fun = [](bool b) -> stde::expected<int>
+  auto fun = [](bool b) -> expected_sc<int>
   {
     if(b)
       return stde::make_expected(5);
@@ -974,17 +976,17 @@ void expected_bind()
       return stde::make_unexpected(test_exception());
   };
 
-  auto add_five = [](int sum) -> stde::expected<int>
+  auto add_five = [](int sum) -> expected_sc<int>
   {
     return stde::make_expected(sum + 5);
   };
 
-  auto launch_except = [](int sum) -> stde::expected<int>
+  auto launch_except = [](int sum) -> expected_sc<int>
   {
     throw test_exception();
   };
 
-  stde::expected<int> e = fun(true).bind(add_five);
+  expected_sc<int> e = fun(true).bind(add_five);
   BOOST_TEST_NO_THROW(e.value());
   BOOST_TEST_EQ(*e, 10);
 
@@ -1006,10 +1008,10 @@ void expected_void_bind()
     if(b)
       return stde::make_expected();
     else
-      return stde::expected<void>(stde::make_unexpected(test_exception()));
+      return expected_sc<void>(stde::make_unexpected(test_exception()));
   };
 
-  auto launch_except = []() -> stde::expected<void>
+  auto launch_except = []() -> expected_sc<void>
   {
     throw test_exception();
   };
@@ -1018,7 +1020,7 @@ void expected_void_bind()
     return stde::make_expected();
   };
 
-  stde::expected<void> e = fun(true).bind(do_nothing);
+  expected_sc<void> e = fun(true).bind(do_nothing);
   BOOST_TEST_NO_THROW(e.value());
 
   e = fun(false).bind(do_nothing);
@@ -1036,7 +1038,7 @@ BOOST_AUTO_TEST_SUITE(expected_then)
 
 void expected_non_void_then()
 {
-  auto fun = [](bool b) -> stde::expected<int>
+  auto fun = [](bool b) -> expected_sc<int>
   {
     if(b)
       return stde::make_expected(5);
@@ -1069,7 +1071,7 @@ void expected_non_void_then()
     throw test_exception();
   };
 
-  stde::expected<int> e = fun(true).then(if_valued(add_five));
+  expected_sc<int> e = fun(true).then(if_valued(add_five));
   BOOST_TEST_NO_THROW(e.value());
   BOOST_TEST_EQ(*e, 10);
 
@@ -1081,7 +1083,7 @@ void expected_non_void_then()
   BOOST_TEST_NO_THROW(e.value());
   BOOST_TEST_EQ(*e, 6);
 
-  stde::expected<bool> e1 = fun(true).then(if_valued(pair));
+  expected_sc<bool> e1 = fun(true).then(if_valued(pair));
   BOOST_TEST_NO_THROW(e1.value());
   BOOST_TEST_EQ(*e1, false);
 
@@ -1103,7 +1105,7 @@ void expected_non_void_then()
 
 void expected_void_then()
 {
-  auto fun = [](bool b) -> stde::expected<void>
+  auto fun = [](bool b) -> expected_sc<void>
   {
     if(b)
       return stde::make_expected();
@@ -1119,7 +1121,7 @@ void expected_void_then()
   auto do_nothing = [](){};
 
   BOOST_TEST(true);
-  stde::expected<void> e = fun(true).then(if_valued(do_nothing));
+  expected_sc<void> e = fun(true).then(if_valued(do_nothing));
   BOOST_TEST_NO_THROW(e.value());
 
   e = fun(false).then(if_valued(do_nothing));
@@ -1138,12 +1140,12 @@ void expected_recover()
   auto fun = [](bool b)
   {
     if(b)
-      return stde::expected<int>(5);
+      return expected_sc<int>(5);
     else
-      return stde::expected<int>(stde::make_unexpected(test_exception()));
+      return expected_sc<int>(stde::make_unexpected(test_exception()));
   };
 
-  auto add_five = [](int sum) -> stde::expected<int>
+  auto add_five = [](int sum) -> expected_sc<int>
   {
     return stde::make_expected(sum + 5);
   };
@@ -1155,15 +1157,15 @@ void expected_recover()
 
   auto recover_error_silent_failure = [](std::exception_ptr p)
   {
-    return stde::expected<int>(stde::make_unexpected(p));
+    return expected_sc<int>(stde::make_unexpected(p));
   };
 
-  auto recover_error_failure = [](std::exception_ptr p) -> stde::expected<int>
+  auto recover_error_failure = [](std::exception_ptr p) -> expected_sc<int>
   {
-    return stde::expected<int>(stde::make_unexpected(test_exception()));
+    return expected_sc<int>(stde::make_unexpected(test_exception()));
   };
 
-  auto recover_error_throws = [](std::exception_ptr p) -> stde::expected<int>
+  auto recover_error_throws = [](std::exception_ptr p) -> expected_sc<int>
   {
     throw test_exception();
   };
@@ -1196,7 +1198,7 @@ void expected_void_recover()
     if(b)
       return stde::make_expected();
     else
-      return stde::expected<void>(boost::stde::make_unexpected(test_exception()));
+      return expected_sc<void>(boost::stde::make_unexpected(test_exception()));
   };
 
   auto do_nothing = [](){
@@ -1210,10 +1212,10 @@ void expected_void_recover()
 
   auto recover_error_silent_failure = [](std::exception_ptr p)
   {
-    return stde::expected<void>(boost::stde::make_unexpected(p));
+    return expected_sc<void>(boost::stde::make_unexpected(p));
   };
 
-  auto recover_error_failure = [](std::exception_ptr p) -> stde::expected<void>
+  auto recover_error_failure = [](std::exception_ptr p) -> expected_sc<void>
   {
     throw test_exception();
   };
@@ -1261,14 +1263,14 @@ void proposal_init()
     stde::expected<string, int> ep{stde::make_unexpected(-1)};              // unexpected value, requires Movable<E>
     stde::expected<string, int> eq = {stde::make_unexpected(-1)};           // unexpected value, requires Movable<E>
 
-    stde::expected<string> es{s};                    // requires Copyable<T>
-    stde::expected<string> et = s;                   // requires Copyable<T>
-    stde::expected<string> ev = string{"STR"};       // requires Movable<T>
+    expected_sc<string> es{s};                    // requires Copyable<T>
+    expected_sc<string> et = s;                   // requires Copyable<T>
+    expected_sc<string> ev = string{"STR"};       // requires Movable<T>
 
-    stde::expected<string> ew;                       // unexpected value
-    stde::expected<string> ex{};                     // unexpected value
-    stde::expected<string> ey = {};                  // unexpected value
-    stde::expected<string> ez = stde::expected<string>{};  // unexpected value
+    expected_sc<string> ew;                       // unexpected value
+    expected_sc<string> ex{};                     // unexpected value
+    expected_sc<string> ey = {};                  // unexpected value
+    expected_sc<string> ez = expected_sc<string>{};  // unexpected value
   }
 
   {
@@ -1483,8 +1485,8 @@ void proposal_dereference_operators()
   {
     const string s{"STR"};
 
-    stde::expected<string> e0{s};
-    const stde::expected<string> e1{s};
+    expected_sc<string> e0{s};
+    const expected_sc<string> e1{s};
     BOOST_TEST(*e0.operator->() == s);
     BOOST_TEST(*e1.operator->() == s);
 
@@ -1492,8 +1494,8 @@ void proposal_dereference_operators()
     const OverloadedAddressOf o{};
     BOOST_TEST(&o == nullptr);
 
-    stde::expected<OverloadedAddressOf> e2{o};
-    const stde::expected<OverloadedAddressOf> e3{o};
+    expected_sc<OverloadedAddressOf> e2{o};
+    const expected_sc<OverloadedAddressOf> e3{o};
     BOOST_TEST(e2.operator->() != nullptr);
     BOOST_TEST(e3.operator->() != nullptr);
   }
@@ -1524,13 +1526,13 @@ void movesem_moved_from_state()
   BOOST_TEST (j.moved);
 
   // now, test stde::expected
-  stde::expected<MoveAware<int>> oi{1}, oj{2};
+  expected_sc<MoveAware<int>> oi{1}, oj{2};
   BOOST_TEST (oi);
   BOOST_TEST (!oi->moved);
   BOOST_TEST (oj);
   BOOST_TEST (!oj->moved);
 
-  stde::expected<MoveAware<int>> ok{std::move(oi)};
+  expected_sc<MoveAware<int>> ok{std::move(oi)};
   BOOST_TEST (ok);
   BOOST_TEST (!ok->moved);
   BOOST_TEST (oi);
@@ -1557,7 +1559,7 @@ void movesem_move_only_value()
   const auto return_expected = [](std::unique_ptr<int> value) {
     BOOST_TEST(value != nullptr);
     BOOST_TEST(*value == 100);
-    return stde::expected<void>{boost::expect};
+    return expected_sc<void>{boost::expect};
   };
   const auto return_int = [](std::unique_ptr<int> value) {
     BOOST_TEST(value != nullptr);
@@ -1584,29 +1586,29 @@ void movesem_move_only_value2()
   const auto return_expected = [](std::unique_ptr<int> value) {
     BOOST_TEST(value != nullptr);
     BOOST_TEST(*value == 100);
-    return stde::expected<void>{boost::expect};
+    return expected_sc<void>{boost::expect};
   };
   BOOST_TEST(expected<std::unique_ptr<int>>{make_int()}.bind(return_expected_void));
   BOOST_TEST(expected<std::unique_ptr<int>>{make_int()}.bind(return_expected));
 }
 void movesem_copy_move_ctor_optional_int()
 {
-  stde::expected<int> oi;
-  stde::expected<int> oj = oi;
+  expected_sc<int> oi;
+  expected_sc<int> oj = oi;
 
   BOOST_TEST (oj);
   BOOST_TEST (oj == oi);
   BOOST_TEST (bool(oj));
 
   oi = 1;
-  stde::expected<int> ok = oi;
+  expected_sc<int> ok = oi;
   BOOST_TEST (!!ok);
   BOOST_TEST (bool(ok));
   BOOST_TEST (ok == oi);
   BOOST_TEST (ok != oj);
   BOOST_TEST (*ok == 1);
 
-  stde::expected<int> ol = std::move(oi);
+  expected_sc<int> ol = std::move(oi);
   BOOST_TEST (!!ol);
   BOOST_TEST (bool(ol));
   BOOST_TEST (ol == oi);
@@ -1615,24 +1617,24 @@ void movesem_copy_move_ctor_optional_int()
 }
 void movesem_expected_expected()
 {
-  stde::expected<expected<int, int>> oi1 = stde::make_unexpected(-1);
+  expected_sc<stde::expected<int, int>> oi1 = stde::make_unexpected(-1);
   BOOST_TEST (!oi1);
 
   {
-  stde::expected<expected<int>> oi2 {expect};
+  expected_sc<expected_sc<int>> oi2 {stde::expect};
   BOOST_TEST (bool(oi2));
   BOOST_TEST ((*oi2));
   //std::cout << typeid(**oi2).name() << std::endl;
   }
 
   {
-  stde::expected<expected<int,int>> oi2 {expect, stde::make_unexpected(-1)};
+  expected_sc<stde::expected<int,int>> oi2 {stde::expect, stde::make_unexpected(-1)};
   BOOST_TEST (bool(oi2));
   BOOST_TEST (!*oi2);
   }
 
   {
-  stde::expected<expected<int>> oi2 {expected<int>{}};
+  stde::expected<stde::expected<int>> oi2 {stde::expected<int>{}};
   BOOST_TEST (bool(oi2));
   BOOST_TEST (*oi2);
   }
