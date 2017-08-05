@@ -41,7 +41,7 @@ namespace expected_helpers
     template <class ST>
     static constexpr decltype(auto) get(ST&& st) noexcept
     {
-      return st.get_unexpected();
+      return make_unexpected(st.error());
     }
   };
 }
@@ -67,7 +67,7 @@ namespace sum_type
       {
         if (st)
           return JASEL_INVOKE(forward<V>(v),*st);
-        return JASEL_INVOKE(forward<V>(v), st.get_unexpected());
+        return JASEL_INVOKE(forward<V>(v), make_unexpected(st.error()));
       }
   };
 }

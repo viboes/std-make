@@ -46,9 +46,9 @@ namespace expected_helpers
         )>(JASEL_INVOKE((*forward<F>(f)), *forward<N>(n))))
   {
     if ( ! f )
-      return f.get_unexpected();
+      return make_unexpected(f.error());
     if ( ! n )
-      return n.get_unexpected();
+      return make_unexpected(n.error());
 
     return
         meta::rebind_t<decay_t<N>, decltype(

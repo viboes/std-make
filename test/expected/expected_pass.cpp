@@ -1316,7 +1316,7 @@ void proposal_error_exception_ts()
     } catch (...) {
       BOOST_TEST (false);
     }
-    stde::expected<int, error_exception<std::error_code, std::system_error> > e2 = e.get_unexpected();
+    stde::expected<int, error_exception<std::error_code, std::system_error> > e2 = stde::make_unexpected(e.error());
 #if !defined BOOST_MSVC || BOOST_MSVC >= 1900
     BOOST_TEST(e2.error()==make_error_code(errc::invalid_argument));
 #else
