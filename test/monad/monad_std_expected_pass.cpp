@@ -39,14 +39,14 @@ int main()
   }
   {
     int v=1;
-    expected_sc<int> x = stde::make<stde::expected>(v);
+    expected_sc<int> x = stde::make<expected_sc<stde::_t>>(v);
     expected_sc<int> y = stde::monad::bind(x,twice);
     BOOST_TEST(y);
     BOOST_TEST(*y == 2);
   }
   {
     int v=0;
-    expected_sc<int> x = stde::make<stde::expected>(v);
+    expected_sc<int> x = stde::make<expected_sc<stde::_t>>(v);
     expected_sc<int> y = stde::monad::bind(x,twice);
     BOOST_TEST(! y);
   }

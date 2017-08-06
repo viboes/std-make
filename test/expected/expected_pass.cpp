@@ -396,7 +396,7 @@ void make_expected_const_from_value()
 #if defined __clang__ && __clang_major__ >= 4 && __cplusplus > 201402L
   const int i=0;
   auto e = stde::make_expected<const int>( i );
-  static_assert(std::is_same<decltype(e), stde::expected<const int>>::value, "");
+  static_assert(std::is_same<decltype(e), stde::success<const int>>::value, "");
 #endif
 }
 void make_expected_from_U_value()

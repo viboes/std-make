@@ -41,7 +41,7 @@ int main()
   }
   {
     std::error_code ec = std::make_error_code(std::errc(1));
-    expected_sc<int> x = stde::make<stde::expected>(1);
+    expected_sc<int> x = stde::make<stde::expected<stde::_t, std::error_code>>(1);
     expected_sc<int(*)(int)> f = stde::make_unexpected(ec);
     expected_sc<int> y = stde::applicative::ap(f, x);
     BOOST_TEST(! y);
@@ -56,14 +56,14 @@ int main()
   {
     std::error_code ec = std::make_error_code(std::errc(1));
     expected_sc<int> x = stde::make_unexpected(ec);
-    expected_sc<int(*)(int)> f = stde::make<stde::expected>(twice);
+    expected_sc<int(*)(int)> f = stde::make<stde::expected<stde::_t, std::error_code>>(twice);
     expected_sc<int> y = stde::applicative::ap(f, x);
     BOOST_TEST(! y);
   }
   {
     int v=1;
-    expected_sc<int> x = stde::make<stde::expected>(v);
-    expected_sc<int(*)(int)> f = stde::make<stde::expected>(twice);
+    expected_sc<int> x = stde::make<stde::expected<stde::_t, std::error_code>>(v);
+    expected_sc<int(*)(int)> f = stde::make<stde::expected<stde::_t, std::error_code>>(twice);
     expected_sc<int> y = stde::applicative::ap(f, x);
     BOOST_TEST(*y == 2);
   }

@@ -1592,7 +1592,7 @@ template <typename T, typename E, bool AreCopyConstructible, bool AreMoveConstru
 } // namespace detail
 
 struct holder;
-template <typename ValueType=holder, typename ErrorType=void>
+template <typename ValueType, typename ErrorType>
 class expected;
 
 }
@@ -1605,7 +1605,7 @@ namespace meta
 inline namespace fundamental_v3
 {
 template <typename ValueType>
-class expected<ValueType, void>
+class success
 {
 public:
   typedef ValueType value_type;
@@ -1613,7 +1613,7 @@ public:
   JASEL_0_REQUIRES(
       is_copy_constructible<value_type>::value
   )
-  BOOST_CONSTEXPR expected(const value_type& v) // NOLINT google-explicit-constructor
+  BOOST_CONSTEXPR success(const value_type& v) // NOLINT google-explicit-constructor
       BOOST_NOEXCEPT_IF(
           is_nothrow_copy_constructible<value_type>::value
       )
@@ -1623,17 +1623,17 @@ public:
   JASEL_0_REQUIRES(
     is_move_constructible<value_type>::value
   )
-  BOOST_CONSTEXPR expected(value_type&& v  ) // NOLINT google-explicit-constructor
+  BOOST_CONSTEXPR success(value_type&& v  ) // NOLINT google-explicit-constructor
       BOOST_NOEXCEPT_IF(
             is_nothrow_move_constructible<value_type>::value
       )
   : value_(constexpr_move(v))
   {}
 
-  expected(const expected& rhs) = default;
-  expected(expected&& rhs)  = default;
-  expected& operator=(const expected& rhs) = default;
-  expected& operator=(expected&& rhs)  = default;
+  success(const success& rhs) = default;
+  success(success&& rhs)  = default;
+  success& operator=(const success& rhs) = default;
+  success& operator=(success&& rhs)  = default;
 
 #if ! defined JASEL_NO_CXX11_RVALUE_REFERENCE_FOR_THIS
 
@@ -1670,21 +1670,21 @@ private:
 };
 
 template <>
-class expected<void, void>
+class success<void>
 {
 public:
   typedef void value_type;
 
-  BOOST_CONSTEXPR expected()
+  BOOST_CONSTEXPR success()
   {}
 
-  BOOST_CONSTEXPR expected(in_place_t)
+  BOOST_CONSTEXPR success(in_place_t)
   {}
 
-  expected(const expected& rhs) = default;
-  expected(expected&& rhs)  = default;
-  expected& operator=(const expected& rhs) = default;
-  expected& operator=(expected&& rhs)  = default;
+  success(const success& rhs) = default;
+  success(success&& rhs)  = default;
+  success& operator=(const success& rhs) = default;
+  success& operator=(success&& rhs)  = default;
 
 };
 namespace expected_detail
@@ -1859,7 +1859,7 @@ public:
   JASEL_0_REQUIRES(
       is_copy_constructible<value_type>::value
   )
-  BOOST_CONSTEXPR expected(const expected<value_type>& v) // NOLINT google-explicit-constructor
+  BOOST_CONSTEXPR expected(const success<value_type>& v) // NOLINT google-explicit-constructor
       BOOST_NOEXCEPT_IF(
           is_nothrow_copy_constructible<value_type>::value
       )
@@ -1869,7 +1869,7 @@ public:
   JASEL_0_REQUIRES(
     is_move_constructible<value_type>::value
   )
-  BOOST_CONSTEXPR expected(expected<value_type>&& v  ) // NOLINT google-explicit-constructor
+  BOOST_CONSTEXPR expected(success<value_type>&& v  ) // NOLINT google-explicit-constructor
       BOOST_NOEXCEPT_IF(
             is_nothrow_move_constructible<value_type>::value
       )
@@ -2786,11 +2786,11 @@ public:
   : base_type()
   {}
 
-  BOOST_CONSTEXPR expected(expected<void,void> const&) BOOST_NOEXCEPT  // NOLINT google-explicit-constructor
+  BOOST_CONSTEXPR expected(success<void> const&) BOOST_NOEXCEPT  // NOLINT google-explicit-constructor
   : base_type()
   {}
 
-  BOOST_CONSTEXPR expected(expected<void,void> &&) BOOST_NOEXCEPT // NOLINT google-explicit-constructor
+  BOOST_CONSTEXPR expected(success<void> &&) BOOST_NOEXCEPT // NOLINT google-explicit-constructor
   : base_type()
   {}
 
@@ -3525,19 +3525,19 @@ void swap(expected<T,E>& x, expected<T,E>& y) BOOST_NOEXCEPT_IF(BOOST_NOEXCEPT_E
 // Factories
 
 template <typename T>
-BOOST_CONSTEXPR expected<typename decay<T>::type, void> make_expected(T&& v)
+BOOST_CONSTEXPR success<typename decay<T>::type> make_expected(T&& v)
 {
-  return expected<typename decay<T>::type, void>(constexpr_forward<T>(v));
+  return success<typename decay<T>::type>(constexpr_forward<T>(v));
 }
 template <typename T, class U>
-BOOST_CONSTEXPR expected<T, void> make_expected(U&& v)
+BOOST_CONSTEXPR success<T> make_expected(U&& v)
 {
-  return expected<T, void>(constexpr_forward<T>(v));
+  return success<T>(constexpr_forward<T>(v));
 }
 
-BOOST_FORCEINLINE expected<void, void> make_expected()
+BOOST_FORCEINLINE success<void> make_expected()
 {
-  return expected<void, void>(in_place);
+  return success<void>(in_place);
 }
 
 template <typename T>
