@@ -5,6 +5,7 @@
 // (See accompanying file // LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 //////////////////////////////////////////////////////////////////////////////
+// fixme: It isn't too much to provide these functions for Nullable as they are more adapted to ValueOrError
 
 #ifndef JASEL_FUNDAMENTAL_V3_NULLABLE_HAS_ERROR_HPP
 #define JASEL_FUNDAMENTAL_V3_NULLABLE_HAS_ERROR_HPP

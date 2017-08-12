@@ -79,7 +79,6 @@ inline namespace fundamental_v3
     template <class T>
     struct traits<T*> : traits_pointer_like {};
 
-
   struct none_t {
     explicit none_t() = default;
     template <class T>
@@ -195,11 +194,14 @@ inline namespace fundamental_v3
   using nullable::deref_none;
 
   // todo: define in function of whether
-  // EqualityComparable && DefaultConstructible && Destructible
+  // EqualityComparable && DefaultConstructible && Destructible & PossibleValued
   // nullable::none<T>()
-  // nullable::has_value(t)
-  // T{none_t}
-  // T{none<T>()}
+  // nullable::has_value(t) -> {bool}
+  // nullable::deref(t)
+  // T{}
+  // T{nullable::none_t}
+  // T{nullable::none<T>()}
+  // T{nullable::deref(t)}
 
   template <class T>
   struct is_nullable

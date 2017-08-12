@@ -6,6 +6,8 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
+// fixme: It isn't too much to provide these functions for Nullable as they are more adapted to ValueOrError
+
 #ifndef JASEL_FUNDAMENTAL_V3_NULLABLE_ERROR_OR_HPP
 #define JASEL_FUNDAMENTAL_V3_NULLABLE_ERROR_OR_HPP
 
@@ -23,9 +25,9 @@ inline  namespace fundamental_v3
 namespace nullable
 {
   /**
-   * nullable::value_or
+   * nullable::error_or
    * @par Returns
-   *  The contained value or the parameter
+   *  The error value or the parameter
    */
   template <class N, class E
   // constraint on E
