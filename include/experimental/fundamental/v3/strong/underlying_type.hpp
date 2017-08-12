@@ -45,7 +45,7 @@ inline  namespace fundamental_v3
     template <class U, class T>
     U underlying_cast(T const& v)
     {
-      return static_cast<U>(v.underlying());
+      return static_cast<U>(underlying(v));
     }
 }
 }
