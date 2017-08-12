@@ -19,6 +19,47 @@ namespace std
   {
     namespace mixin
     {
+      template <class Final, class Other>
+      struct addable_with
+      {
+        friend JASEL_MUTABLE_CONSTEXPR Final& operator+=(Final& x, Other const& y) noexcept
+        {
+          x._backdoor()._underlying() += y._backdoor()._underlying();
+          return x;
+        }
+        friend constexpr
+        Final operator+(Final const& x, Other const& y)  noexcept
+        {
+          return Final(x._backdoor()._underlying() + y._backdoor()._underlying());
+        }
+
+        friend constexpr
+        Final operator+(Other const& x, Final const& y)  noexcept
+        {
+          return y + x;
+        }
+
+      };
+
+      template <class Final, class Other>
+      struct substractable_with
+      {
+        friend JASEL_MUTABLE_CONSTEXPR Final& operator-=(Final& x, Other const& y) noexcept
+        {
+          x._backdoor()._underlying() -= y._backdoor()._underlying();
+          return x;
+        }
+
+        friend constexpr Final operator-(Final const& x, Other const& y)  noexcept
+        {
+          return Final(x._backdoor()._underlying() - y._backdoor()._underlying());
+        }
+
+        friend constexpr Other operator-(Final const& x, Final const& y)  noexcept
+        {
+          return Other(x._backdoor()._underlying() - y._backdoor()._underlying());
+        }
+      };
       // Single arg
       template <class Final>
       struct additive_base

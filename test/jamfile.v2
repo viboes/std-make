@@ -300,6 +300,7 @@ test-suite strong
       [ run strong/strong_counter_pass.cpp  ]
       [ run strong/strong_id_pass.cpp  ]
       [ run ../example/strong/duration_pass.cpp  ]
+      [ run ../example/strong/address_offset_pass.cpp  ]
     ;
 
 test-suite utility
