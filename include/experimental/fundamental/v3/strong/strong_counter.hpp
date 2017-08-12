@@ -6,7 +6,7 @@
 
 #ifndef JASEL_FUNDAMENTAL_V3_STRONG_STRONG_COUNTER_HPP
 #define JASEL_FUNDAMENTAL_V3_STRONG_STRONG_COUNTER_HPP
-//#include <iostream>
+
 /**
  * @file
  * strong_counter<Domain, Rep> is a generalization of std::chrono::duration<Rep, Period>
