@@ -5,7 +5,7 @@
 // (See accompanying file // LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 //////////////////////////////////////////////////////////////////////////////
-
+#error
 #ifndef JASEL_FUNDAMENTAL_V3_NULLABLE_ERROR_OR_HPP
 #define JASEL_FUNDAMENTAL_V3_NULLABLE_ERROR_OR_HPP
 
@@ -29,7 +29,7 @@ namespace monad_error
    */
 
   // It will be great to be able to return the error itself, but monad_error, doesn't allows to extract the error
-  // We need either to be Nullable or Errorable
+  // We need either to be Nullable or ValueOrError
 
   template <class M, class E
   // constraints on M and E
@@ -43,10 +43,10 @@ namespace monad_error
   error_or(M&& n, E&& e)
   {
     using ME = meta::uncvref_t<M>;
-    return bind(forward<M>(m), [e](auto) -> ME { return make_error<ME>(e)});
+    return (bind)(forward<M>(m), [e](auto) -> ME { return make_error<ME>(e)});
   }
 
-} // nullable
+} // monad_error
 }}
 }
 #endif // header
