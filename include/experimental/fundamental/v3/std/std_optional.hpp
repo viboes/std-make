@@ -10,6 +10,7 @@
 #include <optional.hpp>
 
 #include <experimental/make.hpp>
+#include <experimental/possibly_valued.hpp>
 #include <experimental/nullable.hpp>
 #include <experimental/sum_type.hpp>
 #include <experimental/meta.hpp>
@@ -57,6 +58,13 @@ namespace experimental
 
 inline namespace fundamental_v3
 {
+namespace possibly_valued
+{
+  template <class T>
+  struct traits<optional<T>> : traits_pointer_like {
+  };
+}
+
 namespace nullable
 {
   template <class T>
