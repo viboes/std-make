@@ -31,3 +31,6 @@ test/bin/*
 *.exe
 *.out
 *.app
+
+# Others
+.DS_Store
