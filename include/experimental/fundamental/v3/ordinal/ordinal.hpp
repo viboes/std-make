@@ -61,7 +61,7 @@ namespace ordinal {
     // arithmetic traits: usable by bounded with a step of 1
     // fixme: do we need to make SizeType width enough
     template <class T, T Low, T High, T Step = T{1}, class SizeType=size_t>
-    struct arithmetic_traits
+    struct arithmetic_traits : tag
     {
       static_assert(is_arithmetic<T>::value, "T must be arithmetic");
 
@@ -70,7 +70,7 @@ namespace ordinal {
 
       static constexpr size_type size_v = (size_type(High)-size_type(Low)+1u);
       using size = integral_constant<size_type, size_v>;
-      static constexpr value_type val(size_type p) { return value_type{p*Step+Low}; }
+      static constexpr value_type val(size_type p) { return static_cast<value_type>(p*Step+Low); }
 
       static constexpr size_type pos(value_type v)  { return static_cast<size_type>(v*Step-Low); }
     };
