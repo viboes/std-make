@@ -31,9 +31,7 @@
 #include <limits>
 
 #include <experimental/fundamental/v2/config.hpp>
-
-
-// todo: Extract bits algorithms in an explicit file
+#include <experimental/fundamental/v3/bits/bit_ops.hpp>
 
 // todo: Add explicit conversions from bit_mask of different sizes
 
@@ -66,74 +64,6 @@ inline namespace fundamental_v3
   struct fill_tag_t {}; //! tag used when passing a value to fill in the constructor
   struct mask_tag_t {}; //! tag used when passing a mask to set in the constructor
 
-  namespace bit_ops
-  {
-    //! @par Returns
-    //!   The bits in x rotated to the left s times
-    template <class T>
-    JASEL_MUTABLE_CONSTEXPR T rotl(T x, unsigned int s) noexcept
-    {
-      constexpr unsigned int N = std::numeric_limits<T>::digits;
-      constexpr unsigned int m = s % N;
-      return m==0
-           ? x
-           : (x << m) | (x >> (N - m))
-           ;
-    }
-
-    //! @par Returns
-    //!   The number of bits set to 1 in x
-    template <class T>
-    constexpr int popcount(T x) noexcept
-    {
-      return __builtin_popcount(x);
-    }
-
-    //! @par Requires:
-    //!   N <= sizeof(T) * CHAR_BIT
-    //! @par Returns
-    //!   A mask with all the bits set to 1 up to the bit N
-    template <size_t N, class T=unsigned>
-    constexpr T up_to() noexcept
-    {
-      return (N >= sizeof(T) * CHAR_BIT) ?
-          T(-1) : (T(1) << N) - 1;
-    }
-
-    //! @par Pre-condition:
-    //!   n <= sizeof(T) * CHAR_BIT
-    //! @par Returns
-    //!   A mask with all the bits set to 1 up to the bit n
-    template <class T=unsigned>
-    constexpr T up_to(size_t n) noexcept
-    {
-      return (n >= sizeof(T) * CHAR_BIT) ?
-          T(-1) : (T(1) << n) - 1;
-    }
-
-    //! @par Requires:
-    //!   S < sizeof(T) * CHAR_BIT
-    //! @par Returns
-    //!   A mask with the bit S set to 1
-    template <size_t S, class T=unsigned>
-    constexpr T single() noexcept
-    {
-      //constexpr unsigned int N = std::numeric_limits<T>::digits;
-      //constexpr unsigned int m = S % std::numeric_limits<T>::digits;
-      return T(1) << (S % std::numeric_limits<T>::digits);
-    }
-    //! @par Pre-condition:
-    //!   s < sizeof(T) * CHAR_BIT
-    //! @par Returns
-    //!   A mask with the bit s set to 1
-    template <class T>
-    constexpr T single(size_t s) noexcept
-    {
-      //constexpr unsigned int N = std::numeric_limits<T>::digits;
-      //const unsigned int m = s % std::numeric_limits<T>::digits;
-      return T(T(1) << (s % std::numeric_limits<T>::digits));
-    }
-  }
     /**
       @tparam N the number of significant bits on the storage
       @tparam T the storage type
