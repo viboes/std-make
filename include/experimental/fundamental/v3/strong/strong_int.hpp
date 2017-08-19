@@ -15,8 +15,8 @@
 #include <experimental/fundamental/v3/strong/mixins/integer_multiplicative.hpp>
 #include <experimental/fundamental/v3/strong/mixins/hashable.hpp>
 #include <experimental/fundamental/v3/strong/mixins/streamable.hpp>
+#include <experimental/fundamental/v3/strong/mixins/ordinal.hpp>
 #include <experimental/type_traits.hpp>
-#include <experimental/ordinal.hpp>
 #include <experimental/fundamental/v2/config.hpp>
 
 #include <cstdint>
@@ -68,6 +68,7 @@ inline namespace fundamental_v3
     , mixin::integer_multiplicative_with_if<strong_int<Tag, UT>>
     , mixin::hashable<strong_int<Tag, UT>>
     , mixin::streamable<strong_int<Tag, UT>>
+    , mixin::ordinal<strong_int<Tag, UT>>
   {
       static_assert(is_integral<UT>::value, "UT must be integral");
 
@@ -145,11 +146,6 @@ inline namespace fundamental_v3
   using integer64_t = strong_int<default_tag, int64_t>;
   using uinteger64_t = strong_int<default_tag, uint64_t>;
 
-  namespace ordinal {
-    /// A strong_int is an ordinal type if the underlying type is an ordinal type
-    template <class Tag, class T>
-    struct traits<strong_int<Tag, T>> : wrapped_ordinal_traits<strong_int<Tag, T>>    { };
-  }
 }
 }
 

@@ -115,20 +115,7 @@ inline  namespace fundamental_v3
       operator UT () const = delete;
     };
 
-    // todo: traits are specialized type by type, but we want to specialize all the types that model another concept , e.g. wrapped.
-    // todo: try to use when<is_wrapped<T>>
-    template <class W
-    , class = enable_if_t<is_ordinal<typename W::underlying_t>{}>
-    >
-    struct wrapped_ordinal_traits
-    {
-      using T =  typename W::underlying_t;
-      using size_type = size_t;
-      using size = integral_constant<size_type, ordinal::traits<T>::max()-numeric_limits<T>::min()+1>;
-      static W val(size_type p) { return W{T{p}}; }
 
-      static size_type pos(W w)  { return size_type{underlying(w)}; }
-    };
 }
 }
 }

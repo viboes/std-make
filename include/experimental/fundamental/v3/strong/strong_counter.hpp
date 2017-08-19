@@ -25,8 +25,8 @@
 #include <experimental/fundamental/v3/strong/mixins/integer_multiplicative.hpp>
 #include <experimental/fundamental/v3/strong/mixins/hashable.hpp>
 #include <experimental/fundamental/v3/strong/mixins/streamable.hpp>
+#include <experimental/fundamental/v3/strong/mixins/ordinal.hpp>
 #include <experimental/meta/v1/rebind.hpp>
-#include <experimental/ordinal.hpp>
 #include <experimental/type_traits.hpp>
 
 #include <iosfwd>
@@ -253,6 +253,7 @@ inline namespace fundamental_v3
     , mixin::modable<strong_counter<Domain, UT>>
     , mixin::hashable<strong_counter<Domain, UT>>
     , mixin::streamable<strong_counter<Domain, UT>>
+    , mixin::ordinal<strong_counter<Domain, UT>>
   {
       using domain = Domain;
       using rep = UT;
@@ -493,11 +494,6 @@ inline namespace fundamental_v3
 //    return os << x.underlying();
 //  }
 
-  namespace ordinal {
-    /// A strong_counter is an ordinal type if the underlying type is an ordinal type
-    template <class Tag, class T>
-    struct traits<strong_counter<Tag, T>> : wrapped_ordinal_traits<strong_counter<Tag, T>>    { };
-  }
 }
 }
 

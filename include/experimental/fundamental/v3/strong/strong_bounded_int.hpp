@@ -15,7 +15,7 @@
 #include <experimental/fundamental/v3/strong/mixins/integer_multiplicative.hpp>
 #include <experimental/fundamental/v3/strong/mixins/hashable.hpp>
 #include <experimental/fundamental/v3/strong/mixins/streamable.hpp>
-#include <experimental/ordinal.hpp>
+#include <experimental/fundamental/v3/strong/mixins/ordinal.hpp>
 
 #include <stdexcept>
 #include <limits>
@@ -110,7 +110,7 @@ inline namespace fundamental_v3
   namespace ordinal {
     /// A strong_bounded_int is an ordinal type having the bounds Low..High
     template <class Tag, class T, T Low, T High >
-    struct traits<strong_bounded_int<Tag, T, Low, High>>
+    struct traits<strong_bounded_int<Tag, T, Low, High>> : tag
     {
       using size_type = size_t;
       using size = integral_constant<size_type, High-Low+1>;

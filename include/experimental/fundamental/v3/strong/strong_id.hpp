@@ -12,7 +12,8 @@
 #include <experimental/fundamental/v3/strong/mixins/comparable.hpp>
 #include <experimental/fundamental/v3/strong/mixins/hashable.hpp>
 #include <experimental/fundamental/v3/strong/mixins/streamable.hpp>
-#include <experimental/ordinal.hpp>
+#include <experimental/fundamental/v3/strong/mixins/ordinal.hpp>
+#include <experimental/meta.hpp>
 #include <experimental/fundamental/v2/config.hpp>
 
 #include <type_traits>
@@ -41,22 +42,40 @@ inline namespace fundamental_v3
 
   </code>
   */
+#if 0
   template <class Tag, class UT = int>
   struct strong_id final
     : strong_type<strong_id<Tag, UT>, UT>
     , mixin::comparable<strong_id<Tag, UT>>
     , mixin::hashable<strong_id<Tag, UT>>
     , mixin::streamable<strong_id<Tag, UT>>
+    , mixin::ordinal<strong_id<Tag, UT>>
   {
-      //static_assert(is_integral<UT>, "The underlying of a strong_id must be an integral type");
-
       using base_type = strong_type<strong_id<Tag, UT>, UT>;
       using tag_type = Tag;
       using underlying_t = UT;
 
       using base_type::base_type;
   };
-
+#else
+    template <class Tag, class UT = int>
+    struct strong_id
+      : new_class<strong_id<Tag, UT>, UT
+      , meta_mixin::comparable
+      , meta_mixin::hashable
+      , meta_mixin::streamable
+      , meta_mixin::ordinal
+      >
+    {
+        using base_type = new_class<strong_id<Tag, UT>, UT
+            , meta_mixin::comparable
+            , meta_mixin::hashable
+            , meta_mixin::streamable
+            , meta_mixin::ordinal
+            >;
+        using base_type::base_type;
+    };
+#endif
   static_assert(std::is_pod<strong_id<int>>::value, "");
   static_assert(std::is_trivially_default_constructible<strong_id<int>>::value, "");
   static_assert(std::is_trivially_copyable<strong_id<int>>::value, "");
@@ -67,18 +86,14 @@ inline namespace fundamental_v3
   template <class Tag, class UT>
   struct underlying_type<strong_id<Tag, UT>> { using type = UT; };
 
-  // An Id is an Ordinal type if its underlying type is an Ordinal type.
-  namespace ordinal {
-    template <class Tag, class T>
-    struct traits<strong_id<Tag, T>> : wrapped_ordinal_traits<strong_id<Tag, T>>    { };
-  }
 }
 }
 
   /// Hash specialization forwarding to the hash of underlying type
   template <class Tag, class UT>
-  struct hash<experimental::strong_id<Tag, UT>>
-    : experimental::wrapped_hash<experimental::strong_id<Tag, UT>> {};
+  struct hash<experimental::strong_id<Tag, UT>
+        //, experimental::meta::when<is_hashable<UT>::value>
+      > : experimental::wrapped_hash<experimental::strong_id<Tag, UT>> {};
 
 }
 

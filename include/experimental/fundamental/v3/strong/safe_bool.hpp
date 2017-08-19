@@ -13,7 +13,7 @@
 #include <experimental/fundamental/v3/strong/mixins/comparable.hpp>
 #include <experimental/fundamental/v3/strong/mixins/hashable.hpp>
 #include <experimental/fundamental/v3/strong/mixins/streamable.hpp>
-#include <experimental/ordinal.hpp>
+#include <experimental/fundamental/v3/strong/mixins/ordinal.hpp>
 
 #include <type_traits>
 #include <functional>
@@ -128,6 +128,7 @@ inline namespace fundamental_v3
   , mixin::explicit_convertible_to<safe_bool<bool>, bool>
   , mixin::hashable<safe_bool<bool>>
   , mixin::streamable<safe_bool<bool>>
+  , mixin::ordinal<safe_bool<bool>>
   {
       using base_type = strong_type<safe_bool<bool>, bool>;
       using base_type::base_type;
@@ -169,18 +170,6 @@ inline namespace fundamental_v3
   //! underlying_type specialization for strong_bool
   template <class Bool>
   struct underlying_type<safe_bool<Bool>> { using type = Bool; };
-
-  namespace ordinal {
-    template <class T>
-    struct traits<safe_bool<T>>
-    {
-      using size_type = size_t;
-      using size = integral_constant<size_type, 2>;
-      static safe_bool<T> val(size_type p) { return safe_bool<T>{static_cast<T>(p)}; }
-
-      static size_type pos(safe_bool<T> u)  { return size_type{u.underlying()}; }
-    };
-  }
 
   //! alias of safe_bool using the builtin bool
   using boolean = safe_bool<bool>;

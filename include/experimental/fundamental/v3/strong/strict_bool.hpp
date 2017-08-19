@@ -13,7 +13,7 @@
 #include <experimental/fundamental/v3/strong/mixins/logical.hpp>
 #include <experimental/fundamental/v3/strong/mixins/hashable.hpp>
 #include <experimental/fundamental/v3/strong/mixins/streamable.hpp>
-#include <experimental/ordinal.hpp>
+#include <experimental/fundamental/v3/strong/mixins/ordinal.hpp>
 
 #include <type_traits>
 #include <functional>
@@ -53,6 +53,7 @@ inline namespace fundamental_v3
   , mixin::logical<strict_bool<Tag, Bool>>
   , mixin::hashable<strict_bool<Tag, Bool>>
   , mixin::streamable<strict_bool<Tag, Bool>>
+  , mixin::ordinal<strict_bool<Tag, Bool>>
   {
       using base_type = strong_type<strict_bool<Tag, Bool>, Bool>;
       using base_type::base_type;
@@ -91,6 +92,7 @@ inline namespace fundamental_v3
     , mixin::logical<strict_bool<Tag, bool>>
     , mixin::hashable<strict_bool<Tag, bool>>
     , mixin::streamable<strict_bool<Tag, bool>>
+    , mixin::ordinal<strict_bool<Tag, bool>>
   {
       using base_type = strong_type<strict_bool<Tag, bool>, bool>;
       using base_type::base_type;
@@ -118,18 +120,6 @@ inline namespace fundamental_v3
   //! underlying_type specialization for strict_bool
   template <class Tag, class Bool>
   struct underlying_type<strict_bool<Tag, Bool>> { using type = Bool; };
-
-  namespace ordinal {
-    template <class Tag, class T>
-    struct traits<strict_bool<Tag, T>>
-    {
-      using size_type = size_t;
-      using size = integral_constant<size_type, 2>;
-      static strict_bool<Tag, T> val(size_type p) { return strict_bool<Tag, T>{static_cast<T>(p)}; }
-
-      static size_type pos(strict_bool<Tag, T> u)  { return size_type{u.underlying()}; }
-    };
-  }
 
 }
 }
