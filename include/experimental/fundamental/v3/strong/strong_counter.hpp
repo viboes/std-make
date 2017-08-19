@@ -23,6 +23,7 @@
 #include <experimental/fundamental/v3/strong/mixins/additive.hpp>
 #include <experimental/fundamental/v3/strong/mixins/comparable.hpp>
 #include <experimental/fundamental/v3/strong/mixins/integer_multiplicative.hpp>
+#include <experimental/fundamental/v3/strong/mixins/hashable.hpp>
 #include <experimental/fundamental/v3/strong/mixins/streamable.hpp>
 #include <experimental/meta/v1/rebind.hpp>
 #include <experimental/ordinal.hpp>
@@ -250,6 +251,7 @@ inline namespace fundamental_v3
     , mixin::comparable<strong_counter<Domain, UT>>
     , mixin::integer_multiplicative_with<strong_counter<Domain, UT>, UT>
     , mixin::modable<strong_counter<Domain, UT>>
+    , mixin::hashable<strong_counter<Domain, UT>>
     , mixin::streamable<strong_counter<Domain, UT>>
   {
       using domain = Domain;

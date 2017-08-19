@@ -20,6 +20,7 @@
 #include <experimental/fundamental/v3/strong/strong_type.hpp>
 #include <experimental/fundamental/v3/strong/mixins/incrementable.hpp>
 #include <experimental/fundamental/v3/strong/mixins/comparable.hpp>
+#include <experimental/fundamental/v3/strong/mixins/hashable.hpp>
 #include <experimental/fundamental/v3/strong/mixins/streamable.hpp>
 #include <experimental/type_traits.hpp>
 
@@ -45,6 +46,7 @@ inline namespace fundamental_v3
     : strong_type<strong_random_incrementable<Tag, UT, DiffType>, UT>
     , mixin::comparable<strong_random_incrementable<Tag, UT, DiffType>>
     , mixin::random_incrementable<strong_random_incrementable<Tag, UT, DiffType>, DiffType>
+    , mixin::hashable<strong_random_incrementable<Tag, UT, DiffType>>
     , mixin::streamable<strong_random_incrementable<Tag, UT, DiffType>>
   {
       // associated types

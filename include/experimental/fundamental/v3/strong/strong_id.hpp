@@ -10,6 +10,7 @@
 #include <experimental/fundamental/v3/strong/strong_type.hpp>
 #include <experimental/fundamental/v3/strong/underlying_type.hpp>
 #include <experimental/fundamental/v3/strong/mixins/comparable.hpp>
+#include <experimental/fundamental/v3/strong/mixins/hashable.hpp>
 #include <experimental/fundamental/v3/strong/mixins/streamable.hpp>
 #include <experimental/ordinal.hpp>
 #include <experimental/fundamental/v2/config.hpp>
@@ -44,6 +45,7 @@ inline namespace fundamental_v3
   struct strong_id final
     : strong_type<strong_id<Tag, UT>, UT>
     , mixin::comparable<strong_id<Tag, UT>>
+    , mixin::hashable<strong_id<Tag, UT>>
     , mixin::streamable<strong_id<Tag, UT>>
   {
       //static_assert(is_integral<UT>, "The underlying of a strong_id must be an integral type");

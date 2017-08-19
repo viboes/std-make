@@ -10,7 +10,6 @@
 #include <experimental/fundamental/v3/strong/underlying_type.hpp>
 #include <experimental/ordinal.hpp>
 #include <experimental/fundamental/v2/config.hpp>
-#include <functional>
 #include <experimental/type_traits.hpp>
 
 namespace std
@@ -116,20 +115,8 @@ inline  namespace fundamental_v3
       operator UT () const = delete;
     };
 
-    template <class W>
-    struct wrapped_hash  {
-      using argument_type = W;
-      using UT = underlying_type_t<W> ;
-      using result_type = std::size_t;
-      result_type operator()(argument_type const& s) const
-      {
-          return std::hash<UT>{}(s.underlying());
-      }
-    };
-
     // todo: traits are specialized type by type, but we want to specialize all the types that model another concept , e.g. wrapped.
     // todo: try to use when<is_wrapped<T>>
-
     template <class W
     , class = enable_if_t<is_ordinal<typename W::underlying_t>{}>
     >
@@ -140,7 +127,7 @@ inline  namespace fundamental_v3
       using size = integral_constant<size_type, ordinal::traits<T>::max()-numeric_limits<T>::min()+1>;
       static W val(size_type p) { return W{T{p}}; }
 
-      static size_type pos(W w)  { return size_type{w.underlying()}; }
+      static size_type pos(W w)  { return size_type{underlying(w)}; }
     };
 }
 }

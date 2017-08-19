@@ -10,6 +10,7 @@
 #include <experimental/fundamental/v3/strong/strong_type.hpp>
 #include <experimental/fundamental/v3/strong/underlying_type.hpp>
 #include <experimental/fundamental/v3/strong/mixins/comparable.hpp>
+#include <experimental/fundamental/v3/strong/mixins/hashable.hpp>
 #include <experimental/fundamental/v3/strong/mixins/streamable.hpp>
 #include <experimental/optional.hpp>
 #include <experimental/type_traits.hpp>
@@ -83,6 +84,7 @@ inline namespace fundamental_v3
   struct enum_wrapper
       : strong_type<Final, UT>
       , mixin::comparable<Final>
+      , mixin::hashable<Final>
       , mixin::streamable<Final>
   {
       using base_type = strong_type<Final, UT>;

@@ -11,6 +11,7 @@
 #include <experimental/fundamental/v3/strong/underlying_type.hpp>
 #include <experimental/fundamental/v3/strong/mixins/comparable.hpp>
 #include <experimental/fundamental/v3/strong/mixins/logical.hpp>
+#include <experimental/fundamental/v3/strong/mixins/hashable.hpp>
 #include <experimental/fundamental/v3/strong/mixins/streamable.hpp>
 #include <experimental/ordinal.hpp>
 
@@ -50,6 +51,7 @@ inline namespace fundamental_v3
   , mixin::comparable<strict_bool<Tag, Bool>>
   , mixin::explicit_convertible_to<strong_bool<Tag, Bool>, bool>
   , mixin::logical<strict_bool<Tag, Bool>>
+  , mixin::hashable<strict_bool<Tag, Bool>>
   , mixin::streamable<strict_bool<Tag, Bool>>
   {
       using base_type = strong_type<strict_bool<Tag, Bool>, Bool>;
@@ -87,6 +89,7 @@ inline namespace fundamental_v3
     , mixin::comparable<strict_bool<Tag, bool>>
     , mixin::explicit_convertible_to<strong_bool<Tag, bool>, bool>
     , mixin::logical<strict_bool<Tag, bool>>
+    , mixin::hashable<strict_bool<Tag, bool>>
     , mixin::streamable<strict_bool<Tag, bool>>
   {
       using base_type = strong_type<strict_bool<Tag, bool>, bool>;

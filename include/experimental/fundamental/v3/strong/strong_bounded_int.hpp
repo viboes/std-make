@@ -13,6 +13,7 @@
 #include <experimental/fundamental/v3/strong/mixins/bitwise.hpp>
 #include <experimental/fundamental/v3/strong/mixins/comparable.hpp>
 #include <experimental/fundamental/v3/strong/mixins/integer_multiplicative.hpp>
+#include <experimental/fundamental/v3/strong/mixins/hashable.hpp>
 #include <experimental/fundamental/v3/strong/mixins/streamable.hpp>
 #include <experimental/ordinal.hpp>
 
@@ -70,6 +71,7 @@ inline namespace fundamental_v3
     , mixin::bitwise_with_if<strong_bounded_int<Tag, UT, Low, High>, mixin::check>
     , mixin::comparable_with_if<strong_bounded_int<Tag, UT, Low, High>>
     , mixin::integer_multiplicative_with_if<strong_bounded_int<Tag, UT, Low, High>, mixin::check>
+    , mixin::hashable<strong_bounded_int<Tag, UT, Low, High>>
     , mixin::streamable<strong_bounded_int<Tag, UT, Low, High>>
   {
       static_assert(is_integral<UT>::value, "UT must be integral");
