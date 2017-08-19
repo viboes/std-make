@@ -53,6 +53,15 @@ inline namespace fundamental_v3
         }
     };
   }
+  namespace meta_mixin
+  {
+    struct streamable
+    {
+      template <class Final>
+      using type = mixin::streamable<Final>;
+    };
+  }
+
 }
 }
 }

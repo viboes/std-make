@@ -83,6 +83,14 @@ namespace std
         //!@}
       };
     }
+    namespace meta_mixin
+    {
+      struct comparable
+      {
+        template <class Final>
+        using type = mixin::comparable<Final>;
+      };
+    }
   }
 }
 }
