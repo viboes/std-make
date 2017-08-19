@@ -9,6 +9,7 @@
 
 #include <experimental/fundamental/v2/config.hpp>
 #include <experimental/fundamental/v3/strong/underlying_type.hpp>
+#include <experimental/fundamental/v3/strong/strong_type.hpp>
 
 #include <functional>
 
@@ -20,16 +21,29 @@ namespace std
   {
     namespace mixin
     {
+      // Credits to Jonathan Boccara from where this trick has been adopted
+      // https://www.fluentcpp.com/2017/05/30/implementing-a-hash-function-for-strong-types/
+
       template <class Final>
       struct hashable
       {
         static constexpr bool is_hashable = true;
       };
     }
+    namespace meta_mixin
+    {
+      struct hashable
+      {
+        template <class Final>
+        using type = mixin::hashable<Final>;
+      };
+    }
 
     // todo: traits are specialized type by type, but we want to specialize all the types that model another concept , e.g. wrapped.
     // todo: try to use when<is_wrapped<T>>
-    template <class W>
+    template <class W
+    //, class = enable_if_t<is_hashable<typename W::underlying_t>{}>
+    >
     struct wrapped_hash  {
       using argument_type = W;
       using UT = underlying_type_t<W> ;
@@ -42,20 +56,25 @@ namespace std
   }
 }
 
-#if 0
   // We can not specialize hash for a type that satisfy a condition as it has T::is_hashable and it is true
   // We need to specialize it for specific types
-  template <>
-  struct hash<XXX>
-  // requires XXX::is_hashable
-  :
-    experimental::wrapped_hash<T>
-  {
-  };
 
   // The solution is to move either to a hash specialization that has an Enabler void_t or to move to wait until hash_value overload is standard.
-  // Until then we cannot do define a hashable mixin to hash strong types.
-#endif
+  // Until then we cannot define a hashable mixin to hash all the strong types with a hashable mixin.
+  // However for type aliases of new_type we can always define it as we don't define a new class but an alias.
+
+  template <
+    typename Tag,
+    typename UT,
+    typename ...MetaMixins
+  >
+  struct hash<experimental::new_type<Tag, UT, MetaMixins...>>
+  :
+    experimental::wrapped_hash<experimental::new_type<Tag, UT, MetaMixins...>>
+  {
+    using enabler = enable_if_t<experimental::new_type<Tag, UT, MetaMixins...>::is_hashable, void>;
+  };
+
 }
 
 #endif // header
