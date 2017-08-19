@@ -7,7 +7,6 @@
 #ifndef JASEL_FUNDAMENTAL_V3_STRONG_STRONG_TYPE_HPP
 #define JASEL_FUNDAMENTAL_V3_STRONG_STRONG_TYPE_HPP
 
-#include <experimental/fundamental/v3/strong/underlying_type.hpp>
 #include <experimental/fundamental/v3/strong/tagged.hpp>
 #include <experimental/fundamental/v2/config.hpp>
 

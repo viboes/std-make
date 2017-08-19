@@ -98,9 +98,6 @@ inline namespace fundamental_v3
       constexpr explicit strong_bounded_int(UT v) : base_type(cast(v)) {}
   };
 
-  template <class Tag, class UT, UT Low, UT High>
-  struct underlying_type<strong_bounded_int<Tag,UT,Low,High>> { using type = UT; };
-
   static_assert(std::is_pod<strong_bounded_int<bool,int,0,3>>::value, "");
   static_assert(std::is_trivially_default_constructible<strong_bounded_int<bool,int,0,3>>::value, "");
   static_assert(std::is_trivially_copyable<strong_bounded_int<bool,int,0,3>>::value, "");

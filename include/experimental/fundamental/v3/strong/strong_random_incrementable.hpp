@@ -59,10 +59,8 @@ inline namespace fundamental_v3
       using base_type::base_type;
   };
 
-
 }
 }
-
 
   /// Hash specialization forwarding to the hash of underlying type
   template <class Tag, class UT, class DT>

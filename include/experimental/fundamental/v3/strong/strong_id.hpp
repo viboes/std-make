@@ -82,10 +82,6 @@ inline namespace fundamental_v3
   static_assert(std::is_standard_layout<strong_id<int>>::value, "");
   static_assert(std::is_trivial<strong_id<int>>::value, "");
 
-  //! underlying_type specialization for strong_id
-  template <class Tag, class UT>
-  struct underlying_type<strong_id<Tag, UT>> { using type = UT; };
-
 }
 }
 

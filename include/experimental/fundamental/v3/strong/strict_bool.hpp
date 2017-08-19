@@ -117,10 +117,6 @@ inline namespace fundamental_v3
   static_assert(std::is_standard_layout<strict_bool<bool>>::value, "");
   static_assert(std::is_trivial<strict_bool<bool>>::value, "");
 
-  //! underlying_type specialization for strict_bool
-  template <class Tag, class Bool>
-  struct underlying_type<strict_bool<Tag, Bool>> { using type = Bool; };
-
 }
 }
 

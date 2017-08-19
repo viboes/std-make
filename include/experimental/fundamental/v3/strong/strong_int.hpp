@@ -125,10 +125,6 @@ inline namespace fundamental_v3
 
   // fixme do we need swap?
 
-  //! underlying_type specialization for strong_int
-  template <class Tag, class UT>
-  struct underlying_type<strong_int<Tag,UT>> { using type = UT; };
-
   static_assert(std::is_pod<strong_int<bool,int>>::value, "");
   static_assert(std::is_trivially_default_constructible<strong_int<bool,int>>::value, "");
   static_assert(std::is_trivially_copyable<strong_int<bool,int>>::value, "");

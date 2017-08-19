@@ -7,7 +7,6 @@
 #ifndef JASEL_FUNDAMENTAL_V3_STRONG_TAGGED_HPP
 #define JASEL_FUNDAMENTAL_V3_STRONG_TAGGED_HPP
 
-#include <experimental/fundamental/v3/strong/underlying_type.hpp>
 #include <experimental/fundamental/v3/strong/wrapper.hpp>
 
 namespace std

@@ -18,12 +18,12 @@ namespace experimental
 {
 inline  namespace fundamental_v3
 {
-
+    struct wrapper_base {};
     //! wrapper wraps an underlying type providing access to the underlying value via the underlying function
     //!
     //! @tparam UT the underlying type
     template <class UT>
-    struct wrapper
+    struct wrapper : wrapper_base
     {
       //! the underlying type reflected type
       using underlying_t = UT;
@@ -63,9 +63,13 @@ inline  namespace fundamental_v3
 #endif
 
     //! underlying_type specialization for wrapper
-    template <class UT>
-    struct underlying_type<wrapper<UT>>
-    { typedef UT type; };
+//    template <class UT>
+//    struct underlying_type<wrapper<UT>>
+//    { typedef UT type; };
+
+    template <typename T>
+    struct underlying_type<T, meta::when<is_base_of<wrapper_base, T>::value>>
+    { using type = typename T::underlying_t; };
 
     //! public_wrapper is a wrapper that provides implicit conversion to the underlying type
     //!

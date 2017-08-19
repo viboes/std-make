@@ -447,12 +447,6 @@ inline namespace fundamental_v3
     return strong_counter<Domain, UT>(x);
   }
 
-  //! underlying_type specialization for strong_counter
-  //! Exposes the type named type, which is the underlying representation of two strong_counter
-  template <class Domain, class UT>
-  struct underlying_type<strong_counter<Domain,UT>>
-  { using type = UT; };
-
 #if 1
   static_assert(is_pod<strong_counter<bool,int>>::value, "");
   static_assert(is_trivially_default_constructible<strong_counter<bool,int>>::value, "");

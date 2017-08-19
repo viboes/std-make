@@ -118,9 +118,6 @@ inline namespace fundamental_v3
 
   };
 
-  template <class E, class UT>
-  struct underlying_type<strong_enum<E,UT>> { typedef UT type; };
-
   // safe_enum is a strong_enum that checks the validity of the values of the enum using is_valid_enum
   template <class E, class UT=underlying_type_t<E>>
   struct safe_enum final: enum_wrapper<safe_enum<E, UT>, E, UT>
@@ -137,8 +134,8 @@ inline namespace fundamental_v3
 
   };
 
-  template <class E, class UT>
-  struct underlying_type<safe_enum<E,UT>> { typedef UT type; };
+//  template <class E, class UT>
+//  struct underlying_type<safe_enum<E,UT>> { typedef UT type; };
 
   // ordinal_enum is a strong enum that checks the validity of the values of the enum using is_enumerator
   // is_enumerator is specialized for ordinal enums
@@ -159,8 +156,8 @@ inline namespace fundamental_v3
 
   };
 
-  template <class E, class UT>
-  struct underlying_type<ordinal_enum<E,UT>> { typedef UT type; };
+//  template <class E, class UT>
+//  struct underlying_type<ordinal_enum<E,UT>> { typedef UT type; };
 
 }
 }
