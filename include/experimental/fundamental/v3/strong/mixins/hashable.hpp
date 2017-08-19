@@ -42,7 +42,7 @@ namespace std
     // todo: traits are specialized type by type, but we want to specialize all the types that model another concept , e.g. wrapped.
     // todo: try to use when<is_wrapped<T>>
     template <class W
-    //, class = enable_if_t<is_hashable<typename W::underlying_t>{}>
+    //, class = enable_if_t<is_hashable<underlying_type_t<W>{}>
     >
     struct wrapped_hash  {
       using argument_type = W;

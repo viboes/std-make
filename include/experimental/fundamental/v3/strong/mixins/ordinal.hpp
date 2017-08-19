@@ -33,20 +33,19 @@ namespace std
       };
     }
 
-    // todo: traits are specialized type by type, but we want to specialize all the types that model another concept , e.g. wrapped.
-    // todo: try to use when<is_wrapped<T>>
     template <class W
-    , class = enable_if_t<is_ordinal<typename W::underlying_t>{}>
+    , class = enable_if_t<is_ordinal<typename W::underlying_type>{}>
     >
     struct wrapped_ordinal_traits : ordinal::tag
     {
-      using T =  typename W::underlying_t;
+      using T =  typename W::underlying_type;
       using size_type = typename ordinal::traits<T>::size_type;
       using size = typename ordinal::traits<T>::size;
       static W val(size_type p) { return W{ordinal::val<T>(p)}; }
 
       static size_type pos(W w)  { return ordinal::pos(underlying(w)); }
     };
+
     // An strong_id is an Ordinal type if its underlying type is an Ordinal type.
     namespace ordinal
     {

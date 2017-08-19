@@ -26,23 +26,23 @@ inline  namespace fundamental_v3
     struct wrapper : wrapper_base
     {
       //! the underlying type reflected type
-      using underlying_t = UT;
+      using underlying_type = UT;
 
       constexpr wrapper() noexcept = default;
 
       //! explicit conversion from the underlying type
       //! @par Effects Constructs a wrapper from its underlying type
-      explicit constexpr wrapper(underlying_t v): value(v) {}
+      explicit constexpr wrapper(underlying_type v): value(v) {}
 
       //! underlying value access
       //! @par Returns the underlying value
-      constexpr underlying_t underlying() const noexcept
+      constexpr underlying_type underlying() const noexcept
       { return value; }
 
 
     protected:
       //! the wrapped value
-      underlying_t value;
+      underlying_type value;
     };
 
 #if 0
@@ -69,7 +69,7 @@ inline  namespace fundamental_v3
 
     template <typename T>
     struct underlying_type<T, meta::when<is_base_of<wrapper_base, T>::value>>
-    { using type = typename T::underlying_t; };
+    { using type = typename T::underlying_type; };
 
     //! public_wrapper is a wrapper that provides implicit conversion to the underlying type
     //!
@@ -79,7 +79,7 @@ inline  namespace fundamental_v3
     : wrapper<UT>
     {
       using base_type = wrapper<UT>;
-      using typename base_type::underlying_t;
+      using typename base_type::underlying_type;
       using base_type::base_type;
       using base_type::underlying;
 
@@ -96,7 +96,7 @@ inline  namespace fundamental_v3
     : wrapper<UT>
     {
       using base_type = wrapper<UT>;
-      using typename base_type::underlying_t;
+      using typename base_type::underlying_type;
       using base_type::base_type;
       using base_type::underlying;
 

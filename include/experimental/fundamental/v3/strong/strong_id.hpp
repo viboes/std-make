@@ -42,31 +42,43 @@ inline namespace fundamental_v3
 
   </code>
   */
-#if 0
-  template <class Tag, class UT = int>
-  struct strong_id final
-    : strong_type<strong_id<Tag, UT>, UT>
-    , mixin::comparable<strong_id<Tag, UT>>
-    , mixin::hashable<strong_id<Tag, UT>>
-    , mixin::streamable<strong_id<Tag, UT>>
-    , mixin::ordinal<strong_id<Tag, UT>>
-  {
-      using base_type = strong_type<strong_id<Tag, UT>, UT>;
-      using tag_type = Tag;
-      using underlying_t = UT;
+#if 1
+//  template <class Tag, class UT = int>
+//  struct strong_id final
+//    : strong_type<strong_id<Tag, UT>, UT>
+//    , mixin::comparable<strong_id<Tag, UT>>
+//    , mixin::hashable<strong_id<Tag, UT>>
+//    , mixin::streamable<strong_id<Tag, UT>>
+//    , mixin::ordinal<strong_id<Tag, UT>>
+//  {
+//      using base_type = strong_type<strong_id<Tag, UT>, UT>;
+//      using base_type::base_type;
+//  };
 
-      using base_type::base_type;
-  };
+    template <class Tag, class UT = int>
+    struct strong_id final
+      : strong_type<strong_id<Tag, UT>, UT>, mixins<strong_id<Tag, UT>
+        , meta_mixin::comparable
+        , meta_mixin::hashable
+        , meta_mixin::streamable
+        , meta_mixin::ordinal
+      >
+    {
+        using base_type = strong_type<strong_id<Tag, UT>, UT>;
+        using base_type::base_type;
+    };
+
 #else
     template <class Tag, class UT = int>
     struct strong_id
       : new_class<strong_id<Tag, UT>, UT
-      , meta_mixin::comparable
-      , meta_mixin::hashable
-      , meta_mixin::streamable
-      , meta_mixin::ordinal
-      >
+        , meta_mixin::comparable
+        , meta_mixin::hashable
+        , meta_mixin::streamable
+        , meta_mixin::ordinal
+        >
     {
+        // this has the drawback to repeat all the mixins :(
         using base_type = new_class<strong_id<Tag, UT>, UT
             , meta_mixin::comparable
             , meta_mixin::hashable

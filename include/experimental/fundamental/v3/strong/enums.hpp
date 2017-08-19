@@ -124,13 +124,13 @@ inline namespace fundamental_v3
   {
       using base_type = enum_wrapper<safe_enum<E, UT>, E, UT>;
       using base_type::base_type;
-      using underlying_t = typename base_type::underlying_t;
+      using underlying_type = typename base_type::underlying_type;
 
       // safe_enum is not safe if the default value 0 is not one of the enumerators
       // the question is, should the class invariant be valid for uninitialized instances.
       // This has relation of applicability of invariant of moved objects.
       constexpr safe_enum() noexcept = default;
-      explicit safe_enum(underlying_t v): base_type(UT(to_valid_enum<E>(v))) {}
+      explicit safe_enum(underlying_type v): base_type(UT(to_valid_enum<E>(v))) {}
 
   };
 
@@ -144,13 +144,13 @@ inline namespace fundamental_v3
   {
       using base_type = enum_wrapper<ordinal_enum<E, UT>, E, UT>;
       using base_type::base_type;
-      using underlying_t = typename  base_type::underlying_t;
+      using underlying_type = typename  base_type::underlying_type;
 
       // ordinal_enum is not ordinal if the default value 0 is not one of the enumerators
       // the question is, should the class invariant be valid for uninitialized instances.
       // This has relation of applicability of invariant of moved objects.
       constexpr ordinal_enum() noexcept = default;
-      explicit ordinal_enum(underlying_t v): base_type(UT(to_enumerator<E>(v))) {}
+      explicit ordinal_enum(underlying_type v): base_type(UT(to_enumerator<E>(v))) {}
 
       // Note that ordinal_enum order is based on the underlying type not the position
 

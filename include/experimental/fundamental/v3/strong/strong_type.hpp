@@ -43,7 +43,7 @@ inline  namespace fundamental_v3
       using base_type = tagged<Final, UT>;
       using base_type::base_type;
 
-      using typename base_type::underlying_t;
+      using typename base_type::underlying_type;
 
       //! explicit conversion from a base const class to the @c Final class.
       template<typename F>
@@ -67,7 +67,7 @@ inline  namespace fundamental_v3
 
         //! explicit conversion to the underlying type.
         //template<typename F>
-        JASEL_CXX14_CONSTEXPR underlying_t& _underlying() const {
+        JASEL_CXX14_CONSTEXPR underlying_type& _underlying() const {
           return that->value;
         }
       private:
@@ -80,7 +80,7 @@ inline  namespace fundamental_v3
 
         //! explicit conversion to the underlying type.
         //template<typename F>
-        JASEL_CXX14_CONSTEXPR underlying_t const& _underlying() const {
+        JASEL_CXX14_CONSTEXPR underlying_type const& _underlying() const {
           return that->value;
         }
       private:
@@ -102,6 +102,14 @@ inline  namespace fundamental_v3
       backdoor _backdoor() {
         return backdoor(_final(this));
       }
+    };
+
+    template <
+      typename Final,
+      typename ...MetaMixins
+    >
+    struct mixins : MetaMixins::template type<Final>...
+    {
     };
 
     template <
