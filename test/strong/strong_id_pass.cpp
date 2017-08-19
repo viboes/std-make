@@ -18,6 +18,9 @@ using UEngineId = stdex::strong_id<class EngineIdTag, unsigned int>;
 using UCEngineId = stdex::strong_id<class EngineIdTag, unsigned char>;
 
 static_assert(std::is_same<stdex::underlying_type_t<EngineId>, int>::value, "");
+static_assert(stdex::is_ordinal<int>::value, "");
+static_assert(stdex::is_ordinal<EngineId>::value, "");
+
 
 void set_ids(EngineId engine, BoardId board){
   (void)engine;
@@ -118,6 +121,11 @@ int main()
   {
     //char c = 1;
     //UCEngineId id  {c}; // this fails as expected - narrowing conversion
+  }
+  // hash
+  {
+    EngineId es1 {1};
+    BOOST_TEST(std::hash<EngineId>{}(es1)==std::hash<int>{}(1));
   }
 
   return ::boost::report_errors();

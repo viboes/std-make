@@ -15,6 +15,9 @@ namespace stdex = std::experimental;
 static_assert(sizeof(stdex::boolean)==1, "");
 static_assert(sizeof(stdex::boolean8_t)==1, "");
 
+static_assert(stdex::is_ordinal<bool>::value, "");
+static_assert(stdex::is_ordinal<stdex::boolean>::value, "");
+
 struct X {
     operator bool() { return true; }
 };
