@@ -104,6 +104,29 @@ inline  namespace fundamental_v3
         return backdoor(_final(this));
       }
     };
+
+    template <
+      typename Final,
+      typename UT,
+      typename ...MetaMixins
+    >
+    struct new_class : strong_type<Final, UT>, MetaMixins::template type<Final>...
+    {
+      using base_type = strong_type<Final, UT>;
+      using base_type::base_type;
+    };
+
+    template <
+      typename Tag,
+      typename UT,
+      typename ...MetaMixins
+    >
+    struct new_type final : new_class<new_type<Tag, UT, MetaMixins...>, UT, MetaMixins...>
+    {
+      using base_type = new_class<new_type<Tag, UT, MetaMixins...>, UT, MetaMixins...>;
+      using base_type::base_type;
+    };
+
 }
 }
 }
