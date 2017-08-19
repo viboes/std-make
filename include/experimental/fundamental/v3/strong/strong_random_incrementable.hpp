@@ -52,7 +52,6 @@ inline namespace fundamental_v3
       // associated types
       using domain = Tag;
       using rep = UT;
-      using difference_type = DiffType;
 
       using base_type = strong_type<strong_random_incrementable<Tag, UT, DiffType>, UT>;
 
