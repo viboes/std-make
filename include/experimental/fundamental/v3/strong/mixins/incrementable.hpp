@@ -50,7 +50,7 @@ namespace std
           , addable_with<Final, DiffType>
           , substractable_with<Final, DiffType>
       {
-
+            using difference_type = DiffType;
       };
 
     }
