@@ -52,7 +52,7 @@ inline namespace fundamental_v3
   // If we define them, the result should be safe_bool, as the explicit conversion to bool already result in bool, we would need to explicitly to convert to bool these boolean expressions.
   // bool b = bool(!boolean);
   // This could be considered cumbersome
-  // For the time being, we pretend that logical operation on a boolean scape the safety rules.
+  // For the time being, we pretend that logical operation on a boolean escape the safety rules.
   // If we wanted this to be safer, we would need an additional type that makes the difference.
   //
   // Do we need mixed boolean operators?
@@ -69,7 +69,7 @@ inline namespace fundamental_v3
   // Should safe_bool default construct to false?
   //    If we add a default constructor safe_bool will not be trivial anymore, and couldn't be used in physical structs.
   //
-  // Should safe_bool<B1> and safe_bool<B1> be convertible?
+  // Should safe_bool<B1> and safe_bool<B2> be convertible?
   //    The single difference is the representation. A safe_bool has only two values and so it should be implicitly convertible
 
   /// A safe bool is a boolean type that stores a representation Bool
