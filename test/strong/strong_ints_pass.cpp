@@ -12,13 +12,13 @@
 
 namespace stdex = std::experimental;
 
-using OrangeCount = stdex::strong_int<class OrangeTag, int>;
-using OrangeCountDC = stdex::strong_int<class OrangeTag, int>;
-using AppelCount = stdex::strong_int<class AppelTag, int>;
-using UOrangeCount = stdex::strong_int<class OrangeTag, unsigned int>;
-using UCOrangeCount = stdex::strong_int<class OrangeTag, unsigned char>;
-using SOrangeCount = stdex::strong_int<class OrangeTag, short>;
-using COrangeCount = stdex::strong_int<class OrangeTag, char>;
+using OrangeCount = stdex::strong_integral<class OrangeTag, int>;
+using OrangeCountDC = stdex::strong_integral<class OrangeTag, int>;
+using AppelCount = stdex::strong_integral<class AppelTag, int>;
+using UOrangeCount = stdex::strong_integral<class OrangeTag, unsigned int>;
+using UCOrangeCount = stdex::strong_integral<class OrangeTag, unsigned char>;
+using SOrangeCount = stdex::strong_integral<class OrangeTag, short>;
+using COrangeCount = stdex::strong_integral<class OrangeTag, char>;
 
 static_assert(sizeof(OrangeCount)==sizeof(int), "");
 
