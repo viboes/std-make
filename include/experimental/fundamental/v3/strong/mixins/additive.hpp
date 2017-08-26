@@ -4,6 +4,10 @@
 //
 // Copyright (C) 2017 Vicente J. Botet Escriba
 
+// Should the mixin operations be defined using SFINAE on the underlying operations?
+// The advantage of not using SFINAE is compile time
+// The liability of not using SFINAE is that we define an invalid operation
+
 #ifndef JASEL_FUNDAMENTAL_V3_STRONG_MIXIN_ADITIVE_HPP
 #define JASEL_FUNDAMENTAL_V3_STRONG_MIXIN_ADITIVE_HPP
 
@@ -19,6 +23,7 @@ namespace std
   {
     namespace mixin
     {
+
       template <class Final, class Other>
       struct addable_with
       {
@@ -62,15 +67,11 @@ namespace std
       };
       // Single arg
       template <class Final>
-      struct additive_base
+      struct addable_base
       {
         friend constexpr Final operator+(Final const&x)  noexcept
         {
           return x;
-        }
-        friend constexpr Final operator-(Final const&x)  noexcept
-        {
-          return Final(-x._backdoor()._underlying());
         }
 
         friend JASEL_MUTABLE_CONSTEXPR Final operator++(Final& x) noexcept
@@ -81,6 +82,16 @@ namespace std
         {
           return Final(x._backdoor()._underlying()++);
         }
+
+      };
+      template <class Final>
+      struct substractable_base
+      {
+        friend constexpr Final operator-(Final const&x)  noexcept
+        {
+          return Final(-x._backdoor()._underlying());
+        }
+
         friend JASEL_MUTABLE_CONSTEXPR Final operator--(Final& x ) noexcept
         {
           return Final(--x._backdoor()._underlying());
@@ -91,8 +102,11 @@ namespace std
         }
 
       };
+      template <class Final>
+      struct additive_base : addable_base<Final>, substractable_base<Final>      {      };
+
       template <class Final, class Check=no_check>
-      struct additive_assign : additive_base<Final>
+      struct addable_assign : addable_base<Final>
       {
         // todo These should be moved to homogeneous when I'll add heterogeneous
         //! Forwards to the underlying value
@@ -101,6 +115,22 @@ namespace std
           x._backdoor()._underlying() += y._backdoor()._underlying();
           return x;
         }
+      };
+
+      //arithmetic assignment when checked relies in the assignment of the result of the arithmetic operation
+      template <class Final>
+      struct addable_assign<Final, check> : addable_base<Final>
+      {
+        friend JASEL_MUTABLE_CONSTEXPR Final& operator+=(Final& x, Final const& y) noexcept
+        {
+          x = x + y;
+          return x;
+        }
+      };
+
+      template <class Final, class Check=no_check>
+      struct substractable_assign : substractable_base<Final>
+      {
         friend JASEL_MUTABLE_CONSTEXPR Final& operator-=(Final& x, Final const& y) noexcept
         {
           x._backdoor()._underlying() -= y._backdoor()._underlying();
@@ -111,13 +141,8 @@ namespace std
 
       //arithmetic assignment when checked relies in the assignment of the result of the arithmetic operation
       template <class Final>
-      struct additive_assign<Final, check> : additive_base<Final>
+      struct substractable_assign<Final, check> : substractable_base<Final>
       {
-        friend JASEL_MUTABLE_CONSTEXPR Final& operator+=(Final& x, Final const& y) noexcept
-        {
-          x = x + y;
-          return x;
-        }
         friend JASEL_MUTABLE_CONSTEXPR Final& operator-=(Final& x, Final const& y) noexcept
         {
           x = x - y;
@@ -125,20 +150,29 @@ namespace std
         }
       };
 
+
       template <class Final, class Check=no_check>
-      struct additive : additive_assign<Final, Check>
+      struct additive_assign : addable_assign<Final, Check>, substractable_assign<Final, Check>      {      };
+
+
+      template <class Final, class Check=no_check>
+      struct addable : addable_assign<Final, Check>
       {
         friend constexpr Final operator+(Final const& x, Final const& y)  noexcept
         {
           return Final(x._backdoor()._underlying() + y._backdoor()._underlying());
         }
-
+      };
+      template <class Final, class Check=no_check>
+      struct substractable : substractable_assign<Final, Check>
+      {
         friend constexpr Final operator-(Final const& x, Final const& y)  noexcept
         {
           return Final(x._backdoor()._underlying() - y._backdoor()._underlying());
         }
-
       };
+      template <class Final, class Check=no_check>
+      struct additive : addable<Final, Check>, substractable<Final, Check>      {      };
 
       // additive heterogeneous
       template <class Final, class Check=no_check, template <class, class> class Pred=is_compatible_with>
