@@ -89,6 +89,20 @@ inline namespace fundamental_v3
       return __builtin_clz(x);
 
     }
+    //! @par Returns
+    //!   The number of consecutive 0 bits, starting from the least significant bit.
+    //!   [ Note: Returns std::numeric_limits<T>::digits if x == 0. ]
+    //! @par Remarks:
+    //!   Participates in overload resolution only if T is an unsigned integer type
+    template<class T, typename= enable_if_t<
+            is_integral<T>::value && is_unsigned<T>::value
+        >
+    >
+    constexpr int countt_zero(T x) noexcept
+    {
+      return __builtin_ctz(x);
+
+    }
 
     //! @par Returns
     //!   The number of consecutive 1 bits, starting from the most significant bit.
