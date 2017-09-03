@@ -170,6 +170,8 @@ test-suite ordinal_range
 
 test-suite bits
     : 
+      [ run ../example/bits/bit.cpp  ]
+      [ run bits/bit_pass.cpp  ]
       [ run bits/bit_mask_pass.cpp  ]
     ;
 

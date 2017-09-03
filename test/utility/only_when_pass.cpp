@@ -38,6 +38,7 @@ void static_test_only_int_convertible()
   static_assert(std::is_constructible<Rational, short>::value, "failed only_int");
   static_assert(std::is_constructible<Rational, SuperInt>::value, "failed only_int");
 
+  static_assert(std::is_constructible<Rational, bool>::value, "failed only_int");
   static_assert(!std::is_constructible<Rational, float>::value, "failed only_int");
   static_assert(!std::is_constructible<Rational, double>::value, "failed only_int");
   static_assert(!std::is_constructible<Rational, long double>::value, "failed only_int");

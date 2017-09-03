@@ -98,7 +98,7 @@ inline namespace fundamental_v3
             is_integral<T>::value && is_unsigned<T>::value
         >
     >
-    constexpr int countt_zero(T x) noexcept
+    constexpr int countr_zero(T x) noexcept
     {
       return __builtin_ctz(x);
 
@@ -116,6 +116,20 @@ inline namespace fundamental_v3
     constexpr int countl_one(T x) noexcept
     {
       return countl_zero(~x);
+    }
+
+    //! @par Returns
+    //!   The number of consecutive 1 bits, starting from the least significant bit.
+    //!   [ Note: Returns std::numeric_limits<T>::digits if x == std::numeric_limits<T>::max(). ]
+    //! @par Remarks:
+    //!   Participates in overload resolution only if T is an unsigned integer type
+    template<class T, typename= enable_if_t<
+            is_integral<T>::value && is_unsigned<T>::value
+        >
+    >
+    constexpr int countr_one(T x) noexcept
+    {
+      return countr_zero(~x);
     }
 
     //! @par Returns

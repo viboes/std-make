@@ -57,7 +57,7 @@ int main()
 #endif
   { // operator [T]
     BitMask bm{};
-    bm[UInt{1}]=true;
+    bm[UInt{1}]=stde::bit_on;
     BOOST_TEST( 1 == bm.count() );
     BOOST_TEST( bm.any() );
     BOOST_TEST(bm[UInt{1}]);
@@ -348,19 +348,19 @@ int main()
     auto x = bm[1].flip();
     BOOST_TEST( ! x );
   }
-  { // operator[] reference::operator~
-    BitMask bm{};
-    bm.set(UInt{1});
-    auto x = bm[1];
-    auto y = ~x;
-    BOOST_TEST( ! y );
-  }
-  { // operator[] reference::operator~
-    BitMask bm{};
-    bm.set(UInt{1});
-    auto x = ~bm[1];
-    BOOST_TEST( ! x );
-  }
+//  { // operator[] reference::operator~
+//    BitMask bm{};
+//    bm.set(UInt{1});
+//    auto x = bm[1];
+//    auto y = ~x;
+//    BOOST_TEST( ! y );
+//  }
+//  { // operator[] reference::operator~
+//    BitMask bm{};
+//    bm.set(UInt{1});
+//    auto x = ~bm[1];
+//    BOOST_TEST( ! x );
+//  }
 
 #endif
   return ::boost::report_errors();

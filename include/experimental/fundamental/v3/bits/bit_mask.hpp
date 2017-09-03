@@ -32,6 +32,7 @@
 
 #include <experimental/fundamental/v2/config.hpp>
 #include <experimental/fundamental/v3/bits/bit_ops.hpp>
+#include <experimental/bit.hpp>
 
 // todo: Add explicit conversions from bit_mask of different sizes
 
@@ -115,45 +116,8 @@ inline namespace fundamental_v3
       //! It contains an assignment operator, a conversion to @c bool,
       //! an @c operator~, and a member function @c flip.
       //! It exists only as a helper class for @c bit_mask's @c operator[].
-      class reference {
-        friend class bit_mask<N,T>;
-        bit_mask<N,T>* ref_;
-        T pos_;
-        constexpr reference(bit_mask<N,T>& ref, T pos) noexcept
-          : ref_(&ref), pos_(pos)
-        { }
-      public:
-        constexpr reference() noexcept = delete;
-        constexpr reference(reference const&) noexcept = default;
-        reference& operator=(reference const&) noexcept = default;
-        ~reference() noexcept = default;
 
-        //! assignment from bool
-        JASEL_MUTABLE_CONSTEXPR reference& operator=(bool x) noexcept
-        {
-          ref_->set(pos_,x);
-          return *this;
-        }
-
-        //! flip the bit
-        constexpr bool operator~() const noexcept
-        {
-          return ! ref_->test(pos_);
-        }
-
-        //! implicit conversion to bool
-        constexpr operator bool() const noexcept
-        {
-          return ref_->test(pos_);
-        }
-
-        //! flip the bit
-        JASEL_MUTABLE_CONSTEXPR reference flip()  noexcept
-        {
-          ref_->flip(pos_);
-          return *this;
-        }
-      };
+      using reference = bit_reference<T>;
 
       //fixme: If we want bit_mask to be a POD this constructor should be default
       // The user will need to use explicit zero-initialization.
@@ -187,7 +151,7 @@ inline namespace fundamental_v3
       }
 
       //! @par Effects:
-      //!   Constructs an object of class \c bit_mask<>, initializing the
+      //!   Constructs an object of class \c bit_mask<>, initializing
       //!   all bit position to \c val.
       //! @par Throws:
       //!   Nothing
@@ -198,10 +162,7 @@ inline namespace fundamental_v3
 
       //! @par Effects:
       //!   Constructs an object of class \c bit_mask<>, initializing the
-      //!   first \c M bit positions to the corresponding bit values in \c val.
-      //!   \c M is the smaller of \c N and the number of bits in the value
-      //!   representation of \c unsigned \c long \c long. If \c M<N, the remaining bit
-      //!   positions are initialized to zero.
+      //!   first \c N bit positions to the corresponding bit values in \c val.
       //! @par Throws:
       //!   Nothing
 
@@ -210,7 +171,7 @@ inline namespace fundamental_v3
       {
       }
 
-      // todo implement this
+      // todo implement this using string_view
       //#if defined(__GNUC__) &&  (__GNUC__ < 4 || ( __GNUC__ == 4 && __GNUC_MINOR__ < 4 ))
       #if 1
       #else
@@ -315,7 +276,7 @@ inline namespace fundamental_v3
       JASEL_MUTABLE_CONSTEXPR bit_mask& operator>>=(size_t pos) noexcept
       {
         bits >>= pos;
-        bits &= bit_ops::up_to<N,T>();
+        //bits &= bit_ops::up_to<N,T>();
         return *this;
       }
 
@@ -324,7 +285,7 @@ inline namespace fundamental_v3
       constexpr std::size_t count() const noexcept
       {
         // fixme
-        return static_cast<size_t>(__builtin_popcount(bits));
+        return static_cast<size_t>(bit_ops::popcount(bits));
       }
 
       //! @par Returns:
@@ -363,7 +324,7 @@ inline namespace fundamental_v3
       JASEL_CXX14_CONSTEXPR reference operator[](size_t pos)
       {
         //JASEL_EXPECTS(valid_position(pos));
-        return reference(*this, static_cast<T>(pos));
+        return reference(bits, pos);
       }
       //! @par Effects:
       //!   Sets all bits in \c *this.
@@ -389,7 +350,7 @@ inline namespace fundamental_v3
       {
         check(setting);
         bits &= ~bit_ops::single<T>(setting);
-        bits |= (int(value)<<setting); // fixme
+        bits |= (unsigned(value)<<setting); // fixme
         return *this;
       }
 
