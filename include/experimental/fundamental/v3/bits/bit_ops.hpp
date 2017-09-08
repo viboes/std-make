@@ -89,6 +89,16 @@ inline namespace fundamental_v3
       return __builtin_clz(x);
 
     }
+    inline constexpr int countl_zero(unsigned long x) noexcept
+    {
+      return __builtin_clzl(x);
+
+    }
+    inline constexpr int countl_zero(unsigned long long x) noexcept
+    {
+      return __builtin_clzll(x);
+
+    }
     //! @par Returns
     //!   The number of consecutive 0 bits, starting from the least significant bit.
     //!   [ Note: Returns std::numeric_limits<T>::digits if x == 0. ]
@@ -101,8 +111,15 @@ inline namespace fundamental_v3
     constexpr int countr_zero(T x) noexcept
     {
       return __builtin_ctz(x);
-
     }
+    inline constexpr int countr_zero(unsigned long x) noexcept
+        {
+          return __builtin_ctzl(x);
+        }
+    inline constexpr int countr_zero(unsigned long long x) noexcept
+        {
+          return __builtin_ctzll(x);
+        }
 
     //! @par Returns
     //!   The number of consecutive 1 bits, starting from the most significant bit.
@@ -149,7 +166,7 @@ inline namespace fundamental_v3
     constexpr T up_to() noexcept
     {
       return (N >= sizeof(T) * CHAR_BIT) ?
-          T(-1) : (T(1) << N) - 1;
+          T(-1) : T(1u << N) - 1;
     }
 
     //! @par Pre-condition:
@@ -160,7 +177,7 @@ inline namespace fundamental_v3
     constexpr T up_to(size_t n) noexcept
     {
       return (n >= sizeof(T) * CHAR_BIT) ?
-          T(-1) : (T(1) << n) - 1;
+          T(-1) : T(1u << n) - 1;
     }
 
     //! @par Requires:
@@ -172,7 +189,7 @@ inline namespace fundamental_v3
     {
       //constexpr unsigned int N = std::numeric_limits<T>::digits;
       //constexpr unsigned int m = S % std::numeric_limits<T>::digits;
-      return T(1) << (S % std::numeric_limits<T>::digits);
+      return T(1u << (S % std::numeric_limits<T>::digits));
     }
     //! @par Pre-condition:
     //!   s < sizeof(T) * CHAR_BIT
@@ -183,10 +200,11 @@ inline namespace fundamental_v3
     {
       //constexpr unsigned int N = std::numeric_limits<T>::digits;
       //const unsigned int m = s % std::numeric_limits<T>::digits;
-      return T(1) << (s % std::numeric_limits<T>::digits);
+      return T(1u << (s % std::numeric_limits<T>::digits));
     }
   }
 }}
 } // std
 
 #endif // header
+

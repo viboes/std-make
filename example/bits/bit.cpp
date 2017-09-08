@@ -45,7 +45,7 @@ int main()
   }
   {
     // First, we create an array of integers
-    using uint_t = unsigned long long int;
+    using uint_t = unsigned long int;
     std::array<uint_t, 2> intarr = {{42, 314}};
 
     // Then we create a bit reference and a bit pointer

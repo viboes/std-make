@@ -319,6 +319,7 @@ inline namespace fundamental_v3
 
       // Lifecycle
       public:
+      constexpr bit_reference(const bit_reference& ) noexcept = default;
       template <class T>
       constexpr bit_reference(const bit_reference<T>& other) noexcept
       : _ptr(other._ptr)
@@ -332,7 +333,7 @@ inline namespace fundamental_v3
       }
       constexpr bit_reference(word_type& ref, index_type pos)
       : _ptr((JASEL_CONSTEXPR_ASSERT(pos < binary_digits<word_type>::value), &ref))
-      , _mask(static_cast<word_type>(1) << pos)
+      , _mask(static_cast<word_type>(1u << pos))
       {
       }
 
@@ -445,7 +446,7 @@ inline namespace fundamental_v3
       }
       constexpr size_type position() const noexcept
       {
-          return bit_ops::countr_zero(_mask);
+          return static_cast<size_type>(bit_ops::countr_zero(_mask));
       }
       constexpr word_type mask() const noexcept
       {

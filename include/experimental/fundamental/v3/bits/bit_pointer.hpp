@@ -56,6 +56,7 @@ inline namespace fundamental_v3
       : _ref(nullptr)
       {
       }
+      constexpr bit_pointer(const bit_pointer& ) noexcept = default;
       template <class T>
       constexpr bit_pointer(const bit_pointer<T>& other) noexcept
       : _ref(other._ref)
@@ -148,12 +149,12 @@ inline namespace fundamental_v3
       JASEL_CXX14_CONSTEXPR bit_pointer operator+(difference_type n) const
       {
           constexpr difference_type digits = binary_digits<word_type>::value;
-          const difference_type sum = _ref.position() + n;
+          const difference_type sum = static_cast<difference_type>(_ref.position()) + n;
           difference_type diff = sum / digits;
           if (sum < 0 && diff * digits != sum) {
               --diff;
           }
-          return bit_pointer(_ref._ptr + diff, sum - diff * digits);
+          return bit_pointer(_ref._ptr + diff, static_cast<size_type>(sum - diff * digits));
       }
       JASEL_CXX14_CONSTEXPR bit_pointer operator-(difference_type n) const
       {
