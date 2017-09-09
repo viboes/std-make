@@ -131,18 +131,21 @@ int main()
       BOOST_TEST(b==true);
   }
   {
+      bool True = true;
       stdex::boolean es1 = true;
-      auto b = true || es1 ;
+      auto b = True || es1 ;
       BOOST_TEST(b==true);
   }
   {
+      bool True = true;
       stdex::boolean es1 = false;
-      auto b = true || es1 ;
+      auto b = True || es1 ;
       BOOST_TEST(b==true);
   }
   {
+      bool True = true;
       stdex::boolean es2 = false;
-      stdex::boolean es = true || es2;
+      stdex::boolean es = True || es2;
       BOOST_TEST(es==true);
   }
   {

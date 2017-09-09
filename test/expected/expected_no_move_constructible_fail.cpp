@@ -93,6 +93,7 @@ int main()
   {
     optional<NoMoveConstructible> x;
     optional<NoMoveConstructible> y {std::move(x)}; //FAILS as expected
+    (void)y;
   }
   static_assert(! std::is_default_constructible<NoDefaultConstructible>::value, "");
   static_assert(! std::is_default_constructible<expected_sc<NoDefaultConstructible>>::value, "");
@@ -106,11 +107,13 @@ int main()
     // fixme
     expected_sc<NoMoveConstructible> x;
     expected_sc<NoMoveConstructible> y =  std::move(x); // DOESN'T FAIL as copy is used instead
+    (void)y;
   }
   {
     // fixme
     expected_sc<NoMoveConstructible> x;
     expected_sc<NoMoveConstructible> y {expected_sc<NoMoveConstructible>{}}; // DOESN'T FAIL as copy is used instead
+    (void)y;
   }
   static_assert(! std::is_move_constructible<NoMoveConstructible>::value, "");
   static_assert( std::is_constructible<expected_sc<NoMoveConstructible>, NoMoveConstructible && >::value, "");
