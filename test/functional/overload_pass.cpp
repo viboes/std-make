@@ -507,7 +507,7 @@ int main()
           std::cout << "string(string&&)" << std::endl;
           return i;
         },
-        [](...)
+        [](auto)
         {
           std::cout << "int(...)" << std::endl;
           return -1;
@@ -523,13 +523,13 @@ int main()
 #if defined __GNUC__ and ! defined __clang__
         , &X::f
 #endif
-        , [](...)
+        , [](auto)
         {
           std::cout << "int(...)" << std::endl;
           return -1;
         }
     );
-    BOOST_TEST(f(1.0) == 42);
+    BOOST_TEST(f(1.0f) == 42);
 #if defined __GNUC__ and ! defined __clang__
     X x;
     BOOST_TEST(f(x, 'c') == x);
