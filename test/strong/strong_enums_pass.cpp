@@ -28,7 +28,7 @@ namespace std
 namespace experimental
 {
 template <>
-bool is_enumerator<E>(E x) {
+bool is_enumerator<E>(int x) {
     switch (x) {
         case E0:
         case E1:
@@ -40,7 +40,7 @@ bool is_enumerator<E>(E x) {
 }
 
 template <>
-bool is_enumerator<SE::type>(SE::type x) {
+bool is_enumerator<SE::type>(int x) {
     switch (x) {
         case SE::E0:
         case SE::E1:

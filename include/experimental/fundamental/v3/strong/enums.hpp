@@ -29,11 +29,11 @@ inline namespace fundamental_v3
   constexpr bool is_valid_enum(Int ) { return true; }
 
   // This function must be specialized for each enum
-  template <class E>
-  constexpr bool is_enumerator(E ) { return false; }
+  template <class E, class Int>
+  constexpr bool is_enumerator(Int ) { return false; }
 
   template <class E, class Int>
-  constexpr bool is_valid_enumerator(Int x) { return is_valid_enum<E>(x) && is_enumerator(E(x)); }
+  constexpr bool is_valid_enumerator(Int x) { return is_valid_enum<E>(x) && is_enumerator<E>(x); }
 
 
   template <class E, class Int>
