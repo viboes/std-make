@@ -26,11 +26,11 @@ inline namespace fundamental_v3
   // By default it should checks if x is in the range of the underlying type
   // This function must be specialized for C++98 enums which have a more specific range
   template <class E, class Int>
-  constexpr bool is_valid_enum(Int x) { return true; }
+  constexpr bool is_valid_enum(Int ) { return true; }
 
   // This function must be specialized for each enum
   template <class E>
-  constexpr bool is_enumerator(E x) { return false; }
+  constexpr bool is_enumerator(E ) { return false; }
 
   template <class E, class Int>
   constexpr bool is_valid_enumerator(Int x) { return is_valid_enum<E>(x) && is_enumerator(E(x)); }

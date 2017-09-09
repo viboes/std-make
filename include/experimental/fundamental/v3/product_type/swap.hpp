@@ -46,7 +46,7 @@ namespace product_type
   template <>
   struct swap_impl<0> {
     template <class T>
-    static constexpr void apply(T& x, T& y)
+    static constexpr void apply(T&, T&)
     {
       return;
     }

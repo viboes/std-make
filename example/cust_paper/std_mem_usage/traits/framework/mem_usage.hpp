@@ -34,7 +34,7 @@ namespace mem_usage_able
   struct traits<R, meta::when<std::is_trivial<R>::value>>
   {
     template <typename T>
-    static constexpr size_t apply(T&& v) noexcept { return sizeof ( remove_cv_t<remove_reference_t<T>> ); }
+    static constexpr size_t apply(T&& ) noexcept { return sizeof ( remove_cv_t<remove_reference_t<T>> ); }
   };
 
 

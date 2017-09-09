@@ -47,7 +47,7 @@ template <size_t I, class T> struct variant_alternative<I, const volatile T>;
 template <size_t I, class T>
       using variant_alternative_t = typename variant_alternative<I, T>::type;
 
-constexpr size_t variant_npos = -1;
+constexpr size_t variant_npos = static_cast<size_t>(-1);
 
 
 #endif
@@ -287,10 +287,10 @@ namespace sum_type {
     }
 
     template <class ST>
-    constexpr size_t get_size(ST && st) noexcept { return sum_type::size_v<remove_reference_t<ST>>; }
+    constexpr size_t get_size(ST &&) noexcept { return sum_type::size_v<remove_reference_t<ST>>; }
 
     template <class ST>
-    constexpr size_t is_empty(ST && st) noexcept { return sum_type::empty_v<remove_reference_t<ST>>; }
+    constexpr size_t is_empty(ST &&) noexcept { return sum_type::empty_v<remove_reference_t<ST>>; }
 
     template <class ST>
     using alternative_sequence_for = make_index_sequence<sum_type::size_v<meta::uncvref_t<ST>>>;

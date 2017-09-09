@@ -101,20 +101,20 @@ int main()
         BOOST_TEST(oc == OrangeCount{1});
       }
       { // constructor from implicitly convertible to UT
-        short s=1;
-        OrangeCount oc{s};
+        short s2=1;
+        OrangeCount oc{s2};
         BOOST_TEST(oc == OrangeCount{1});
       }
       { // copy constructor
         OrangeCount oc1{1};
-        OrangeCount oc2{oc1};
-        BOOST_TEST(oc1 == oc2);
+        OrangeCount oc22{oc1};
+        BOOST_TEST(oc1 == oc22);
       }
       { // assignment
         OrangeCount oc1{1};
-        OrangeCount oc2;
-        oc2 = oc1;
-        BOOST_TEST(oc2 == oc1);
+        OrangeCount oc22;
+        oc22 = oc1;
+        BOOST_TEST(oc22 == oc1);
       }
 #if defined COMPILE_ERROR
       { // assignment from UT
@@ -124,23 +124,23 @@ int main()
 #endif
       { // operator+(x)
         OrangeCount oc{1};
-        OrangeCount oc2 = +oc;
-        BOOST_TEST(oc2 == OrangeCount{1});
+        OrangeCount oc22 = +oc;
+        BOOST_TEST(oc22 == OrangeCount{1});
       }
       { // operator+(x,y)
         OrangeCount oc1{1};
-        OrangeCount oc2{2};
-        BOOST_TEST(oc1+oc2 == OrangeCount{3});
+        OrangeCount oc22{2};
+        BOOST_TEST(oc1+oc22 == OrangeCount{3});
       }
       { // operator+(x,y)
         SOrangeCount oc1{1};
-        SOrangeCount oc2{2};
-        BOOST_TEST(oc1+oc2 == SOrangeCount{3});
+        SOrangeCount oc22{2};
+        BOOST_TEST(oc1+oc22 == SOrangeCount{3});
       }
       { // operator+(x,y)
         SOrangeCount oc1{1};
-        SOrangeCount oc2{2};
-        auto oc = oc1+oc2;
+        SOrangeCount oc22{2};
+        auto oc = oc1+oc22;
         static_assert(std::is_same<decltype(oc), SOrangeCount>::value, "error");
 
         BOOST_TEST(oc == SOrangeCount{3});
@@ -148,166 +148,166 @@ int main()
 
       { // operator+=(x)
         OrangeCount oc1{1};
-        OrangeCount oc2{2};
-        oc2 += oc1;
-        BOOST_TEST(oc2 == OrangeCount{3});
+        OrangeCount oc22{2};
+        oc22 += oc1;
+        BOOST_TEST(oc22 == OrangeCount{3});
       }
       { // operator++()
         OrangeCount oc1{1};
-        auto oc2 = ++oc1;
+        auto oc22 = ++oc1;
         BOOST_TEST(oc1 == OrangeCount{2});
-        BOOST_TEST(oc2 == OrangeCount{2});
+        BOOST_TEST(oc22 == OrangeCount{2});
       }
       { // operator++(int)
         OrangeCount oc1{1};
-        auto oc2 = oc1++;
+        auto oc22 = oc1++;
         BOOST_TEST(oc1 == OrangeCount{2});
-        BOOST_TEST(oc2 == OrangeCount{1});
+        BOOST_TEST(oc22 == OrangeCount{1});
       }
 
       { // operator-(x)
         OrangeCount oc{1};
-        OrangeCount oc2 = -oc;
-        BOOST_TEST(oc2 == OrangeCount{-1});
+        OrangeCount oc22 = -oc;
+        BOOST_TEST(oc22 == OrangeCount{-1});
       }
       { // operator-(x)
         UOrangeCount oc{1};
-        UOrangeCount oc2 = -oc;
-        BOOST_TEST(oc2 == UOrangeCount{-1u});
+        UOrangeCount oc22 = -oc;
+        BOOST_TEST(oc22 == UOrangeCount{-1u});
       }
       { // operator-(x,y)
         OrangeCount oc1{1};
-        OrangeCount oc2{2};
-        BOOST_TEST(oc1-oc2 == OrangeCount{-1});
+        OrangeCount oc22{2};
+        BOOST_TEST(oc1-oc22 == OrangeCount{-1});
       }
       { // operator-(x,y)
         SOrangeCount oc1{1};
-        SOrangeCount oc2{2};
-        BOOST_TEST(oc1-oc2 == SOrangeCount{-1});
+        SOrangeCount oc22{2};
+        BOOST_TEST(oc1-oc22 == SOrangeCount{-1});
       }
       { // operator-(x,y)
         SOrangeCount oc1{1};
-        SOrangeCount oc2{2};
-        auto oc = oc1-oc2;
+        SOrangeCount oc22{2};
+        auto oc = oc1-oc22;
         static_assert(std::is_same<decltype(oc), SOrangeCount>::value, "error");
 
         BOOST_TEST(oc == SOrangeCount{-1});
       }
       { // operator-(x,y)
         UOrangeCount oc1{3};
-        UOrangeCount oc2{2};
-        BOOST_TEST(oc1-oc2 == UOrangeCount{1});
+        UOrangeCount oc22{2};
+        BOOST_TEST(oc1-oc22 == UOrangeCount{1});
       }
       { // operator-(x,y)
         UOrangeCount oc1{3};
-        UOrangeCount oc2{2};
-        auto oc = oc1-oc2;
+        UOrangeCount oc22{2};
+        auto oc = oc1-oc22;
         static_assert(std::is_same<decltype(oc), UOrangeCount>::value, "error");
         BOOST_TEST(oc == UOrangeCount{1});
       }
       { // operator-=(x)
         OrangeCount oc1{1};
-        OrangeCount oc2{2};
-        oc2 -= oc1;
-        BOOST_TEST(oc2 == OrangeCount{1});
+        OrangeCount oc22{2};
+        oc22 -= oc1;
+        BOOST_TEST(oc22 == OrangeCount{1});
       }
       { // operator--()
         OrangeCount oc1{1};
-        auto oc2 = --oc1;
+        auto oc22 = --oc1;
         BOOST_TEST(oc1 == OrangeCount{0});
-        BOOST_TEST(oc2 == OrangeCount{0});
+        BOOST_TEST(oc22 == OrangeCount{0});
       }
       { // operator--(int)
         OrangeCount oc1{1};
-        auto oc2 = oc1--;
+        auto oc22 = oc1--;
         BOOST_TEST(oc1 == OrangeCount{0});
-        BOOST_TEST(oc2 == OrangeCount{1});
+        BOOST_TEST(oc22 == OrangeCount{1});
       }
 
       { // operator*(x,y)
         OrangeCount oc1{3};
-        OrangeCount oc2{2};
-        BOOST_TEST(oc1*oc2 == OrangeCount{6});
+        OrangeCount oc22{2};
+        BOOST_TEST(oc1*oc22 == OrangeCount{6});
       }
       { // operator*=(x)
         OrangeCount oc1{3};
-        OrangeCount oc2{2};
-        oc2 *= oc1;
-        BOOST_TEST(oc2 == OrangeCount{6});
+        OrangeCount oc22{2};
+        oc22 *= oc1;
+        BOOST_TEST(oc22 == OrangeCount{6});
       }
 
       { // operator/(x,y)
         OrangeCount oc1{6};
-        OrangeCount oc2{2};
-        BOOST_TEST(oc1/oc2 == OrangeCount{3});
+        OrangeCount oc22{2};
+        BOOST_TEST(oc1/oc22 == OrangeCount{3});
       }
       { // operator/=(x)
         OrangeCount oc1{6};
-        OrangeCount oc2{2};
-        oc1 /= oc2;
+        OrangeCount oc22{2};
+        oc1 /= oc22;
         BOOST_TEST(oc1 == OrangeCount{3});
       }
 
       { // operator%(x,y)
         OrangeCount oc1{6};
-        OrangeCount oc2{5};
-        BOOST_TEST(oc1%oc2 == OrangeCount{1});
+        OrangeCount oc22{5};
+        BOOST_TEST(oc1%oc22 == OrangeCount{1});
       }
       { // operator%=(x)
         OrangeCount oc1{6};
-        OrangeCount oc2{5};
-        oc1 %= oc2;
+        OrangeCount oc22{5};
+        oc1 %= oc22;
         BOOST_TEST(oc1 == OrangeCount{1});
       }
 
       { // operator==(x,y)
         OrangeCount oc1{2};
-        OrangeCount oc2{2};
-        BOOST_TEST( oc1==oc2 );
+        OrangeCount oc22{2};
+        BOOST_TEST( oc1==oc22 );
       }
       { // operator!=(x,y)
         OrangeCount oc1{2};
-        OrangeCount oc2{3};
-        BOOST_TEST( oc1!=oc2 );
+        OrangeCount oc22{3};
+        BOOST_TEST( oc1!=oc22 );
       }
       { // operator<(x,y)
         OrangeCount oc1{2};
-        OrangeCount oc2{5};
-        BOOST_TEST( oc1<oc2 );
+        OrangeCount oc22{5};
+        BOOST_TEST( oc1<oc22 );
       }
       { // operator<=(x,y)
         OrangeCount oc1{2};
-        OrangeCount oc2{5};
-        BOOST_TEST( oc1<=oc2 );
+        OrangeCount oc22{5};
+        BOOST_TEST( oc1<=oc22 );
       }
       { // operator<=(x,y)
         OrangeCount oc1{2};
-        OrangeCount oc2{2};
-        BOOST_TEST( oc1<=oc2 );
+        OrangeCount oc22{2};
+        BOOST_TEST( oc1<=oc22 );
       }
       { // operator>(x,y)
         OrangeCount oc1{6};
-        OrangeCount oc2{5};
-        BOOST_TEST( oc1>oc2 );
+        OrangeCount oc22{5};
+        BOOST_TEST( oc1>oc22 );
       }
       { // operator>=(x,y)
         OrangeCount oc1{6};
-        OrangeCount oc2{5};
-        BOOST_TEST( oc1>=oc2 );
+        OrangeCount oc22{5};
+        BOOST_TEST( oc1>=oc22 );
       }
       { // operator<=(x,y)
         OrangeCount oc1{2};
-        OrangeCount oc2{2};
-        BOOST_TEST( oc1>=oc2 );
+        OrangeCount oc22{2};
+        BOOST_TEST( oc1>=oc22 );
       }
       // swap
       {
         OrangeCount oc1{1};
-        OrangeCount oc2{2};
+        OrangeCount oc22{2};
         using std::swap;
-        swap(oc1,oc2);
+        swap(oc1,oc22);
         BOOST_TEST(oc1.underlying()==2);
-        BOOST_TEST(oc2.underlying()==1);
+        BOOST_TEST(oc22.underlying()==1);
       }
 
       // hash
@@ -325,23 +325,23 @@ int main()
       // operator >>
       {
           OrangeCount oc;
-          std::stringstream s;
-          s << 1;
-          s >> oc;
+          std::stringstream s2;
+          s2 << 1;
+          s2 >> oc;
           BOOST_TEST_EQ(oc, OrangeCount{1});
       }
       {
           SOrangeCount oc;
-          std::stringstream s;
-          s << 1;
-          s >> oc;
+          std::stringstream s2;
+          s2 << 1;
+          s2 >> oc;
           BOOST_TEST_EQ(oc, SOrangeCount{1});
       }
       {
           COrangeCount oc;
-          std::stringstream s;
-          s << COrangeCount{5};
-          s >> oc;
+          std::stringstream s2;
+          s2 << COrangeCount{5};
+          s2 >> oc;
           BOOST_TEST_EQ(oc, COrangeCount{5});
       }
       {
@@ -355,8 +355,8 @@ int main()
         //OrangeCount id  {d}; // this fails as expected
       }
       {
-        short s = 1;
-        OrangeCount id  {s}; // OK
+        short s2 = 1;
+        OrangeCount id  {s2}; // OK
         BOOST_TEST_EQ(id.underlying(), 1);
       }
       {

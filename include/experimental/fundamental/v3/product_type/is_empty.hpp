@@ -27,7 +27,7 @@ namespace product_type
   , class = enable_if_t< is_product_type_v<meta::uncvref_t<ProductType>>  >
 #endif
   >
-  constexpr auto is_empty(ProductType&& pt)
+  constexpr auto is_empty(ProductType&& )
     JASEL_DECLTYPE_RETURN_NOEXCEPT(
         product_type::size<meta::uncvref_t<ProductType>>::value==0
     )

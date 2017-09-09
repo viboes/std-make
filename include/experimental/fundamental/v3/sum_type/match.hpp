@@ -56,12 +56,12 @@ namespace sum_type
       public:
 
 
-        applier(R *r, F &fct, tuple<DTs const&...> &&members,
-            tuple<STs const&...> &&sums)
-        : fct(fct),
-          r(r),
-          members(move(members)),
-          sums(move(sums))
+        applier(R *r_, F &fct_, tuple<DTs const&...> &&members_,
+            tuple<STs const&...> &&sums_)
+        : fct(fct_),
+          r(r_),
+          members(move(members_)),
+          sums(move(sums_))
         {}
 
         F &fct;

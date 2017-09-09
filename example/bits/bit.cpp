@@ -1,4 +1,4 @@
-// Copyright (C) 2016 Vicente J. Botet Escriba
+// Copyright (C) 2017 Vicente J. Botet Escriba
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -40,8 +40,35 @@ int main()
     std::cout<<bval0<<bref0<<bval5<<bref5<<std::endl;          //  Prints 1010
 
     // Prints the location and the corresponding mask of bit references
-    std::cout<<bref0.position()<<" "<<bref0.mask()<<std::endl; // Prints 0 and 1
-    std::cout<<bref5.position()<<" "<<bref5.mask()<<std::endl; // Prints 5 and 32
+    std::cout<<bref0.position()<<" "<<int(bref0.mask())<<std::endl; // Prints 0 and 1
+    std::cout<<bref5.position()<<" "<<int(bref5.mask())<<std::endl; // Prints 5 and 32
+  }
+  {
+    // First, we create an integer
+    using uint_t = unsigned char;
+    uint_t intval = 42;                                        // 101010
+
+    // Then we create aligned bit values and a bit references on this integer
+    stde::bit_value bval0(intval);                              // Creates a bit value from the bit at position 0 of intval
+    stde::bit_reference<uint_t> bref0(intval);                  // Creates a bit reference from the bit at position 0 of intval
+
+    // And unaligned bit values and a bit references on this integer
+    stde::bit_value bval5(intval, 5);                           // Creates a bit value from the bit at position 5 of intval
+    stde::bit_reference<uint_t> bref5(intval, 5);               // Creates a bit reference from the bit at position 5 of intval
+
+    // Display them
+    std::cout<<bval0<<bref0<<bval5<<bref5<<std::endl;          // Prints 0011
+
+    // Change their values conditionnally
+    if (static_cast<bool>(bval5)) {
+      bval0.flip();  // Flips the bit without affecting the integer
+      bref5.reset(); // Resets the bit to zero and affects the integer
+    }
+    std::cout<<bval0<<bref0<<bval5<<bref5<<std::endl;          //  Prints 1010
+
+    // Prints the location and the corresponding mask of bit references
+    std::cout<<bref0.position()<<" "<<int(bref0.mask())<<std::endl; // Prints 0 and 1
+    std::cout<<bref5.position()<<" "<<int(bref5.mask())<<std::endl; // Prints 5 and 32
   }
   {
     // First, we create an array of integers

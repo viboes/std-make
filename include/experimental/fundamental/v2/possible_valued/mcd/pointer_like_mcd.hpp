@@ -46,7 +46,7 @@ inline namespace fundamental_v2
   }
 
   template <class M>
-  auto not_a_value_custom(pointer_like, M const& ptr)
+  auto not_a_value_custom(pointer_like, M const&)
   -> decltype(none<type_constructor_t<M>>())
   {
     return none<type_constructor_t<M>>();

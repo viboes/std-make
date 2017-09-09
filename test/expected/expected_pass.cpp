@@ -58,7 +58,7 @@ struct OracleVal
 {
     State s;
     int i;
-    constexpr OracleVal(int i = 0) : s(sValueConstructed), i(i) {}
+    constexpr OracleVal(int i_ = 0) : s(sValueConstructed), i(i_) {}
 
 };
 
@@ -100,7 +100,7 @@ struct Date
 {
     int i;
     Date() = delete;
-    Date(int i) noexcept : i{i} {}
+    Date(int i_) noexcept : i{i_} {}
     Date(Date&& d) noexcept : i(d.i) { d.i = 0; }
     Date(const Date&) = delete;
     Date& operator=(const Date&) = delete;
@@ -111,7 +111,7 @@ struct TExcept
 {
     int i;
     TExcept() = delete;
-    TExcept(int i) : i{i} {}
+    TExcept(int i_) : i{i_} {}
     TExcept(TExcept&& d) : i(d.i) { d.i = 0; }
     TExcept(const TExcept&) = delete;
     TExcept& operator=(const TExcept&) = delete;
@@ -123,7 +123,7 @@ struct MoveAware
 {
   T val;
   bool moved;
-  MoveAware(T val) : val(val), moved(false) {}
+  MoveAware(T val_) : val(val_), moved(false) {}
   MoveAware(MoveAware const&) = delete;
   MoveAware(MoveAware&& rhs) : val(rhs.val), moved(rhs.moved) {
     rhs.moved = true;

@@ -35,10 +35,9 @@ namespace detail
   template <>
   struct nullable_get<0> {
     template <class ST>
-    static constexpr decltype(auto) get(ST&& st) noexcept
+    static constexpr decltype(auto) get(ST&&) noexcept
     {
       return nullable::none<meta::uncvref_t<ST>>();
-      //return nullable::deref_none(forward<ST>(st));
     }
   };
   template <>

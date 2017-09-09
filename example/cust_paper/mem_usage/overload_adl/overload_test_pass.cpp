@@ -49,37 +49,35 @@ int main()
 
 
   {
-      int i;
-      assert(framework::mem_usage(i)==4);
+      int i2;
+      assert(framework::mem_usage(i2)==4);
   }
   {
       //static_assert(is_adl_mem_usage<T>::value
-      boost::optional<int> o;
-      std::cout << framework::mem_usage(o) << "\n";
+      boost::optional<int> o2;
+      std::cout << framework::mem_usage(o2) << "\n";
       //assert(framework::mem_usage(o)==8);
   }
   {
-      boost::optional<boost::optional<int>> o;
-      std::cout << framework::mem_usage(o) << "\n";
+      boost::optional<boost::optional<int>> o2;
+      std::cout << framework::mem_usage(o2) << "\n";
       //assert(framework::mem_usage(o)==8);
   }
   {
-      std::experimental::optional<int> o;
-      std::cout << framework::mem_usage(o) << "\n";
+      std::experimental::optional<int> o2;
+      std::cout << framework::mem_usage(o2) << "\n";
       //assert(framework::mem_usage(o)==8);
   }
   {
-      std::vector<std::experimental::optional<int>> o;
-      std::cout << framework::mem_usage(o) << "\n";
+      std::vector<std::experimental::optional<int>> o2;
+      std::cout << framework::mem_usage(o2) << "\n";
       //assert(framework::mem_usage(o)==8);
   }
-  #if 1
   {
-      std::experimental::optional<std::vector<int>> o;
-      std::cout << framework::mem_usage(o) << "\n";
+      std::experimental::optional<std::vector<int>> o2;
+      std::cout << framework::mem_usage(o2) << "\n";
       //assert(framework::mem_usage(o)==8);
   }
-  #endif
   return ::boost::report_errors();
 }
 

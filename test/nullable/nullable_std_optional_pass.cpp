@@ -13,7 +13,7 @@ int main()
 }
 #else
 
-#define JASEL_STD_EXPERIMENTAL_FACTORIES_USE_OPTIONAL
+//#define JASEL_STD_EXPERIMENTAL_FACTORIES_USE_OPTIONAL
 //#define JASEL_FUNDAMENTAL_EXTENDED
 
 #include <experimental/optional.hpp>
@@ -26,7 +26,7 @@ struct A
 {
   int v;
   A(): v(3) {}
-  A(int v): v(std::move(v)) {}
+  A(int v_): v(std::move(v_)) {}
   A(int v1, int v2): v(v1+v2) {}
 };
 
@@ -48,12 +48,12 @@ struct check;
 
 
 template<class T>
-T& g(T &x) {
+T& g(T &) {
   return std::experimental::deref(T(1));
 }
 
 template<class T>
-void g1(T &x) {
+void g1(T &) {
   auto xx = std::experimental::deref(T(1));
   std::cout << xx << std::endl;
 

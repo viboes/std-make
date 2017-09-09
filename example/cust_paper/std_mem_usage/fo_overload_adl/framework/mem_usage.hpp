@@ -30,7 +30,7 @@ inline namespace fundamental_v3
     template <typename T>
     constexpr typename std::enable_if<is_trivial< remove_cv_t<remove_reference_t<T>> >::value, size_t>::type
     //constexpr typename std::enable_if<is_trivial< decay_t<T> >::value, size_t>::type
-    mem_usage(T&& v)
+    mem_usage(T&& )
     {
 #ifdef JASEL_UT_TRACE
       if (trace) std::cout << typeid(remove_cv_t<remove_reference_t<T>>).name() << " is_trivial\n";

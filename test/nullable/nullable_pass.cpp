@@ -30,7 +30,7 @@ struct A
 {
   T v;
   A(): v(2) {}
-  A(T v): v(std::move(v)) {}
+  A(T v_): v(std::move(v_)) {}
 };
 template <class T>
 struct A<T&>

@@ -203,22 +203,22 @@ int main()
       std::cout << "xfn = " << xfn << "\n";
 
       {
-          x_subframe_number x { frames(fn) + subframes(sfn) };
-          std::cout << "x = " << x << "\n";
+          x_subframe_number xsfn2 { frames(fn) + subframes(sfn) };
+          std::cout << "xsfn2 = " << xsfn2 << "\n";
       }
       {
-          auto x = make_x_subframe_number( fn, sfn );
-          std::cout << "x = " << x << "\n";
-      }
-
-      {
-          x_subframe_number x = make_x_subframe_number( fn, sfn );
-          std::cout << "x = " << x << "\n";
+          auto xsfn2 = make_x_subframe_number( fn, sfn );
+          std::cout << "xsfn2 = " << xsfn2 << "\n";
       }
 
       {
-          auto x = fn.to_duration() + sfn.to_duration();
-          std::cout << "x = " << x.count() << "\n";
+          x_subframe_number xsfn2 = make_x_subframe_number( fn, sfn );
+          std::cout << "xsfn2 = " << xsfn2 << "\n";
+      }
+
+      {
+          auto xsfn2 = fn.to_duration() + sfn.to_duration();
+          std::cout << "xsfn2 = " << xsfn2.count() << "\n";
       }
 
   }

@@ -111,12 +111,12 @@ int main()
   std::cout << stdx::mem_usage_able::mem_usage(vo) << "\n";
   std::cout << stdx::mem_usage_able::mem_usage(ov) << "\n";
   {
-    int* t;
-    std::cout << "int* " << stdx::mem_usage_able::mem_usage(t) << "\n";
+    int* t2;
+    std::cout << "int* " << stdx::mem_usage_able::mem_usage(t2) << "\n";
   }
   {
-    int* t=new int;
-    std::cout << "int* " << stdx::mem_usage_able::mem_usage(t) << "\n";
+    int* t2=new int;
+    std::cout << "int* " << stdx::mem_usage_able::mem_usage(t2) << "\n";
   }
 #if __cplusplus > 201402L
   {

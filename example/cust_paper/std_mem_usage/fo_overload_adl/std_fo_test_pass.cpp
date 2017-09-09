@@ -26,7 +26,7 @@ bool trace = false;
 
 struct X {
   X() {}
-  X(int i) {}
+  X(int ) {}
 };
 
 std::size_t mem_usage(X const&) {

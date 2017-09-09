@@ -28,7 +28,7 @@ namespace product_type
   namespace product_type_detail {
 
     template <class F, class State, class ProductType>
-    constexpr decltype(auto) fold_left_index_impl( ProductType&& pt, State&& state, F&& f, index_sequence<> )
+    constexpr decltype(auto) fold_left_index_impl( ProductType&&, State&& state, F&&, index_sequence<> )
     {
       return forward<State>(state);
     }

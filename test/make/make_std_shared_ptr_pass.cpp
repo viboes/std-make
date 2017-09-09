@@ -22,7 +22,7 @@ struct A
 {
   int v;
   A(): v(3) {}
-  A(int v): v(std::move(v)) {}
+  A(int v_): v(std::move(v_)) {}
   A(int v1, int v2): v(v1+v2) {}
 };
 

@@ -43,6 +43,7 @@ int main()
       //OrangeCount oc1 = 1;     // error - explicit required
   }
   {
+    {
       OrangeCount oc2{1};
       BOOST_TEST(oc2 == OrangeCount{1});
       //short s=1;
@@ -65,7 +66,7 @@ int main()
       //auto oc7 = add(oc2, 1); // error
       BOOST_TEST(oc2 != oc6);
       BOOST_TEST(oc2 < oc6);
-
+    }
       {
           //OrangeCount es {Y{}};        // error
         //OrangeCount es {X{}};        // ok, but shouldn't this be forbiden also?

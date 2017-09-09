@@ -327,7 +327,7 @@ template <
 }
 
 template <class PT>
-constexpr size_t get_size(PT &&pt) noexcept
+constexpr size_t get_size(PT &&) noexcept
 {
 	return product_type::size_v<remove_reference_t<PT>>;
 }

@@ -29,13 +29,13 @@ struct Y {
 };
 
 struct final_function_object_const final {
-  void operator ()(int arg) const { }
+  void operator ()(int ) const { }
 };
 struct final_function_object_const2 final {
-  void operator ()(Y arg) const { }
+  void operator ()(Y ) const { }
 };
 struct final_function_object_non_const final {
-  void operator ()(int arg) { }
+  void operator ()(int ) { }
 };
 
 struct YYYY {};
@@ -50,14 +50,14 @@ struct Bar final
 
 
 struct function_with_state {
-  void operator ()(int arg) { invoked = true; }
+  void operator ()(int ) { invoked = true; }
   bool invoked = false;
 };
 struct function_without_state {
-  constexpr void operator ()(int arg) const noexcept { }
+  constexpr void operator ()(int ) const noexcept { }
 };
 struct function_without_state_x {
-  constexpr void operator ()(float arg) const noexcept { }
+  constexpr void operator ()(float ) const noexcept { }
 };
 struct convertible_to_function_object {
   operator function_without_state() const {
@@ -66,7 +66,7 @@ struct convertible_to_function_object {
 };
 
 struct function_without_state_throw {
-  void operator ()(int arg) const { throw 1;}
+  void operator ()(int ) const { throw 1;}
 };
 struct function_without_state2 {
   constexpr int operator ()(int arg) const noexcept { return arg;}
@@ -76,33 +76,33 @@ struct function_without_state3 {
 };
 
 struct function_with_rvalue_ref_q {
-  int operator ()(int arg) && { return 1; }
-  int operator ()(int arg) const && { return 2; }
-  int operator ()(int arg) & { return 3;}
-  int operator ()(int arg) const & { return 4;}
+  int operator ()(int ) && { return 1; }
+  int operator ()(int ) const && { return 2; }
+  int operator ()(int ) & { return 3;}
+  int operator ()(int ) const & { return 4;}
 };
 struct final_function_with_rvalue_ref_q final {
-  int operator ()(int arg) && { return 1; }
-  int operator ()(int arg) const && { return 2; }
-  int operator ()(int arg) & { return 3;}
-  int operator ()(int arg) const & { return 4;}
+  int operator ()(int ) && { return 1; }
+  int operator ()(int ) const && { return 2; }
+  int operator ()(int ) & { return 3;}
+  int operator ()(int ) const & { return 4;}
 };
 struct function_with_lvalue_ref_q {
-  void operator ()(int arg) & { }
+  void operator ()(int ) & { }
 };
 struct function_with_no_ref_q {
-  void operator ()(int arg) { }
+  void operator ()(int ) { }
 };
 struct function_with_ref_q {
-  int operator ()(int arg) & { return 1; }
-  int operator ()(int arg) && { return 2; }
+  int operator ()(int ) & { return 1; }
+  int operator ()(int ) && { return 2; }
 };
 
 struct function_with_cv_q {
-  int operator ()(int arg) { return 0; }
-  int operator ()(int arg) const { return 1; }
-  int operator ()(int arg) volatile { return 2; }
-  int operator ()(int arg) const volatile { return 3; }
+  int operator ()(int ) { return 0; }
+  int operator ()(int ) const { return 1; }
+  int operator ()(int ) volatile { return 2; }
+  int operator ()(int ) const volatile { return 3; }
 };
 
 
@@ -114,7 +114,7 @@ int nonMember_throw( float ) {
   throw 1;;
 }
 struct XXXX {};
-void freefnx(XXXX x) {  std::cout <<"X\n"; }
+void freefnx(XXXX ) {  std::cout <<"X\n"; }
 
 
 namespace cppljevans {
@@ -254,7 +254,7 @@ int main()
     final_function_object_non_const foo;
 
     auto f = overload(foo,  // foo should be copied
-        [](std::string str) {
+        [](std::string ) {
       BOOST_TEST(false);
       return 1;
     }
@@ -281,7 +281,7 @@ int main()
     final_function_object_non_const foo;
 
     auto f = overload<int>(foo,  // foo should be copied
-        [](std::string str) {
+        [](std::string ) {
       BOOST_TEST(false);
       return 1;
     }
@@ -293,7 +293,7 @@ int main()
     final_function_object_non_const foo;
 
     overload<int>(foo,
-        [](std::string str) {
+        [](std::string ) {
       BOOST_TEST(false);
       return 1;
     }
@@ -316,7 +316,7 @@ int main()
     function_without_state foo;
 
     auto f = overload<int>(foo,  // foo should be copied
-        [](std::string str) {
+        [](std::string ) {
       BOOST_TEST(false);
       return 1;
     }
@@ -329,7 +329,7 @@ int main()
     function_without_state foo;
 
     auto f = overload(foo,  // foo should be copied
-        [](std::string str) {
+        [](std::string ) {
       BOOST_TEST(false);
     },
     nonMember
@@ -341,7 +341,7 @@ int main()
     function_without_state foo;
 
     auto f = overload(foo,  // foo should be copied
-        [](std::string str) {
+        [](std::string ) {
       BOOST_TEST(false);
     },
     freefnx
@@ -363,7 +363,7 @@ int main()
     function_without_state foo;
 
     auto f = overload(std::move(foo),  // foo should be copied
-        [](std::string str) {
+        [](std::string ) {
       BOOST_TEST(false);
     },
     [](...)
@@ -380,7 +380,7 @@ int main()
     BOOST_TEST(! foo.invoked);
 
     overload(std::ref(foo),
-        [](std::string str) {
+        [](std::string ) {
       BOOST_TEST(false);
     })(1);
 
@@ -388,7 +388,7 @@ int main()
   }
   {
     overload(function_with_state{},
-        [](std::string str) {
+        [](std::string ) {
       BOOST_TEST(false);
     })(1);
   }
@@ -398,7 +398,7 @@ int main()
     BOOST_TEST(! foo.invoked);
 
     overload(foo,
-        [](std::string str) {
+        [](std::string ) {
       BOOST_TEST(false);
     })(1);
 
@@ -409,7 +409,7 @@ int main()
 
     BOOST_TEST(! foo.invoked);
 
-    overload(std::ref(foo), [](std::string str) { })("aaa");
+    overload(std::ref(foo), [](std::string ) { })("aaa");
 
     BOOST_TEST(! foo.invoked);
   }
@@ -485,9 +485,9 @@ int main()
           std::cout << "string(string&&)" << std::endl;
           return i;
         },
-        [](...)
+        [](auto)
         {
-          std::cout << "int(...)" << std::endl;
+          std::cout << "..." << std::endl;
           return -1;
         }
     );
@@ -673,7 +673,7 @@ int main()
 #endif
 
     auto f = overload(nonMember,
-        [](std::string str) noexcept {
+        [](std::string ) noexcept {
       return 1;
     }
     );

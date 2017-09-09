@@ -20,18 +20,18 @@ using expected_sc = stde::expected<T, std::error_code>;
 struct NoDefaultConstructible
 {
   NoDefaultConstructible() = delete;
-  NoDefaultConstructible(int i)  {};
+  NoDefaultConstructible(int)  {}
 };
 
 struct NoCopyConstructible
 {
-  NoCopyConstructible()  {};
+  NoCopyConstructible()  {}
   NoCopyConstructible(NoCopyConstructible const&) = delete;
   NoCopyConstructible(NoCopyConstructible &&) = default;
 };
 struct NoMoveConstructible
 {
-  NoMoveConstructible()  {};
+  NoMoveConstructible()  {}
   NoMoveConstructible(NoMoveConstructible const&) = default;
   NoMoveConstructible(NoMoveConstructible &&) = delete;
   NoMoveConstructible& operator=(NoMoveConstructible const&) = default;
@@ -41,7 +41,7 @@ struct NoMoveConstructible
 
 template<typename T, bool> struct base {
   base() = default;
-  base(T v) : v(v) {};
+  base(T v_) : v(v_) {}
   base(base const&) = default;
   base(base&&) = default;
   T v;
@@ -49,7 +49,7 @@ template<typename T, bool> struct base {
 
 template<typename T> struct base<T, false> {
    base() = default;
-   base(T v) : v(v) {};
+   base(T v_) : v(v_) {}
    base(base const&) = default;
    base(base&&) = delete;
    T v;
@@ -60,7 +60,7 @@ class optional : public base<T, std::is_move_constructible<T>::value> {
   using base_type = base<T, std::is_move_constructible<T>::value>;
 public:
   optional() = default;
-  optional(T v) : base_type(v) {};
+  optional(T v) : base_type(v) {}
   optional(const optional&) = default;
   optional(optional &&) = default;
 };

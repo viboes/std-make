@@ -93,7 +93,7 @@ int main()
     stdex::optionals<int, B> opt_a_b;
     //stdex::optional_ref<0, int> opt_a = stdex::get<0>(opt_a_b);
     auto opt_a = stdex::get<0>(opt_a_b);
-    opt_a = 1l;
+    opt_a = 1;
     BOOST_TEST(opt_a);
     BOOST_TEST( (opt_a_b.template has_value<0>()));
     BOOST_TEST(opt_a == 1);

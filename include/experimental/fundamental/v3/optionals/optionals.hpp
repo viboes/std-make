@@ -104,7 +104,7 @@ public:
 
     void reset() noexcept
     {
-        *mask &= ~(1 << index);
+        *mask &= ~(1u << index);
     }
 
     constexpr bool has_value() const noexcept
@@ -394,11 +394,11 @@ struct optional_ref_fact {
     static constexpr optional_ref<I,T> make(size_t& mask, T& ref) noexcept
     {
         return optional_ref<I, T>(mask, ref);
-    };
+    }
     static constexpr optional_ref<I, const T> make(size_t const& mask, T const& ref) noexcept
     {
         return optional_ref<I, const T>(mask, ref);
-    };
+    }
 };
 }
 

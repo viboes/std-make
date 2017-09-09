@@ -67,10 +67,10 @@ struct  sepc {
 template <class OSTREAM, class PT>
 OSTREAM& operator<<(OSTREAM& os, PT const& pt) {
   os << "{" ;
-  std::experimental::product_type::fold_left_index(pt, os, [](auto i, OSTREAM& os, auto const& element) -> OSTREAM&
+  std::experimental::product_type::fold_left_index(pt, os, [](auto i, OSTREAM& os_, auto const& element) -> OSTREAM&
       {
-        if (decltype(i)::value>0) os << ", ";
-        return os << element;
+        if (decltype(i)::value>0) os_ << ", ";
+        return os_ << element;
       }
   );
   return os << "}";
@@ -322,7 +322,7 @@ int main()
     auto _sizeof = [](auto & x) {return sizeof(decltype(x));};
     auto call = std::make_tuple(_sizeof, _sizeof, _sizeof, _sizeof);
     auto q2 = stde::product_type::n_transform(q1, call);
-    auto sum = stde::product_type::fold_left(q2, 0, [](auto x, auto y) { return x+y;});
+    auto sum = stde::product_type::fold_left(q2, 0ul, [](auto x, auto y) { return x+y;});
 
     BOOST_TEST(sizeof(q1) > sum);
   }
