@@ -21,7 +21,7 @@ namespace stdex = std::experimental;
 
 using offset = stdex::strong_counter<struct offset_tag, std::int64_t>;
 
-using address = stdex::strong_random_incrementable<struct address_tag, std::uint64_t, offset>;
+using address = stdex::strong_random_incrementable<struct address_tag, std::int64_t, offset>;
 
 
 
