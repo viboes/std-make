@@ -100,7 +100,7 @@ inline  namespace v1
   {
     static_assert(is_integral<T>::value, "T must be integral");
 
-    return to_half(to_unsigned(a) >> (CHAR_BIT * sizeof(T) / 2));
+    return static_cast<half_width<unsigned_<T>>>(to_half(to_unsigned(a) >> (CHAR_BIT * sizeof(T) / 2)));
   }
   template <typename T>
   half_width<unsigned_<T>> split_lower( T a )

@@ -59,7 +59,7 @@ inline  namespace v1
   {
     static_assert(is_integral<T>::value, "T must be integral");
 
-    return to_double(a) << b;
+    return static_cast<double_width<T>>(to_double(a) << b);
   }
 
   template <typename T>
@@ -124,7 +124,7 @@ inline  namespace v1
     static_assert(is_integral<T>::value, "T must be integral");
     static_assert(is_same<D, double_width<T>>::value, "D must be double_width<T>");
 
-    return to_half(a / to_double(b));
+    return static_cast<T>(to_half(a / to_double(b)));
   }
   template <typename T, typename D>
   D wide_divw( D a, T b )
