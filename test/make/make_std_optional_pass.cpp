@@ -41,7 +41,7 @@ int twice(int i) {
 }
 
 std::experimental::optional<double> inverse(double x) {
-  if (x==0) return std::experimental::nullopt;
+  if (x==0.0) return std::experimental::nullopt;
   return 1/x;
 }
 

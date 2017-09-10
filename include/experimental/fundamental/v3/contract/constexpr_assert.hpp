@@ -27,7 +27,7 @@ namespace detail
   // When evaluated at compile time emits a compilation error if condition is not true.
   // Invokes the standard assert at run time.
   #define JASEL_CONSTEXPR_ASSERT(cond) \
-      ((void)((cond) ? 0 : (detail::constexpr_assert_failed([](){ assert(!#cond);}), 0)))
+      ((void)((cond) ? 0 : (detail::constexpr_assert_failed([](){ assert(false && #cond);}), 0)))
 
 }
 }

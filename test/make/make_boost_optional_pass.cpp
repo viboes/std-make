@@ -122,7 +122,7 @@ int twice(int i) {
 }
 
 boost::optional<double> inverse(double x) {
-  if (x==0) return boost::none;
+  if (x==0.0) return boost::none;
   return 1/x;
 }
 
@@ -215,14 +215,14 @@ int main()
   {
     double v=2;
     boost::optional<double> x = stde::make<boost::optional>(v);
-    BOOST_TEST(stde::value(x) == 2);
+    BOOST_TEST(stde::value(x) == 2.0);
     boost::optional<double> y = stde::mbind(x, inverse);
-    BOOST_TEST(stde::value(y) == 1.0/2);
+    BOOST_TEST(stde::value(y)*2 == 1.0);
   }
   {
     double v=0;
     boost::optional<double> x = stde::make<boost::optional>(v);
-    BOOST_TEST(stde::value(x) == 0);
+    BOOST_TEST(stde::value(x) == 0.0);
     boost::optional<double> y = stde::mbind(x, inverse);
     BOOST_TEST(! stde::has_value(y));
   }
