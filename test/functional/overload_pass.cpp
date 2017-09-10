@@ -66,7 +66,7 @@ struct convertible_to_function_object {
 };
 
 struct function_without_state_throw {
-  void operator ()(int ) const { throw 1;}
+  JASEL_NORETURN void operator ()(int ) const { throw 1;}
 };
 struct function_without_state2 {
   constexpr int operator ()(int arg) const noexcept { return arg;}

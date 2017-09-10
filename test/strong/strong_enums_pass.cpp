@@ -111,12 +111,6 @@ int main()
       Y y = (Y)x;
   }
   #endif
-  {
-      X x;
-      X* xptr = &x;
-      Y* yptr = (Y*)xptr;
-      (void)yptr;
-  }
   // throw if not a value
   {
     //EC e;

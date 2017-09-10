@@ -169,7 +169,7 @@ namespace std
       public:
         template<typename EFP, typename = enable_if_t<_ctor_from<EFP>::value>>
         explicit basic_scope_exit(EFP &&ef) noexcept(_noexcept_ctor_from<EFP>::value)
-        : _exit_function((EFP &&) ef, _make_failsafe(_noexcept_ctor_from<EFP>
+        : _exit_function(static_cast<EFP &&>(ef), _make_failsafe(_noexcept_ctor_from<EFP>
                 {}, &ef))
         {}
         basic_scope_exit(basic_scope_exit &&that) noexcept(noexcept(detail::_box<EF>(that._exit_function.move(), that)))

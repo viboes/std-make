@@ -425,7 +425,7 @@ inline namespace fundamental_v3
 
       constexpr unsigned long to_ulong() const noexcept
       {
-        return (unsigned long)(bits);
+        return static_cast<unsigned long>(bits);
       }
 
       //! \c <tt>unsigned long long</tt> conversion
@@ -433,7 +433,7 @@ inline namespace fundamental_v3
       //! \c x.
       constexpr unsigned long long to_ullong() const noexcept
       {
-        return (unsigned long long)(bits);
+        return static_cast<unsigned long long>(bits);
       }
 #if 0
 

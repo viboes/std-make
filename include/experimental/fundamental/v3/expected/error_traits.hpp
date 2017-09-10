@@ -54,7 +54,7 @@ inline namespace fundamental_v3
     {
       return current_exception();
     }
-    static void rethrow(exception_ptr const& e)
+    JASEL_NORETURN static void rethrow(exception_ptr const& e)
     {
       rethrow_exception(e);
     }
@@ -83,7 +83,7 @@ inline namespace fundamental_v3
         return error_code();
       }
     }
-    static void rethrow(error_code const& e)
+    JASEL_NORETURN static void rethrow(error_code const& e)
     {
       throw system_error(e);
     }

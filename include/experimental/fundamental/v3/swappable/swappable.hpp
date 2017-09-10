@@ -103,7 +103,7 @@ namespace adl_swappable {
     struct is_adl_swappable
       : false_type {};
   template <class T, class U>
-    struct is_adl_swappable<T, U, void_t<decltype(swap((T&&)declval<T>(), (U&&)declval<U>())) > >
+    struct is_adl_swappable<T, U, void_t<decltype(swap(static_cast<T&&>(declval<T>()), static_cast<U&&>(declval<U>()))) > >
       : true_type {};
 
 #if __cplusplus >= 201402L || defined JASEL_DOXYGEN_INVOKED
@@ -287,7 +287,7 @@ namespace swap_detail {
   template <class T, class U>
     struct is_swappable<T, U,
       meta::when<meta::is_valid<
-        decltype(swappable::swap((T&&)(declval<T>()), (U&&)(declval<U>())))
+        decltype(swappable::swap(static_cast<T&&>(declval<T>()), static_cast<U&&>(declval<U>())))
       >>
     >: true_type {};
 
@@ -296,7 +296,7 @@ namespace swap_detail {
   template <class T, class U>
     struct is_nothrow_swappable<T, U,
       meta::when<
-        noexcept(swappable::swap((T&&)declval<T>(), (U&&)declval<U>()))
+        noexcept(swappable::swap(static_cast<T&&>(declval<T>()), static_cast<U&&>(declval<U>())))
       >
     >: true_type {};
 

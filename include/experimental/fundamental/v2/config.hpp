@@ -90,6 +90,9 @@
     noexcept(noexcept(decltype(__VA_ARGS__)(__VA_ARGS__)))  \
     { return (__VA_ARGS__); }                               \
 
+
+#define JASEL_NORETURN BOOST_NORETURN
+
 /**/
 
 #endif // BOOST_ENUMS_CONFIG_HPP

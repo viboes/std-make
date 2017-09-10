@@ -153,7 +153,7 @@ class test_exception : public std::exception
 int throwing_fun(){ throw test_exception(); }
 int nothrowing_fun(){ return 4; }
 
-void void_throwing_fun(){ throw test_exception(); }
+JASEL_NORETURN void void_throwing_fun(){ throw test_exception(); }
 void do_nothing_fun(){}
 
 void except_default_constructor()

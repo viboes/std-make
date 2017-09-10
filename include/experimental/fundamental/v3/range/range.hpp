@@ -65,8 +65,8 @@ namespace std
               : false_type {};
           template <class T>
             struct has_adl_begin_end<T, void_t<
-                  decltype( begin((T&&)declval<T>()) )
-                , decltype( end((T&&)declval<T>()) )
+                  decltype( begin(static_cast<T&&>(declval<T>())) )
+                , decltype( end(static_cast<T&&>(declval<T>())) )
                 > >
               : true_type {};
 

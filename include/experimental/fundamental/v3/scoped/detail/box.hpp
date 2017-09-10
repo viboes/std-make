@@ -51,8 +51,8 @@ namespace hidden
       template<typename TT, class G
           , typename = enable_if_t<is_constructible<T, TT>::value>
       >
-      explicit _box(TT &&t, G &&guard) noexcept(noexcept(_box((T &&) t)))
-        : _box((T &&) t)
+      explicit _box(TT &&t, G &&guard) noexcept(noexcept(_box(static_cast<T &&>(t))))
+        : _box(static_cast<T &&>(t))
       {
           guard.release();
       }
@@ -87,7 +87,7 @@ namespace hidden
       template<typename TT, class G
           , typename = enable_if_t<is_convertible<TT, T &>::value>
       >
-      _box(TT &&t, G &&guard) noexcept(noexcept(static_cast<T &>((TT &&) t)))
+      _box(TT &&t, G &&guard) noexcept(noexcept(static_cast<T &>(static_cast<T &&>(t))))
         : _value(static_cast<T &>(t))
       {
           guard.release();

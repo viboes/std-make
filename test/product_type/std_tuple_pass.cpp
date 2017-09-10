@@ -308,7 +308,7 @@ int main()
     BOOST_TEST(has_padding(std::make_tuple(2, '3', 4, 5.2)));
     BOOST_TEST(has_padding(std::make_tuple(2, '3')));
     BOOST_TEST(! has_padding(std::make_tuple(2, 3)));
-    BOOST_TEST(! has_padding(std::make_tuple(2, (unsigned short)3, (unsigned short)4  )));
+    BOOST_TEST(! has_padding(std::make_tuple(2, static_cast<unsigned short>(3), static_cast<unsigned short>(4))));
   }
 #if not defined __clang__
   {
