@@ -300,6 +300,7 @@ inline namespace fundamental_v3
   }
 
   // Constant bit values
+  // fixme: these should be inline variables
   constexpr bit_value bit_off(0u);
   constexpr bit_value bit_on(1u);
 

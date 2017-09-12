@@ -24,15 +24,17 @@ int main()
     // Then we create aligned bit values and a bit references on this integer
     stde::bit_value bval0(intval);                              // Creates a bit value from the bit at position 0 of intval
     stde::bit_reference<uint_t> bref0(intval);                  // Creates a bit reference from the bit at position 0 of intval
+    assert(bval0 == bref0);
 
     // And unaligned bit values and a bit references on this integer
     stde::bit_value bval5(intval, 5);                           // Creates a bit value from the bit at position 5 of intval
     stde::bit_reference<uint_t> bref5(intval, 5);               // Creates a bit reference from the bit at position 5 of intval
+    assert(bval5 == bref5);
 
     // Display them
     std::cout<<bval0<<bref0<<bval5<<bref5<<std::endl;          // Prints 0011
 
-    // Change their values conditionnally
+    // Change their values conditionally
     if (static_cast<bool>(bval5)) {
       bval0.flip();  // Flips the bit without affecting the integer
       bref5.reset(); // Resets the bit to zero and affects the integer
@@ -59,7 +61,7 @@ int main()
     // Display them
     std::cout<<bval0<<bref0<<bval5<<bref5<<std::endl;          // Prints 0011
 
-    // Change their values conditionnally
+    // Change their values conditionally
     if (static_cast<bool>(bval5)) {
       bval0.flip();  // Flips the bit without affecting the integer
       bref5.reset(); // Resets the bit to zero and affects the integer

@@ -47,7 +47,7 @@ inline namespace fundamental_v3
       public:
       using word_type = WordType;
       using index_type = bit_value::index_type;
-      using size_type = bit_value::index_type;
+      using size_type = bit_value::size_type;
       using difference_type = ptrdiff_t;
 
       // Lifecycle

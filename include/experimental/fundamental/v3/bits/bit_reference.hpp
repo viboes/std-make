@@ -49,8 +49,8 @@ inline namespace fundamental_v3
       // Types
       public:
       using word_type = WordType;
-      using index_type = size_t;
-      using size_type = size_t;
+      using index_type = bit_value::index_type;
+      using size_type = bit_value::size_type;
 
       // Lifecycle
       public:
@@ -228,7 +228,6 @@ inline namespace fundamental_v3
               ++_ptr;
               _pos = 0;
           }
-          return *this;
       }
       constexpr void dec_as_pointer()
       {
@@ -239,7 +238,6 @@ inline namespace fundamental_v3
               --_ptr;
               _pos = digits - 1;
           }
-          return *this;
       }
       // Implementation details: data members
       private:
@@ -315,7 +313,7 @@ inline namespace fundamental_v3
       public:
       using word_type = WordType;
       using index_type = bit_value::index_type;
-      using size_type = bit_value::index_type;
+      using size_type = bit_value::size_type;
 
       // Lifecycle
       public:

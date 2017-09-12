@@ -202,6 +202,22 @@ inline namespace fundamental_v3
       //const unsigned int m = s % std::numeric_limits<T>::digits;
       return T(1u << (s % std::numeric_limits<T>::digits));
     }
+
+    //! @par Requires:
+    //!   N <= sizeof(T) * CHAR_BIT
+    //! @par Returns
+    //!   A mask with all the bits set to 1 up to the bit N
+    //!   [ Note: Returns T(-1} if x > std::numeric_limits<T>::digits. ]
+    //! abcdefgh >> 2
+    //!   abcdef && 3
+    //!       ef
+    template <size_t N, class T=unsigned>
+    constexpr T from_up_to(T value, size_t pos) noexcept
+    {
+      return (N >= sizeof(T) * CHAR_BIT) ?
+          value : (value >> pos) & up_to<N,T>();
+    }
+
   }
 }}
 } // std
