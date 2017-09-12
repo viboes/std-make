@@ -34,14 +34,15 @@ namespace experimental
 inline namespace fundamental_v3
 {
   // forward declarations
-  enum class word : unsigned int {};
-  template <int Words, class WordType=word>
+  using single_uword = unsigned int;
+  using word = single_uword;
+  template <int Words, class WordType=single_uword>
   class multiword;
 
-  template <int Bits, class WordType=unsigned>
+  template <int Bits, class WordType=single_uword>
   class subword_value;
-  template <int Bits, class WordType=unsigned, class T=remove_cv_t<WordType>> class subword_reference;
-  template <int Bits, class WordType=unsigned, class T=WordType> class subword_pointer;
+  template <int Bits, class WordType=single_uword, class T=remove_cv_t<WordType>> class subword_reference;
+  template <int Bits, class WordType=single_uword, class T=WordType> class subword_pointer;
   template <class Iterator, int Bits, class T=typename Iterator::value_type> class subword_iterator;
 
 //  template <class UIntType>
