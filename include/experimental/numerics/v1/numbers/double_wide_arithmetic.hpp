@@ -23,34 +23,34 @@ inline  namespace v1
   {
     static_assert(is_integral<T>::value, "T must be integral");
 
-    return -to_double(a);
+    return -to_double_width(a);
   }
   template <typename T>
   double_width<T> wide_add( T a, T b )
   {
     static_assert(is_integral<T>::value, "T must be integral");
 
-    return to_double(a) + to_double(b);
+    return to_double_width(a) + to_double_width(b);
   }
   template <typename T>
   double_width<T> wide_sub( T a, T b )
   {
     static_assert(is_integral<T>::value, "T must be integral");
-    return to_double(a) - to_double(b);
+    return to_double_width(a) - to_double_width(b);
   }
   template <typename T>
   double_width<T> wide_add2( T a, T b, T c )
   {
     static_assert(is_integral<T>::value, "T must be integral");
 
-    return to_double(a) + to_double(b) + to_double(c);
+    return to_double_width(a) + to_double_width(b) + to_double_width(c);
   }
   template <typename T>
   double_width<T> wide_sub2( T a, T b, T c )
   {
     static_assert(is_integral<T>::value, "T must be integral");
 
-    return to_double(a) - to_double(b) - to_double(c);
+    return to_double_width(a) - to_double_width(b) - to_double_width(c);
   }
 
   template <typename T>
@@ -59,7 +59,7 @@ inline  namespace v1
   {
     static_assert(is_integral<T>::value, "T must be integral");
 
-    return static_cast<double_width<T>>(to_double(a) << b);
+    return static_cast<double_width<T>>(to_double_width(a) << b);
   }
 
   template <typename T>
@@ -68,7 +68,7 @@ inline  namespace v1
   {
     static_assert(is_integral<T>::value, "T must be integral");
 
-    return (to_double(a) << b) + to_double(c);
+    return (to_double_width(a) << b) + to_double_width(c);
   }
   template <typename T>
   double_width<T> wide_lshsub( T a, int b, T c )
@@ -76,14 +76,14 @@ inline  namespace v1
   {
     static_assert(is_integral<T>::value, "T must be integral");
 
-    return (to_double(a) << b) - to_double(c);
+    return (to_double_width(a) << b) - to_double_width(c);
   }
   template <typename T>
   double_width<T> wide_mul( T a, T b )
   {
     static_assert(is_integral<T>::value, "T must be integral");
 
-    return to_double(a) * to_double(b);
+    return to_double_width(a) * to_double_width(b);
   }
   template <typename T>
   double_width<T> wide_muladd( T a, T b, T c )
@@ -91,7 +91,7 @@ inline  namespace v1
   {
     static_assert(is_integral<T>::value, "T must be integral");
 
-    return to_double(a) * to_double(b) + to_double(c);
+    return to_double_width(a) * to_double_width(b) + to_double_width(c);
   }
   template <typename T>
   double_width<T> wide_mulsub( T a, T b, T c )
@@ -99,7 +99,7 @@ inline  namespace v1
   {
     static_assert(is_integral<T>::value, "T must be integral");
 
-    return to_double(a) * to_double(b) - to_double(c);
+    return to_double_width(a) * to_double_width(b) - to_double_width(c);
   }
   template <typename T>
   double_width<T> wide_muladd2( T a, T b, T c, T d )
@@ -107,7 +107,7 @@ inline  namespace v1
   {
     static_assert(is_integral<T>::value, "T must be integral");
 
-    return to_double(a) * to_double(b) + to_double(c) + to_double(d);
+    return to_double_width(a) * to_double_width(b) + to_double_width(c) + to_double_width(d);
   }
   template <typename T>
   double_width<T> wide_mulsub2( T a, T b, T c, T d )
@@ -115,7 +115,7 @@ inline  namespace v1
   {
     static_assert(is_integral<T>::value, "T must be integral");
 
-    return to_double(a) * to_double(b) - to_double(c) - to_double(d);
+    return to_double_width(a) * to_double_width(b) - to_double_width(c) - to_double_width(d);
   }
   template <typename T, typename D>
   T wide_divn( D a, T b )
@@ -124,7 +124,7 @@ inline  namespace v1
     static_assert(is_integral<T>::value, "T must be integral");
     static_assert(is_same<D, double_width<T>>::value, "D must be double_width<T>");
 
-    return static_cast<T>(to_half(a / to_double(b)));
+    return static_cast<T>(to_half_width(a / to_double_width(b)));
   }
   template <typename T, typename D>
   D wide_divw( D a, T b )
@@ -133,7 +133,7 @@ inline  namespace v1
     static_assert(is_integral<T>::value, "T must be integral");
     static_assert(is_same<D, double_width<T>>::value, "D must be double_width<T>");
 
-    return a / to_double(b);
+    return a / to_double_width(b);
   }
 
   // use double when posible
@@ -141,8 +141,8 @@ inline  namespace v1
   enable_if_t< (sizeof(T) <= 4), UT> split_neg( UT* low, T a )
   {
     static_assert(is_integral<T>::value, "T must be integral");
-    static_assert(is_same<UT, unsigned_<T>>::value, "UT must be unsigned_<T>");
-    double_width<T> r = -to_double(a);
+    static_assert(is_same<UT, make_unsigned_t<T>>::value, "UT must be make_unsigned_t<T>");
+    double_width<T> r = -to_double_width(a);
     *low = split_lower(r);
     return split_upper(r);
   }
@@ -152,26 +152,26 @@ inline  namespace v1
   enable_if_t<(sizeof(T) > 4) && is_signed<T>::value, UT> split_neg( UT* low, T a )
   {
     static_assert(is_integral<T>::value, "T must be integral");
-    static_assert(is_same<UT, unsigned_<T>>::value, "UT must be unsigned_<T>");
-    *low = unsigned_<T>(-a);
-    return unsigned_<T>(-1)*(a>=0);
+    static_assert(is_same<UT, make_unsigned_t<T>>::value, "UT must be make_unsigned_t<T>");
+    *low = make_unsigned_t<T>(-a);
+    return make_unsigned_t<T>(-1)*(a>=0);
   }
   template <typename T, typename UT >
   enable_if_t<(sizeof(T) > 4) && ! is_signed<T>::value, UT> split_neg( UT* low, T a )
   {
     static_assert(is_integral<T>::value, "T must be integral");
-    static_assert(is_same<UT, unsigned_<T>>::value, "UT must be unsigned_<T>");
-    *low = unsigned_<T>(-1)-a+1u;
-    return unsigned_<T>(-1);
+    static_assert(is_same<UT, make_unsigned_t<T>>::value, "UT must be make_unsigned_t<T>");
+    *low = make_unsigned_t<T>(-1)-a+1u;
+    return make_unsigned_t<T>(-1);
   }
 
   template <typename T, typename UT>
   enable_if_t< (sizeof(T) <= 4), UT> split_add( UT* low, T a, T b )
   {
     static_assert(is_integral<T>::value, "T must be integral");
-    static_assert(is_same<UT, unsigned_<T>>::value, "UT must be unsigned_<T>");
+    static_assert(is_same<UT, make_unsigned_t<T>>::value, "UT must be make_unsigned_t<T>");
 
-    double_width<T> r = to_double(a) + to_double(b);
+    double_width<T> r = to_double_width(a) + to_double_width(b);
     *low = split_lower(r);
     return split_upper(r);
   }
@@ -180,9 +180,9 @@ inline  namespace v1
   enable_if_t< (sizeof(T) <= 4), UT> split_sub( UT* low, T a, T b )
   {
     static_assert(is_integral<T>::value, "T must be integral");
-    static_assert(is_same<UT, unsigned_<T>>::value, "UT must be unsigned_<T>");
+    static_assert(is_same<UT, make_unsigned_t<T>>::value, "UT must be make_unsigned_t<T>");
 
-    double_width<T> r = to_double(a) - to_double(b);
+    double_width<T> r = to_double_width(a) - to_double_width(b);
     *low = split_lower(r);
     return split_upper(r);
   }
@@ -191,9 +191,9 @@ inline  namespace v1
   enable_if_t< (sizeof(T) <= 4), UT> split_add2( UT* low, T a, T b, T c )
   {
     static_assert(is_integral<T>::value, "T must be integral");
-    static_assert(is_same<UT, unsigned_<T>>::value, "UT must be unsigned_<T>");
+    static_assert(is_same<UT, make_unsigned_t<T>>::value, "UT must be make_unsigned_t<T>");
 
-    double_width<T> r = to_double(a) + to_double(b) + to_double(c);
+    double_width<T> r = to_double_width(a) + to_double_width(b) + to_double_width(c);
     *low = split_lower(r);
     return split_upper(r);
   }
@@ -202,9 +202,9 @@ inline  namespace v1
   enable_if_t< (sizeof(T) <= 4), UT> split_sub2( UT* low, T a, T b, T c )
   {
     static_assert(is_integral<T>::value, "T must be integral");
-    static_assert(is_same<UT, unsigned_<T>>::value, "UT must be unsigned_<T>");
+    static_assert(is_same<UT, make_unsigned_t<T>>::value, "UT must be make_unsigned_t<T>");
 
-    double_width<T> r = to_double(a) - to_double(b) - to_double(c);
+    double_width<T> r = to_double_width(a) - to_double_width(b) - to_double_width(c);
     *low = split_lower(r);
     return split_upper(r);
   }
@@ -216,7 +216,7 @@ inline  namespace v1
   enable_if_t< (sizeof(T) > 4), UT> split_sub( UT* low, T a, T b )
   {
     static_assert(is_integral<T>::value, "T must be integral");
-    static_assert(is_same<UT, unsigned_<T>>::value, "UT must be unsigned_<T>");
+    static_assert(is_same<UT, make_unsigned_t<T>>::value, "UT must be make_unsigned_t<T>");
 
     if (a>=0 and b>=0)
     {
@@ -245,7 +245,7 @@ inline  namespace v1
   enable_if_t< (sizeof(T) > 4), UT> split_add( UT* low, T a, T b )
   {
     static_assert(is_integral<T>::value, "T must be integral");
-    static_assert(is_same<UT, unsigned_<T>>::value, "UT must be unsigned_<T>");
+    static_assert(is_same<UT, make_unsigned_t<T>>::value, "UT must be make_unsigned_t<T>");
 
     if (a<0 and b<0)
       return UT(-split_add(low, -a, -b));
@@ -272,9 +272,9 @@ inline  namespace v1
   enable_if_t< (sizeof(T) <= 4), UT> split_lsh( UT* low, T a, int b )
   {
     static_assert(is_integral<T>::value, "T must be integral");
-    static_assert(is_same<UT, unsigned_<T>>::value, "UT must be unsigned_<T>");
+    static_assert(is_same<UT, make_unsigned_t<T>>::value, "UT must be make_unsigned_t<T>");
 
-    double_width<T> r = to_double(a) << b;
+    double_width<T> r = to_double_width(a) << b;
     *low = split_lower(r);
     return split_upper(r);
   }
@@ -283,9 +283,9 @@ inline  namespace v1
   enable_if_t< (sizeof(T) <= 4), UT> split_lshadd( UT* low, T a, int b, T c )
   {
     static_assert(is_integral<T>::value, "T must be integral");
-    static_assert(is_same<UT, unsigned_<T>>::value, "UT must be unsigned_<T>");
+    static_assert(is_same<UT, make_unsigned_t<T>>::value, "UT must be make_unsigned_t<T>");
 
-    double_width<T> r = (to_double(a) << b) + to_double(c);
+    double_width<T> r = (to_double_width(a) << b) + to_double_width(c);
     *low = split_lower(r);
     return split_upper(r);
   }
@@ -294,9 +294,9 @@ inline  namespace v1
   enable_if_t< (sizeof(T) <= 4), UT> split_lshsub( UT* low, T a, int b, T c )
   {
     static_assert(is_integral<T>::value, "T must be integral");
-    static_assert(is_same<UT, unsigned_<T>>::value, "UT must be unsigned_<T>");
+    static_assert(is_same<UT, make_unsigned_t<T>>::value, "UT must be make_unsigned_t<T>");
 
-    double_width<T> r = (to_double(a) << b) - to_double(c);
+    double_width<T> r = (to_double_width(a) << b) - to_double_width(c);
     *low = split_lower(r);
     return split_upper(r);
   }
@@ -305,9 +305,9 @@ inline  namespace v1
   enable_if_t< (sizeof(T) <= 4), UT> split_mul( UT* low, T a, T b )
   {
     static_assert(is_integral<T>::value, "T must be integral");
-    static_assert(is_same<UT, unsigned_<T>>::value, "UT must be unsigned_<T>");
+    static_assert(is_same<UT, make_unsigned_t<T>>::value, "UT must be make_unsigned_t<T>");
 
-    double_width<T> r = to_double(a) * to_double(b);
+    double_width<T> r = to_double_width(a) * to_double_width(b);
     *low = split_lower(r);
     return split_upper(r);
   }
@@ -316,9 +316,9 @@ inline  namespace v1
   enable_if_t< (sizeof(T) <= 4), UT> split_muladd( UT* low, T a, T b, T c )
   {
     static_assert(is_integral<T>::value, "T must be integral");
-    static_assert(is_same<UT, unsigned_<T>>::value, "UT must be unsigned_<T>");
+    static_assert(is_same<UT, make_unsigned_t<T>>::value, "UT must be make_unsigned_t<T>");
 
-    double_width<T> r = to_double(a) * to_double(b) + to_double(c);
+    double_width<T> r = to_double_width(a) * to_double_width(b) + to_double_width(c);
     *low = split_lower(r);
     return split_upper(r);
   }
@@ -327,9 +327,9 @@ inline  namespace v1
   enable_if_t< (sizeof(T) <= 4), UT> split_mulsub( UT* low, T a, T b, T c )
   {
     static_assert(is_integral<T>::value, "T must be integral");
-    static_assert(is_same<UT, unsigned_<T>>::value, "UT must be unsigned_<T>");
+    static_assert(is_same<UT, make_unsigned_t<T>>::value, "UT must be make_unsigned_t<T>");
 
-    double_width<T> r = to_double(a) * to_double(b) - to_double(c);
+    double_width<T> r = to_double_width(a) * to_double_width(b) - to_double_width(c);
     *low = split_lower(r);
     return split_upper(r);
   }
@@ -338,9 +338,9 @@ inline  namespace v1
   enable_if_t< (sizeof(T) <= 4), UT> split_muladd2( UT* low, T a, T b, T c, T d )
   {
     static_assert(is_integral<T>::value, "T must be integral");
-    static_assert(is_same<UT, unsigned_<T>>::value, "UT must be unsigned_<T>");
+    static_assert(is_same<UT, make_unsigned_t<T>>::value, "UT must be make_unsigned_t<T>");
 
-    double_width<T> r = to_double(a) * to_double(b) + to_double(c) + to_double(d);
+    double_width<T> r = to_double_width(a) * to_double_width(b) + to_double_width(c) + to_double_width(d);
     *low = split_lower(r);
     return split_upper(r);
   }
@@ -349,9 +349,9 @@ inline  namespace v1
   enable_if_t< (sizeof(T) <= 4), UT> split_mulsub2( UT* low, T a, T b, T c, T d )
   {
     static_assert(is_integral<T>::value, "T must be integral");
-    static_assert(is_same<UT, unsigned_<T>>::value, "UT must be unsigned_<T>");
+    static_assert(is_same<UT, make_unsigned_t<T>>::value, "UT must be make_unsigned_t<T>");
 
-    double_width<T> r = to_double(a) * to_double(b) - to_double(c) - to_double(d);
+    double_width<T> r = to_double_width(a) * to_double_width(b) - to_double_width(c) - to_double_width(d);
     *low = split_lower(r);
     return split_upper(r);
   }
@@ -360,7 +360,7 @@ inline  namespace v1
   enable_if_t< (sizeof(T) <= 4), T> split_divn( UT* low, UT ah, UT al, T b )
   {
     static_assert(is_integral<T>::value, "T must be integral");
-    static_assert(is_same<UT, unsigned_<T>>::value, "UT must be unsigned_<T>");
+    static_assert(is_same<UT, make_unsigned_t<T>>::value, "UT must be make_unsigned_t<T>");
 
 
   }
@@ -369,7 +369,7 @@ inline  namespace v1
   enable_if_t< (sizeof(T) <= 4), UT> split_divw( UT* low, UT ah, UT al, T b )
   {
     static_assert(is_integral<T>::value, "T must be integral");
-    static_assert(is_same<UT, unsigned_<T>>::value, "UT must be unsigned_<T>");
+    static_assert(is_same<UT, make_unsigned_t<T>>::value, "UT must be make_unsigned_t<T>");
 
 
   }
@@ -378,7 +378,7 @@ inline  namespace v1
   enable_if_t< (sizeof(T) <= 4), T> split_divnrem( T* remainder, UT ah, UT al, T b )
   {
     static_assert(is_integral<T>::value, "T must be integral");
-    static_assert(is_same<UT, unsigned_<T>>::value, "UT must be unsigned_<T>");
+    static_assert(is_same<UT, make_unsigned_t<T>>::value, "UT must be make_unsigned_t<T>");
 
 
   }
@@ -386,7 +386,7 @@ inline  namespace v1
   enable_if_t< (sizeof(T) <= 4), UT> split_divwrem( UT* low, T* remainder, UT ah, UT al, T b )
   {
     static_assert(is_integral<T>::value, "T must be integral");
-    static_assert(is_same<UT, unsigned_<T>>::value, "UT must be unsigned_<T>");
+    static_assert(is_same<UT, make_unsigned_t<T>>::value, "UT must be make_unsigned_t<T>");
 
 
   }

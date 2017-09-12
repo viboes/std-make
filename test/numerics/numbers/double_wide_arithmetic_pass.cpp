@@ -65,7 +65,9 @@ int main()
 
   {
     uint8_t l;
-    uint8_t h = nmx::split_neg(&l, uint8_t(1));
+    static_assert(std::is_same<uint8_t, std::make_unsigned_t<int8_t>>::value, "UT must be make_unsigned_t<T>");
+
+    uint8_t h = nmx::split_neg(&l, int8_t(1));
     BOOST_TEST_EQ(l, uint8_t(0xff));
     BOOST_TEST_EQ(h, uint8_t(0xff));
   }
