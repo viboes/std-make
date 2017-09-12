@@ -175,6 +175,12 @@ test-suite bits
       [ run bits/bit_mask_pass.cpp  ]
     ;
 
+test-suite subwords
+    : 
+      [ run ../example/subword/subword.cpp  ]
+      #[ run subword/subword_pass.cpp  ]
+    ;
+
 test-suite product_type
     : 
       [ run product_type/struct_pass.cpp  ]
