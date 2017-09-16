@@ -69,6 +69,7 @@ optional_ref is a proxy to a pseudo optional<T> included in optionals<Ts...>
 It behaves like an optional<T> and it is explicitly convertible to optional<T>.
 */
 
+// fixme. Do we need to parameterize on the mask type in case u8,u16,u32 is a better choice?
 template <size_t Index, class T>
 class optional_ref {
 public:
@@ -77,6 +78,7 @@ public:
   using mask_type = size_t;
   using value_type = const T;
 
+  // fixme this should copy the value
   //optional_ref(optional_ref const&) = default;
   //optional_ref(optional_ref &&) = default;
   //optional_ref& operator=(optional_ref const&) = default;
@@ -248,10 +250,12 @@ private:
         *mask |= (1 << index);
     }
 
+    // fixme: there is no need to use pointer if we define the copy/move constructor/assignment
     mask_type* mask;
     T* ref;
 };
 
+// fixme: do we need to specialize for const?
 template <size_t Index, class T>
 class optional_ref<Index, const T> {
 public:
@@ -442,7 +446,7 @@ public:
     //! You could use
     //! opts.copy_assign(opt2);
     //! which will copy the values type only if m_present.
-    //! Note that the defaul copy and assignment will copy all the bytes.
+    //! Note that the default copy and assignment will copy all the bytes.
     //! fixme: Which one is more efficient
     void copy_assign(optionals const& other) noexcept
     {
