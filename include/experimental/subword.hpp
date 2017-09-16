@@ -4,8 +4,8 @@
 //
 // (C) Copyright 2017 Vicente J. Botet Escriba
 
-#ifndef JASEL_EXPERIMENTAL_BIT_HPP
-#define JASEL_EXPERIMENTAL_BIT_HPP
+#ifndef JASEL_EXPERIMENTAL_SUBWORD_HPP
+#define JASEL_EXPERIMENTAL_SUBWORD_HPP
 
 #include <experimental/fundamental/v3/word/subword_value.hpp>
 #include <experimental/fundamental/v3/word/subword_reference.hpp>
