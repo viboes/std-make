@@ -12,13 +12,12 @@
 /*
  \file
  \brief
- The header \c <experimental/.../bits/subword_value.hpp> defines a bit value with two possible values subword_off/subword_on.
- Most of them are based on "Wording for fundamental bit manipulation utilities" http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2017/p0237r8.pdf
+ The header \c <experimental/.../bits/subword_value.hpp> defines a subword value with 2^N possible values.
 
  */
 
-#ifndef JASEL_FUNDAMENTAL_V3_WORD_SUBWORD_VALUE_HPP
-#define JASEL_FUNDAMENTAL_V3_WORD_SUBWORD_VALUE_HPP
+#ifndef JASEL_FUNDAMENTAL_V3_SUBWORD_SUBWORD_VALUE_HPP
+#define JASEL_FUNDAMENTAL_V3_SUBWORD_SUBWORD_VALUE_HPP
 
 
 #include <experimental/fundamental/v3/bits/binary_digits.hpp>
@@ -227,22 +226,21 @@ inline namespace fundamental_v3
       }
 
       // Stream functions
-      template <class CharT, class Traits, int B, class T>
+      template <class CharT, class Traits>
       friend basic_istream<CharT, Traits>& operator>>(
           basic_istream<CharT, Traits>& is,
-          subword_value<B,T>& x
+          subword_value& x
       )
       {
-
           return is >> x.value;
           x.value &= mask();
           return is;
       }
 
-      template <class CharT, class Traits, int B, class T>
+      template <class CharT, class Traits>
       friend basic_ostream<CharT, Traits>& operator<<(
           basic_ostream<CharT, Traits>& os,
-          subword_value<B, T> const& x
+          subword_value const& x
       )
       {
           return os << x.value();

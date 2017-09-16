@@ -12,13 +12,12 @@
 /*
  \file
  \brief
- The header \c <experimental/.../bits/subword_value.hpp> defines a bit value with two possible values subword_off/subword_on.
- Most of them are based on "Wording for fundamental bit manipulation utilities" http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2017/p0237r8.pdf
+ The header \c <experimental/.../subword/subword_iterator.hpp> defines a subword iterator used to iterate over subwords of the word assocaited to an iterator.
 
  */
 
-#ifndef JASEL_FUNDAMENTAL_V3_WORD_SUBWORD_ITERATOR_HPP
-#define JASEL_FUNDAMENTAL_V3_WORD_SUBWORD_ITERATOR_HPP
+#ifndef JASEL_FUNDAMENTAL_V3_SUBWORD_SUBWORD_ITERATOR_HPP
+#define JASEL_FUNDAMENTAL_V3_SUBWORD_SUBWORD_ITERATOR_HPP
 
 
 #include <experimental/fundamental/v3/bits/binary_digits.hpp>

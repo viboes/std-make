@@ -12,7 +12,7 @@
 /*
  \file
  \brief
- The header \c <experimental/.../bits/bit_reference.hpp> defines a bit reference located inside a word.
+ The header \c <experimental/.../bits/bit_reference.hpp> defines a bit reference to a bit located inside a word.
  Most of them are based on "Wording for fundamental bit manipulation utilities" http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2017/p0237r8.pdf
 
  */
@@ -26,6 +26,7 @@
 
 #include <experimental/fundamental/v3/contract/constexpr_assert.hpp>
 #include <experimental/fundamental/v2/config.hpp>
+#include <experimental/fundamental/v3/config/requires.hpp>
 
 #include <iosfwd>
 
@@ -54,7 +55,9 @@ inline namespace fundamental_v3
 
       // Lifecycle
       public:
-      template <class T>
+      template <class T
+          , JASEL_REQUIRES( is_convertible<T&, WordType&>::value )
+      >
       constexpr bit_reference(const bit_reference<T>& other) noexcept
       : _ptr(other._ptr)
       , _pos(other._pos)
@@ -79,7 +82,9 @@ inline namespace fundamental_v3
           other ? set() : reset();
           return *this;
       }
-      template <class T>
+      template <class T
+          //, JASEL_REQUIRES( is_convertible<T&, WordType&>::value )
+      >
       constexpr bit_reference& operator=(const bit_reference<T>& other) noexcept
       {
           other ? set() : reset();
@@ -318,7 +323,9 @@ inline namespace fundamental_v3
       // Lifecycle
       public:
       constexpr bit_reference(const bit_reference& ) noexcept = default;
-      template <class T>
+      template <class T
+      , JASEL_REQUIRES( is_convertible<T&, WordType&>::value )
+      >
       constexpr bit_reference(const bit_reference<T>& other) noexcept
       : _ptr(other._ptr)
       , _mask(other._mask)
@@ -342,7 +349,9 @@ inline namespace fundamental_v3
           other ? set() : reset();
           return *this;
       }
-      template <class T>
+      template <class T
+      //, JASEL_REQUIRES( is_convertible<T&, WordType&>::value )
+      >
       JASEL_MUTABLE_CONSTEXPR bit_reference& operator=(const bit_reference<T>& other) noexcept
       {
           other ? set() : reset();

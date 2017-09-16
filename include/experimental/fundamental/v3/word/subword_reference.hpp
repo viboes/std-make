@@ -12,13 +12,12 @@
 /*
  \file
  \brief
- The header \c <experimental/.../bits/subword.hpp> defines a bit value with two possible values bit_off/bit_on.
- Most of them are based on "Wording for fundamental bit manipulation utilities" http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2017/p0237r8.pdf
+ The header \c <experimental/.../subword/subword_reference.hpp> defines a subword reference to a subword located inside a word.
 
  */
 
-#ifndef JASEL_FUNDAMENTAL_V3_WORD_SUBWORD_REFERENCE_HPP
-#define JASEL_FUNDAMENTAL_V3_WORD_SUBWORD_REFERENCE_HPP
+#ifndef JASEL_FUNDAMENTAL_V3_SUBWORD_SUBWORD_REFERENCE_HPP
+#define JASEL_FUNDAMENTAL_V3_SUBWORD_SUBWORD_REFERENCE_HPP
 
 
 #include <experimental/fundamental/v3/bits/binary_digits.hpp>
@@ -30,6 +29,7 @@
 
 #include <iosfwd>
 #include <type_traits>
+#include <cstring>
 
 namespace std
 {
@@ -69,7 +69,7 @@ inline namespace fundamental_v3
   public:
       constexpr subword_reference(const subword_reference& other) noexcept = default;
       template <class W>
-      constexpr subword_reference(const subword_reference<Bits, T,W>& other) noexcept
+      constexpr subword_reference(const subword_reference<Bits, W, T>& other) noexcept
       : _ptr(other._ptr)
       , _pos(other._pos)
       {
@@ -88,13 +88,13 @@ inline namespace fundamental_v3
 
       // Assignment
   public:
-      constexpr subword_reference& operator=(subword_reference const& other) noexcept
+      JASEL_CXX14_CONSTEXPR subword_reference& operator=(subword_reference const& other) noexcept
       {
           set(other.value());
           return *this;
       }
       template <class W>
-      constexpr subword_reference& operator=(subword_reference<Bits, T,W> const& other) noexcept
+      JASEL_CXX14_CONSTEXPR subword_reference& operator=(subword_reference<Bits, W, T> const& other) noexcept
       {
           set(other.value());
           return *this;
@@ -104,16 +104,16 @@ inline namespace fundamental_v3
 //          set(val);
 //          return *this;
 //      }
-      constexpr subword_reference& operator=(subword const& val) noexcept
+      JASEL_CXX14_CONSTEXPR subword_reference& operator=(subword const& val) noexcept
       {
           set(val);
           return *this;
       }
-      constexpr subword_reference& assign(word_type const& val) noexcept
+      JASEL_CXX14_CONSTEXPR subword_reference& assign(word_type const& val) noexcept
       {
           return *this=subword(val);
       }
-      constexpr subword_reference& assign(word_type const& val, index_type pos)
+      JASEL_CXX14_CONSTEXPR subword_reference& assign(word_type const& val, index_type pos)
       {
           JASEL_CONSTEXPR_ASSERT(pos < binary_digits<word_type>::value);
           return *this=subword(val, pos);
@@ -121,17 +121,17 @@ inline namespace fundamental_v3
 
       // Bitwise assignment operators
   public:
-      constexpr subword_reference& operator&=(subword const& other) noexcept
+      JASEL_CXX14_CONSTEXPR subword_reference& operator&=(subword const& other) noexcept
       {
           *_ptr &= ~mask() | mask(other,_pos);
           return *this;
       }
-      constexpr subword_reference& operator|=(subword const& other) noexcept
+      JASEL_CXX14_CONSTEXPR subword_reference& operator|=(subword const& other) noexcept
       {
           *_ptr |= ~mask() | mask(other,_pos);
           return *this;
       }
-      constexpr subword_reference& operator^=(subword const& other) noexcept
+      JASEL_CXX14_CONSTEXPR subword_reference& operator^=(subword const& other) noexcept
       {
           *_ptr ^= mask(other,_pos);
           return *this;
@@ -156,8 +156,13 @@ inline namespace fundamental_v3
       {
         return subword(*_ptr , _pos);
       }
+      word_type value() const noexcept
+      {
+          return subword(*this).value();
+      }
       public:
-      explicit constexpr operator T() const noexcept
+      // fixme: cannot be const because declaring a variable uninitialized and using memcpy?
+      explicit operator T() const noexcept
       {
         //return T(subword(*this)); // if explicitly convertible
         subword s(*_ptr , _pos); // if trivially_copiable
@@ -176,7 +181,7 @@ inline namespace fundamental_v3
       // Swap members
       public:
       template <class W>
-      void swap(subword_reference<Bits, T,W> other)
+      void swap(subword_reference<Bits, W, T> other)
       {
           if (other != *this) {
               subword s(*this);
@@ -192,22 +197,22 @@ inline namespace fundamental_v3
       }
       // Bit manipulation
       public:
-      constexpr subword_reference& set(subword other) noexcept
+      JASEL_CXX14_CONSTEXPR subword_reference& set(subword other) noexcept
       {
           reset();
           *_ptr |= ~mask() | mask(other, _pos);
           return *this;
       }
-      constexpr subword_reference& set(T other) noexcept
+      JASEL_CXX14_CONSTEXPR subword_reference& set(T other) noexcept
       {
           return set(subword(other));
       }
-      constexpr subword_reference& reset() noexcept
+      JASEL_CXX14_CONSTEXPR subword_reference& reset() noexcept
       {
           *_ptr &= ~mask();
           return *this;
       }
-      constexpr subword_reference& flip() noexcept
+      JASEL_CXX14_CONSTEXPR subword_reference& flip() noexcept
       {
           *_ptr ^= mask();
           return *this;
@@ -250,24 +255,24 @@ inline namespace fundamental_v3
       , _pos(pos)
       {
       }
-      constexpr void assign_as_pointer(std::nullptr_t) noexcept
+      JASEL_CXX14_CONSTEXPR void assign_as_pointer(std::nullptr_t) noexcept
       {
         _ptr = nullptr;
         _pos = 0;
       }
-      constexpr void assign_as_pointer(subword_reference rhs) noexcept
+      JASEL_CXX14_CONSTEXPR void assign_as_pointer(subword_reference rhs) noexcept
       {
         _ptr = rhs._ptr;
         _pos = rhs._pos;
       }
       template <class W>
-      constexpr void assign_as_pointer(subword_reference<Bits, W, T> rhs) noexcept
+      JASEL_CXX14_CONSTEXPR void assign_as_pointer(subword_reference<Bits, W, T> rhs) noexcept
       {
         _ptr = rhs._ptr;
         _pos = rhs._pos;
       }
 
-      constexpr void inc_as_pointer()
+      JASEL_CXX14_CONSTEXPR void inc_as_pointer()
       {
           //constexpr size_type word_digits = binary_digits<word_type>::value;
           if ((_pos*subword_digits) + subword_digits < word_digits) {
@@ -278,7 +283,7 @@ inline namespace fundamental_v3
           }
           //return *this;
       }
-      constexpr void dec_as_pointer()
+      JASEL_CXX14_CONSTEXPR void dec_as_pointer()
       {
           //constexpr size_type word_digits = binary_digits<word_type>::value;
           if ((_pos*subword_digits) > subword_digits) {

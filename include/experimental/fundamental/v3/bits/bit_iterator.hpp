@@ -12,7 +12,7 @@
 /*
  \file
  \brief
- The header \c <experimental/.../bits/bit_iterator.hpp> defines a bit iterator wrapping a word container iterator.
+ The header \c <experimental/.../bits/bit_iterator.hpp> defines a bit iterator to iterate over the bits located on an associated iterator.
  Most of them are based on "Wording for fundamental bit manipulation utilities" http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2017/p0237r8.pdf
 
  */
@@ -25,6 +25,7 @@
 
 #include <experimental/fundamental/v3/contract/constexpr_assert.hpp>
 #include <experimental/fundamental/v2/config.hpp>
+#include <experimental/fundamental/v3/config/requires.hpp>
 
 #include <iosfwd>
 
@@ -61,7 +62,9 @@ inline namespace fundamental_v3
       , _position()
       {
       }
-      template <class T>
+      template <class T
+      , JASEL_REQUIRES( is_constructible<iterator_type, T>::value )
+      >
       constexpr bit_iterator(const bit_iterator<T>& other)
       : _current(other._current)
       , _position(other._position)
@@ -80,7 +83,9 @@ inline namespace fundamental_v3
 
       // Assignment
       public:
-      template <class T>
+      template <class T
+      , JASEL_REQUIRES( is_assignable<iterator_type, T>::value )
+      >
       JASEL_MUTABLE_CONSTEXPR bit_iterator& operator=(const bit_iterator<T>& other)
       {
           _current = other._current;

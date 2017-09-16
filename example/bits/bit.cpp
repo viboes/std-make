@@ -11,6 +11,7 @@
 
 #include <array>
 #include <list>
+#include <algorithm>
 
 namespace stde = std::experimental;
 
@@ -93,6 +94,13 @@ int main()
 
     // And finally we set the bit pointer to the position of the bit reference
     bptr = &bref5;
+
+    stde::bit_pointer<const uint_t> bcptr = bptr;
+
+    //stde::bit_pointer<uint_t> bptr2 = bcptr; // compile fails as expected
+
+    stde::bit_pointer<const uint_t> bcptr2 = bcptr - 2;
+    std::cout<<bcptr2 - bptr<<std::endl;
   }
   {
     // First, we create a list of integers
