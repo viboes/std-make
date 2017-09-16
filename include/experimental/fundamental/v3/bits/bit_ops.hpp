@@ -39,6 +39,22 @@ inline namespace fundamental_v3
 {
   namespace bit_ops
   {
+
+    //! @par Requires:
+    //!   T is an integral type?
+    //! @par Returns
+    //!   the number of bits of the type T
+    template <class T>
+    constexpr int bitsof()
+    {
+      return sizeof(T) * CHAR_BIT;
+    }
+    template <class T>
+    constexpr int bitsof(T)
+    {
+      return bitsof<T>();
+    }
+
     //! @par Returns
     //!   The bits in x rotated to the left s times
     //! @par Remarks:
@@ -158,64 +174,99 @@ inline namespace fundamental_v3
     }
 
     //! @par Requires:
-    //!   N <= sizeof(T) * CHAR_BIT
+    //!   N <= bitsof<T>()
     //! @par Returns
     //!   A mask with all the bits set to 1 up to the bit N
     //!   [ Note: Returns T(-1} if x > std::numeric_limits<T>::digits. ]
     template <size_t N, class T=unsigned>
     constexpr T up_to() noexcept
     {
-      return (N >= sizeof(T) * CHAR_BIT) ?
+      static_assert(N < bitsof<T>(), "Error");
+      return (N >= bitsof<T>()) ?
           T(-1) : T(1u << N) - 1;
     }
 
     //! @par Pre-condition:
-    //!   n <= sizeof(T) * CHAR_BIT
+    //!   0 < n <= bitsof<T>()
     //! @par Returns
     //!   A mask with all the bits set to 1 up to the bit n.
     template <class T=unsigned>
     constexpr T up_to(size_t n) noexcept
     {
-      return (n >= sizeof(T) * CHAR_BIT) ?
+      return (n == bitsof<T>()) ?
           T(-1) : T(1u << n) - 1;
+           //T(-1) >> (digits-n)
     }
 
     //! @par Requires:
-    //!   S < sizeof(T) * CHAR_BIT
+    //!   0 <= N < bitsof<T>()
     //! @par Returns
-    //!   A mask with the bit S set to 1
-    template <size_t S, class T=unsigned>
+    //!   A mask with the bit P set to 1
+    template <size_t P, class T=unsigned>
     constexpr T single() noexcept
     {
-      //constexpr unsigned int N = std::numeric_limits<T>::digits;
-      //constexpr unsigned int m = S % std::numeric_limits<T>::digits;
-      return T(1u << (S % std::numeric_limits<T>::digits));
+      static_assert(P < bitsof<T>(), "Error");
+      return T(T(1u) << P);
     }
     //! @par Pre-condition:
-    //!   s < sizeof(T) * CHAR_BIT
+    //!   pos < bitsof<T>()
     //! @par Returns
     //!   A mask with the bit s set to 1
     template <class T>
-    constexpr T single(size_t s) noexcept
+    constexpr T single(size_t pos)
     {
-      //constexpr unsigned int N = std::numeric_limits<T>::digits;
-      //const unsigned int m = s % std::numeric_limits<T>::digits;
-      return T(1u << (s % std::numeric_limits<T>::digits));
+      return T(T(1u) << pos);
     }
 
-    //! @par Requires:
-    //!   N <= sizeof(T) * CHAR_BIT
     //! @par Returns
-    //!   A mask with all the bits set to 1 up to the bit N
-    //!   [ Note: Returns T(-1} if x > std::numeric_limits<T>::digits. ]
-    //! abcdefgh >> 2
-    //!   abcdef && 3
-    //!       ef
     template <size_t N, class T=unsigned>
     constexpr T from_up_to(T value, size_t pos) noexcept
     {
-      return (N >= sizeof(T) * CHAR_BIT) ?
-          value : (value >> pos) & up_to<N,T>();
+      // (pos+N <= bitsof<T>()) ?
+      return (value >> pos) & up_to<N,T>();
+    }
+
+    template <class Integral>
+    constexpr Integral set_bit(Integral x, int pos) noexcept
+    {
+      return x | single<Integral>(pos);
+    }
+
+    template <class Integral>
+    constexpr Integral reset_bit(Integral x, int pos) noexcept
+    {
+      return x & ~single<Integral>(pos);
+    }
+    template <class Integral>
+    constexpr Integral flip_bit(Integral x, int pos) noexcept
+    {
+      return x ^ single<Integral>(pos);
+    }
+    template <class Integral>
+    constexpr bool test_bit(Integral x, int pos) noexcept
+    {
+      return bool(x & single<Integral>(pos));
+    }
+
+    template <size_t Pos, class Integral>
+    constexpr Integral set_bit(Integral x) noexcept
+    {
+      return x | single<Pos,Integral>();
+    }
+    template <size_t Pos, class Integral>
+    constexpr Integral reset_bit(Integral x) noexcept
+    {
+      return x & ~single<Pos, Integral>();
+    }
+    template <size_t Pos, class Integral>
+    constexpr Integral flip_bit(Integral x) noexcept
+    {
+      return x ^ single<Pos, Integral>();
+    }
+    template <size_t Pos, class Integral>
+    constexpr bool test_bit(Integral x) noexcept
+    {
+      return bool(x & single<Pos, Integral>());
     }
 
   }
