@@ -13,12 +13,37 @@
 namespace stdex = std::experimental;
 
 template <class T> struct show;
+
 static_assert(std::is_pod<stdex::pod::optional<int>>::value, "pod::optional<int> is not a POD");
 static_assert(sizeof(stdex::pod::optional<char, std::int8_t>) == 2, "sizeof(stdex::pod::optional<char, std::int8_t>)  must be 2");
+static_assert(sizeof(stdex::pod::optional<char>) == 2, "sizeof(stdex::pod::optional<char>)  must be 2");
 static_assert(sizeof(stdex::pod::optional<int, std::int8_t>) == 8, "sizeof(stdex::pod::optional<int, std::int8_t>)  must be 8");
+
+
+struct P {
+  short x;
+  short y;
+};
+
+static_assert(std::is_pod<stdex::pod::optional<P>>::value, "pod::optional<P> is not a POD");
+static_assert(std::is_pod<stdex::pod::optional<P, std::int16_t>>::value, "pod::optional<P> is not a POD");
+static_assert(sizeof(stdex::pod::optional<P>) == 6, "sizeof(stdex::pod::optional<P>)  must be 6");
+static_assert(sizeof(stdex::pod::optional<P, std::int16_t>) == 6, "sizeof(stdex::pod::optional<P, std::int16_t>)  must be 6");
 
 int main()
 {
+  {
+    stdex::pod::optional<int> o1 = {};
+    BOOST_TEST (!o1);
+  }
+  {
+    stdex::pod::optional<P> o1 = {};
+    BOOST_TEST (!o1);
+  }
+  {
+    stdex::pod::optional<P> o1{};
+    BOOST_TEST (!o1);
+  }
   {
     stdex::pod::optional<int> o1;
     o1 = std::nullopt;
@@ -97,12 +122,41 @@ int main()
     BOOST_TEST (*ol == 1);
   }
   {
+    stdex::pod::optional<int> oi {stdex::pod::in_place};
+    BOOST_TEST (oi != stdex::pod::nullopt);
+    BOOST_TEST (bool(oi));
+  }
+  {
+    stdex::pod::optional<int> oi {stdex::pod::in_place, 1};
+    BOOST_TEST (oi != stdex::pod::nullopt);
+    BOOST_TEST (bool(oi));
+  }
+  {
+    stdex::pod::optional<P> oi {stdex::pod::in_place};
+    BOOST_TEST (oi != stdex::pod::nullopt);
+    BOOST_TEST (bool(oi));
+  }
+#if 0
+  // fixme: needs a different in_place that does aggregate initialization
+  {
+    stdex::pod::optional<P> oi {stdex::pod::in_place, 1, 2};
+    BOOST_TEST (oi != stdex::pod::nullopt);
+    BOOST_TEST (bool(oi));
+  }
+#endif
+  {
     stdex::pod::optional<stdex::pod::optional<int>> oi1 = stdex::pod::nullopt;
     BOOST_TEST (oi1 == stdex::pod::nullopt);
     BOOST_TEST (!oi1);
 
     {
     stdex::pod::optional<stdex::pod::optional<int>> oi2 {stdex::pod::in_place};
+    BOOST_TEST (oi2 != stdex::pod::nullopt);
+    BOOST_TEST (bool(oi2));
+    BOOST_TEST (*oi2 == stdex::pod::nullopt);
+    }
+    {
+    stdex::pod::optional<stdex::pod::optional<P>> oi2 {stdex::pod::in_place};
     BOOST_TEST (oi2 != stdex::pod::nullopt);
     BOOST_TEST (bool(oi2));
     BOOST_TEST (*oi2 == stdex::pod::nullopt);
