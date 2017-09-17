@@ -130,7 +130,7 @@ public:
     >
     constexpr optional( U&& value ) noexcept
             : m_present(bool_type(true))
-            , m_value( move(value) )
+            , m_value( constexpr_move(value) )
     {
     }
     template < class U = value_type
@@ -143,7 +143,7 @@ public:
     >
     explicit constexpr optional( U&& value ) noexcept
             : m_present(bool_type(true))
-            , m_value( move(value) )
+            , m_value( constexpr_move(value) )
     {
     }
 
@@ -290,11 +290,11 @@ public:
     }
     JASEL_CXX14_CONSTEXPR const T&& operator*() const&&
     {
-        return move(m_value);
+        return constexpr_move(m_value);
     }
     JASEL_CXX14_CONSTEXPR T&& operator*() &&
     {
-        return move(m_value);
+        return constexpr_move(m_value);
     }
 
     constexpr bool has_value() const noexcept
@@ -340,7 +340,7 @@ public:
     template< class U >
     JASEL_CXX14_CONSTEXPR value_type value_or(U && default_value) &&
     {
-        return has_value() ? move(**this) : static_cast<T>(forward<U>(default_value));
+        return has_value() ? constexpr_move(**this) : static_cast<T>(forward<U>(default_value));
     }
 
     void reset() noexcept
