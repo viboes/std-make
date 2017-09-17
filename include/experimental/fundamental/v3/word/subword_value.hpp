@@ -29,16 +29,20 @@
 
 #include <iosfwd>
 
+// fixme: which operation should a subword_value provide?
+// If we see them just as a set of bits it should provide the bitwise operations
+// Should it provide the bit_set operations?
+
 namespace std
 {
 namespace experimental
 {
 inline namespace fundamental_v3
 {
+// fixme: If the T parameter is any type, we could use aligned_storage that is a trivial type an do conversion from T and to T
   template <int Bits, class WT>
   class subword_value
   {
-
       // Friendship
       template <int B, class W, class T>
       friend class subword_reference;

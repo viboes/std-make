@@ -31,6 +31,11 @@
 #include <type_traits>
 #include <cstring>
 
+// fixme: which operation should a subword_reference provide?
+// If we see them just as a reference to a set of bits it should provide the bitwise operations
+// Should it provide the bit_set operations?
+// However, subword_reference is a T proxy
+
 namespace std
 {
 namespace experimental
@@ -45,8 +50,18 @@ inline namespace fundamental_v3
       using word_type = WordType;
       using subword_type = T;
 
+      static_assert(is_unsigned<word_type>::value, "A WordType must be unsigned");
+      static_assert(is_unsigned<subword_type>::value, "A T must be unsigned");
+
       static constexpr int subword_digits = Bits;
       static constexpr int word_digits = binary_digits<word_type>::value;
+
+      // fixme: this works only for T that are unsigned integral types.
+      // But we want to store here any trivial type that has Bits significant bits
+      // We need an unsigned type associated to T, so that we can memcpy from T to subword and vice-versa
+      // Note that this forbids to store signed types.
+      // An alternative is change the meaning of the T parameter of subword_value<Bits, T> so that the storage is an unsigned,
+      // but the conversion from from subword to T add the sign if the type is an signed type
       using subword = subword_value<subword_digits, T>;
 
       using index_type = typename subword::index_type;
@@ -56,9 +71,6 @@ inline namespace fundamental_v3
       static_assert(is_trivially_copyable<subword_type>::value, "A subword must be trivially copyable");
       static_assert(subword_digits <= binary_digits<T>::value, "");
       static_assert(word_digits % subword_digits == 0, "");
-      //static_assert(alignof(T) <= alignof(WordType), ""); // it is not clear yet if this will be needed
-
-
 
       // Friendship
   private:
@@ -85,7 +97,6 @@ inline namespace fundamental_v3
       {
       }
 
-
       // Assignment
   public:
       JASEL_CXX14_CONSTEXPR subword_reference& operator=(subword_reference const& other) noexcept
@@ -99,6 +110,8 @@ inline namespace fundamental_v3
           set(other.value());
           return *this;
       }
+      // fixme: We can not define a assignment from word_type and value_type if both are the same.
+      //
 //      constexpr subword_reference& operator=(value_type const& val) noexcept
 //      {
 //          set(val);
@@ -137,31 +150,20 @@ inline namespace fundamental_v3
           return *this;
       }
 
-      // 16 32 64 128 256 352 512
-      // 11 22 55 121 253 352 506
-      //  5 10  9   7   3   0   6
-      // 11*20= 220
-      // 11*21= 231
-      // 11*22= 242
-      // 11*23= 253
-      // 11*32= 352
-      // 11*46= 506
-      // 11*47= 517
-      // 11*48= 528
-
-
       // Conversion
   public:
       constexpr operator subword() const noexcept
       {
         return subword(*_ptr , _pos);
       }
+      // fixme:: should value return word_type or value_type?
+      // what name for retrieving the word_type?
       word_type value() const noexcept
       {
           return subword(*this).value();
       }
       public:
-      // fixme: cannot be const because declaring a variable uninitialized and using memcpy?
+      // fixme: cannot be constexpr because the function is declaring a variable uninitialized and using memcpy?
       explicit operator T() const noexcept
       {
         //return T(subword(*this)); // if explicitly convertible
