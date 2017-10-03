@@ -6,7 +6,8 @@
 // <experimental/functor.hpp>
 
 #include <experimental/functor.hpp>
-#include <experimental/nullable.hpp>
+#include <experimental/value_or_none.hpp>
+#include <experimental/make.hpp>
 #include <boost/detail/lightweight_test.hpp>
 
 int twice(int i) {

@@ -10,6 +10,7 @@
 #include <experimental/make.hpp>
 #include <experimental/meta.hpp>
 #include <experimental/nullable.hpp>
+#include <experimental/value_or_none.hpp>
 #include <experimental/functor.hpp>
 #include <memory>
 
@@ -43,6 +44,11 @@ namespace type_constructible {
 }
 
 namespace nullable {
+  template <class T>
+  struct traits<shared_ptr<T>> : traits_pointer_like {};
+}
+
+namespace value_or_none {
   template <class T>
   struct traits<shared_ptr<T>> : traits_pointer_like {};
 }

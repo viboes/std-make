@@ -12,6 +12,7 @@
 #include <experimental/make.hpp>
 #include <experimental/possibly_valued.hpp>
 #include <experimental/nullable.hpp>
+#include <experimental/value_or_none.hpp>
 #include <experimental/sum_type.hpp>
 #include <experimental/meta.hpp>
 #include <experimental/functor.hpp>
@@ -74,11 +75,18 @@ namespace nullable
   };
 }
 
+namespace value_or_none
+{
+  template <class T>
+  struct traits<optional<T>> : traits_pointer_like {
+  };
+}
+
 #if __cplusplus >= 201402L  || defined JASEL_DOXYGEN_INVOKED
 namespace sum_type
 {
   template <class T>
-  struct traits<optional<T>> : nullable::as_sum_type<optional<T>> {};
+  struct traits<optional<T>> : value_or_none::as_sum_type<optional<T>> {};
 }
 #endif
 

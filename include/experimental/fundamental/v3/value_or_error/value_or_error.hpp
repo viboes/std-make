@@ -10,11 +10,12 @@
 #define JASEL_FUNDAMENTAL_V3_VALUE_OR_ERROR_HPP
 
 //#include <experimental/type_constructible.hpp>
-#include <experimental/possibly_valued.hpp>
 #include <experimental/type_traits.hpp>
 #include <experimental/meta.hpp>
 #include <experimental/fundamental/v2/config.hpp>
 #include <experimental/meta/v1/when.hpp>
+#include <experimental/success_or_failure.hpp>
+#include <experimental/wrapped.hpp>
 #include <functional>
 
 #include <utility>
@@ -28,7 +29,6 @@ inline namespace fundamental_v3
 {
 
   namespace value_or_error {
-    using namespace possibly_valued;
 
     struct tag {};
 
@@ -47,24 +47,115 @@ inline namespace fundamental_v3
     {
 #if __cplusplus >= 201402L || defined JASEL_DOXYGEN_INVOKED
 
-      template <class U>
-      static
-      auto error(U && ptr)  = delete;
+        template <class U>
+        static
+        bool has_value(U const& ptr)  = delete;
+
+        template <class U>
+        static
+        auto deref(U && ptr) = delete;
+
+        template <class U>
+        static
+        auto error(U && ptr)  = delete;
 
 #endif
     };
 
     struct traits_pointer_like : tag
     {
-      template <class U>
-      static constexpr
-      nullptr_t error(U && ptr) noexcept { return nullptr; }
+        template <class U>
+        static constexpr
+        bool has_value(U const& ptr) noexcept { return bool(ptr); }
+
+        template <class U>
+        static constexpr
+        auto deref(U && ptr)
+          JASEL_DECLTYPE_RETURN (
+              *(forward<U>(ptr))
+          )
+
+        template <class U>
+        static constexpr
+        nullptr_t error(U && ptr) noexcept { return nullptr; }
     };
 
-    template <>
-    struct traits<add_pointer<_t>> : traits_pointer_like {};
+    // fixme
+    //template <>
+    //struct traits<add_pointer<_t>> : traits_pointer_like {};
     template <class T>
     struct traits<T*> : traits_pointer_like {};
+
+#if 1
+    // specialization for SuccessOrFailure types.
+    template <typename T>
+    struct traits<T, meta::when<is_success_or_failure<T>::value>> : tag
+    {
+
+        template <class U>
+        static
+        bool has_value(U && u)  { return success_or_failure::succeeded(forward<U>(u)); }
+
+        template <class U>
+        static
+        auto deref(U && u) { return wrapped::unwrap(success_or_failure::success_value(forward<U>(u))); }
+
+        template <class U>
+        static
+        auto error(U && u)  { return wrapped::unwrap(success_or_failure::failure_value(forward<U>(u))); }
+
+    };
+#endif
+
+    template <class T>
+    constexpr
+    auto has_value(T const& x)
+      JASEL_DECLTYPE_RETURN_NOEXCEPT (
+        traits<T>::has_value(x)
+      )
+
+    template <class T>
+    constexpr
+    bool has_value(T const* ptr) noexcept {
+      return ptr != nullptr;
+    }
+
+    template <class T>
+    constexpr
+    auto deref(T && x)
+      JASEL_DECLTYPE_RETURN (
+        traits<decay_t<T>>::deref(x)
+      )
+
+    template <class T>
+    constexpr
+    T& deref(T* ptr) noexcept {
+      return *ptr ;
+    }
+
+    template <class T>
+      struct value_type;
+    template <class T>
+        using value_type_t = typename value_type<T>::type;
+
+    template <class T>
+      struct value_type { using type = remove_reference_t<decltype(value_or_error::deref(declval<T>()))>; };
+
+    template <class M>
+    auto have_value(M const& v)
+      JASEL_DECLTYPE_RETURN_NOEXCEPT (
+        value_or_error::has_value(v)
+      )
+
+    template <class M1, class M2, class ...Ms>
+    auto have_value(M1 const& v1, M2 const& v2, Ms const& ...vs)
+      //-> decltype(has_value(v1) && have_value(v2, vs...))
+      noexcept(noexcept(value_or_error::has_value(v1)))
+      -> decltype(value_or_error::has_value(v1))
+
+    {
+      return value_or_error::has_value(v1) && have_value(v2, vs...);
+    }
 
     template <class T>
     constexpr
@@ -127,7 +218,7 @@ inline namespace fundamental_v3
 
 //#define JASEL_TRY_HELPER(UNIQUE, V, EXPR)
 //auto UNIQUE = EXPR;
-//if ( ! value_or_error::has_value(UNIQUE) ) return value_or_error::error(UNIQUE);
+//if ( ! value_or_error::has_value(UNIQUE) ) return value_or_error::failure_value(UNIQUE);
 //auto V = value_or_error::deref(UNIQUE)
 
 #endif // header

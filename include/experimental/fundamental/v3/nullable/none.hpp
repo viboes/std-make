@@ -18,9 +18,6 @@
 #include <experimental/type_traits.hpp>
 
 
-// the operation deref_none make Nullable something more like Error-able.
-// It allows to forward errors from one Nullable to another.
-
 namespace std
 {
 namespace experimental
@@ -50,10 +47,6 @@ inline namespace fundamental_v3
       static
       bool has_value(U const& ptr)  = delete;
 
-      template <class U>
-      static
-      auto deref(U && ptr) = delete;
-
 #endif
     };
 
@@ -66,12 +59,6 @@ inline namespace fundamental_v3
       static constexpr
       bool has_value(U const& ptr) noexcept { return bool(ptr); }
 
-      template <class U>
-      static constexpr
-      auto deref(U && ptr)
-        JASEL_DECLTYPE_RETURN (
-            *(forward<U>(ptr))
-        )
     };
 
     template <>
@@ -133,40 +120,6 @@ inline namespace fundamental_v3
     return ptr != nullptr;
   }
 
-  template <class T>
-  constexpr
-  auto deref(T && x)
-    JASEL_DECLTYPE_RETURN (
-      traits<decay_t<T>>::deref(x)
-    )
-
-  template <class T>
-  constexpr
-  T& deref(T* ptr) noexcept {
-    return *ptr ;
-  }
-
-  template <class T>
-    struct value_type;
-  template <class T>
-      using value_type_t = typename value_type<T>::type;
-
-  template <class T>
-    struct value_type { using type = remove_reference_t<decltype(nullable::deref(declval<T>()))>; };
-
-  template <class T>
-  constexpr
-  auto deref_none(T&& )
-    JASEL_DECLTYPE_RETURN (
-      none<decay_t<T>>()
-    )
-
-  template <class T>
-  constexpr
-  std::nullptr_t deref_none(T*) noexcept {
-    return nullptr ;
-  }
-
   template <class M>
   auto have_value(M const& v)
     JASEL_DECLTYPE_RETURN_NOEXCEPT (
@@ -190,18 +143,14 @@ inline namespace fundamental_v3
   using nullable::none;
   using nullable::has_value;
   using nullable::have_value;
-  using nullable::deref;
-  using nullable::deref_none;
 
   // todo: define in function of whether
   // EqualityComparable && DefaultConstructible && Destructible & PossibleValued
   // nullable::none<T>()
   // nullable::has_value(t) -> {bool}
-  // nullable::deref(t)
   // T{}
   // T{nullable::none_t}
   // T{nullable::none<T>()}
-  // T{nullable::deref(t)}
 
   template <class T>
   struct is_nullable

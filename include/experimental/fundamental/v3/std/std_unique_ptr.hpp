@@ -10,6 +10,7 @@
 #include <experimental/make.hpp>
 #include <experimental/meta.hpp>
 #include <experimental/nullable.hpp>
+#include <experimental/value_or_none.hpp>
 #include <experimental/functor.hpp>
 #include <experimental/type_traits.hpp>
 #include <memory>
@@ -88,6 +89,10 @@ namespace nullable {
   struct traits<unique_ptr<T, D>> : traits_pointer_like {};
 }
 
+namespace value_or_none {
+  template <class T, class D>
+  struct traits<unique_ptr<T, D>> : traits_pointer_like {};
+}
 }
 }
 }

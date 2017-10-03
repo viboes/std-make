@@ -118,7 +118,7 @@ test-suite stde_expected
       [ run expected/expected_pass.cpp  ]
     ;
 
-explicit possibly_valued ;
+#explicit possibly_valued ;
 test-suite possibly_valued
     : 
       [ run possibly_valued/possibly_valued_pass.cpp  ]
@@ -128,14 +128,14 @@ test-suite possibly_valued
 
     ;
 
-explicit value_or_error ;
+#explicit value_or_error ;
 test-suite value_or_error
     : 
       [ run value_or_error/value_or_error_pass.cpp  ]
-      #[ run value_or_error/possibly_valued_stde_expected_pass.cpp  ]
-      #[ run value_or_error/possibly_valued_std_optional_pass.cpp  ]
-      #[ run value_or_error/possibly_valued_std_unique_ptr_pass.cpp  ]
-      #[ run value_or_error/possibly_valued_std_shared_ptr_pass.cpp  ]
+      [ run value_or_error/value_or_error_stde_expected_pass.cpp  ]
+      #[ run value_or_error/value_or_error_std_optional_pass.cpp  ]
+      #[ run value_or_error/value_or_error_std_unique_ptr_pass.cpp  ]
+      #[ run value_or_error/value_or_error_std_shared_ptr_pass.cpp  ]
 
     ;
 
@@ -145,6 +145,15 @@ test-suite nullable
       [ run nullable/nullable_std_optional_pass.cpp  ]
       [ run nullable/nullable_std_unique_ptr_pass.cpp  ]
       [ run nullable/nullable_std_shared_ptr_pass.cpp  ]
+
+    ;
+
+test-suite value_or_none
+    : 
+      [ run value_or_none/value_or_none_pass.cpp  ]
+      [ run value_or_none/value_or_none_std_optional_pass.cpp  ]
+      [ run value_or_none/value_or_none_std_unique_ptr_pass.cpp  ]
+      [ run value_or_none/value_or_none_std_shared_ptr_pass.cpp  ]
 
     ;
 

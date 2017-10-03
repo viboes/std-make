@@ -1,12 +1,13 @@
-// Copyright (C) 2014-2016 Vicente J. Botet Escriba
+// Copyright (C) 2017 Vicente J. Botet Escriba
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-// <experimental/nullable.hpp>
-// <experimental/optional.hpp>
+// <experimental/value_or_error.hpp>
+// <experimental/expected.hpp>
 
 #include <experimental/expected.hpp>
+#include <experimental/value_or_error.hpp>
 
 #include <boost/detail/lightweight_test.hpp>
 
@@ -22,12 +23,12 @@ int twice(int i) {
   return 2*i;
 }
 
-std::experimental::optional<int> mtwice(int i) {
-  return std::experimental::make_optional(2*i);
+std::experimental::expected<int, bool> mtwice(int i) {
+  return std::experimental::expected<int, bool>(2*i);
 }
 
-std::experimental::optional<double> inverse(double x) {
-  if (x==0) return std::experimental::nullopt;
+std::experimental::expected<double, bool> inverse(double x) {
+  if (x==0) return std::experimental::unexpected<bool>(true);
   return 1/x;
 }
 
@@ -35,28 +36,7 @@ template <class T>
 struct check;
 
 
-template<class T>
-T& g(T &x) {
-  return std::experimental::deref(T(1));
-}
-
-template<class T>
-void g1(T &x) {
-  auto xx = std::experimental::deref(T(1));
-  std::cout << xx << std::endl;
-
-}
-
-template<class T>
-T const& h(T const &x) {
-  return g(x);
-}
-template<class T>
-void h1(T const &x) {
-  g1(x);
-}
-
-int res(std::experimental::nullopt_t) {
+int res(std::experimental::unexpected<bool>) {
   return -1;
 }
 
@@ -65,391 +45,210 @@ int main()
 {
   namespace stde = std::experimental;
 
-  static_assert(not std::is_base_of<stde::nullable::tag, stde::nullable::traits<stde::none_t>>::value, "ERROR");
-  static_assert(not stde::is_nullable<stde::none_t>::value, "ERROR");
-  static_assert(stde::is_nullable<stde::optional<int>>::value, "ERROR");
+  static_assert(stde::is_success_or_failure<stde::expected<int, bool>>::value, "ERROR");
 
   static_assert(std::is_same<
-      stde::nullable::none_type_t<stde::optional<int>>,
-      stde::nullopt_t
+      stde::success_or_failure::failure_type_t<stde::expected<int, bool>>,
+      stde::unexpected<bool>
     >::value, "ERROR");
   static_assert(std::is_same<
-      stde::nullable::value_type_t<stde::optional<int>>,
+      stde::success_or_failure::success_type_t<stde::expected<int, bool>>,
       int
     >::value, "ERROR");
 
-#if defined JASEL_FUNDAMENTAL_EXTENDED
-  static_assert(std::is_same<stde::value_type_t<stde::optional<int&>>, int&>::value, "ERROR");
-#endif
-  {
-    auto n = stde::none_t{};
-    stde::optional<int> x(n);
-    BOOST_TEST(! x);
-    BOOST_TEST(! has_value(x));
-    BOOST_TEST(x == stde::none());
-    BOOST_TEST(stde::none() == x);
-    BOOST_TEST(x == stde::none<stde::optional<stde::_t>>());
-    BOOST_TEST(stde::nullopt == stde::nullopt);
-    BOOST_TEST(stde::deref_none(x) == stde::nullopt);
+  static_assert(stde::is_value_or_error<stde::expected<int, bool>>::value, "ERROR");
+#if 1
 
-  }
-  {
-    stde::optional<stde::optional<int>> x = stde::none() ;
-    BOOST_TEST(! x);
-    BOOST_TEST(! has_value(x));
-    BOOST_TEST(x == stde::none());
-    BOOST_TEST(stde::none() == x);
-    BOOST_TEST(x == stde::none<stde::optional<stde::_t>>());
-  }
-  {
-    stde::optional<stde::optional<int>> x { stde::none() };
-    BOOST_TEST(! x);
-    BOOST_TEST(! has_value(x));
-    BOOST_TEST(x == stde::none());
-    BOOST_TEST(stde::none() == x);
-    BOOST_TEST(x == stde::none<stde::optional<stde::_t>>());
-  }
-  {
-    stde::optional<stde::optional<int>> x = stde::optional<int>(stde::none()) ;
-    BOOST_TEST(x);
-    BOOST_TEST(has_value(x));
-    BOOST_TEST(x != stde::none());
-    BOOST_TEST(stde::none() != x);
-    BOOST_TEST(x != stde::none<stde::optional<stde::_t>>());
+  static_assert(std::is_same<
+      stde::value_or_error::error_type_t<stde::expected<int, bool>>,
+      bool
+    >::value, "ERROR");
+  static_assert(std::is_same<
+      stde::value_or_error::value_type_t<stde::expected<int, bool>>,
+      int
+    >::value, "ERROR");
 
-    BOOST_TEST(stde::deref(x) == stde::none());
-    BOOST_TEST(stde::none() == stde::deref(x));
-    BOOST_TEST(stde::deref(x) == stde::none<stde::optional<stde::_t>>());
+  {
+    auto n = stde::unexpected<bool>(true);
+    stde::expected<int, A> x{n};
+    //auto b = stde::success_or_failure::traits<stde::expected<int, A>>::succeeded(x);
+    BOOST_TEST(! stde::success_or_failure::succeeded(x));
   }
   {
-    stde::optional<stde::optional<int>> x { stde::optional<int>(stde::none()) };
-    BOOST_TEST(x);
-    BOOST_TEST(has_value(x));
-  }
+    auto n = stde::unexpected<bool>(true);
+    stde::expected<int, bool> x(n);
+    BOOST_TEST(! x);
+    BOOST_TEST(! stde::value_or_error::has_value(x));
+    BOOST_TEST(x == stde::unexpected<bool>(true));
+    BOOST_TEST(stde::unexpected<bool>(true) == x);
 
-# if !defined __clang__ && defined __GNUC__ // NOTE: GNUC is also defined for Clang
-#   if (__GNUC__ < 6)
-  {
-    stde::optional<stde::optional<int>> x { { stde::none() } };
-    BOOST_TEST(! x);
-    BOOST_TEST(! has_value(x));
-  }
-#endif
-#endif
-
-#if defined __clang__
-  {
-    stde::optional<stde::optional<int>> x { { stde::none() } };
-    BOOST_TEST(! x);
-    BOOST_TEST(! has_value(x));
-  }
-#endif
-
-
-#if defined __clang__
-  {
-    stde::optional<stde::optional<int>> x { { stde::nullopt } };
-    BOOST_TEST( ! x);
-    BOOST_TEST( ! has_value(x));
-  }
-#endif
-  {
-    stde::optional<stde::optional<int>> x { stde::none<stde::optional>() };
-    BOOST_TEST(! x);
-    BOOST_TEST(! has_value(x));
-  }
-  {
-    stde::optional<stde::optional<int>> x = stde::none<stde::optional>() ;
-    BOOST_TEST(! x);
-    BOOST_TEST(! has_value(x));
-  }
-  {
-    stde::optional<stde::optional<int>> x = stde::none<stde::optional<stde::optional<int>> >() ;
-    BOOST_TEST(! x);
-    BOOST_TEST(! has_value(x));
-  }
-  // fixme: do we want this to work. See https://github.com/viboes/std-make/issues/14
-#if 0
-  {
-    stde::optional<stde::optional<int>> x = stde::none<stde::optional<int>>() ;
-    BOOST_TEST(x);
-    BOOST_TEST(has_value(x));
-  }
-#endif
-  {
-    stde::optional<stde::optional<int>> x { stde::none<stde::optional>() };
-    BOOST_TEST(! x);
-    BOOST_TEST(! has_value(x));
-  }
-
-#if defined __clang__
-  {
-    stde::optional<stde::optional<int>> x { { stde::none<stde::optional>() } };
-    BOOST_TEST( ! x);
-    BOOST_TEST( ! has_value(x));
-  }
-#endif
-  {
-    stde::optional<int> x = stde::none<stde::optional>();
-    BOOST_TEST(! x);
-    BOOST_TEST(! has_value(x));
-    BOOST_TEST(x == stde::none());
-    BOOST_TEST(stde::none() == x);
-    BOOST_TEST(x == stde::none<stde::optional<stde::_t>>());
-
-#if defined JASEL_FUNDAMENTAL_EXTENDED
-    stde::optional<int> y = stde::fmap(twice, x);
-    BOOST_TEST(! stde::has_value(y));
-#endif
   }
   {
     int v=1;
-    stde::optional<int> x = stde::make_optional(v);
+    stde::expected<int, bool> x(v);
     BOOST_TEST(*x == 1);
-    BOOST_TEST(x != stde::none());
-    BOOST_TEST(deref(x) == 1);
-#if defined JASEL_FUNDAMENTAL_EXTENDED
-    stde::optional<int> y = stde::fmap(twice, x);
-    BOOST_TEST(deref(y) == 2);
-#endif
+    BOOST_TEST(x != stde::unexpected<bool>(true));
+    BOOST_TEST(stde::value_or_error::deref(x) == 1);
     x = 2;
-    BOOST_TEST(deref(x) == 2);
-
+    BOOST_TEST(stde::value_or_error::deref(x) == 2);
   }
   {
     int v=1;
-    const stde::optional<int> x = stde::make_optional(v);
+    const stde::expected<int, bool> x (v);
     BOOST_TEST(*x == 1);
-    BOOST_TEST(x != stde::none());
-    BOOST_TEST(deref(x) == 1);
-    h1(x);
-    //BOOST_TEST(h(x) == 1);
-
-#if defined JASEL_FUNDAMENTAL_EXTENDED
-    stde::optional<int> y = stde::fmap(twice, x);
-    BOOST_TEST(deref(y) == 2);
-#endif
-
+    BOOST_TEST(x != stde::unexpected<bool>(true));
+    BOOST_TEST(stde::value_or_error::deref(x) == 1);
   }
   {
     int v=0;
-    stde::optional<int> x = stde::make_optional(v);
+    stde::expected<int, bool> x (v);
     BOOST_TEST(*x == 0);
-    BOOST_TEST(deref(x) == 0);
-    static_assert(std::is_same<int&, decltype(deref(x))>::value, "a");
+    BOOST_TEST(stde::value_or_error::deref(x) == 0);
+    // fixme static_assert(std::is_same<int&, decltype(stde::value_or_error::deref(x))>::value, "a");
   }
   {
 
     int v=0;
-    BOOST_TEST(deref(stde::make_optional(v)) == 0);
-    //check<decltype(stde::make_optional(v))> xx;
-    static_assert(std::is_same<stde::optional<int>, decltype(stde::make_optional(v))>::value, "a");
+    BOOST_TEST(stde::value_or_error::deref(stde::expected<int, bool>(v)) == 0);
   }
-#if 0
-  {
-    short v=0;
-    stde::optional<int> x = stde::make_optional<int>(v);
-    BOOST_TEST(*x == 0);
-    BOOST_TEST(value(x) == 0);
-  }
-#endif
   static_assert(std::is_constructible<A,int, int>::value, "a");
   static_assert(std::is_constructible<A>::value, "b");
 
-  static_assert(std::is_constructible<stde::optional<A>, stde::in_place_t,int, int>::value, "a");
-  static_assert(std::is_constructible<stde::optional<A>, stde::in_place_t>::value, "b");
+  //static_assert(std::is_constructible<stde::expected<A, bool>, stde::in_place_t,int, int>::value, "a");
+  //static_assert(std::is_constructible<stde::expected<A, bool>, stde::in_place_t>::value, "b");
 
-#if 0
+  // value_or_error::transform
+  {
+    stde::expected<int, bool> x = stde::unexpected<bool>(true);
+    BOOST_TEST(! stde::value_or_error::has_value(x));
+    stde::expected<int, bool> y = stde::value_or_error::transform(x, twice);
+    BOOST_TEST(! stde::value_or_error::has_value(y));
+  }
+
   {
     int v=1;
-    stde::optional<A> x = stde::make_optional<A>(stde::in_place, v,v);
-    BOOST_TEST(x->v == 2);
-    BOOST_TEST(deref(x).v == 2);
+    stde::expected<int, bool> x (v);
+    stde::expected<int, bool> y = stde::value_or_error::transform(x, twice);
+    BOOST_TEST(stde::value_or_error::deref(y) == 2);
   }
   {
-    stde::optional<int> x = stde::make_optional<int>(stde::in_place);
-    BOOST_TEST_EQ(*x,  0);
-    BOOST_TEST(deref(x) == 0);
+    int v=1;
+    stde::expected<int, bool> y = stde::value_or_error::transform(stde::expected<int, bool>(v), twice);
+    BOOST_TEST(stde::value_or_error::has_value(y));
+    BOOST_TEST(stde::value_or_error::deref(y) == 2);
   }
+  // value_or_error::ap
+  {
+    stde::expected<int, bool> x = stde::unexpected<bool>(true);
+    stde::expected<int(*)(int), bool> f = stde::unexpected<bool>(true);
+    stde::expected<int, bool> y = stde::value_or_error::ap(f, x);
+    BOOST_TEST(! stde::value_or_error::has_value(y));
+  }
+  {
+    stde::expected<int, bool> x (1);
+    stde::expected<int(*)(int), bool> f = stde::unexpected<bool>(true);
+    stde::expected<int, bool> y = stde::value_or_error::ap(f, x);
+    BOOST_TEST(! stde::value_or_error::has_value(y));
+  }
+  {
+    const stde::expected<int, bool> x (1);
+    const stde::expected<int(*)(int), bool> f = stde::unexpected<bool>(true);
+    stde::expected<int, bool> y = stde::value_or_error::ap(f, x);
+    BOOST_TEST(! stde::value_or_error::has_value(y));
+  }
+  {
+    stde::expected<int(*)(int), bool> f = stde::unexpected<bool>(true);
+    stde::expected<int, bool> y = stde::value_or_error::ap(f, stde::expected<int, bool>(1));
+    BOOST_TEST(! stde::value_or_error::has_value(y));
+  }
+  {
+    stde::expected<int, bool> x = stde::unexpected<bool>(true);
+    stde::expected<int(*)(int), bool> f = stde::expected<int(*)(int), bool>(twice);
+    stde::expected<int, bool> y = stde::value_or_error::ap(f, x);
+    BOOST_TEST(! stde::value_or_error::has_value(y));
+  }
+  {
+    int v=1;
+    stde::expected<int, bool> x = stde::expected<int, bool>(v);
+    stde::expected<int(*)(int), bool> f = stde::expected<int(*)(int), bool>(twice);
+    stde::expected<int, bool> y = stde::value_or_error::ap(f, x);
+    BOOST_TEST(stde::value_or_error::deref(y) == 2);
+  }
+  {
+    int v=1;
+    stde::expected<int(*)(int), bool> f = stde::expected<int(*)(int), bool>(twice);
+    stde::expected<int, bool> y = stde::value_or_error::ap(f, stde::expected<int, bool>(v));
+    BOOST_TEST(stde::value_or_error::deref(y) == 2);
+  }
+  // value_or_error::bind
+   {
+     stde::expected<int, bool> x = stde::unexpected<bool>(true);
+     stde::expected<int, bool> y = stde::value_or_error::bind(x, mtwice);
+     BOOST_TEST(! stde::value_or_error::has_value(y));
+   }
+   {
+     int v=1;
+     stde::expected<int, bool> x (v);
+     stde::expected<int, bool> y = stde::value_or_error::bind(x, mtwice);
+     BOOST_TEST(stde::value_or_error::deref(y) == 2);
+   }
+   {
+     int v=1;
+     stde::expected<int, bool> y = stde::value_or_error::bind(stde::expected<int, bool>(v), mtwice);
+     BOOST_TEST(stde::value_or_error::deref(y) == 2);
+   }
+   {
+     int v=1;
+     const stde::expected<int, bool> x (v);
+     stde::expected<int, bool> y = stde::value_or_error::bind(x, mtwice);
+     BOOST_TEST(stde::value_or_error::deref(y) == 2);
+   }
 #endif
-  {
-    stde::optional<int> o((stde::in_place));
-    BOOST_TEST(o);
-    BOOST_TEST(has_value(o));
-  }
 #if 0
-  {
-    stde::optional<int> o((stde::in_place));
-    stde::optional<int> x = stde::make_optional<int>();
-    BOOST_TEST(! x);
-    BOOST_TEST(! has_value(x));
-  }
-#endif
-  {
-    int v=0;
-    stde::optional<int&> x = stde::make_optional(std::ref(v));
-    BOOST_TEST(&v == &x.value());
-    BOOST_TEST(&v == std::addressof(x.value()));
-    BOOST_TEST(&v == std::addressof(deref(x)));
 
-  }
+  //value_or_error::value_or
   {
-    stde::optional<int> x;
-    BOOST_TEST(x == stde::none());
-    BOOST_TEST(stde::none() == x);
-    BOOST_TEST(x <= stde::none());
-    BOOST_TEST(stde::none() <= x);
-    BOOST_TEST(x >= stde::none());
-    BOOST_TEST(stde::none() >= x);
-  }
-  {
-    stde::optional<int> x=stde::make_optional(1);
-    BOOST_TEST(x != stde::none());
-    BOOST_TEST(stde::none() != x);
-    BOOST_TEST(x > stde::none());
-    BOOST_TEST(stde::none() < x);
-  }
-  {
-    stde::optional<int> x=stde::make_optional(1);
-    BOOST_TEST(x != stde::none<stde::optional<int>>());
-    BOOST_TEST(stde::none() != x);
-    BOOST_TEST(x > stde::none());
-    BOOST_TEST(stde::none() < x);
-  }
-
- // nullable::transform
-  {
-    stde::optional<int> x = stde::none<stde::optional>();
-    stde::optional<int> y = stde::nullable::transform(x, twice);
-    BOOST_TEST(! stde::has_value(y));
-  }
-  {
-    int v=1;
-    stde::optional<int> x = stde::make_optional(v);
-    stde::optional<int> y = stde::nullable::transform(x, twice);
-    BOOST_TEST(stde::deref(y) == 2);
-  }
-  {
-    int v=1;
-    stde::optional<int> y = stde::nullable::transform(stde::make_optional(v), twice);
-    BOOST_TEST(stde::deref(y) == 2);
-  }
-  {
-    int v=1;
-    const stde::optional<int> x = stde::make_optional(v);
-    stde::optional<int> y = stde::nullable::transform(x, twice);
-    BOOST_TEST(stde::deref(y) == 2);
-  }
-  // nullable::ap
-  {
-    stde::optional<int> x = stde::none<stde::optional>();
-    stde::optional<int(*)(int)> f = stde::none<stde::optional>();
-    stde::optional<int> y = stde::nullable::ap(f, x);
-    BOOST_TEST(! stde::has_value(y));
-  }
-  {
-    stde::optional<int> x = stde::make<stde::optional>(1);
-    stde::optional<int(*)(int)> f = stde::none<stde::optional>();
-    stde::optional<int> y = stde::nullable::ap(f, x);
-    BOOST_TEST(! stde::has_value(y));
-  }
-  {
-    const stde::optional<int> x = stde::make<stde::optional>(1);
-    const stde::optional<int(*)(int)> f = stde::none<stde::optional>();
-    stde::optional<int> y = stde::nullable::ap(f, x);
-    BOOST_TEST(! stde::has_value(y));
-  }
-  {
-    stde::optional<int(*)(int)> f = stde::none<stde::optional>();
-    stde::optional<int> y = stde::nullable::ap(f, stde::make<stde::optional>(1));
-    BOOST_TEST(! stde::has_value(y));
-  }
-  {
-    stde::optional<int> x = stde::none<stde::optional>();
-    stde::optional<int(*)(int)> f = stde::make<stde::optional>(twice);
-    stde::optional<int> y = stde::nullable::ap(f, x);
-    BOOST_TEST(! stde::has_value(y));
-  }
-  {
-    int v=1;
-    stde::optional<int> x = stde::make<stde::optional>(v);
-    stde::optional<int(*)(int)> f = stde::make<stde::optional>(twice);
-    stde::optional<int> y = stde::nullable::ap(f, x);
-    BOOST_TEST(stde::deref(y) == 2);
-  }
-  {
-    int v=1;
-    stde::optional<int(*)(int)> f = stde::make<stde::optional>(twice);
-    stde::optional<int> y = stde::nullable::ap(f, stde::make<stde::optional>(v));
-    BOOST_TEST(stde::deref(y) == 2);
-  }
-  // nullable::bind
-   {
-     stde::optional<int> x = stde::none<stde::optional>();
-     stde::optional<int> y = stde::nullable::bind(x, mtwice);
-     BOOST_TEST(! stde::has_value(y));
-   }
-   {
-     int v=1;
-     stde::optional<int> x = stde::make_optional(v);
-     stde::optional<int> y = stde::nullable::bind(x, mtwice);
-     BOOST_TEST(stde::deref(y) == 2);
-   }
-   {
-     int v=1;
-     stde::optional<int> y = stde::nullable::bind(stde::make_optional(v), mtwice);
-     BOOST_TEST(stde::deref(y) == 2);
-   }
-   {
-     int v=1;
-     const stde::optional<int> x = stde::make_optional(v);
-     stde::optional<int> y = stde::nullable::bind(x, mtwice);
-     BOOST_TEST(stde::deref(y) == 2);
-   }
-
-  //nullable::value_or
-  {
-    stde::optional<int> x = stde::none<stde::optional>();
-    int y = stde::nullable::value_or(x, 1);
+    stde::expected<int, bool> x = stde::unexpected<bool>(true);
+    int y = stde::value_or_error::value_or(x, 1);
     BOOST_TEST(y == 1);
   }
   {
-    stde::optional<int> x = stde::make<stde::optional>(1);
-    int y = stde::nullable::value_or(x, 2);
+    stde::expected<int, bool> x = stde::expected<int, bool>(1);
+    int y = stde::value_or_error::value_or(x, 2);
     BOOST_TEST(y == 1);
   }
-  //nullable::apply_or
+  //value_or_error::apply_or
   {
-    stde::optional<int> x = stde::none<stde::optional>();
-    int y = stde::nullable::apply_or(x, twice, 1);
+    stde::expected<int, bool> x = stde::unexpected<bool>(true);
+    int y = stde::value_or_error::apply_or(x, twice, 1);
     BOOST_TEST(y == 1);
   }
   {
-    stde::optional<int> x = stde::make<stde::optional>(1);
-    int y = stde::nullable::apply_or(x, twice, -1);
+    stde::expected<int, bool> x = stde::expected<int, bool>(1);
+    int y = stde::value_or_error::apply_or(x, twice, -1);
     BOOST_TEST(y == 2);
   }
-  //nullable::has_error
+  //value_or_error::has_error
   {
-    stde::optional<int> x = stde::none<stde::optional>();
-    BOOST_TEST(stde::nullable::has_error(x, stde::nullopt));
+    stde::expected<int, bool> x = stde::unexpected<bool>(true);
+    BOOST_TEST(stde::value_or_error::has_error(x, stde::unexpected<bool>(true)));
   }
   {
-    stde::optional<int> x = stde::make<stde::optional>(1);
-    BOOST_TEST(! stde::nullable::has_error(x, stde::nullopt));
+    stde::expected<int, bool> x = stde::expected<int, bool>(1);
+    BOOST_TEST(! stde::value_or_error::has_error(x, stde::unexpected<bool>(true)));
   }
 
-  //nullable::resolve
+  //value_or_error::resolve
   {
-    stde::optional<int> x = stde::none<stde::optional>();
-    int y = stde::nullable::resolve(x, res);
+    stde::expected<int, bool> x = stde::unexpected<bool>(true);
+    int y = stde::value_or_error::resolve(x, res);
     BOOST_TEST(y == -1);
   }
   {
-    stde::optional<int> x = stde::make<stde::optional>(1);
-    int y = stde::nullable::resolve(x, res);
+    stde::expected<int, bool> x = stde::expected<int, bool>(1);
+    int y = stde::value_or_error::resolve(x, res);
     BOOST_TEST(y == 1);
   }
-
+#endif
   return ::boost::report_errors();
 }

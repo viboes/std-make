@@ -1,11 +1,11 @@
-// Copyright (C) 2014-2015 Vicente J. Botet Escriba
+// Copyright (C) 2014-2017 Vicente J. Botet Escriba
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-// <experimental/nullable.hpp>
+// <experimental/value_or_none.hpp>
 
-#include <experimental/nullable.hpp>
+#include <experimental/value_or_none.hpp>
 #include <experimental/meta.hpp>
 
 //#include <memory>
@@ -117,6 +117,10 @@ int main()
       stde::meta::invoke<stde::add_pointer_f, int>,
       int*
     >::value, "ERROR");
+  static_assert(std::is_same<
+      stde::value_or_none::value_type_t<int*>,
+      int
+    >::value, "ERROR");
   {
     auto ip = make_none5<stde::add_pointer_f>(0);
     BOOST_TEST(ip == nullptr);
@@ -163,24 +167,27 @@ int main()
     accept_nullptr_t(std::nullptr_t()); // shouldn't compile fails :)
     accept_nullptr_t({}); // shouldn't compile fails :)
   }
-  static_assert(stde::is_nullable<int*>::value, "ERROR");
+  static_assert(stde::is_value_or_none<int*>::value, "ERROR");
   {
     int * x = nullptr;
     BOOST_TEST(! stde::has_value(x));
     BOOST_TEST(x == stde::none());
     BOOST_TEST(stde::none() == x);
+    BOOST_TEST(stde::deref_none(x) == nullptr);
   }
   {
     int * x = stde::none();
     BOOST_TEST(! stde::has_value(x));
     BOOST_TEST(x == stde::none());
     BOOST_TEST(stde::none() == x);
+    BOOST_TEST(stde::deref_none(x) == nullptr);
   }
   {
     int * x = stde::none<std::add_pointer<stde::_t>>();
     BOOST_TEST(! stde::has_value(x));
     BOOST_TEST(x == stde::none());
     BOOST_TEST(stde::none() == x);
+    BOOST_TEST(stde::deref_none(x) == nullptr);
   }
 #if 0
 // no type named 'type' in 'std::__1::add_pointer<experimental::_t>'
@@ -193,12 +200,14 @@ int main()
     BOOST_TEST(! stde::has_value(x));
     BOOST_TEST(x == stde::none());
     BOOST_TEST(stde::none() == x);
+    BOOST_TEST(stde::deref_none(x) == nullptr);
   }
   {
     const int * x = stde::none();
     BOOST_TEST(! stde::has_value(x));
     BOOST_TEST(x == stde::none());
     BOOST_TEST(stde::none() == x);
+    BOOST_TEST(stde::deref_none(x) == nullptr);
   }
   {
     const int * x = stde::none<std::add_pointer<stde::_t>>();
@@ -206,12 +215,14 @@ int main()
     BOOST_TEST(x == stde::none());
     BOOST_TEST(stde::none() == x);
     BOOST_TEST(x == stde::none<std::add_pointer<stde::_t>>());
+    BOOST_TEST(stde::deref_none(x) == nullptr);
   }
   {
     int * x = new int(1);
     BOOST_TEST(stde::has_value(x));
     BOOST_TEST(x != stde::none());
     BOOST_TEST(stde::none() != x);
+    BOOST_TEST(stde::deref(x) == 1);
     delete x;
   }
   {
@@ -219,8 +230,32 @@ int main()
     BOOST_TEST(stde::has_value(x));
     BOOST_TEST(x != stde::none());
     BOOST_TEST(stde::none()  != x);
+    BOOST_TEST(stde::deref(x) == 1);
     delete x;
   }
-
+  //value_or_none::value_or
+  {
+    int * x = nullptr;
+    auto y = stde::value_or_none::value_or(x, 1);
+    BOOST_TEST_EQ(y, 1);
+  }
+  {
+    int * x = new int(1);
+    int y = stde::value_or_none::value_or(x, 2);
+    delete x;
+    BOOST_TEST(y == 1);
+  }
+  //value_or_none::apply_or
+  {
+    int * x = nullptr;
+    int y = stde::value_or_none::apply_or(x, twice, 1);
+    BOOST_TEST(y == 1);
+  }
+  {
+    int * x = new int(1);
+    int y = stde::value_or_none::apply_or(x, twice, -1);
+    delete x;
+    BOOST_TEST(y == 2);
+  }
   return ::boost::report_errors();
 }

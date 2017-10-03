@@ -6,11 +6,13 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef JASEL_FUNDAMENTAL_V3_VALUE_OR_ERROR_ERROR_OR_HPP
-#define JASEL_FUNDAMENTAL_V3_VALUE_OR_ERROR_ERROR_OR_HPP
+// fixme: It isn't too much to provide these functions for Nullable as they are more adapted to ValueOrError
+
+#ifndef JASEL_FUNDAMENTAL_V3_VALUE_OR_NONE_ERROR_OR_HPP
+#define JASEL_FUNDAMENTAL_V3_VALUE_OR_NONE_ERROR_OR_HPP
 
 #include <experimental/fundamental/v2/config.hpp>
-#include <experimental/fundamental/v3/value_or_error/value_or_error.hpp>
+#include <experimental/fundamental/v3/value_or_none/value_or_none.hpp>
 #include <experimental/meta.hpp>
 #include <utility>
 
@@ -20,32 +22,32 @@ namespace experimental
 {
 inline  namespace fundamental_v3
 {
-namespace value_or_error
+namespace value_or_none
 {
   /**
-   * value_or_error::value_or
+   * value_or_none::error_or
    * @par Returns
-   *  The contained value or the parameter
+   *  The error value or the parameter
    */
   template <class N, class E
   // constraint on E
     , class = enable_if_t<
-          is_value_or_error< meta::uncvref_t<N> >::value
-          && is_convertible< E, error_type_t< meta::uncvref_t<N> > >::value
+          is_value_or_none< meta::uncvref_t<N> >::value
+          && is_convertible< E, none_type_t< meta::uncvref_t<N> > >::value
     >
   >
   BOOST_CXX14_CONSTEXPR
-  error_type_t<meta::uncvref_t<N>>
+  none_type_t<meta::uncvref_t<N>>
   error_or(N&& n, E&& e)
   {
-    if (value_or_error::has_value(forward<N>(n)))
+    if (value_or_none::has_value(forward<N>(n)))
     {
-      return value_or_error::error(forward<N>(n));
+      return value_or_none::none<meta::uncvref_t<N>>();
     }
     return forward<E>(e);
   }
 
-} // value_or_error
+} // value_or_none
 }}
 }
 #endif // header

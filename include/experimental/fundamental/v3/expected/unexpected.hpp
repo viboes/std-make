@@ -1,13 +1,14 @@
 // Distributed under the Boost Software License, Version 1.0. (See
 // accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
-// (C) Copyright 2014 Vicente J. Botet Escriba
+// (C) Copyright 2014-2017 Vicente J. Botet Escriba
 
 #ifndef JASEL_EXPERIMENTAL_V3_EXPECTED_UNEXPECTED_HPP
 #define JASEL_EXPERIMENTAL_V3_EXPECTED_UNEXPECTED_HPP
 
 #include <experimental/fundamental/v3/expected/config.hpp>
 #include <experimental/fundamental/v3/config/requires.hpp>
+#include <experimental/wrapped.hpp>
 #include <experimental/utility.hpp>
 
 #include <exception>
@@ -106,6 +107,7 @@ inline namespace fundamental_v3
     return unexpected<typename decay<E>::type> (forward<E>(ex));
   }
 
+#if 1
   template <>
   struct unexpected<exception_ptr>
   {
@@ -134,6 +136,7 @@ inline namespace fundamental_v3
       return error_;
     }
   };
+#endif
 
   template <class E>
   BOOST_CONSTEXPR bool operator==(const unexpected<E>& x, const unexpected<E>& y)
@@ -169,7 +172,7 @@ inline namespace fundamental_v3
   {
     return !(x < y);
   }
-
+#if 1
   inline BOOST_CONSTEXPR bool operator<(const unexpected<exception_ptr>&, const unexpected<exception_ptr>&)
   {
     return false;
@@ -186,6 +189,7 @@ inline namespace fundamental_v3
   {
     return x==y;
   }
+#endif
 
   template <typename E>
   struct is_unexpected : false_type {};
@@ -197,6 +201,19 @@ inline namespace fundamental_v3
     return unexpected<exception_ptr> (current_exception());
   }
 
+  namespace wrapped  {
+      template <class T>
+      struct traits<unexpected<T>>
+      {
+          template <class U>
+          static auto unwrap(U&& u)
+          {
+              return u.value();
+          }
+
+      };
+
+  }
 }}
 } // namespace
 

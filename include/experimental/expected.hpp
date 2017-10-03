@@ -13,5 +13,8 @@
 #include <experimental/fundamental/v3/expected/bind.hpp>
 #include <experimental/fundamental/v3/expected/visit.hpp>
 #include <experimental/fundamental/v3/expected/monad_error.hpp>
+#include <experimental/fundamental/v3/expected/value_or_error.hpp>
+#include <experimental/fundamental/v3/expected/unexpected.hpp>
+#include <experimental/fundamental/v3/expected/success_or_failure.hpp>
 
 #endif // header
