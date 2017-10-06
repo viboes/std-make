@@ -59,13 +59,22 @@ int main()
   static_assert(stde::is_value_or_error<stde::expected<int, bool>>::value, "ERROR");
 #if 1
 
-  static_assert(std::is_same<
-      stde::value_or_error::error_type_t<stde::expected<int, bool>>,
-      bool
-    >::value, "ERROR");
+  {
+      auto u = stde::unexpected<bool>(true);
+      auto b = stde::wrapped::unwrap(u);
+      static_assert(std::is_same<
+          decltype(b),
+          bool
+        >::value, "ERROR");
+  }
+
   static_assert(std::is_same<
       stde::value_or_error::value_type_t<stde::expected<int, bool>>,
       int
+    >::value, "ERROR");
+  static_assert(std::is_same<
+      stde::value_or_error::error_type_t<stde::expected<int, bool>>,
+      bool
     >::value, "ERROR");
 
   {

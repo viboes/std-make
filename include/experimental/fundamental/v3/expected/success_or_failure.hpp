@@ -31,14 +31,20 @@ struct traits<expected<T,E>> : tag
 
     template <class U>
     static constexpr
-    auto success_value(U && e) noexcept { return *e; }
+    auto success_value(U && e)
+    JASEL_DECLTYPE_RETURN_NOEXCEPT (
+            *e
+    )
 
     // This is the major reason for having expected::get_unexpected. Error propagation.
     // We could do it unexpected and expected::error, but then we cannot return a reference.
     // return unexpected(e.error())
     template <class U>
     static constexpr
-    auto failure_value(U && e) noexcept { return e.get_unexpected(); }
+    auto failure_value(U && e)
+    JASEL_DECLTYPE_RETURN_NOEXCEPT (
+            e.get_unexpected()
+    )
 
 };
 }

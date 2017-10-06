@@ -207,9 +207,9 @@ inline namespace fundamental_v3
       {
           template <class U>
           static auto unwrap(U&& u)
-          {
-              return u.value();
-          }
+          JASEL_DECLTYPE_RETURN_NOEXCEPT (
+                  u.value()
+          )
 
       };
 

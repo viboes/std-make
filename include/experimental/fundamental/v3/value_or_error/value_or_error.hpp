@@ -96,11 +96,17 @@ inline namespace fundamental_v3
 
         template <class U>
         static
-        auto deref(U && u) { return wrapped::unwrap(success_or_failure::success_value(forward<U>(u))); }
+        auto deref(U && u)
+        JASEL_DECLTYPE_RETURN_NOEXCEPT (
+                wrapped::unwrap(success_or_failure::success_value(forward<U>(u)))
+        )
 
         template <class U>
         static
-        auto error(U && u)  { return wrapped::unwrap(success_or_failure::failure_value(forward<U>(u))); }
+        auto error(U && u)
+        JASEL_DECLTYPE_RETURN_NOEXCEPT (
+                wrapped::unwrap(success_or_failure::failure_value(forward<U>(u)))
+        )
 
     };
 

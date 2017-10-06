@@ -47,7 +47,10 @@ inline namespace fundamental_v3
     {
         template <class U>
         static
-        auto unwrap(U && u) { return forward<U>(u); }
+        auto unwrap(U && u)
+        JASEL_DECLTYPE_RETURN_NOEXCEPT (
+                forward<U>(u)
+        )
     };
 
     // fixme: should the result be a reference
@@ -58,7 +61,7 @@ inline namespace fundamental_v3
     constexpr
     auto unwrap(T && x)
       JASEL_DECLTYPE_RETURN_NOEXCEPT (
-        traits<T>::unwrap(forward<T>(x))
+        traits<decay_t<T>>::unwrap(forward<T>(x))
       )
 
     template <class T>
