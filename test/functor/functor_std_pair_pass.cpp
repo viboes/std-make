@@ -25,7 +25,6 @@ int main()
 
   static_assert(stde::is_product_type_v<T>, "ERROR");
   static_assert(stde::is_type_constructible_v<T>, "ERROR");
-  static_assert(std::is_base_of<stde::functor::tag, stde::functor::traits<std::pair<stde::_t, stde::_t>>> ::value, "ERROR");
   static_assert(stde::is_functor<std::pair<stde::_t, stde::_t>>::value, "ERROR");
 
   {

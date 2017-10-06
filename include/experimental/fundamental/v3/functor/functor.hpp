@@ -38,9 +38,11 @@ inline namespace fundamental_v3
 
 namespace functor
 {
-  //! Functor tag
-  struct tag{};
-
+namespace detail
+{
+  //! Functor default_tag
+  struct not_a_functor_tag{};
+}
   //! Functor tag
   //! This class must be specialized by the user
   //! @tparam F the Functor to specialize
@@ -56,7 +58,7 @@ namespace functor
   //! Default failing specialization
   //! It doesn't inherits from the functor::tag and deletes any signature to make the code more explicit
   template <typename U, bool condition>
-  struct traits<U, meta::when<condition>>
+  struct traits<U, meta::when<condition>> : detail::not_a_functor_tag
   {
 #if __cplusplus >= 201402L || defined JASEL_DOXYGEN_INVOKED
       template <class T, class F>
@@ -130,7 +132,7 @@ namespace functor
 #endif
 
   //! minimal complete definition based on transform
-  struct mcd_transform : functor::tag
+  struct mcd_transform
   {
     //! Applies the `Callable_T_U` `f` over the elements of `Functor_T` `xs` satisfying the predicate `Pred_T` `p`.
     //! @tparam Functor_T the Functor [T]
@@ -149,7 +151,7 @@ namespace functor
       )
   };
   //! minimal complete definition based on adjust_if
-  struct mcd_adjust_if : functor::tag
+  struct mcd_adjust_if
   {
     template <class Functor_T, class Callable_T_U>
     static auto transform(Functor_T && xs, Callable_T_U  f)
@@ -162,7 +164,9 @@ namespace functor
   template <class T>
     struct is_functor
 #if ! defined JASEL_DOXYGEN_INVOKED
-        : is_base_of<functor::tag, functor::traits<T>> {}
+        : integral_constant<bool,
+              ! is_base_of<functor::detail::not_a_functor_tag, functor::traits<T>>::value
+          > {}
 #endif
         ;
   template <class T>

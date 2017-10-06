@@ -24,7 +24,6 @@ int main()
 {
 
   static_assert(stde::is_type_constructible<expected_sc<int>>::value, "ERROR");
-  static_assert(std::is_base_of<stde::functor::tag, stde::functor::traits<expected_sc<stde::_t>>> ::value, "ERROR");
   static_assert(stde::is_functor<expected_sc<stde::_t>>::value, "ERROR");
 
   std::error_code ec = std::make_error_code(std::errc(1));

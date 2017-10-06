@@ -22,7 +22,6 @@ int main()
 
   static_assert(stde::is_nullable<int*>::value, "ERROR");
   static_assert(stde::is_type_constructible<int*>::value, "ERROR");
-  static_assert(std::is_base_of<stde::functor::tag, stde::functor::traits<int*>> ::value, "ERROR");
   static_assert(stde::is_functor<int*>::value, "ERROR");
 
   {
