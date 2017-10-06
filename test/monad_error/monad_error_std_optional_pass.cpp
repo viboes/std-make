@@ -30,7 +30,6 @@ int main()
   namespace stde = std::experimental;
 
   static_assert(stde::is_type_constructible<stde::optional<int>>::value, "ERROR");
-  static_assert(std::is_base_of<stde::monad_error::tag, stde::monad_error::traits<stde::optional<stde::_t>>> ::value, "ERROR");
   static_assert(stde::is_monad_error<stde::optional<stde::_t>>::value, "ERROR");
 
   {

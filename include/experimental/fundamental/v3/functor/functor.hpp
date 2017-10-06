@@ -40,10 +40,9 @@ namespace functor
 {
 namespace detail
 {
-  //! Functor default_tag
   struct not_a_functor_tag{};
 }
-  //! Functor tag
+
   //! This class must be specialized by the user
   //! @tparam F the Functor to specialize
   //! @tparam Enabler SFINAE enabler condition

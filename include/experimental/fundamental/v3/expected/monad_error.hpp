@@ -27,7 +27,7 @@ inline  namespace fundamental_v3
 namespace monad_error
 {
 template <class T, class E>
-struct traits<expected<T,E>> : monad_error::tag
+struct traits<expected<T,E>>
 {
   template <class M>
   using error_type = typename M::error_type;

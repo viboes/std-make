@@ -80,7 +80,10 @@ namespace monad_error
 {
   using namespace monad; // NOLINT google-build-using-namespace
 
-  struct tag{};
+namespace detail
+{
+    struct not_a_monad_error_tag{};
+}
 
   template <class M, class Enabler=void>
     struct traits
@@ -91,7 +94,7 @@ namespace monad_error
 
   // Default failing specialization
   template <typename MM, bool condition>
-  struct traits<MM, meta::when<condition>>
+  struct traits<MM, meta::when<condition>> : detail::not_a_monad_error_tag
   {
 #if __cplusplus >= 201402L || defined JASEL_DOXYGEN_INVOKED
 
@@ -157,7 +160,10 @@ namespace monad_error
   template <class T>
     struct is_monad_error
 #if ! defined JASEL_DOXYGEN_INVOKED
-        : is_base_of<monad_error::tag, monad_error::traits<T>> {}
+            : integral_constant<bool,
+                  ! is_base_of<monad_error::detail::not_a_monad_error_tag, monad_error::traits<T>>::value
+                  && is_monad<T>::value
+              > {}
 #endif
         ;
   template <class T>

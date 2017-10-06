@@ -35,7 +35,7 @@ inline  namespace fundamental_v3
       return (has_value(forward<N>(x))) ? move(x) : f();
     }
 
-    struct as_monad_error: monad_error::tag
+    struct as_monad_error
     {
       template <class M>
       using error_type = none_type_t<M>;

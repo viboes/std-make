@@ -29,7 +29,6 @@ int main()
 {
   namespace stde = std::experimental;
 
-  static_assert(std::is_base_of<stde::monad_error::tag, stde::monad_error::traits<std::unique_ptr<stde::_t>>> ::value, "ERROR");
   static_assert(stde::is_monad_error<std::unique_ptr<stde::_t>>::value, "ERROR");
 
   {

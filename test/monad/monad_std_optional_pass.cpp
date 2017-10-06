@@ -30,7 +30,6 @@ int main()
 
   static_assert(stde::is_nullable<stde::optional<int>>::value, "ERROR");
   static_assert(stde::is_type_constructible<stde::optional<int>>::value, "ERROR");
-  static_assert(std::is_base_of<stde::monad::tag, stde::monad::traits<stde::optional<stde::_t>>> ::value, "ERROR");
   static_assert(stde::is_monad<stde::optional<stde::_t>>::value, "ERROR");
 
   {

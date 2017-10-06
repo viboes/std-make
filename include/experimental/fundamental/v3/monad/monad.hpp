@@ -40,7 +40,10 @@ namespace monad
 {
   using namespace applicative; // NOLINT google-build-using-namespace
 
-  struct tag{};
+namespace detail
+{
+struct not_a_monad_tag{};
+}
 
   template <class M, class Enabler=void>
     struct traits
@@ -51,7 +54,7 @@ namespace monad
 
   // Default failing specialization
   template <typename MM, bool condition>
-  struct traits<MM, meta::when<condition>>
+  struct traits<MM, meta::when<condition>> : detail::not_a_monad_tag
   {
 #if __cplusplus >= 201402L || defined JASEL_DOXYGEN_INVOKED
     // bind:: [T] x [T->[U]] -> [U]
@@ -79,7 +82,7 @@ namespace monad
       )
 
   //! minimal complete definition based on transform
-  struct mcd_bind : monad::tag
+  struct mcd_bind
   {
     template <class M>
     static auto unwrap(M&& x)
@@ -89,7 +92,7 @@ namespace monad
   };
 
   //! minimal complete definition based on transform
-  struct mcd_unwrap : monad::tag
+  struct mcd_unwrap
   {
     template <class M, class F>
     auto
@@ -104,7 +107,10 @@ namespace monad
   template <class T>
     struct is_monad
 #if ! defined JASEL_DOXYGEN_INVOKED
-        : is_base_of<monad::tag, monad::traits<T>> {}
+            : integral_constant<bool,
+                  ! is_base_of<monad::detail::not_a_monad_tag, monad::traits<T>>::value
+                  && is_applicative<T>::value
+              > {}
 #endif
         ;
   template <class T>

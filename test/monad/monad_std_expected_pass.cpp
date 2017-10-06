@@ -28,7 +28,6 @@ int main()
 {
 
   static_assert(stde::is_type_constructible<expected_sc<int>>::value, "ERROR");
-  static_assert(std::is_base_of<stde::monad::tag, stde::monad::traits<expected_sc<stde::_t>>> ::value, "ERROR");
   static_assert(stde::is_monad<expected_sc<stde::_t>>::value, "ERROR");
 
   {

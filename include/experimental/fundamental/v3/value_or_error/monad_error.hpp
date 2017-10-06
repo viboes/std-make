@@ -41,7 +41,7 @@ inline  namespace fundamental_v3
           error_type_t<M>(forward<Xs>(xs)...)
       )
 
-    struct as_monad_error: monad_error::tag
+    struct as_monad_error
     {
       template <class M>
       using error_type = error_type_t<M>;
