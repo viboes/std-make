@@ -160,7 +160,7 @@ namespace product_type
   }
 
   //! struct mapping a product_type to a Functor
-  struct as_functor : functor::tag
+  struct as_functor
   {
     template <class T, class F>
       static constexpr auto transform(T&& x, F&& f)
