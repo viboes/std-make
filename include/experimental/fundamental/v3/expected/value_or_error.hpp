@@ -28,13 +28,6 @@ namespace value_or_error
 template <class T, class E>
 struct traits<expected<T,E>> : traits_pointer_like
 {
-//    template <class U>
-//    static constexpr
-//    bool has_value(U && e) noexcept { return e.has_value(); }
-//
-//    template <class U>
-//    static constexpr
-//    auto deref(U && e) noexcept { return *e; }
 
     template <class U>
     static constexpr

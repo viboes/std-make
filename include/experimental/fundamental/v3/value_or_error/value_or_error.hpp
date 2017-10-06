@@ -9,7 +9,6 @@
 #ifndef JASEL_FUNDAMENTAL_V3_VALUE_OR_ERROR_HPP
 #define JASEL_FUNDAMENTAL_V3_VALUE_OR_ERROR_HPP
 
-//#include <experimental/type_constructible.hpp>
 #include <experimental/type_traits.hpp>
 #include <experimental/meta.hpp>
 #include <experimental/fundamental/v2/config.hpp>
@@ -86,7 +85,6 @@ inline namespace fundamental_v3
     template <class T>
     struct traits<T*> : traits_pointer_like {};
 
-#if 1
     // specialization for SuccessOrFailure types.
     template <typename T>
     struct traits<T, meta::when<is_success_or_failure<T>::value>> : tag
@@ -105,7 +103,6 @@ inline namespace fundamental_v3
         auto error(U && u)  { return wrapped::unwrap(success_or_failure::failure_value(forward<U>(u))); }
 
     };
-#endif
 
     template <class T>
     constexpr
