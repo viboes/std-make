@@ -22,7 +22,6 @@ int main()
 {
 
   static_assert(stde::is_type_constructible<expected_sc<int>>::value, "ERROR");
-  static_assert(std::is_base_of<stde::applicative::tag, stde::applicative::traits<expected_sc<stde::_t>>> ::value, "ERROR");
   static_assert(stde::is_applicative<expected_sc<stde::_t>>::value, "ERROR");
   static_assert(std::is_same<
       std::experimental::fundamental_v3::expected<int, std::error_code>,

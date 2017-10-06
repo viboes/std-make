@@ -20,7 +20,6 @@ int main()
   namespace stde = std::experimental;
 
   static_assert(stde::is_type_constructible_v<std::pair<int, int>>, "ERROR");
-  static_assert(std::is_base_of<stde::applicative::tag, stde::applicative::traits<std::tuple<stde::_t>>> ::value, "ERROR");
   static_assert(stde::is_applicative<std::tuple<stde::_t>>::value, "ERROR");
 
   {

@@ -53,7 +53,7 @@ namespace nullable
         JASEL_INVOKE(nullable::deref(std::forward<F>(f)), nullable::deref(forward<N>(n)))
       );
   }
-  struct as_applicative: applicative::tag
+  struct as_applicative
   {
     template <class T, class F>
       static constexpr auto ap(F&& f, T&& x)

@@ -1,6 +1,6 @@
 //////////////////////////////////////////////////////////////////////////////
 //
-// (C) Copyright Vicente J. Botet Escriba 2016.
+// (C) Copyright Vicente J. Botet Escriba 2016-2017.
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file // LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
@@ -39,7 +39,10 @@ namespace applicative
   using namespace functor; // NOLINT google-build-using-namespace
   //using namespace type_constructible;
 
-  struct tag{};
+namespace detail
+{
+  struct not_an_applicative_tag {};
+}
 
   template <class A, class Enabler=void>
     struct traits
@@ -50,7 +53,7 @@ namespace applicative
 
   // Default failing specialization
   template <typename Ap, bool condition>
-  struct traits<Ap, meta::when<condition>>
+  struct traits<Ap, meta::when<condition>> : detail::not_an_applicative_tag
   {
 #if __cplusplus >= 201402L || defined JASEL_DOXYGEN_INVOKED
     // ap:: [T->U] x [T] -> [U]
@@ -80,7 +83,10 @@ namespace applicative
   template <class T>
     struct is_applicative
 #if ! defined JASEL_DOXYGEN_INVOKED
-        : is_base_of<applicative::tag, applicative::traits<T>> {}
+            : integral_constant<bool,
+                  ! is_base_of<applicative::detail::not_an_applicative_tag, applicative::traits<T>>::value
+                  && is_functor<T>::value
+              > {}
 #endif
         ;
   template <class T>

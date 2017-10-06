@@ -63,7 +63,7 @@ namespace expected_helpers
 namespace applicative
 {
 template <class T, class E>
-struct traits<expected<T,E>> : applicative::tag
+struct traits<expected<T,E>>
 {
   template <class Expected, class F>
     static auto ap(F&& f, Expected&& x)

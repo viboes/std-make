@@ -53,7 +53,7 @@ namespace value_or_none
         JASEL_INVOKE(value_or_none::deref(std::forward<F>(f)), value_or_none::deref(forward<N>(n)))
       );
   }
-  struct as_applicative: applicative::tag
+  struct as_applicative
   {
     template <class T, class F>
       static constexpr auto ap(F&& f, T&& x)

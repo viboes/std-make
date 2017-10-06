@@ -30,7 +30,6 @@ int main()
 
   static_assert(stde::is_nullable_v<stde::optional<int>>, "ERROR");
   static_assert(stde::is_type_constructible_v<stde::optional<int>>, "ERROR");
-  static_assert(std::is_base_of<stde::applicative::tag, stde::applicative::traits<stde::optional<stde::_t>>> ::value, "ERROR");
   static_assert(stde::is_applicative<stde::optional<stde::_t>>::value, "ERROR");
 
   {

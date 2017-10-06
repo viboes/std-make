@@ -90,7 +90,7 @@ namespace type_constructible {
   }
   namespace applicative {
     template <>
-    struct traits<array_tc> : applicative::tag
+    struct traits<array_tc>
     {
       template <class Array, class F>
         static auto ap(F&& f, Array&& x)

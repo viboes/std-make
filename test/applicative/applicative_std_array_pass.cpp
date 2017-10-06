@@ -28,7 +28,6 @@ int main()
 #if __cplusplus >= 201402L
   namespace stde = std::experimental;
 
-  static_assert(std::is_base_of<stde::applicative::tag, stde::applicative::traits<stde::array_tc>> ::value, "ERROR");
   static_assert(stde::is_applicative<stde::array_tc>::value, "ERROR");
 
   {
