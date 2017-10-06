@@ -1,11 +1,11 @@
 <table border="0" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="607">
     <tr>
         <td width="172" align="left" valign="top">Document number:</td>
-        <td width="435"><span style="background-color: #FFFF00">DXXXXR0</span></td>
+        <td width="435"><span style="background-color: #FFFF00">D0786R0</span></td>
     </tr>
     <tr>
         <td width="172" align="left" valign="top">Date:</td>
-        <td width="435">2017-09-27</td>
+        <td width="435">2017-10-02</td>
     </tr>
     <tr>
         <td width="172" align="left" valign="top">Project:</td>
@@ -49,15 +49,18 @@ In the same way we have *Nullable* types that have a single not-a-value we have 
 # Introduction
 
 
-This paper proposes the concept of *SuccessOrFailure* that represents a type that can contain a success value or a failure value that can be used as the result of a function to return the value computed by the function or the reason of the failure of this computation. As a sum type it provides the `visit` function.
+This paper proposes the concept of *SuccessOrFailure* that represents a type that can contain a success value or a failure value that can be used as the result of a function to return the value computed by the function or the reason of the failure of this computation. 
 
 *SuccessOrFailure* contains the interface needed to customize the types that can work with the proposed `operator try`. This makes the error propagation on functions returning this kind of types much more simpler.
 
 The paper proposes also some error handling utilities that help while the user wants to recover from error as `resolve`,  `value_or`, `value_or_throw`, `error_or` and `check_error`. 
 
-When the type is *TypeConstructible* and *SuccessOrFailure*, the type can be seen as a *Functor*, an *ApplicativeFunctor*, a *Monad* or a *MonadError*.
+When the type is *TypeConstructible* and *SuccessOrFailure*, the type can be seen as a *Functor*, an *ApplicativeFunctor*, a *Monad* or a *MonadError*. 
 
 Some *SuccessOrFailure* types contain success and/or failure types that wrap a value or an error. However, the user wants to see the wrapped value and error types instead of the wrapping success and failure types. We name these types *ValueOrError*. These types unwrap the wrapped value before calling to the user provided functions.
+
+*ValueOrError* as a *SumType* can provide the `visit` function. However we cannot specialize the variant-like traits, nor, the `get<I>` functions. Nevertheless we could specialize the *SumType* traits.
+
 
 <table border="0" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="807">
     <tr>
@@ -129,7 +132,7 @@ The customization of the `operator try` consists in returning a type that has 3 
 * get the value of the success path
 * get the value of the failure path
 
-The result type of getting the value of the success and the failure paths must be implicitly convertible to the return type of the function calling the `operator try`
+The result type of getting the failure paths must be implicitly convertible to the return type of the function calling the `operator try` and the value of the success must be implicitly convertible (assignable?) to the type of the try-expression.  
 
 The name of these functions depend on the concept we want to abstract. If we name this concept *SuccessOrFailure* they could be:
 
@@ -162,7 +165,6 @@ X<U,E> g() {
 }  
 ```
 
-There is more to say about the *try-expression* when used elsewhere than the initialization part of a variable definition, e.g. when nested as argument of a function call. We will see this later.
 
 ## *SuccessOrFailure* operations
 
@@ -213,7 +215,7 @@ X<U,E> g() {
 This interpretation is more in line with the transformation of the range-based for loop, which could be seen as simpler but makes again the language dependent on the library.
 
 Note that a *SuccessOrFailure* can be seen as a *Tryable*, but not the opposite.
- 
+
 ## Error handling with *SuccessOrFailure*
 
 While the *try-expression* is used to propagate the error as such, the user needs at a given moment recover or propagate a different error. Next we describe some these utilities.
@@ -836,7 +838,7 @@ namespace value_or_none {
 ```c++
 namespace value_or_none {
     template <class T>
-    struct traits<optional<T>>  : tag 
+    struct traits<optional<T>> 
     {
       template <class U>
       static constexpr
@@ -957,10 +959,6 @@ Special thanks and recognition goes to Technical Center of Nokia - Lannion for s
 
 [P0650R0]: http://www.open-std.org/JTC1/SC22/WG21/docs/papers/2017/p0650r0.pdf "C++ Monadic interface"  
 
-[LWG 2510]: http://cplusplus.github.io/LWG/lwg-active.html#2510 "Tag types should not be DefaultConstructible"
-        
-[CWG 1518]: http://open-std.org/JTC1/SC22/WG21/docs/cwg_active.html#1518 "Explicit default constructors and copy-list-initialization" 
-    
 [CWG 1630]: http://open-std.org/JTC1/SC22/WG21/docs/cwg_defects.html#1630 "Multiple default constructor templates" 
 
 [SUM_TYPE]: https://github.com/viboes/std-make/tree/master/include/experimental/fundamental/v3/sum_type "Generic Sum Types"
@@ -997,14 +995,6 @@ Special thanks and recognition goes to Technical Center of Nokia - Lannion for s
 * [P0650R0] C++ Monadic interface
 
     http://www.open-std.org/JTC1/SC22/WG21/docs/papers/2017/p0650r0.pdf
-
-* [LWG 2510] Tag types should not be DefaultConstructible
-
-    http://cplusplus.github.io/LWG/lwg-active.html#2510
-    
-* [CWG 1518] Explicit default constructors and copy-list-initialization 
-
-    http://open-std.org/JTC1/SC22/WG21/docs/cwg_active.html#1518
 
 * [CWG 1630] Multiple default constructor templates  
 
