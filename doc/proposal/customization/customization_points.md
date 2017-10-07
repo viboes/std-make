@@ -95,7 +95,7 @@ The standard solution consists in overloading the customization point in the `st
 ```c++    
     int a, b;
     using std::swap;
-    swap(a,b); // not found
+    swap(a,b);
 ```
 
 This design has some flaws that [N4569] has very well described.
@@ -110,7 +110,7 @@ To address III, we could always include the tuple-like customization for `std::s
 
 To address point I, I believe that the customization and the use of the customization points should be explicit, that is, make use of some kind of prefix that states clearly what the user is customizing and which customization point it is using.
 
-[N4381] design has in the author opinion two major liabilities already identified in [N4381]. Adding a function objet in the namespace `std2` will disable the addition of ADL overloads to customize classes in `std2`.  The proposed solution is to use friend functions. While this is a solution for classes it doesn't work for enums and [N4381] proposes a workaround, move the enum to a nested namespace add the overload there. Then import the defined enum in `std2`.
+[N4381] design has in the author opinion two major liabilities already identified in [N4381]. Adding a function objet in the namespace `std2` will disable the addition of ADL overloads to customize classes in `std2`.  The proposed solution is to use friend functions. While this is a solution for classes, it doesn't work for enums and [N4381] proposes a workaround, move the enum to a nested namespace add the overload there. Then import the defined enum in `std2`.
 
 There is an additional issue that concerns the standard indirectly. 
 
@@ -130,33 +130,39 @@ The proposed alternative design will take into account the following goals:
 In summary the proposal consists in:
 
 * Adding an indirection level, using traits as customization points. 
-* Making explicit the customization points call
+* Making explicit the customization points call.
 
 To be able to customize also types satisfying some requirements (e.g. a concept) the trait has an `Enabler` parameter (`std::void_t`).
 
-The technique is well know. Boost.Hana has a similar approach for customization points that has yet an additional level of indirection (Hana uses a tag associated to a class that is used as tag dispatcher).
+The technique is well know. [Boost.Hana] has a similar approach for customization points that has yet an additional level of indirection (Hana uses a tag associated to a class that is used as tag dispatcher).
 
-However Boost.Hana requires that all the customization points have a different name as all the customization points are at the `boost::hana` namespace level.
+However [Boost.Hana] requires that all the customization points have a different name as all the customization points are at the `boost::hana` namespace level.
 
 Enabling customizations for groups of types has also some liabilities, possible ambiguity for types on several groups. These are the same kind of problems as we can find with multiple inheritance and the technique to solve the possible ambiguity is almost the same: be more specific.
 
 ## Traits as customization points
  
-The following code uses SFINAE (based on Boost.Hana design, `when<Cond>` is used to SFINAE on conditions), but any other way to do partial specialization based on SFINAE will be good.
+The following code uses SFINAE (based on [Boost.Hana] design, `when<Cond>` is used to SFINAE on conditions), but any other way to do partial specialization based on SFINAE will be good. The author doesn't master Concepts well, and don't know if concepts could help here.
+
+Next follows an example of how to define the customization point `swap`.
+
+## Define the default `traits` class
 
 ```c++
 namespace std2 {
 explicit namespace swappable {
+
+struct not_a_swappable
 
 template <class R, class S, class Enabler=void>
 struct traits: traits<R, S, when<true>> {};
 
 // Default failing specialization
 template <typename R, typename S, bool condition>
-struct traits<R, S, when<condition>>
+struct traits<R, S, when<condition>> : not_a_swappable
 {
     template <class T, class U>
-    static constexpr auto swap(const T& x, const U& y) =delete;
+    static constexpr auto swap(T& x, U& y) =delete;
 };
 }
 ```
@@ -165,14 +171,14 @@ Note the use of template parameters on the traits class and for each operation. 
 
 ## Locate the customized functions inside a specific scope
 
-Add a class representing the associated concept (the prefix), with static functions that will forward the call to the traits.
+Add a explicit namespace representing the associated concept (the prefix), with free functions that will forward the call to the traits.
 
 ```c++
 namespace std2 {
 explicit namespace swappable {
 
 template <class T, class U>
-static constexpr auto swap(const T& x, const U& y) 
+static constexpr auto swap(T& x, U& y) 
     noexcept(noexcept(traits<T, U>::swap(x,y))) ->
     decltype(traits<T, U>::swap(x,y)) 
 {
@@ -187,11 +193,11 @@ We've chosen an explicit namespace because it is open for additions and the scop
 
 ## Syntactic sugar
 
-[SimpleFunctions] proposed a syntactic sugar extension that allows to replace
+[P0573R1] proposes a syntactic sugar extension that allows to write simple lambdas. We could extend it to simplify forwarding functions and replace
 
 ```c++
 template <class T, class U>
-static constexpr auto swap(const T& x, const U& y) 
+static constexpr auto swap(T& x, U& y) 
     noexcept(noexcept(traits<T, U>::swap(x,y))) ->
     decltype(traits<T, U>::swap(x,y)) 
 {
@@ -203,7 +209,7 @@ by
 
 ```c++
 template <class T, class U>
-static constexpr auto swap(const T& x, const U& y)  =>
+static constexpr auto swap(T& x, U& y)  =>
     traits<T, U>::swap(x,y));
 ```
 
@@ -213,7 +219,7 @@ We will use this extension in this paper to make the paper more succinct, avoid 
 
 * Define `is_swappable` using SFINAE on `std2::swappable::swap`
 
-* Define `is_adl_swappable` using SFINAE on `swap`
+* Define `is_adl_swappable` using SFINAE on `swap` found by ADL
 
 ## Usage
 
@@ -239,12 +245,12 @@ swap(a,b)
 
 ## Backward compatibility
 
-In order to be backward compatible, specialize the `swappable` traits by default to use overloading, use the default swap algorithm when possible and define the builtin specialization.
+In order to be backward compatible, specialize the `swappable` traits by default to use overloading, use the default `swap` algorithm when possible and define the builtin specialization.
 
 ```c++
 namespace std {
 
-//To avoid the legacy std definitions [P0370r0]
+// To avoid the legacy std definitions [P0370R0]
 template <class T>
 void swap(T&, T&) = delete;
 template <class T, size_t N>
@@ -259,7 +265,7 @@ template <typename T>
 struct traits<T, T, 
     when<   is_adl_swappable<T&, T&>{} >> 
 {
-    constexpr auto swap(const T& x, const T& y) 
+    constexpr auto swap(T& x, T& y) 
         =
             // Found by ADL as customization is not an explicit namespace
             (void)swap(forward<T>(t), forward<U>(u))        
@@ -273,7 +279,7 @@ struct traits<T, U,
             models::MoveConstructible<T>{}() &&
             models::Assignable<T&, U&&>{}() >> 
 {
-    static constexpr auto swap(const T& x, const T& y) 
+    static constexpr auto swap(T& x, T& y) 
     =
         (void)(b = std::exchange(a, std::move(b)))
     ;
@@ -294,14 +300,12 @@ struct traits<T(&)[N], U(&)[N],
 };
 } // std2::swappable
 
-struct swappable {
+explicit namespace swappable {
 
-template <class T, class U>
-using traits = swappable::traits<T, U>;
 
 template <class T, class U>
 static constexpr auto 
-swap(const T& x, const U& y) 
+swap(T& x, U& y) 
     => traits<T, U>::swap(x,y) ; // Syntactic sugar
 }
 
@@ -338,7 +342,7 @@ namespace std2 {
 
 Virtual functions are used as customization points for run-time polymorphism. However, we don't have a language construct for static polymorphism.
 
-Type classes in Haskell are a tool that is close to the problematic we are handing on here.
+Type classes in Haskell are a tool that is close to the problematic we are handling on here.
 
 C++0X Concepts had a concept mapping feature that is close to this customization problem.
 
@@ -403,12 +407,12 @@ explicit namespace functor {
 };
 ```
 
-There are some notable things about this solution. As promised, the customization point `transform` is located in an explicit scope `struct functor`. 
+There are some notable things about this solution. As promised, the customization point `transform` is located in an explicit scope `explicit namespace functor`. 
 
 #### operators
 
 ```c++
-namespace functor_operators {
+namespace functor::operators {
 
 }
 ```
@@ -457,43 +461,44 @@ namespace std {
 
 #### Customization of a concept
 
-We shall be able to also specialize for a specific kind of types, e.g. *Nullable*.
+We shall be able to also specialize for a specific kind of types, e.g. *ValueOrNone* [P0786R0].
 
 The `Enabler` parameter is used to this end. 
 
 ```c++
-namespace nullable {
-    struct as_functor_traits 
+namespace value_or_none {
+    struct as_functor 
     {
         template <class Callable, class Nullable>
             static constexpr auto transform(Nullable&& n, Callable&& c) 
                 noexcept(noexcept( c(n.value()) )) ->
                 decltype( c(n.value()) ) 
         {
-            if (nullable::has_value(n)) return c(nullable::value(n));
-            return nullable::none<Nullable>();
+            if (value_or_none::has_value(n)) return c(value_or_none::deref(n));
+            return value_or_none::none<Nullable>();
         }    
     };
 }
 
+namespace functor {
   template <class N>
-  struct functor::traits<N, when< is_nullable_v<N> >>  : 
-    nullable_as_functor_traits {};
-
+  struct traits<N, when< is_value_or_none_v<N> >>  : 
+    value_or_none::as_functor {};
+}
 ```
 
-With **Concepts-Lite** the syntax will be different, but we should be able to do the same kind of conditional specialization.
+With **Concepts** the syntax will be different, but we should be able to do the same kind of conditional specialization.
 
 ```c++
 namespace functor {
-    template <Nullable N>
-    struct traits<N>  : nullable::as_functor_traits<N>  {};
+    template <ValueOrNone N>
+    struct traits<N>  : value_or_none::as_functor<N>  {};
 } // functor/customization
 ```
 
-Now any *Nullable* type is seen as a *Functor*.
+Now any *ValueOrNone* type is seen as a *Functor*.
 
-This mapping shall be defined where *Nullable* is defined.
+This mapping shall be defined where *ValueOrNone* is defined.
 
 #### Customization of a type using a concept customization
 
@@ -502,7 +507,7 @@ A type `T` can satisfy the constraints of different concepts `C1`and `C2` that h
 ```c++
 namespace functor {
     template <class T>
-    struct traits<std::optional<T>> : nullable::as_functor_traits<N>  {};
+    struct traits<std::optional<T>> : value_or_none::as_functor<N>  {};
 }} // functor/customization
 ```
 
@@ -524,7 +529,7 @@ template <typename R, bool condition>
 struct traits<R, R, when<condition>> : default_ 
 {
     template <class T>
-    static constexpr auto swap(const T& x, const T& y) =delete;
+    static constexpr auto swap(T& x, T& y) =delete;
 };
 }} // swappable   
 }
@@ -541,7 +546,7 @@ template <class T, class U>
 using traits = swappable::traits<T, U>;
 
 template <class T, class U>
-static constexpr auto swap(const T& x, const U& y) =>
+static constexpr auto swap(T& x, U& y) =>
     traits<T, U>::swap(x,y);
     
 } // swapppable
@@ -564,7 +569,7 @@ template <typename T>
 struct traits<T, T, 
     when<   is_adl_swappable<T&, T&>{} >> 
 {
-    static constexpr auto swap(const T& x, const T& y) =>
+    static constexpr auto swap(T& x, T& y) =>
             // Found by ADL as customization is not an explicit namespace
             swap(forward<T>(t), forward<U>(u))        
 };
@@ -576,7 +581,7 @@ struct traits<T, T,
             models::MoveConstructible<T>{} &&
             models::Assignable<T&, T&&>{} >> 
 {
-    constexpr void swap(const T& x, const T& y) =>
+    constexpr void swap(T& x, T& y) =>
         (void)(b = std::exchange(a, std::move(b)))
     ;
 };
@@ -597,8 +602,7 @@ struct traits<T(&)[N], U(&)[N],
 } // std2::swappable   
 ```
 
-As promised, `swap` is located in an explicit scope `std2::swappable`. `std2::swappable::swap(T,U)` forwards to the `std2::customization::swappable::traits<T,U>::swap(T,U)`.
-
+As promised, `swap` is located in an explicit scope `std2::swappable`. `std2::swappable::swap(T,U)` forwards to the `std2::swappable::traits<T,U>::swap(T,U)`.
 
 Also `std2::swappable` contains the `traits` specialization for the familiar `std::swap` free functions cases and in addition for the backward compatible ADL customized case. 
 
@@ -804,6 +808,7 @@ We need some way to ensure that a customization point inhibits ADL. Function obj
 
 # Proposed Wording
 
+TBC
 
 # Open Points
 
@@ -822,7 +827,7 @@ Usage
     </tr>   
     <tr>
         <td align="left" valign="top"><pre class='brush: cpp'>
-std::experimental::ranges::swap(a,b);
+std2::experimental::ranges::swap(a,b);
         </pre></td>
         <td align="left" valign="top"><pre class='brush: cpp'> std2::swappable::swap(a,b);
         </pre></td>
@@ -1090,26 +1095,45 @@ Thanks to Eric Nibbler for his proposal [N4381] for customization points.
 
 [P0119R2]: http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0119r2.pdf "Overload sets as function arguments"
 
-[P0370r0]: http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0370r0.html "Ranges TS Design Updates Omnibus"
+[P0370R0]: http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0370r0.html "Ranges TS Design Updates Omnibus"
 
 [P0382R0]: http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0382r0.html "Comments on P0119: Overload sets as function arguments"
 
-* [Boost.Hana] Boost.Hana library
-http://boostorg.github.io/hana/index.html
+[P0573R1]: http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2017/p0573r1.html "Abbreviated Lambdas for Fun and Profit"
+  
+[P0786R0]: http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2017/p0786r0.html "*SuccessOrFailure*, *ValuedOrError* and *ValueOrNone* types"   
+  
 
-* [N1691] Explicit Namespaces http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2004/n1691.html
+* [Boost.Hana] Boost.Hana library
+ 
+    http://boostorg.github.io/hana/index.html
+
+* [N1691] Explicit Namespaces     http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2004/n1691.html
 
 * [N4381] Suggested Design for Customization Points
-http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/n4381.html
+
+    http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/n4381.html
 
 * [N4569] Working Draft, C++ Extensions for Ranges
-www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/n4569.pdf
+
+    www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/n4569.pdf
 
 * [P0119R2] Overload sets as function arguments
-http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0119r2.pdf
+
+    http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0119r2.pdf
 	
-* [P0370r0] Ranges TS Design Updates Omnibus
-http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0370r0.html
+* [P0370R0] Ranges TS Design Updates Omnibus
+
+    http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0370r0.html
 
 * [P0382R0] Comments on P0119: Overload sets as function arguments
-http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0382r0.html
+
+    http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0382r0.html
+
+* [P0573R1] Abbreviated Lambdas for Fun and Profit
+
+    http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2017/p0573r1.html
+
+* [P0786R0] *SuccessOrFailure*, *ValuedOrError* and *ValueOrNone* types
+
+    http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2017/p0786r0.html
