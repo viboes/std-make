@@ -33,8 +33,9 @@ namespace value_or_none
 {
     using namespace nullable;
 
-    struct tag
-    {};
+    namespace detail {
+        struct not_a_value_or_none_tag{};
+    }
 
     template <class T, class Enabler=void>
     struct traits
@@ -46,7 +47,7 @@ namespace value_or_none
 
     // Default specialization
     template <typename T, bool condition>
-    struct traits<T, meta::when<condition>>
+    struct traits<T, meta::when<condition>> : detail::not_a_value_or_none_tag
     {
 #if __cplusplus >= 201402L || defined JASEL_DOXYGEN_INVOKED
         template <class U>
@@ -56,7 +57,7 @@ namespace value_or_none
 #endif
     };
 
-    struct traits_pointer_like : tag
+    struct traits_pointer_like
     {
         template <class U>
         static constexpr
@@ -126,7 +127,9 @@ using value_or_none::deref_none;
   template <class T>
   struct is_value_or_none
 #if ! defined JASEL_DOXYGEN_INVOKED
-      : is_base_of<value_or_none::tag, value_or_none::traits<T>> {}
+          : integral_constant<bool,
+                ! is_base_of<value_or_none::detail::not_a_value_or_none_tag, value_or_none::traits<T>>::value
+            > {}
 #endif
       ;
   template <class T>

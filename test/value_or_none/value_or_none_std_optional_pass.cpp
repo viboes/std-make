@@ -77,7 +77,6 @@ int main()
 {
   namespace stde = std::experimental;
 
-  static_assert(not std::is_base_of<stde::value_or_none::tag, stde::value_or_none::traits<stde::none_t>>::value, "ERROR");
   static_assert(not stde::is_value_or_none<stde::none_t>::value, "ERROR");
   static_assert(stde::is_value_or_none<stde::optional<int>>::value, "ERROR");
 
