@@ -79,7 +79,6 @@ namespace type_constructible
   };
 }
 namespace nullable {
-    tag xx;
     template <class T>
     struct traits<boost::optional<T>> : traits_pointer_like {
 

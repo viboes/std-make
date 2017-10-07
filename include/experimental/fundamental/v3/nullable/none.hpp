@@ -26,7 +26,9 @@ inline namespace fundamental_v3
 {
 
   namespace nullable {
-    struct tag {};
+  namespace detail {
+      struct not_a_nullable_tag{};
+  }
 
     template <class T, class Enabler=void>
       struct traits
@@ -37,7 +39,7 @@ inline namespace fundamental_v3
 
     // Default specialization
     template <typename T, bool condition>
-    struct traits<T, meta::when<condition>>
+    struct traits<T, meta::when<condition>> : detail::not_a_nullable_tag
     {
 #if __cplusplus >= 201402L || defined JASEL_DOXYGEN_INVOKED
       static
@@ -50,7 +52,7 @@ inline namespace fundamental_v3
 #endif
     };
 
-    struct traits_pointer_like : tag
+    struct traits_pointer_like
     {
       static constexpr
       nullptr_t none() noexcept { return nullptr; }
@@ -155,7 +157,9 @@ inline namespace fundamental_v3
   template <class T>
   struct is_nullable
 #if ! defined JASEL_DOXYGEN_INVOKED
-      : is_base_of<nullable::tag, nullable::traits<T>> {}
+          : integral_constant<bool,
+                ! is_base_of<nullable::detail::not_a_nullable_tag, nullable::traits<T>>::value
+            > {}
 #endif
       ;
   template <class T>
