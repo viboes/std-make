@@ -226,24 +226,8 @@ struct traits<PT, meta::when<has_tuple_like_access<PT>::value>>
 	}
 };
 
-// customization for C-arrays
-template <class T, size_t N>
-struct traits<T (&)[N]>
-{
-	using size = integral_constant<size_t, N>;
-	template <size_t I>
-	struct element
-	{
-		using type = T;
-	};
 
-	template <size_t I, class U, size_t M,
-	          class = std::enable_if_t<I<N>> static constexpr U &get(
-	                  U (&arr)[M]) noexcept
-	{
-		return arr[I];
-	}
-};
+// customization for C-arrays
 template <class T, size_t N>
 struct traits<T[N]>
 {
@@ -260,6 +244,11 @@ struct traits<T[N]>
 	{
 		return arr[I];
 	}
+};
+
+template <class T, size_t N>
+struct traits<T (&)[N]> : traits<T[N]>
+{
 };
 
 template <class PT>
@@ -282,9 +271,8 @@ struct size<const volatile T> : size<T>
 template <class PT>
 constexpr size_t size_v = size<PT>::value;
 #endif
-template <size_t I, class PT,
-          class = std::enable_if_t<I<size_v<PT>>> struct element : traits<
-                  PT>::template element<I>
+template <size_t I, class PT, class = std::enable_if_t<I<size_v<PT>>>
+struct element : traits<PT>::template element<I>
 {
 };
 template <size_t I, class PT>
