@@ -29,7 +29,9 @@ inline namespace fundamental_v3
 
   namespace value_or_error {
 
-    struct tag {};
+    namespace detail {
+        struct not_a_value_or_error_tag{};
+    }
 
     // A ValueOrError must specialize the following traits and be implicitly convertible from the value_type_t<T> and the error_type_t<T>.
     // value_type_t<T> and the error_type_t<T>
@@ -42,7 +44,7 @@ inline namespace fundamental_v3
 
     // Default specialization
     template <typename T, bool condition>
-    struct traits<T, meta::when<condition>>
+    struct traits<T, meta::when<condition>> : detail::not_a_value_or_error_tag
     {
 #if __cplusplus >= 201402L || defined JASEL_DOXYGEN_INVOKED
 
@@ -61,7 +63,7 @@ inline namespace fundamental_v3
 #endif
     };
 
-    struct traits_pointer_like : tag
+    struct traits_pointer_like
     {
         template <class U>
         static constexpr
@@ -87,7 +89,7 @@ inline namespace fundamental_v3
 
     // specialization for SuccessOrFailure types.
     template <typename T>
-    struct traits<T, meta::when<is_success_or_failure<T>::value>> : tag
+    struct traits<T, meta::when<is_success_or_failure<T>::value>>
     {
 
         template <class U>
@@ -193,7 +195,9 @@ inline namespace fundamental_v3
   template <class T>
   struct is_value_or_error
 #if ! defined JASEL_DOXYGEN_INVOKED
-      : is_base_of<value_or_error::tag, value_or_error::traits<T>> {}
+          : integral_constant<bool,
+                ! is_base_of<value_or_error::detail::not_a_value_or_error_tag, value_or_error::traits<T>>::value
+            > {}
 #endif
       ;
   template <class T>
