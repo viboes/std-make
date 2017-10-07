@@ -30,8 +30,9 @@ inline namespace fundamental_v3
   // the success/failure type constructors for result<T>.
   // These corresponds to the Haskell type-constructors. Maybe a better name is needed.
   namespace wrapped {
-
-    struct tag {};
+  namespace detail {
+      struct not_a_wrapped_tag{};
+  }
 
     // A Wrapped must specialize the following traits
     template <class T, class Enabler=void>
@@ -41,6 +42,7 @@ inline namespace fundamental_v3
 #endif
     ;
 
+    // fixme:: Shouldn't we use SFINAE here?
     // Default specialization
     template <typename T, bool condition>
     struct traits<T, meta::when<condition>>
@@ -85,7 +87,9 @@ inline namespace fundamental_v3
   template <class T>
   struct is_wrapped
 #if ! defined JASEL_DOXYGEN_INVOKED
-      : is_base_of<wrapped::tag, wrapped::traits<T>> {}
+      : integral_constant<bool,
+            ! is_base_of<wrapped::detail::not_a_wrapped_tag, wrapped::traits<T>>::value
+        > {}
 #endif
       ;
   template <class T>
