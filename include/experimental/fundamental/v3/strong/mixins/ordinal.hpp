@@ -36,7 +36,7 @@ namespace std
     template <class W
     , class = enable_if_t<is_ordinal<typename W::underlying_type>{}>
     >
-    struct wrapped_ordinal_traits : ordinal::tag
+    struct wrapped_ordinal_traits
     {
       using T =  typename W::underlying_type;
       using size_type = typename ordinal::traits<T>::size_type;

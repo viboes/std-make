@@ -262,7 +262,7 @@ namespace chrono
 namespace ordinal {
   //! chrono::moduloD,SD,R> is an ordinal type that can be used with the ordinal containers
   template <class D, class SD, class R>
-  struct traits<chrono::modulo<D,SD,R>> : ordinal::tag
+  struct traits<chrono::modulo<D,SD,R>>
   {
     using size_type = size_t;
     using size = integral_constant<size_t, chrono::modulo<D,SD,R>::cardinal>;

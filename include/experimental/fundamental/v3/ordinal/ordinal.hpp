@@ -30,7 +30,10 @@ inline namespace fundamental_v3
 {
 
 namespace ordinal {
-    struct tag {};
+namespace detail
+{
+    struct not_a_ordinal_tag{};
+}
 
 #if defined JASEL_DOXYGEN_INVOKED
     template <class T, class Enabler=void>
@@ -41,7 +44,7 @@ namespace ordinal {
 
     // Default specialization
     template <typename T, bool condition>
-    struct traits<T, meta::when<condition>>
+    struct traits<T, meta::when<condition>> : detail::not_a_ordinal_tag
     {
       using size = void;
       using size_type = size_t;
@@ -61,7 +64,7 @@ namespace ordinal {
     // arithmetic traits: usable by bounded with a step of 1
     // fixme: do we need to make SizeType width enough
     template <class T, T Low, T High, T Step = T{1}, class SizeType=size_t>
-    struct arithmetic_traits : tag
+    struct arithmetic_traits
     {
       static_assert(is_arithmetic<T>::value, "T must be arithmetic");
 
@@ -198,7 +201,9 @@ namespace meta {
   template <class T>
   struct is_ordinal
 #if ! defined JASEL_DOXYGEN_INVOKED
-     : is_base_of<ordinal::tag, ordinal::traits<T>> {}
+     : integral_constant<bool,
+           ! is_base_of<ordinal::detail::not_a_ordinal_tag, ordinal::traits<T>>::value
+       > {}
 #endif
       ;
   template <class T>
