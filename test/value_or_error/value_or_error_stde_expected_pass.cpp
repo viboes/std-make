@@ -57,7 +57,6 @@ int main()
     >::value, "ERROR");
 
   static_assert(stde::is_value_or_error<stde::expected<int, bool>>::value, "ERROR");
-#if 1
 
   {
       auto u = stde::unexpected<bool>(true);
@@ -212,8 +211,6 @@ int main()
      stde::expected<int, bool> y = stde::value_or_error::bind(x, mtwice);
      BOOST_TEST(stde::value_or_error::deref(y) == 2);
    }
-#endif
-#if 0
 
   //value_or_error::value_or
   {
@@ -240,11 +237,11 @@ int main()
   //value_or_error::has_error
   {
     stde::expected<int, bool> x = stde::unexpected<bool>(true);
-    BOOST_TEST(stde::value_or_error::has_error(x, stde::unexpected<bool>(true)));
+    BOOST_TEST(stde::value_or_error::check_error(x, true));
   }
   {
     stde::expected<int, bool> x = stde::expected<int, bool>(1);
-    BOOST_TEST(! stde::value_or_error::has_error(x, stde::unexpected<bool>(true)));
+    BOOST_TEST(! stde::value_or_error::check_error(x, true));
   }
 
   //value_or_error::resolve
@@ -258,6 +255,5 @@ int main()
     int y = stde::value_or_error::resolve(x, res);
     BOOST_TEST(y == 1);
   }
-#endif
   return ::boost::report_errors();
 }

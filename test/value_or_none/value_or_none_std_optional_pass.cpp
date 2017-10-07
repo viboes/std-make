@@ -445,14 +445,14 @@ int main()
     int y = stde::value_or_none::apply_or(x, twice, -1);
     BOOST_TEST(y == 2);
   }
-  //value_or_none::has_error
+  //value_or_none::check_error
   {
     stde::optional<int> x = stde::none<stde::optional>();
-    BOOST_TEST(stde::value_or_none::has_error(x, stde::nullopt));
+    BOOST_TEST(stde::value_or_none::check_error(x, stde::nullopt));
   }
   {
     stde::optional<int> x = stde::make<stde::optional>(1);
-    BOOST_TEST(! stde::value_or_none::has_error(x, stde::nullopt));
+    BOOST_TEST(! stde::value_or_none::check_error(x, stde::nullopt));
   }
 
   //value_or_none::resolve

@@ -6,8 +6,8 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef JASEL_FUNDAMENTAL_V3_VALUE_OR_ERROR_RESOLVE_HPP
-#define JASEL_FUNDAMENTAL_V3_VALUE_OR_ERROR_RESOLVE_HPP
+#ifndef JASEL_FUNDAMENTAL_V3_VALUE_OR_ERROR_CHECK_ERROR_HPP
+#define JASEL_FUNDAMENTAL_V3_VALUE_OR_ERROR_CHECK_ERROR_HPP
 
 #include <experimental/fundamental/v2/config.hpp>
 #include <experimental/fundamental/v3/value_or_error/value_or_error.hpp>
@@ -23,26 +23,26 @@ inline  namespace fundamental_v3
 namespace value_or_error
 {
   /**
-   * value_or_error::resolve
+   * value_or_error::check_error
    * @par Returns
-   *  The contained value or the resolution of none via the function `f`
+   *  Whether the contained error (if any) is equal to the parameter `e
    */
-  template <class N, class F
-  // todo add constraint on F
-  //, class = enable_if_t<
-  //    is_value_or_error_v<meta::uncvref_t<N>>
-  // && is_convertible_v< F(error_type_t<meta::uncvref_t<N>>), value_type_t<meta::uncvref_t<N>> >
-  //>
+  template <class N, class E
+    , class = enable_if_t<
+        is_value_or_error< meta::uncvref_t<N> >::value
+        // add constraint on E
+        //&& is_comparable_v< decay_t<E>, none_type_t<meta::uncvref_t<N>> >
+    >
   >
   BOOST_CXX14_CONSTEXPR
-  value_type_t<meta::uncvref_t<N>>
-  resolve(N&& n, F&& f)
+  bool
+  check_error(N&& n, E&& e)
   {
     if (value_or_error::has_value(forward<N>(n)))
     {
-      return value_or_error::deref(forward<N>(n));
+      return false;
     }
-    return JASEL_INVOKE(std::forward<F>(f),  value_or_error::failure_value(forward<N>(n)) );
+    return value_or_error::error(forward<N>(n)) == forward<E>(e);
   }
 
 } // value_or_error

@@ -28,6 +28,7 @@ inline namespace fundamental_v3
 {
 
   namespace value_or_error {
+    using namespace success_or_failure;
 
     namespace detail {
         struct not_a_value_or_error_tag{};
@@ -123,6 +124,18 @@ inline namespace fundamental_v3
     constexpr
     bool has_value(T const* ptr) noexcept {
       return ptr != nullptr;
+    }
+
+    template <class T>
+    constexpr
+    auto has_error(T const& x)
+    JASEL_DECLTYPE_RETURN_NOEXCEPT (
+      ! traits<T>::has_value(x)
+    )
+    template <class T>
+    constexpr
+    bool has_error(T const* ptr) noexcept {
+      return ptr == nullptr;
     }
 
     template <class T>

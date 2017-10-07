@@ -34,7 +34,7 @@
 // ValueOrNone algos
 #include <experimental/fundamental/v3/value_or_none/value_or.hpp>
 #include <experimental/fundamental/v3/value_or_none/error_or.hpp>
-#include <experimental/fundamental/v3/value_or_none/has_error.hpp>
+#include <experimental/fundamental/v3/value_or_none/check_error.hpp>
 #include <experimental/fundamental/v3/value_or_none/apply_or.hpp>
 #include <experimental/fundamental/v3/value_or_none/resolve.hpp>
 

@@ -53,7 +53,7 @@
 // ValueOrError algos
 #include <experimental/fundamental/v3/value_or_error/value_or.hpp>
 #include <experimental/fundamental/v3/value_or_error/error_or.hpp>
-#include <experimental/fundamental/v3/value_or_error/has_error.hpp>
+#include <experimental/fundamental/v3/value_or_error/check_error.hpp>
 #include <experimental/fundamental/v3/value_or_error/apply_or.hpp>
 #include <experimental/fundamental/v3/value_or_error/resolve.hpp>
 
