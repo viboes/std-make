@@ -25,8 +25,9 @@ inline namespace fundamental_v3
 
   namespace success_or_failure {
 
-    struct tag {};
-
+    namespace detail {
+        struct not_a_success_or_failure_tag{};
+    }
     // A SuccessOrFailure must specialize the following traits and be implicitly convertible from the success_type_t<T> and the failure_type_t<T>.
     // success_type_t<T> and the failure_type_t<T>
     template <class T, class Enabler=void>
@@ -38,7 +39,7 @@ inline namespace fundamental_v3
 
     // Default specialization
     template <typename T, bool condition>
-    struct traits<T, meta::when<condition>>
+    struct traits<T, meta::when<condition>> : detail::not_a_success_or_failure_tag
     {
 #if __cplusplus >= 201402L || defined JASEL_DOXYGEN_INVOKED
 
@@ -62,7 +63,7 @@ inline namespace fundamental_v3
     };
 
 
-    struct traits_pointer_like : tag
+    struct traits_pointer_like
     {
         template <class U>
         static constexpr
@@ -149,13 +150,13 @@ inline namespace fundamental_v3
     template <class TC>
     using failure_type_t = typename failure_type<TC>::type;
 
-    struct mcd_succeeded: tag
+    struct mcd_succeeded
     {
         template <class U>
         static constexpr
         bool failed(U const& ptr) noexcept { return ! success_or_failure::succeeded(ptr); }
     };
-    struct mcd_failed: tag
+    struct mcd_failed
     {
         template <class U>
         static constexpr
@@ -175,7 +176,9 @@ inline namespace fundamental_v3
   template <class T>
   struct is_success_or_failure
 #if ! defined JASEL_DOXYGEN_INVOKED
-      : is_base_of<success_or_failure::tag, success_or_failure::traits<T>> {}
+      : integral_constant<bool,
+            ! is_base_of<success_or_failure::detail::not_a_success_or_failure_tag, success_or_failure::traits<T>>::value
+        > {}
 #endif
       ;
   template <class T>
