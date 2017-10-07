@@ -53,8 +53,9 @@ namespace detail
 
 //! struct mapping a Nullable to a SumType
   template <class N>
-  struct as_sum_type : sum_type::tag {
+  struct as_sum_type {
     using size = integral_constant<size_t, 2>;
+    using single = false_type;
 
     template <size_t I>
     using alternative = tuple_element<I, meta::types<none_type_t<N>, value_type_t<N>>>;

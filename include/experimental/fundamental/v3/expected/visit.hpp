@@ -50,9 +50,10 @@ namespace expected_helpers
 namespace sum_type
 {
   template <class T, class E>
-  struct traits<expected<T,E>> : sum_type::tag
+  struct traits<expected<T,E>>
   {
     using size = integral_constant<size_t, 2>;
+    using single = false_type;
 
     template <size_t I>
     using alternative = tuple_element<I, meta::types<T, unexpected<E> >>;

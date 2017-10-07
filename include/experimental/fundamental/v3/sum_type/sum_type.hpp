@@ -25,11 +25,20 @@
 #include <cstddef>
 #include <utility>
 #define JASEL_HAS_EXPERIMENTAL_VARIANT 0
+#define JASEL_HAS_VARIANT 0
+
 #if JASEL_HAS_EXPERIMENTAL_VARIANT
 #include <experimental/variant>
+#elif JASEL_HAS_VARIANT
+#include <variant>
 #else
 
-
+namespace std
+{
+namespace experimental
+{
+inline namespace fundamental_v3
+{
 // 20.7.3, variant helper classes
 template <class T> struct variant_size; // undefined template <class T> struct variant_size<const T>;
 template <class T> struct variant_size<volatile T>;
@@ -49,6 +58,7 @@ template <size_t I, class T>
 
 constexpr size_t variant_npos = static_cast<size_t>(-1);
 
+}}}
 
 #endif
 
@@ -162,7 +172,9 @@ namespace detail
       ;
 
 namespace sum_type {
-    struct tag{};
+namespace detail {
+    struct not_a_sum_type_tag{};
+}
 
     template <class ST, class Enabler=void>
     struct traits
@@ -173,9 +185,11 @@ namespace sum_type {
 
     // specialization as a single alternative
     template <class  ST>
-    struct single_traits : tag
+    struct single_traits
     {
         using size = integral_constant<size_t, 1>;
+
+        using single = true_type;
 
         template <size_t I>
         using alternative = ST;
@@ -194,7 +208,7 @@ namespace sum_type {
 
     // failing specialization
     template <class  ST>
-    struct delete_traits
+    struct delete_traits : detail::not_a_sum_type_tag
     {
         template <class T>
           static constexpr auto get(T&& x) = delete;
@@ -218,9 +232,10 @@ namespace sum_type {
     // Forward to customized class using variant-like access
     template <class ST>
     struct traits
-    <  ST, meta::when< has_variant_like_access<ST>::value >  > : tag
+    <  ST, meta::when< has_variant_like_access<ST>::value >  >
     {
       using size = variant_size<ST>;
+      using single = false_type;
 
       template <size_t I>
       using alternative = variant_alternative<I, ST>;
@@ -228,12 +243,12 @@ namespace sum_type {
       template <size_t I, class ST2, class= std::enable_if_t< I < size::value > >
         static constexpr decltype(auto) get(ST2&& st)
         {
-          return detail::variant_get_adl::xget<I>(forward<ST2>(st));
+          return experimental::detail::variant_get_adl::xget<I>(forward<ST2>(st));
         }
       template <class V, class ST2>
         static constexpr decltype(auto) visit(V&& v, ST2&& st)
         {
-          return detail::variant_visit_adl::xvisit(forward<V>(v), forward<ST2>(st));
+          return experimental::detail::variant_visit_adl::xvisit(forward<V>(v), forward<ST2>(st));
         }
     };
 
@@ -319,7 +334,10 @@ namespace sum_type {
   template <class T>
   struct is_sum_type
 #if ! defined JASEL_DOXYGEN_INVOKED
-      : is_base_of<sum_type::tag, sum_type::traits<T>> {}
+          : integral_constant<bool,
+                ! is_base_of<sum_type::detail::not_a_sum_type_tag, sum_type::traits<T>>::value
+            > {}
+
 #endif
       ;
   template <class T>
