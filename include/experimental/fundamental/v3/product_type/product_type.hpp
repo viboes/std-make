@@ -185,6 +185,11 @@ struct has_tuple_like_access<T (&)[N]>
 namespace product_type
 {
 
+namespace detail {
+    struct not_a_product_type_tag
+    {};
+}
+
 template <class PT, class Enabler = void>
 struct traits
 #if !defined JASEL_DOXYGEN_INVOKED
@@ -196,7 +201,7 @@ struct traits
 
 // Default failing specialization
 template <class PT, bool condition>
-struct traits<PT, meta::when<condition>>
+struct traits<PT, meta::when<condition>> : detail::not_a_product_type_tag
 {
 #if __cplusplus >= 201402L || defined JASEL_DOXYGEN_INVOKED
 	template <class T>
@@ -204,13 +209,9 @@ struct traits<PT, meta::when<condition>>
 #endif
 };
 
-struct tag
-{
-};
-
 // Forward to customized class using tuple-like access
 template <class PT>
-struct traits<PT, meta::when<has_tuple_like_access<PT>::value>> : tag
+struct traits<PT, meta::when<has_tuple_like_access<PT>::value>>
 {
 	using size = tuple_size<PT>;
 
@@ -227,7 +228,7 @@ struct traits<PT, meta::when<has_tuple_like_access<PT>::value>> : tag
 
 // customization for C-arrays
 template <class T, size_t N>
-struct traits<T (&)[N]> : tag
+struct traits<T (&)[N]>
 {
 	using size = integral_constant<size_t, N>;
 	template <size_t I>
@@ -244,7 +245,7 @@ struct traits<T (&)[N]> : tag
 	}
 };
 template <class T, size_t N>
-struct traits<T[N]> : tag
+struct traits<T[N]>
 {
 	using size = integral_constant<size_t, N>;
 	template <size_t I>
@@ -341,9 +342,9 @@ using element_sequence_for =
 template <class T>
 struct is_product_type
 #if !defined JASEL_DOXYGEN_INVOKED
-        : is_base_of<product_type::tag, product_type::traits<T>>
-{
-}
+      : integral_constant<bool,
+            ! is_base_of<product_type::detail::not_a_product_type_tag, product_type::traits<T>>::value
+        > {}
 #endif
 ;
 template <class T>

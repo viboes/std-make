@@ -33,7 +33,7 @@ inline namespace fundamental_v3 {
 namespace product_type {
 
   template <>
-  struct traits<Point2D> : tag
+  struct traits<Point2D>
   {
     using size = integral_constant<size_t, 2>;
 
