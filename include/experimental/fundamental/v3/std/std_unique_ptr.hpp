@@ -72,7 +72,7 @@ inline namespace fundamental_v3
 
 namespace type_constructible {
   template <class T, class D>
-  struct traits<unique_ptr<T, D>> : tag
+  struct traits<unique_ptr<T, D>>
   {
     template <class M, class ...Xs>
     static //constexpr

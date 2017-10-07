@@ -61,7 +61,7 @@ namespace experimental
 inline namespace fundamental_v3 {
 namespace type_constructible {
   template <class T, size_t N>
-  struct traits<array<T, N>> : type_constructible::tag
+  struct traits<array<T, N>>
   {
     template <class M, class ...Xs>
     static constexpr

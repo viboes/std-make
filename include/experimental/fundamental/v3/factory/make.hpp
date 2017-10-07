@@ -29,10 +29,11 @@ inline namespace fundamental_v3
 
 namespace type_constructible
 {
-  struct tag {};
-
+  namespace detail {
+      struct not_a_type_constructible_tag{};
+  }
   template <typename T>
-  struct traits_constructor : tag {
+  struct traits_constructor {
     template <class M, class ...Xs>
     static constexpr
     auto make(Xs&& ...xs)
@@ -54,7 +55,7 @@ namespace type_constructible
   struct traits<T, meta::when<condition>> : traits_constructor<T> {};
 
   template <class T>
-  struct traits<T*> : tag
+  struct traits<T*>
   {
     template <class M, class ...Xs>
     static
@@ -173,7 +174,10 @@ using type_constructible::emplace;
 template <class T>
 struct is_type_constructible
 #if ! defined JASEL_DOXYGEN_INVOKED
-    : is_base_of<type_constructible::tag, type_constructible::traits<T>> {}
+    : integral_constant<bool,
+          ! is_base_of<type_constructible::detail::not_a_type_constructible_tag, type_constructible::traits<T>>::value
+      > {}
+
 #endif
     ;
 template <class T>

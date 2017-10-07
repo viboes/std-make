@@ -337,7 +337,6 @@ namespace detail {
           : integral_constant<bool,
                 ! is_base_of<sum_type::detail::not_a_sum_type_tag, sum_type::traits<T>>::value
             > {}
-
 #endif
       ;
   template <class T>

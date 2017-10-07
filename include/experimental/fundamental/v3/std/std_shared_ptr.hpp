@@ -31,7 +31,7 @@ inline namespace fundamental_v3
 
 namespace type_constructible {
   template <class T>
-  struct traits<shared_ptr<T>> : tag
+  struct traits<shared_ptr<T>>
   {
 
     template <class M, class ...Xs>
