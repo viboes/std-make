@@ -55,7 +55,7 @@ namespace detail
         ;
 
   //! Default failing specialization
-  //! It doesn't inherits from the functor::tag and deletes any signature to make the code more explicit
+  //! It inherits from the functor::detail::not_a_functor_tag and deletes any signature to make the code more explicit
   template <typename U, bool condition>
   struct traits<U, meta::when<condition>> : detail::not_a_functor_tag
   {
