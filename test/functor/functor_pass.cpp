@@ -40,13 +40,12 @@ int main()
     int* x = stde::make<int*>(v);
     BOOST_TEST(*x == 1);
     BOOST_TEST(x != stde::none());
-    BOOST_TEST(stde::deref(x) == 1);
     int* y = stde::functor::transform(x, twice);
-    BOOST_TEST(stde::deref(y) == 2);
+    BOOST_TEST(*y == 2);
     delete x; // don't use T* when you must manage memory. Use instead unique_ptr
     delete y;
     x = stde::make<int*>(2);
-    BOOST_TEST(stde::deref(x) == 2);
+    BOOST_TEST(*x == 2);
     delete x;
   }
   {
@@ -54,10 +53,9 @@ int main()
     const int* x = stde::make<int*>(v);
     BOOST_TEST(*x == 1);
     BOOST_TEST(x != stde::none());
-    BOOST_TEST(stde::deref(x) == 1);
 
     int* y = stde::functor::transform(x, twice);
-    BOOST_TEST(stde::deref(y) == 2);
+    BOOST_TEST(*y == 2);
     delete x;
     delete y;
   }

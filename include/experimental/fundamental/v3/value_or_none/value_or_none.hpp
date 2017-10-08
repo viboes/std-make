@@ -13,6 +13,8 @@
 #include <experimental/meta.hpp>
 #include <experimental/fundamental/v2/config.hpp>
 #include <experimental/meta/v1/when.hpp>
+#include <experimental/value_or_error.hpp>
+
 #include <functional>
 
 #include <utility>
@@ -63,7 +65,7 @@ namespace value_or_none
         static constexpr
         auto deref(U && ptr)
         JASEL_DECLTYPE_RETURN (
-                *(forward<U>(ptr))
+               *(forward<U>(ptr))
         )
     };
 
@@ -116,8 +118,8 @@ namespace value_or_none
 }
 
 //using value_or_none::value_type;
-using value_or_none::deref;
-using value_or_none::deref_none;
+//using value_or_none::deref;
+//using value_or_none::deref_none;
 
   // todo: define in function of whether
   // EqualityComparable && DefaultConstructible && Destructible & PossibleValued & Nullable
@@ -150,6 +152,73 @@ using value_or_none::deref_none;
   : true_type {}
 #endif
   ;
+
+namespace success_or_failure
+{
+  template <class T>
+  struct traits<T, meta::when<
+    is_value_or_none<T>::value
+  >>
+  {
+      template <class U>
+      static constexpr
+      bool succeeded(U && u)
+      { return value_or_none::has_value(forward<U>(u)); }
+
+      template <class U>
+      static constexpr
+      bool failed(U && u)
+      { return ! value_or_none::has_value(forward<U>(u)); }
+
+      template <class U>
+      static constexpr
+      auto success_value(U && u)
+      JASEL_DECLTYPE_RETURN_NOEXCEPT (
+              value_or_none::deref(forward<U>(u))
+      )
+
+      template <class U>
+      static constexpr
+      auto failure_value(U && u)
+      JASEL_DECLTYPE_RETURN_NOEXCEPT (
+              value_or_none::deref_none(forward<U>(u))
+      )
+
+  };
+}
+
+namespace value_or_error
+{
+  template <class T>
+  struct traits<T, meta::when<
+    is_value_or_none<T>::value
+  >>
+  {
+      template <class U>
+      static constexpr
+      auto has_value(U && u)
+      JASEL_DECLTYPE_RETURN (
+              value_or_none::has_value(forward<U>(u))
+      )
+
+      template <class U>
+      static constexpr
+      auto deref(U && u)
+      JASEL_DECLTYPE_RETURN (
+              value_or_none::deref(forward<U>(u))
+      )
+
+
+      template <class U>
+      static constexpr
+      auto error(U && u)
+      JASEL_DECLTYPE_RETURN (
+              value_or_none::deref_none(forward<U>(u))
+      )
+
+  };
+}
+
 }
 }
 }

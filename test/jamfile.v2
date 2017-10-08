@@ -118,7 +118,7 @@ test-suite stde_expected
       [ run expected/expected_pass.cpp  ]
     ;
 
-#explicit possibly_valued ;
+explicit possibly_valued ;
 test-suite possibly_valued
     : 
       [ run possibly_valued/possibly_valued_pass.cpp  ]

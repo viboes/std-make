@@ -13,6 +13,7 @@
 #include <experimental/fundamental/v3/value_or_error/value_or_error.hpp>
 #include <experimental/make.hpp>
 #include <experimental/meta.hpp>
+#include <experimental/make.hpp>
 #include <experimental/type_constructible.hpp>
 #include <experimental/fundamental/v3/monad_error/monad_error.hpp>
 #include <utility>
@@ -29,18 +30,18 @@ inline  namespace fundamental_v3
     // fixme: Should we provide another overload taking a Callable<F(error_type_t<N>) as parameter?
     template <class N, class F>
     // requires Nullable<N> and Callable<F,error_type_t<N>(void)>
-    static constexpr decay_t<N> catch_error(N&& x, F&& f)
+    constexpr decay_t<N> catch_error(N&& x, F&& f)
     {
-      return (has_value(forward<N>(x))) ? move(x) : f();
+      return (value_or_error::has_value(forward<N>(x))) ? move(x) : f();
     }
 
     template <class M, class ...Xs>
     constexpr
     auto make_error(Xs && ...xs)
       JASEL_DECLTYPE_RETURN_NOEXCEPT (
-          error_type_t<M>(forward<Xs>(xs)...)
+              //error_type_t<M>(forward<Xs>(xs)...)
+              type_constructible::make<error_type_t<M>>(forward<Xs>(xs)...)
       )
-
     struct as_monad_error
     {
       template <class M>

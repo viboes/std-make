@@ -40,21 +40,19 @@ int main()
     std::unique_ptr<int> x = std::make_unique<int>(v);
     BOOST_TEST(*x == 1);
     BOOST_TEST(x != stde::none());
-    BOOST_TEST(stde::deref(x) == 1);
     std::unique_ptr<int> y = stde::functor::transform(x, twice);
-    BOOST_TEST(stde::deref(y) == 2);
+    BOOST_TEST(*y == 2);
     x = std::make_unique<int>(2);
-    BOOST_TEST(stde::deref(x) == 2);
+    BOOST_TEST(*x == 2);
   }
   {
     int v=1;
     const std::unique_ptr<int> x = std::make_unique<int>(v);
     BOOST_TEST(*x == 1);
     BOOST_TEST(x != stde::none());
-    BOOST_TEST(stde::deref(x) == 1);
 
     std::unique_ptr<int> y = stde::functor::transform(x, twice);
-    BOOST_TEST(stde::deref(y) == 2);
+    BOOST_TEST(*y == 2);
   }
 
   return ::boost::report_errors();

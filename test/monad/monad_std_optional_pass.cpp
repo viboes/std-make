@@ -42,7 +42,7 @@ int main()
     stde::optional<int> x = stde::make<stde::optional>(v);
     stde::optional<int> y = stde::monad::bind(x,twice);
     BOOST_TEST(stde::has_value(y));
-    BOOST_TEST(stde::deref(y) == 2);
+    BOOST_TEST(*y == 2);
   }
   {
     int v=0;
@@ -55,7 +55,7 @@ int main()
     stde::optional<stde::optional<int>> x = stde::make<stde::optional>(v);
     stde::optional<int> y = stde::monad::unwrap(x);
     BOOST_TEST(stde::has_value(y));
-    BOOST_TEST(stde::deref(y) == 0);
+    BOOST_TEST(*y == 0);
   }
 
   return ::boost::report_errors();

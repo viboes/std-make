@@ -53,6 +53,5 @@ int main()
     std::unique_ptr<int> y = stde::monad_error::bind(x,twice);
     BOOST_TEST(! y);
   }
-
   return ::boost::report_errors();
 }

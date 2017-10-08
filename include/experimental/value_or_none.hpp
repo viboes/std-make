@@ -8,21 +8,21 @@
 #define JASEL_EXPERIMENTAL_VALUE_OR_NONE_HPP
 
 
-// Nullable customizations
+// ValueOrNone customizations
 // as functor
-#include <experimental/fundamental/v3/value_or_none/transform.hpp>
+//#include <experimental/fundamental/v3/value_or_none/transform.hpp>
 
 // as applicative
-#include <experimental/fundamental/v3/value_or_none/ap.hpp>
+//#include <experimental/fundamental/v3/value_or_none/ap.hpp>
 
 // as monad
-#include <experimental/fundamental/v3/value_or_none/bind.hpp>
+//#include <experimental/fundamental/v3/value_or_none/bind.hpp>
 
 // as monad_error
-#include <experimental/fundamental/v3/value_or_none/monad_error.hpp>
+//#include <experimental/fundamental/v3/value_or_none/monad_error.hpp>
 
 // as sum_type
-#include <experimental/fundamental/v3/value_or_none/visit.hpp>
+//#include <experimental/fundamental/v3/value_or_none/visit.hpp>
 
 // as foldable
 //#include <experimental/fundamental/v3/value_or_none/fold.hpp>
@@ -32,13 +32,13 @@
 //#include <experimental/fundamental/v3/value_or_none/for_each.hpp>
 
 // ValueOrNone algos
-#include <experimental/fundamental/v3/value_or_none/value_or.hpp>
-#include <experimental/fundamental/v3/value_or_none/error_or.hpp>
-#include <experimental/fundamental/v3/value_or_none/check_error.hpp>
-#include <experimental/fundamental/v3/value_or_none/apply_or.hpp>
-#include <experimental/fundamental/v3/value_or_none/resolve.hpp>
+//#include <experimental/fundamental/v3/value_or_none/value_or.hpp>
+//#include <experimental/fundamental/v3/value_or_none/error_or.hpp>
+//#include <experimental/fundamental/v3/value_or_none/check_error.hpp>
+//#include <experimental/fundamental/v3/value_or_none/apply_or.hpp>
+//#include <experimental/fundamental/v3/value_or_none/resolve.hpp>
 
-// Nullable core
+// ValueOrNone core
 #include <experimental/fundamental/v3/value_or_none/value_or_none.hpp>
 
 // TypeConstructible

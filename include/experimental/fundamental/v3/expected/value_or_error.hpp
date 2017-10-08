@@ -13,7 +13,7 @@
 #include <experimental/fundamental/v3/value_or_error/value_or_error.hpp>
 #include <experimental/fundamental/v3/expected/success_or_failure.hpp>
 
-#if 0
+#if 1
 #include <utility>
 
 namespace std
@@ -31,7 +31,24 @@ struct traits<expected<T,E>> : traits_pointer_like
 
     template <class U>
     static constexpr
-    auto error(U && e) noexcept { return e.error(); }
+    auto error(U && u)
+    JASEL_DECLTYPE_RETURN_NOEXCEPT (
+            u.error()
+    )
+    //noexcept { return u.error(); }
+
+    template <class U>
+    static
+    bool has_value(U && u)
+    { return bool(u); }
+
+    template <class U>
+    static
+    auto deref(U && u)
+    JASEL_DECLTYPE_RETURN_NOEXCEPT (
+            *u
+    )
+    //{ return *u; }
 
 };
 }

@@ -143,7 +143,7 @@ namespace detail
   constexpr auto
   make_error(Xs&& ...xs)
     JASEL_DECLTYPE_RETURN_NOEXCEPT(
-      traits<type_constructor_t<TC>>::template make_error<TC>(std::forward<Xs>(xs)...)
+      traits<type_constructor_t<TC>>::template make_error<type_constructor_t<TC>>(std::forward<Xs>(xs)...)
     )
 
   // make_error overload: requires a template class, deduce the error type associated to the template

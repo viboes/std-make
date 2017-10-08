@@ -35,7 +35,7 @@ int main()
   {
     std::unique_ptr<int> x = stde::none<std::unique_ptr>();
     BOOST_TEST( ! x);
-    BOOST_TEST(! stde::has_value(x));
+    BOOST_TEST(! stde::value_or_none::has_value(x));
     BOOST_TEST(x == stde::none());
     BOOST_TEST(stde::none() == x);
     BOOST_TEST(x == stde::none<std::unique_ptr<stde::_t>>());
@@ -45,27 +45,27 @@ int main()
     std::unique_ptr<int> x = std::make_unique<int>(v);
     BOOST_TEST(*x == 0);
 
-    BOOST_TEST(stde::has_value(x));
+    BOOST_TEST(stde::value_or_none::has_value(x));
     BOOST_TEST(x != stde::none());
     BOOST_TEST(stde::none() != x);
     BOOST_TEST(x != stde::none<std::unique_ptr<stde::_t>>());
 
-    BOOST_TEST(stde::deref(x) == 0);
+    BOOST_TEST(stde::value_or_none::deref(x) == 0);
   }
   {
     int v=0;
-    BOOST_TEST(stde::deref(std::make_unique<int>(v)) == 0);
+    BOOST_TEST(stde::value_or_none::deref(std::make_unique<int>(v)) == 0);
   }
   {
     int v=1;
     std::unique_ptr<A> x = std::make_unique<A>(v,v);
     BOOST_TEST(x->v == 2);
-    BOOST_TEST(stde::deref(x).v == 2);
+    BOOST_TEST(stde::value_or_none::deref(x).v == 2);
   }
   {
     std::unique_ptr<A> x = std::make_unique<A>();
     BOOST_TEST_EQ(x->v,  3);
-    BOOST_TEST(stde::deref(x).v == 3);
+    BOOST_TEST(stde::value_or_none::deref(x).v == 3);
   }
   return ::boost::report_errors();
 }

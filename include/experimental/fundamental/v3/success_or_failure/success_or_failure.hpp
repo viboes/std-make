@@ -44,19 +44,19 @@ inline namespace fundamental_v3
 #if __cplusplus >= 201402L || defined JASEL_DOXYGEN_INVOKED
 
         template <class U>
-        static
+        static constexpr
         bool succeeded(U && ptr)  = delete;
 
         template <class U>
-        static
+        static constexpr
         bool failed(U && ptr)  = delete;
 
         template <class U>
-        static
+        static constexpr
         auto success_value(U && ptr) = delete;
 
         template <class U>
-        static
+        static constexpr
         auto failure_value(U && ptr)  = delete;
 
 #endif

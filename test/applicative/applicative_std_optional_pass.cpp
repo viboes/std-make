@@ -26,6 +26,7 @@ int twice(int i) {
 int main()
 {
 #if __cplusplus >= 201402L
+
   namespace stde = std::experimental;
 
   static_assert(stde::is_nullable_v<stde::optional<int>>, "ERROR");
@@ -55,7 +56,11 @@ int main()
     stde::optional<int> x = stde::make<stde::optional>(v);
     stde::optional<int(*)(int)> f = stde::make<stde::optional>(twice);
     stde::optional<int> y = stde::applicative::ap(f, x);
-    BOOST_TEST(stde::deref(y) == 2);
+    (void)y;
+    BOOST_TEST(stde::value_or_error::has_value(y));
+    //BOOST_TEST(stde::deref(y) == 2);
+    BOOST_TEST(stde::value_or_error::deref(y) == 2);
+    BOOST_TEST(*y == 2);
   }
 #endif
 
