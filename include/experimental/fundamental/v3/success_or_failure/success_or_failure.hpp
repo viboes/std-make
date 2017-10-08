@@ -82,7 +82,7 @@ inline namespace fundamental_v3
 
         template <class U>
         static constexpr
-        nullptr_t failure_value(U && ptr) noexcept { return nullptr; }
+        nullptr_t failure_value(U && ) noexcept { return nullptr; }
     };
 
     // fixme
@@ -140,7 +140,7 @@ inline namespace fundamental_v3
 
     template <class T>
     constexpr
-    std::nullptr_t failure_value(T* ptr) noexcept {
+    std::nullptr_t failure_value(T* ) noexcept {
       return nullptr ;
     }
 

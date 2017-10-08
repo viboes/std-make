@@ -187,38 +187,6 @@ namespace success_or_failure
   };
 }
 
-namespace value_or_error
-{
-  template <class T>
-  struct traits<T, meta::when<
-    is_value_or_none<T>::value
-  >>
-  {
-      template <class U>
-      static constexpr
-      auto has_value(U && u)
-      JASEL_DECLTYPE_RETURN (
-              value_or_none::has_value(forward<U>(u))
-      )
-
-      template <class U>
-      static constexpr
-      auto deref(U && u)
-      JASEL_DECLTYPE_RETURN (
-              value_or_none::deref(forward<U>(u))
-      )
-
-
-      template <class U>
-      static constexpr
-      auto error(U && u)
-      JASEL_DECLTYPE_RETURN (
-              value_or_none::deref_none(forward<U>(u))
-      )
-
-  };
-}
-
 }
 }
 }

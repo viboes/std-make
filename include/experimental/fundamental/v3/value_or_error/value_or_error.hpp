@@ -79,7 +79,7 @@ inline namespace fundamental_v3
 
         template <class U>
         static constexpr
-        nullptr_t error(U && ptr) noexcept { return nullptr; }
+        nullptr_t error(U && ) noexcept { return nullptr; }
     };
 
     // fixme
@@ -88,30 +88,30 @@ inline namespace fundamental_v3
     template <class T>
     struct traits<T*> : traits_pointer_like {};
 
-//    // specialization for SuccessOrFailure types.
-//    template <typename T>
-//    struct traits<T, meta::when<is_success_or_failure<T>::value>>
-//    {
-//
-//        template <class U>
-//        static
-//        bool has_value(U && u)  { return success_or_failure::succeeded(forward<U>(u)); }
-//
-//        template <class U>
-//        static
-//        auto deref(U && u)
-//        JASEL_DECLTYPE_RETURN_NOEXCEPT (
-//                wrapped::unwrap(success_or_failure::success_value(forward<U>(u)))
-//        )
-//
-//        template <class U>
-//        static
-//        auto error(U && u)
-//        JASEL_DECLTYPE_RETURN_NOEXCEPT (
-//                wrapped::unwrap(success_or_failure::failure_value(forward<U>(u)))
-//        )
-//
-//    };
+    // specialization for SuccessOrFailure types.
+    template <typename T>
+    struct traits<T, meta::when<is_success_or_failure<T>::value>>
+    {
+
+        template <class U>
+        static
+        bool has_value(U && u)  { return success_or_failure::succeeded(forward<U>(u)); }
+
+        template <class U>
+        static
+        auto deref(U && u)
+        JASEL_DECLTYPE_RETURN_NOEXCEPT (
+                wrapped::unwrap(success_or_failure::success_value(forward<U>(u)))
+        )
+
+        template <class U>
+        static
+        auto error(U && u)
+        JASEL_DECLTYPE_RETURN_NOEXCEPT (
+                wrapped::unwrap(success_or_failure::failure_value(forward<U>(u)))
+        )
+
+    };
 
     template <class T>
     constexpr
@@ -184,7 +184,7 @@ inline namespace fundamental_v3
 
     template <class T>
     constexpr
-    std::nullptr_t error(T* ptr) noexcept {
+    std::nullptr_t error(T* ) noexcept {
       return nullptr ;
     }
 

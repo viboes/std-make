@@ -28,7 +28,7 @@ std::experimental::expected<int, bool> mtwice(int i) {
 }
 
 std::experimental::expected<double, bool> inverse(double x) {
-  if (x==0) return std::experimental::unexpected<bool>(true);
+  if (static_cast<int>(x)==0) return std::experimental::unexpected<bool>(true);
   return 1/x;
 }
 
