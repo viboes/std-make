@@ -13,7 +13,6 @@
 #include <experimental/meta.hpp>
 #include <experimental/fundamental/v2/config.hpp>
 #include <experimental/meta/v1/when.hpp>
-#include <experimental/success_or_failure.hpp>
 #include <experimental/wrapped.hpp>
 #include <functional>
 
@@ -28,7 +27,6 @@ inline namespace fundamental_v3
 {
 
   namespace value_or_error {
-    using namespace success_or_failure;
 
     namespace detail {
         struct not_a_value_or_error_tag{};
@@ -48,6 +46,21 @@ inline namespace fundamental_v3
     struct traits<T, meta::when<condition>> : detail::not_a_value_or_error_tag
     {
 #if __cplusplus >= 201402L || defined JASEL_DOXYGEN_INVOKED
+        template <class U>
+        static constexpr
+        bool succeeded(U && ptr)  = delete;
+
+        template <class U>
+        static constexpr
+        bool failed(U && ptr)  = delete;
+
+        template <class U>
+        static constexpr
+        auto success_value(U && ptr) = delete;
+
+        template <class U>
+        static constexpr
+        auto failure_value(U && ptr)  = delete;
 
         template <class U>
         static
@@ -64,54 +77,65 @@ inline namespace fundamental_v3
 #endif
     };
 
-    struct traits_pointer_like
-    {
-        template <class U>
-        static constexpr
-        bool has_value(U const& ptr) noexcept { return bool(ptr); }
 
-        template <class U>
-        static constexpr
-        auto deref(U && ptr)
-          JASEL_DECLTYPE_RETURN (
-              *(ptr)
-          )
-
-        template <class U>
-        static constexpr
-        nullptr_t error(U && ) noexcept { return nullptr; }
-    };
-
-    // fixme
-    //template <>
-    //struct traits<add_pointer<_t>> : traits_pointer_like {};
     template <class T>
-    struct traits<T*> : traits_pointer_like {};
+    constexpr
+    auto succeeded(T && x)
+      JASEL_DECLTYPE_RETURN_NOEXCEPT (
+        traits<decay_t<T>>::succeeded(forward<T>(x))
+      )
+    template <class T>
+    constexpr
+    auto failed(T && x)
+    JASEL_DECLTYPE_RETURN_NOEXCEPT (
+      traits<decay_t<T>>::failed(forward<T>(x))
+    )
 
-    // specialization for SuccessOrFailure types.
-    template <typename T>
-    struct traits<T, meta::when<is_success_or_failure<T>::value>>
-    {
+    template <class T>
+    constexpr
+    bool succeeded(T const* ptr) noexcept {
+      return ptr != nullptr;
+    }
 
-        template <class U>
-        static
-        bool has_value(U && u)  { return success_or_failure::succeeded(forward<U>(u)); }
+    template <class T>
+    constexpr
+    auto success_value(T && x)
+      JASEL_DECLTYPE_RETURN (
+        traits<decay_t<T>>::success_value(x)
+      )
 
-        template <class U>
-        static
-        auto deref(U && u)
-        JASEL_DECLTYPE_RETURN_NOEXCEPT (
-                wrapped::unwrap(success_or_failure::success_value(forward<U>(u)))
-        )
+    template <class T>
+    constexpr
+    T& success_value(T* ptr) noexcept {
+      return *ptr ;
+    }
 
-        template <class U>
-        static
-        auto error(U && u)
-        JASEL_DECLTYPE_RETURN_NOEXCEPT (
-                wrapped::unwrap(success_or_failure::failure_value(forward<U>(u)))
-        )
+    template <class T>
+      struct success_type;
+    template <class T>
+        using success_type_t = typename success_type<T>::type;
 
-    };
+    template <class T>
+      struct success_type { using type = remove_reference_t<decltype(value_or_error::success_value(declval<T>()))>; };
+
+    template <class T>
+    constexpr
+    auto failure_value(T && x)
+      JASEL_DECLTYPE_RETURN_NOEXCEPT (
+          traits<decay_t<T>>::failure_value(forward<T>(x))
+      )
+
+    template <class T>
+    constexpr
+    std::nullptr_t failure_value(T* ) noexcept {
+      return nullptr ;
+    }
+
+    template <class T>
+      struct failure_type { using type = remove_reference_t<decltype(value_or_error::failure_value(declval<T>()))>; };
+
+    template <class TC>
+    using failure_type_t = typename failure_type<TC>::type;
 
     template <class T>
     constexpr
@@ -193,6 +217,79 @@ inline namespace fundamental_v3
 
     template <class TC>
     using error_type_t = typename error_type<TC>::type;
+
+    struct traits_pointer_like
+    {
+        template <class U>
+        static constexpr
+        bool succeeded(U const& ptr) noexcept { return bool(ptr); }
+
+        template <class U>
+        static constexpr
+        bool failed(U const& ptr) noexcept { return ! bool(ptr); }
+
+        template <class U>
+        static constexpr
+        auto success_value(U && ptr)
+          JASEL_DECLTYPE_RETURN (
+              *(forward<U>(ptr))
+          )
+
+        template <class U>
+        static constexpr
+        nullptr_t failure_value(U && ) noexcept { return nullptr; }
+
+        template <class U>
+        static constexpr
+        bool has_value(U const& ptr) noexcept { return bool(ptr); }
+
+        template <class U>
+        static constexpr
+        auto deref(U && ptr)
+          JASEL_DECLTYPE_RETURN (
+              *(ptr)
+          )
+
+        template <class U>
+        static constexpr
+        nullptr_t error(U && ) noexcept { return nullptr; }
+    };
+
+    // fixme
+    //template <>
+    //struct traits<add_pointer<_t>> : traits_pointer_like {};
+    template <class T>
+    struct traits<T*> : traits_pointer_like {};
+
+
+    // mcd for typed defining the SuccessOrFailure types.
+    struct mcd_success_or_failure
+    {
+
+        template <class U>
+        static constexpr
+        bool failed(U const& ptr) noexcept { return ! value_or_error::succeeded(ptr); }
+
+        template <class U>
+        static
+        bool has_value(U && u)  { return value_or_error::succeeded(forward<U>(u)); }
+
+        template <class U>
+        static
+        auto deref(U && u)
+        JASEL_DECLTYPE_RETURN_NOEXCEPT (
+                wrapped::unwrap(value_or_error::success_value(forward<U>(u)))
+        )
+
+        template <class U>
+        static
+        auto error(U && u)
+        JASEL_DECLTYPE_RETURN_NOEXCEPT (
+                wrapped::unwrap(value_or_error::failure_value(forward<U>(u)))
+        )
+
+    };
+
 
   }
 

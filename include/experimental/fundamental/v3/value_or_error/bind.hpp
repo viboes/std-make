@@ -50,7 +50,7 @@ namespace value_or_error
     {
       return JASEL_INVOKE(std::forward<F>(f), value_or_error::deref(forward<M>(m)));
     }
-    return success_or_failure::failure_value(forward<M>(m));
+    return value_or_error::failure_value(forward<M>(m));
 
   }
   struct as_monad: monad::mcd_bind

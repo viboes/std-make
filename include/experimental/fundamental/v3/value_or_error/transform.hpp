@@ -49,7 +49,7 @@ namespace value_or_error
           JASEL_INVOKE(std::forward<F>(f), value_or_error::deref(forward<N>(n)))
       );
     }
-    return success_or_failure::failure_value(forward<N>(n));
+    return value_or_error::failure_value(forward<N>(n));
   }
 
   struct as_functor: functor::mcd_transform

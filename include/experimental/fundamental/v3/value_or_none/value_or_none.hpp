@@ -153,12 +153,12 @@ namespace value_or_none
 #endif
   ;
 
-namespace success_or_failure
+namespace value_or_error
 {
   template <class T>
   struct traits<T, meta::when<
     is_value_or_none<T>::value
-  >>
+  >> : mcd_success_or_failure
   {
       template <class U>
       static constexpr

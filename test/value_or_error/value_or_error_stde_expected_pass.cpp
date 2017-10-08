@@ -45,14 +45,14 @@ int main()
 {
   namespace stde = std::experimental;
 
-  static_assert(stde::is_success_or_failure<stde::expected<int, bool>>::value, "ERROR");
+  static_assert(stde::is_value_or_error<stde::expected<int, bool>>::value, "ERROR");
 
   static_assert(std::is_same<
-      stde::success_or_failure::failure_type_t<stde::expected<int, bool>>,
+      stde::value_or_error::failure_type_t<stde::expected<int, bool>>,
       stde::unexpected<bool>
     >::value, "ERROR");
   static_assert(std::is_same<
-      stde::success_or_failure::success_type_t<stde::expected<int, bool>>,
+      stde::value_or_error::success_type_t<stde::expected<int, bool>>,
       int
     >::value, "ERROR");
 
@@ -79,8 +79,7 @@ int main()
   {
     auto n = stde::unexpected<bool>(true);
     stde::expected<int, A> x{n};
-    //auto b = stde::success_or_failure::traits<stde::expected<int, A>>::succeeded(x);
-    BOOST_TEST(! stde::success_or_failure::succeeded(x));
+    BOOST_TEST(! stde::value_or_error::succeeded(x));
   }
   {
     auto n = stde::unexpected<bool>(true);

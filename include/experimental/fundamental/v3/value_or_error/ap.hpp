@@ -46,10 +46,10 @@ namespace value_or_error
       )
   {
     if (! value_or_error::has_value(forward<F>(f)) )
-        return success_or_failure::failure_value(forward<F>(f));
+        return value_or_error::failure_value(forward<F>(f));
 
     if (! value_or_error::has_value(forward<N>(n)))
-        return success_or_failure::failure_value(forward<N>(n));
+        return value_or_error::failure_value(forward<N>(n));
 
     return make<TypeConstructor<decay_t<N>>>(
         JASEL_INVOKE(value_or_error::deref(std::forward<F>(f)), value_or_error::deref(forward<N>(n)))

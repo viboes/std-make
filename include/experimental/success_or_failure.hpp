@@ -4,6 +4,7 @@
 //
 // (C) Copyright 2017 Vicente J. Botet Escriba
 
+#error
 #ifndef JASEL_EXPERIMENTAL_SUCCESS_OR_VALUE_HPP
 #define JASEL_EXPERIMENTAL_SUCCESS_OR_VALUE_HPP
 
