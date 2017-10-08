@@ -5,7 +5,7 @@
     </tr>
     <tr>
         <td width="172" align="left" valign="top">Date:</td>
-        <td width="435">2016-06-11</td>
+        <td width="435">2016-10-08</td>
     </tr>
     <tr>
         <td width="172" align="left" valign="top">Project:</td>
@@ -27,6 +27,10 @@ Traits: An Alternative Design for Customization Points
 
 **Abstract**
 
+This paper propose an alternative design for customization points compared to the  design of customization points proposed in [N4381].
+
+It is based on traits associated to each concept instead of on using ADL.
+Of course, for backward compatibility, the current customization points using ADL are preserved.
 
 # Table of Contents
 
@@ -57,10 +61,11 @@ The proposed design:
 The design is based on:
 
 * Associate the customization points to a concept.
-* Split the customized and the customization point following in some way the Method Pattern.
+* Separate the customized and the customization point following in some way the Method Pattern.
 * Make use of traits as customization points.
-* Include the customized points inside an explicit scope (a prefix) associated to the concept.
+* Include the customized points inside an scope (a prefix) associated to the concept (In order to have an explicit scope this will need a language feature extension that is not described in this paper).
 
+The subject of this paper was presented the first time in **code:dive** conference in November 2016 ([Presentation-Slides]/[Presentation-Video]).
 
 # Motivation
 
@@ -150,7 +155,7 @@ Next follows an example of how to define the customization point `swap`.
 
 ```c++
 namespace std2 {
-explicit namespace swappable {
+namespace swappable {
 
 struct not_a_swappable
 
@@ -171,7 +176,25 @@ Note the use of template parameters on the traits class and for each operation. 
 
 ## Locate the customized functions inside a specific scope
 
-Add a explicit namespace representing the associated concept (the prefix), with free functions that will forward the call to the traits.
+Add a namespace representing the associated concept (the prefix), with free functions that will forward the call to the traits.
+
+```c++
+namespace std2 {
+namespace swappable {
+
+template <class T, class U>
+static constexpr auto swap(T& x, U& y) 
+    noexcept(noexcept(traits<T, U>::swap(x,y))) ->
+    decltype(traits<T, U>::swap(x,y)) 
+{
+    return traits<T, U>::swap(x,y);
+}
+
+};
+}
+```
+
+We've chosen a namespace because it is open for additions. However we would like to have an explicit scope as we have with classes. This point will be addressed by another paper about a new explicit namespace feature.
 
 ```c++
 namespace std2 {
@@ -189,7 +212,6 @@ static constexpr auto swap(T& x, U& y)
 }
 ```
 
-We've chosen an explicit namespace because it is open for additions and the scope is explicit. 
 
 ## Syntactic sugar
 
@@ -300,7 +322,7 @@ struct traits<T(&)[N], U(&)[N],
 };
 } // std2::swappable
 
-explicit namespace swappable {
+namespace swappable {
 
 
 template <class T, class U>
@@ -378,7 +400,7 @@ The goals of customization point design are as follows (for some hypothetical fu
 
 ```c++
 /////////////////////////////
-explicit namespace functor {
+namespace functor {
 
     template <class R, class Enabler=void>
     struct traits : traits<R, when<true>> {};
@@ -398,7 +420,7 @@ explicit namespace functor {
 The customized user interface is located in a specific explicit scope.
 
 ```c++
-explicit namespace functor {   
+namespace functor {   
    
     template <class Callable, class F>
     constexpr auto transform(F&& f, Callable&& c) =>
@@ -407,7 +429,6 @@ explicit namespace functor {
 };
 ```
 
-There are some notable things about this solution. As promised, the customization point `transform` is located in an explicit scope `explicit namespace functor`. 
 
 #### operators
 
@@ -513,7 +534,7 @@ namespace functor {
 
 ### Backward compatible `swap` customization point
 
-This design proposes to locate customization point `swap` in an explicit namespace `std2::swappable`. Below is what `std2::swappable::swap` would look like if it were redesigned.
+This design proposes to locate customization point `swap` in a namespace `std2::swappable`. Below is what `std2::swappable::swap` would look like if it were redesigned.
 
 #### Customization interface
 
@@ -704,7 +725,7 @@ struct traits<R, when<has_begin_end_member<R>>
 
 ```c++
 namespace std2 {
-explicit namespace hashable {   
+namespace hashable {   
 
 template <class T, class Enabler=void>
 struct traits: traits<T, when<true>> {};
@@ -736,7 +757,7 @@ constexpr auto hash_value(T&& x) => traits<T>:: hash_value(forward<T>(x)) ;
 
 ```c++
 namespace std2 {
-explicit namespace hashable {  
+namespace hashable {  
 
 // specialization types found by ADL
 template <typename T>
@@ -811,6 +832,22 @@ We need some way to ensure that a customization point inhibits ADL. Function obj
 TBC
 
 # Open Points
+
+## Do we need a language feature for explicit namespaces?
+
+
+
+
+## Do we need a more specific language feature to define kind of classes in C++?
+
+The customization approach proposed in this paper has yet a lot of noise. A more specific language feature that allows to define kind of classes (traits) and the mapping of types to this kind of classes would help to remove all this noise.
+
+Other languages have already something similar:
+* Haskell has type classes
+* Rust has traits
+* Swift has protocols
+
+
 
 # Comparison
 
@@ -1103,6 +1140,9 @@ Thanks to Eric Nibbler for his proposal [N4381] for customization points.
   
 [P0786R0]: http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2017/p0786r0.html "*SuccessOrFailure*, *ValuedOrError* and *ValueOrNone* types"   
   
+[Presentation-Slides]: https://cdn2-ecros.pl/event/codedive/files/presentations/2016/TraitsAsCustomizationPoints.pdf "An Alternative Approach To Customization Points: Type Classes"
+    
+[Presentation-Video]: https://www.youtube.com/watch?v=Dsm12yd637E "An Alternative Approach To Customization Points: Type Classes"  
 
 * [Boost.Hana] Boost.Hana library
  
@@ -1137,3 +1177,11 @@ Thanks to Eric Nibbler for his proposal [N4381] for customization points.
 * [P0786R0] *SuccessOrFailure*, *ValuedOrError* and *ValueOrNone* types
 
     http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2017/p0786r0.html
+
+* [Presentation-Slides] An Alternative Approach To Customization Points: Type Classes
+
+    https://cdn2-ecros.pl/event/codedive/files/presentations/2016/TraitsAsCustomizationPoints.pdf
+
+* [Presentation-Video] An Alternative Approach To Customization Points: Type Classes
+
+    https://www.youtube.com/watch?v=Dsm12yd637E
