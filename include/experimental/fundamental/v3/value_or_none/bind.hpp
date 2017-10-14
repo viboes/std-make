@@ -36,8 +36,8 @@ namespace value_or_none
   template <class M, class F
   // todo add constraint on F
   //, class = enable_if_t<
-  //    is_value_or_none_v<decay_t<N>>
-  // && is_type_constructible_v<decay_t<N>>
+  //    is_value_or_none_v<meta::uncvref_t<N>>
+  // && is_type_constructible_v<meta::uncvref_t<N>>
   //>
   >
   JASEL_CXX14_CONSTEXPR auto

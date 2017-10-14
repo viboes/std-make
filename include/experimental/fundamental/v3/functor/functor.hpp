@@ -64,7 +64,7 @@ namespace detail
         static auto transform(T&& x, F&& y) = delete;
 
       template <class Functor_T, class Pred_T, class Callable_T_U>
-        static auto adjust_if(Functor_T && xs, Pred_T  p, Callable_T_U  f) = delete;
+        static auto adjust_if(Functor_T && xs, Pred_T&&  p, Callable_T_U&&  f) = delete;
 #endif
   };
 
@@ -105,9 +105,9 @@ namespace detail
   // fixme Should `U` be convertible to `T` instead and return a Functor_T instead of a Functor_U?
 
   template <class Functor_T, class Pred_T, class Callable_T_U>
-    auto adjust_if(Functor_T && xs, Pred_T  p, Callable_T_U  f)
+    auto adjust_if(Functor_T && xs, Pred_T&&  p, Callable_T_U&&  f)
         JASEL_DECLTYPE_RETURN_NOEXCEPT(
-            traits<type_constructor_t<meta::uncvref_t<Functor_T>>>::adjust_if(forward<Functor_T>(xs),p, f)
+            traits<type_constructor_t<meta::uncvref_t<Functor_T>>>::adjust_if(forward<Functor_T>(xs), forward<Pred_T>(p), forward<Callable_T_U>(f))
         )
 
 #if ! defined JASEL_DOXYGEN_INVOKED
@@ -144,18 +144,18 @@ namespace detail
     // fixme Should `U` be convertible to `T` instead and return a Functor_T instead of a Functor_U?
 
     template <class Functor_T, class Pred_T, class Callable_T_U>
-    static auto adjust_if(Functor_T && xs, Pred_T  p, Callable_T_U  f)
+    static auto adjust_if(Functor_T && xs, Pred_T&&  p, Callable_T_U&&  f)
       JASEL_DECLTYPE_RETURN_NOEXCEPT(
-          functor::transform(forward<Functor_T>(xs), detail::adjust_if_helper<Pred_T, Callable_T_U>{p, f})
+          functor::transform(forward<Functor_T>(xs), detail::adjust_if_helper<decay_t<Pred_T>, decay_t<Callable_T_U>>{p, f})
       )
   };
   //! minimal complete definition based on adjust_if
   struct mcd_adjust_if
   {
     template <class Functor_T, class Callable_T_U>
-    static auto transform(Functor_T && xs, Callable_T_U  f)
+    static auto transform(Functor_T && xs, Callable_T_U&&  f)
       JASEL_DECLTYPE_RETURN_NOEXCEPT(
-          functor::adjust_if(forward<Functor_T>(xs), always<bool>(true), f)
+          functor::adjust_if(forward<Functor_T>(xs), always<bool>(true), forward<Functor_T>(f))
       )
   };
 }

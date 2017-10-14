@@ -65,10 +65,10 @@ namespace detail
   };
 
   template <class F, class A>
-  // requires is_same_v<type_constructor_t<decay_t<A>>, type_constructor_t<decay_t<F>>>
+  // requires is_same_v<type_constructor_t<meta::uncvref_t<A>>, type_constructor_t<decay_t<F>>>
   auto ap(F&& f, A&& x)
      JASEL_DECLTYPE_RETURN_NOEXCEPT(
-          traits<type_constructor_t<decay_t<A>>>::ap(forward<F>(f), forward<A>(x))
+          traits<type_constructor_t<meta::uncvref_t<A>>>::ap(forward<F>(f), forward<A>(x))
      )
 
    template <class A, class T>

@@ -64,7 +64,7 @@ inline namespace fundamental_v3
 
         template <class U>
         static
-        bool has_value(U const& ptr)  = delete;
+        bool has_value(U && ptr)  = delete;
 
         template <class U>
         static
@@ -82,33 +82,33 @@ inline namespace fundamental_v3
     constexpr
     auto succeeded(T && x)
       JASEL_DECLTYPE_RETURN_NOEXCEPT (
-        traits<decay_t<T>>::succeeded(forward<T>(x))
+        traits<meta::uncvref_t<T>>::succeeded(forward<T>(x))
       )
     template <class T>
     constexpr
     auto failed(T && x)
     JASEL_DECLTYPE_RETURN_NOEXCEPT (
-      traits<decay_t<T>>::failed(forward<T>(x))
+      traits<meta::uncvref_t<T>>::failed(forward<T>(x))
     )
 
-    template <class T>
-    constexpr
-    bool succeeded(T const* ptr) noexcept {
-      return ptr != nullptr;
-    }
+//    template <class T>
+//    constexpr
+//    bool succeeded(T const* ptr) noexcept {
+//      return ptr != nullptr;
+//    }
 
     template <class T>
     constexpr
     auto success_value(T && x)
       JASEL_DECLTYPE_RETURN (
-        traits<decay_t<T>>::success_value(x)
+        traits<meta::uncvref_t<T>>::success_value(x)
       )
 
-    template <class T>
-    constexpr
-    T& success_value(T* ptr) noexcept {
-      return *ptr ;
-    }
+//    template <class T>
+//    constexpr
+//    T& success_value(T* ptr) noexcept {
+//      return *ptr ;
+//    }
 
     template <class T>
       struct success_type;
@@ -122,14 +122,14 @@ inline namespace fundamental_v3
     constexpr
     auto failure_value(T && x)
       JASEL_DECLTYPE_RETURN_NOEXCEPT (
-          traits<decay_t<T>>::failure_value(forward<T>(x))
+          traits<meta::uncvref_t<T>>::failure_value(forward<T>(x))
       )
 
-    template <class T>
-    constexpr
-    std::nullptr_t failure_value(T* ) noexcept {
-      return nullptr ;
-    }
+//    template <class T>
+//    constexpr
+//    std::nullptr_t failure_value(T* ) noexcept {
+//      return nullptr ;
+//    }
 
     template <class T>
       struct failure_type { using type = remove_reference_t<decltype(value_or_error::failure_value(declval<T>()))>; };
@@ -139,41 +139,41 @@ inline namespace fundamental_v3
 
     template <class T>
     constexpr
-    auto has_value(T const& x)
+    auto has_value(T && x)
       JASEL_DECLTYPE_RETURN_NOEXCEPT (
-        traits<T>::has_value(x)
+        traits<meta::uncvref_t<T>>::has_value(forward<T>(x))
       )
 
-    template <class T>
-    constexpr
-    bool has_value(T const* ptr) noexcept {
-      return ptr != nullptr;
-    }
+//    template <class T>
+//    constexpr
+//    bool has_value(T const* ptr) noexcept {
+//      return ptr != nullptr;
+//    }
 
     template <class T>
     constexpr
-    auto has_error(T const& x)
+    auto has_error(T && x)
     JASEL_DECLTYPE_RETURN_NOEXCEPT (
-      ! traits<T>::has_value(x)
+      ! traits<meta::uncvref_t<T>>::has_value(forward<T>(x))
     )
-    template <class T>
-    constexpr
-    bool has_error(T const* ptr) noexcept {
-      return ptr == nullptr;
-    }
+//    template <class T>
+//    constexpr
+//    bool has_error(T const* ptr) noexcept {
+//      return ptr == nullptr;
+//    }
 
     template <class T>
     constexpr
     auto deref(T && x)
       JASEL_DECLTYPE_RETURN (
-        traits<decay_t<T>>::deref(x)
+        traits<meta::uncvref_t<T>>::deref(x)
       )
 
-    template <class T>
-    constexpr
-    T& deref(T* ptr) noexcept {
-      return *ptr ;
-    }
+//    template <class T>
+//    constexpr
+//    T& deref(T* ptr) noexcept {
+//      return *ptr ;
+//    }
 
     template <class T>
       struct value_type;
@@ -184,33 +184,33 @@ inline namespace fundamental_v3
       struct value_type { using type = remove_reference_t<decltype(value_or_error::deref(declval<T>()))>; };
 
     template <class M>
-    constexpr auto have_value(M const& v)
+    auto have_value(M && v)
       JASEL_DECLTYPE_RETURN_NOEXCEPT (
-        value_or_error::has_value(v)
+              value_or_error::has_value(std::forward<M>(v))
       )
 
     template <class M1, class M2, class ...Ms>
-    constexpr auto have_value(M1 const& v1, M2 const& v2, Ms const& ...vs)
-      //-> decltype(has_value(v1) && have_value(v2, vs...))
-      noexcept(noexcept(value_or_error::has_value(v1)))
-      -> decltype(value_or_error::has_value(v1))
+    auto have_value(M1 && v1, M2 && v2, Ms && ...vs)
+      //-> decltype(has_value(std::forward<M1>(v1)) && have_value(std::forward<M1>(v2), std::forward<M1>(vs)...))
+      noexcept(noexcept(value_or_error::has_value(std::forward<M1>(v1))))
+      -> decltype(value_or_error::has_value(std::forward<M1>(v1)))
 
     {
-      return value_or_error::has_value(v1) && have_value(v2, vs...);
+      return value_or_error::has_value(std::forward<M1>(v1)) && have_value(std::forward<M1>(v2), std::forward<M1>(vs)...);
     }
 
     template <class T>
     constexpr
     auto error(T && x)
       JASEL_DECLTYPE_RETURN_NOEXCEPT (
-          traits<decay_t<T>>::error(forward<T>(x))
+          traits<meta::uncvref_t<T>>::error(forward<T>(x))
       )
 
-    template <class T>
-    constexpr
-    std::nullptr_t error(T* ) noexcept {
-      return nullptr ;
-    }
+//    template <class T>
+//    constexpr
+//    std::nullptr_t error(T* ) noexcept {
+//      return nullptr ;
+//    }
 
     template <class T>
       struct error_type { using type = remove_reference_t<decltype(value_or_error::error(declval<T>()))>; };
@@ -218,48 +218,48 @@ inline namespace fundamental_v3
     template <class TC>
     using error_type_t = typename error_type<TC>::type;
 
-    struct traits_pointer_like
-    {
-        template <class U>
-        static constexpr
-        bool succeeded(U const& ptr) noexcept { return bool(ptr); }
-
-        template <class U>
-        static constexpr
-        bool failed(U const& ptr) noexcept { return ! bool(ptr); }
-
-        template <class U>
-        static constexpr
-        auto success_value(U && ptr)
-          JASEL_DECLTYPE_RETURN (
-              *(forward<U>(ptr))
-          )
-
-        template <class U>
-        static constexpr
-        nullptr_t failure_value(U && ) noexcept { return nullptr; }
-
-        template <class U>
-        static constexpr
-        bool has_value(U const& ptr) noexcept { return bool(ptr); }
-
-        template <class U>
-        static constexpr
-        auto deref(U && ptr)
-          JASEL_DECLTYPE_RETURN (
-              *(ptr)
-          )
-
-        template <class U>
-        static constexpr
-        nullptr_t error(U && ) noexcept { return nullptr; }
-    };
+//    struct traits_pointer_like
+//    {
+//        template <class U>
+//        static constexpr
+//        bool succeeded(U const& ptr) noexcept { return bool(ptr); }
+//
+//        template <class U>
+//        static constexpr
+//        bool failed(U const& ptr) noexcept { return ! bool(ptr); }
+//
+//        template <class U>
+//        static constexpr
+//        auto success_value(U && ptr)
+//          JASEL_DECLTYPE_RETURN (
+//              *(forward<U>(ptr))
+//          )
+//
+//        template <class U>
+//        static constexpr
+//        nullptr_t failure_value(U && ) noexcept { return nullptr; }
+//
+//        template <class U>
+//        static constexpr
+//        bool has_value(U const& ptr) noexcept { return bool(ptr); }
+//
+//        template <class U>
+//        static constexpr
+//        auto deref(U && ptr)
+//          JASEL_DECLTYPE_RETURN (
+//              *(ptr)
+//          )
+//
+//        template <class U>
+//        static constexpr
+//        nullptr_t error(U && ) noexcept { return nullptr; }
+//    };
 
     // fixme
     //template <>
     //struct traits<add_pointer<_t>> : traits_pointer_like {};
-    template <class T>
-    struct traits<T*> : traits_pointer_like {};
+//    template <class T>
+//    struct traits<T*> : traits_pointer_like {};
 
 
     // mcd for typed defining the SuccessOrFailure types.
@@ -268,21 +268,21 @@ inline namespace fundamental_v3
 
         template <class U>
         static constexpr
-        bool failed(U const& ptr) noexcept { return ! value_or_error::succeeded(ptr); }
+        bool failed(U && u) noexcept { return ! value_or_error::succeeded(forward<U>(u)); }
 
         template <class U>
-        static
+        static constexpr
         bool has_value(U && u)  { return value_or_error::succeeded(forward<U>(u)); }
 
         template <class U>
-        static
+        static constexpr
         auto deref(U && u)
         JASEL_DECLTYPE_RETURN_NOEXCEPT (
                 wrapped::unwrap(value_or_error::success_value(forward<U>(u)))
         )
 
         template <class U>
-        static
+        static constexpr
         auto error(U && u)
         JASEL_DECLTYPE_RETURN_NOEXCEPT (
                 wrapped::unwrap(value_or_error::failure_value(forward<U>(u)))
@@ -321,12 +321,12 @@ inline namespace fundamental_v3
   constexpr bool is_value_or_error_v = is_value_or_error<T>::value ;
 #endif
 
-  template <class T>
-  struct is_value_or_error<T*>
-#if ! defined JASEL_DOXYGEN_INVOKED
-  : true_type {}
-#endif
-  ;
+//  template <class T>
+//  struct is_value_or_error<T*>
+//#if ! defined JASEL_DOXYGEN_INVOKED
+//  : true_type {}
+//#endif
+//  ;
 
 }
 }

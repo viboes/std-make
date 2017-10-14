@@ -70,14 +70,14 @@ struct not_a_monad_tag{};
   auto
     bind(M&& x, F&& f)
        JASEL_DECLTYPE_RETURN_NOEXCEPT(
-          traits<type_constructor_t<decay_t<M>>>::bind(forward<M>(x), forward<F>(f))
+          traits<type_constructor_t<meta::uncvref_t<M>>>::bind(forward<M>(x), forward<F>(f))
        )
 
   template <class M>
   auto
    unwrap(M&& x)
       JASEL_DECLTYPE_RETURN_NOEXCEPT(
-          traits<type_constructor_t<decay_t<M>>>::unwrap(forward<M>(x))
+          traits<type_constructor_t<meta::uncvref_t<M>>>::unwrap(forward<M>(x))
          //bind(forward<M>(x), identity{})
       )
 

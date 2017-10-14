@@ -127,14 +127,14 @@ namespace detail
   auto
   catch_error(M&& x, F&& f)
        JASEL_DECLTYPE_RETURN_NOEXCEPT(
-          traits<type_constructor_t<decay_t<M>>>::catch_error(forward<M>(x), forward<F>(f))
+          traits<type_constructor_t<meta::uncvref_t<M>>>::catch_error(forward<M>(x), forward<F>(f))
        )
 
    template <class M, class F>
    auto
    adapt_error(M&& x, F&& f)
         JASEL_DECLTYPE_RETURN_NOEXCEPT(
-           traits<type_constructor_t<decay_t<M>>>::adapt_error(forward<M>(x), forward<F>(f))
+           traits<type_constructor_t<meta::uncvref_t<M>>>::adapt_error(forward<M>(x), forward<F>(f))
         )
 
   // make_error overload: requires a type constructor, , deduce the error type associated to the type constructor

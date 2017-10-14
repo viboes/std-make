@@ -25,7 +25,7 @@ namespace std
     template<class T> struct is_ref_wrapper<reference_wrapper<T>> : true_type {};
 
     //template<class T>
-    //using not_ref_wrapper = experimental::negation<is_ref_wrapper<decay_t<T>>>;
+    //using not_ref_wrapper = experimental::negation<is_ref_wrapper<meta::uncvref_t<T>>>;
 
     template <class D, class...> struct return_type_helper { using type = D; };
     template <class... Types>

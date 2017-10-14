@@ -30,7 +30,7 @@ inline  namespace fundamental_v3
     // fixme: Should we provide another overload taking a Callable<F(error_type_t<N>) as parameter?
     template <class N, class F>
     // requires Nullable<N> and Callable<F,error_type_t<N>(void)>
-    constexpr decay_t<N> catch_error(N&& x, F&& f)
+    constexpr meta::uncvref_t<N> catch_error(N&& x, F&& f)
     {
       return (value_or_error::has_value(forward<N>(x))) ? move(x) : f();
     }

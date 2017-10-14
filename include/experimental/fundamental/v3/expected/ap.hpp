@@ -35,13 +35,13 @@ namespace expected_helpers
   template <class N, class F
   // todo add constraint on F
   //, class = enable_if_t<
-  //    is_nullable_v<decay_t<N>>
-  // && is_type_constructible_v<decay_t<N>>
+  //    is_nullable_v<meta::uncvref_t<N>>
+  // && is_type_constructible_v<meta::uncvref_t<N>>
   //>
   >
   auto
   ap(F&& f, N&& n)
-  -> decltype(meta::rebind_t<decay_t<N>, decltype(
+  -> decltype(meta::rebind_t<meta::uncvref_t<N>, decltype(
           JASEL_INVOKE((*forward<F>(f)), *forward<N>(n))
         )>(JASEL_INVOKE((*forward<F>(f)), *forward<N>(n))))
   {
@@ -51,7 +51,7 @@ namespace expected_helpers
       return make_unexpected(n.error());
 
     return
-        meta::rebind_t<decay_t<N>, decltype(
+        meta::rebind_t<meta::uncvref_t<N>, decltype(
                       JASEL_INVOKE((*forward<F>(f)), *forward<N>(n))
                     )>(JASEL_INVOKE((*forward<F>(f)), *forward<N>(n)));
   }

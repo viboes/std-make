@@ -32,7 +32,7 @@ namespace value_or_none
     , class = enable_if_t<
         is_value_or_none< meta::uncvref_t<N> >::value
         // add constraint on E
-        //&& is_comparable_v< decay_t<E>, none_type_t<meta::uncvref_t<N>> >
+        //&& is_comparable_v< meta::uncvref_t<E>, none_type_t<meta::uncvref_t<N>> >
     >
   >
   BOOST_CXX14_CONSTEXPR

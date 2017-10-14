@@ -80,15 +80,15 @@ namespace value_or_none
     constexpr
     auto deref(T && x)
     JASEL_DECLTYPE_RETURN (
-            traits<decay_t<T>>::deref(x)
+            traits<meta::uncvref_t<T>>::deref(x)
     )
 
-    template <class T>
-    constexpr
-    T& deref(T* ptr) noexcept
-    {
-        return *ptr;
-    }
+//    template <class T>
+//    constexpr
+//    T& deref(T* ptr) noexcept
+//    {
+//        return *ptr;
+//    }
 
     template <class T>
     struct value_type;
@@ -105,15 +105,15 @@ namespace value_or_none
     constexpr
     auto deref_none(T&& )
     JASEL_DECLTYPE_RETURN (
-            none<decay_t<T>>()
+            none<meta::uncvref_t<T>>()
     )
 
-    template <class T>
-    constexpr
-    std::nullptr_t deref_none(T*) noexcept
-    {
-        return nullptr;
-    }
+//    template <class T>
+//    constexpr
+//    std::nullptr_t deref_none(T*) noexcept
+//    {
+//        return nullptr;
+//    }
 
 }
 
@@ -146,12 +146,12 @@ namespace value_or_none
   constexpr bool is_value_or_none_v = is_value_or_none<T>::value ;
 #endif
 
-  template <class T>
-  struct is_value_or_none<T*>
-#if ! defined JASEL_DOXYGEN_INVOKED
-  : true_type {}
-#endif
-  ;
+//  template <class T>
+//  struct is_value_or_none<T*>
+//#if ! defined JASEL_DOXYGEN_INVOKED
+//  : true_type {}
+//#endif
+//  ;
 
 namespace value_or_error
 {

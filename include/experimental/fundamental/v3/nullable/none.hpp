@@ -47,7 +47,7 @@ inline namespace fundamental_v3
 
       template <class U>
       static
-      bool has_value(U const& ptr)  = delete;
+      bool has_value(U && ptr)  = delete;
 
 #endif
     };
@@ -59,7 +59,7 @@ inline namespace fundamental_v3
 
       template <class U>
       static constexpr
-      bool has_value(U const& ptr) noexcept { return bool(ptr); }
+      bool has_value(U && ptr) noexcept { return bool(forward<U>(ptr)); }
 
     };
 
@@ -111,31 +111,31 @@ inline namespace fundamental_v3
 
   template <class T>
   constexpr
-  auto has_value(T const& x)
+  auto has_value(T && x)
     JASEL_DECLTYPE_RETURN_NOEXCEPT (
-      traits<T>::has_value(x)
+      traits<meta::uncvref_t<T>>::has_value(std::forward<T>(x))
     )
 
-  template <class T>
-  constexpr
-  bool has_value(T const* ptr) noexcept {
-    return ptr != nullptr;
-  }
+//  template <class T>
+//  constexpr
+//  bool has_value(T const* ptr) noexcept {
+//    return ptr != nullptr;
+//  }
 
   template <class M>
-  auto have_value(M const& v)
+  auto have_value(M && v)
     JASEL_DECLTYPE_RETURN_NOEXCEPT (
-      nullable::has_value(v)
+      nullable::has_value(std::forward<M>(v))
     )
 
   template <class M1, class M2, class ...Ms>
-  auto have_value(M1 const& v1, M2 const& v2, Ms const& ...vs)
-    //-> decltype(has_value(v1) && have_value(v2, vs...))
-    noexcept(noexcept(nullable::has_value(v1)))
-    -> decltype(nullable::has_value(v1))
+  auto have_value(M1 && v1, M2 && v2, Ms && ...vs)
+    //-> decltype(has_value(std::forward<M1>(v1)) && have_value(std::forward<M1>(v2), std::forward<M1>(vs)...))
+    noexcept(noexcept(nullable::has_value(std::forward<M1>(v1))))
+    -> decltype(nullable::has_value(std::forward<M1>(v1)))
 
   {
-    return nullable::has_value(v1) && have_value(v2, vs...);
+    return nullable::has_value(std::forward<M1>(v1)) && have_value(std::forward<M1>(v2), std::forward<M1>(vs)...);
   }
 
 }
@@ -174,12 +174,12 @@ inline namespace fundamental_v3
   constexpr bool is_nullable_v = is_nullable<T>::value ;
 #endif
 
-  template <class T>
-  struct is_nullable<T*>
-#if ! defined JASEL_DOXYGEN_INVOKED
-  : true_type {}
-#endif
-  ;
+//  template <class T>
+//  struct is_nullable<T*>
+//#if ! defined JASEL_DOXYGEN_INVOKED
+//  : true_type {}
+//#endif
+//  ;
 
   // todo: implement this traits
   template <class T>

@@ -123,8 +123,8 @@ public:
     template < class U = value_type
             , JASEL_REQUIRES(
                     is_constructible<T, U&&>::value
-                    && ! is_same<std::decay_t<U>, in_place_t>::value
-                    && ! is_same<std::decay_t<U>, optional<T>>::value
+                    && ! is_same<meta::uncvref_t<U>, in_place_t>::value
+                    && ! is_same<meta::uncvref_t<U>, optional<T>>::value
                     && is_convertible<U&&, T>::value
             )
     >
@@ -136,8 +136,8 @@ public:
     template < class U = value_type
             , JASEL_REQUIRES(
                     is_constructible<T, U&&>::value
-                    && ! is_same<std::decay_t<U>, in_place_t>::value
-                    && ! is_same<std::decay_t<U>, optional<T>>::value
+                    && ! is_same<meta::uncvref_t<U>, in_place_t>::value
+                    && ! is_same<meta::uncvref_t<U>, optional<T>>::value
                     && ! is_convertible<U&&, T>::value
             )
     >
@@ -557,9 +557,9 @@ void swap(optional<T, B>& x, optional<T, B>& y) noexcept(noexcept(x.swap(y)))
 }
 
 template <class T>
-constexpr optional<decay_t<T>, unsigned char> make_optional(T&& v)
+constexpr optional<meta::uncvref_t<T>, unsigned char> make_optional(T&& v)
 {
-    return optional<decay_t<T>, unsigned char>(constexpr_forward<T>(v));
+    return optional<meta::uncvref_t<T>, unsigned char>(constexpr_forward<T>(v));
 }
 
 #if 0
