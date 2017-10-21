@@ -358,6 +358,12 @@ test-suite numbers
 
     ;
 
+test-suite money_ts
+    : 
+      [ run ../example/strong/money.cpp  ]
+
+    ;
+
 explicit fix ;
 test-suite fix
     : 
