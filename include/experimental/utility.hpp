@@ -14,6 +14,7 @@
 #include <experimental/fundamental/v3/utility/not_null.hpp>
 #include <experimental/fundamental/v3/utility/only_when.hpp>
 #include <experimental/fundamental/v3/utility/out_param.hpp>
+#include <experimental/fundamental/v3/utility/owner.hpp>
 #include <experimental/fundamental/v3/utility/static_addressof.hpp>
 #include <experimental/fundamental/v3/utility/swallow.hpp>
 
