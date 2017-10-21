@@ -21,6 +21,7 @@
 #include <exception>
 #include <type_traits>
 #include <utility>
+#include <experimental/fundamental/v2/config.hpp>
 
 namespace std
 {
@@ -29,23 +30,21 @@ namespace experimental
 inline namespace fundamental_v3
 {
 
-/// a searchable way to do narrowing casts of values
 template <class T, class U>
-inline constexpr T narrow_cast(U &&u) noexcept
+constexpr T narrow_cast(U &&u) noexcept
 {
-	return static_cast<T>(forward<U>(u));
+	return static_cast<T>( forward<U>(u) );
 }
 
-/// narrowing_error exception
 struct narrowing_error : public exception
 {
 };
 
 #if !defined JASEL_DOXYGEN_INVOKED
-namespace details
+namespace detail
 {
 template <class T, class U>
-struct _is_same_signedness
+struct have_same_sign
         : public integral_constant<bool, is_signed<T>::value == is_signed<U>::value>
 {
 };
@@ -59,12 +58,20 @@ inline T narrow(U u)
 	T t = narrow_cast<T>(u);
 	if (static_cast<U>(t) != u)
 	{
-		throw narrowing_error();
-	}
-	if (!details::_is_same_signedness<T, U>::value && ((t < T{}) != (u < U{})))
+#if JASEL_CONFIG_CONTRACT_VIOLATION_THROWS_V
+        throw narrowing_error();
+#else
+        terminate();
+#endif
+    }
+	if (!detail::have_same_sign<T, U>::value && ((t < T{}) != (u < U{})))
 	{
-		throw narrowing_error();
-	}
+#if JASEL_CONFIG_CONTRACT_VIOLATION_THROWS_V
+        throw narrowing_error();
+#else
+        terminate();
+#endif
+    }
 	return t;
 }
 }
