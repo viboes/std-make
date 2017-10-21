@@ -15,7 +15,12 @@
 
 #include <boost/config.hpp>
 
-
+#ifndef JASEL_CONFIG_CONTRACT_VIOLATION_THROWS_V
+#define JASEL_CONFIG_CONTRACT_VIOLATION_THROWS_V 0
+#endif
+#ifndef JASEL_CONFIG_CONTRACT_LEVEL_MASK
+#define JASEL_CONFIG_CONTRACT_LEVEL_MASK 0
+#endif
 
 #if __cplusplus >= 201402L
 #define JASEL_VARIABLE_TEMPLATES
@@ -92,6 +97,9 @@
 
 
 #define JASEL_NORETURN BOOST_NORETURN
+
+#define JASEL_STRINGIFY(  x )  JASEL_STRINGIFY_( x )
+#define JASEL_STRINGIFY_( x )  #x
 
 /**/
 

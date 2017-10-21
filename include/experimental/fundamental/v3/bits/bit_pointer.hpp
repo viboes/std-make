@@ -23,7 +23,7 @@
 
 #include <experimental/fundamental/v3/bits/binary_digits.hpp>
 
-#include <experimental/fundamental/v3/contract/constexpr_assert.hpp>
+#include <experimental/contract.hpp>
 #include <experimental/fundamental/v2/config.hpp>
 #include <experimental/fundamental/v3/config/requires.hpp>
 

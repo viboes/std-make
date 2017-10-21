@@ -23,7 +23,7 @@
 
 #include <experimental/fundamental/v3/bits/binary_digits.hpp>
 
-#include <experimental/fundamental/v3/contract/constexpr_assert.hpp>
+#include <experimental/contract.hpp>
 #include <experimental/fundamental/v2/config.hpp>
 
 #include <iosfwd>
@@ -59,7 +59,7 @@ inline namespace fundamental_v3
       }
       template <class WordType>
       constexpr bit_value(WordType val, index_type pos)
-      : _value((JASEL_CONSTEXPR_ASSERT(pos < binary_digits<WordType>::value), (val >> pos) & 1))
+      : _value((JASEL_ASSERT(pos < binary_digits<WordType>::value), (val >> pos) & 1))
       //: _value(val >> pos & 1)
       {
         static_assert(binary_digits<WordType>::value, "");
@@ -85,7 +85,7 @@ inline namespace fundamental_v3
       JASEL_MUTABLE_CONSTEXPR bit_value& assign(WordType val, index_type pos)
       {
         static_assert(binary_digits<WordType>::value, "");
-        JASEL_CONSTEXPR_ASSERT(pos < binary_digits<WordType>::value);
+        JASEL_ASSERT(pos < binary_digits<WordType>::value);
         _value = val >> pos & 1;
         return *this;
       }

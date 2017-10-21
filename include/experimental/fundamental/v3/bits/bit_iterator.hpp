@@ -23,7 +23,7 @@
 
 #include <experimental/fundamental/v3/bits/binary_digits.hpp>
 
-#include <experimental/fundamental/v3/contract/constexpr_assert.hpp>
+#include <experimental/contract.hpp>
 #include <experimental/fundamental/v2/config.hpp>
 #include <experimental/fundamental/v3/config/requires.hpp>
 
@@ -77,7 +77,7 @@ inline namespace fundamental_v3
       }
       constexpr bit_iterator(iterator_type i, size_type pos)
       : _current(i)
-      , _position((JASEL_CONSTEXPR_ASSERT(pos < binary_digits<word_type>::value), pos))
+      , _position((JASEL_ASSERT(pos < binary_digits<word_type>::value), pos))
       {
       }
 

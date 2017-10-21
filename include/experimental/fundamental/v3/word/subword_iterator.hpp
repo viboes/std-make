@@ -24,7 +24,7 @@
 #include <experimental/fundamental/v3/bits/bit_ops.hpp>
 #include <experimental/fundamental/v3/word/word.hpp>
 
-#include <experimental/fundamental/v3/contract/constexpr_assert.hpp>
+#include <experimental/contract.hpp>
 #include <experimental/fundamental/v2/config.hpp>
 
 #include <iosfwd>
@@ -79,7 +79,7 @@ inline namespace fundamental_v3
       }
       constexpr subword_iterator(iterator_type i, size_type pos)
       : _current(i)
-      , _position((JASEL_CONSTEXPR_ASSERT(pos < binary_digits<word_type>::value), pos))
+      , _position((JASEL_ASSERT(pos < binary_digits<word_type>::value), pos))
       {
       }
 

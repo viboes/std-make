@@ -24,7 +24,7 @@
 #include <experimental/fundamental/v3/bits/binary_digits.hpp>
 #include <experimental/fundamental/v3/bits/bit_ops.hpp>
 
-#include <experimental/fundamental/v3/contract/constexpr_assert.hpp>
+#include <experimental/contract.hpp>
 #include <experimental/fundamental/v2/config.hpp>
 #include <experimental/fundamental/v3/config/requires.hpp>
 
@@ -102,7 +102,7 @@ inline namespace fundamental_v3
       }
       constexpr bit_reference& assign(word_type val, index_type pos)
       {
-          JASEL_CONSTEXPR_ASSERT(pos < binary_digits<word_type>::value);
+          JASEL_ASSERT(pos < binary_digits<word_type>::value);
           val >> pos & 1 ? set() : reset();
           return *this;
       }
@@ -203,7 +203,7 @@ inline namespace fundamental_v3
       {
       }
       constexpr bit_reference(word_type* ptr, index_type pos)
-      : _ptr((JASEL_CONSTEXPR_ASSERT(pos < binary_digits<word_type>::value), ptr))
+      : _ptr((JASEL_ASSERT(pos < binary_digits<word_type>::value), ptr))
       , _pos(pos)
       {
       }
@@ -337,7 +337,7 @@ inline namespace fundamental_v3
       {
       }
       constexpr bit_reference(word_type& ref, index_type pos)
-      : _ptr((JASEL_CONSTEXPR_ASSERT(pos < binary_digits<word_type>::value), &ref))
+      : _ptr((JASEL_ASSERT(pos < binary_digits<word_type>::value), &ref))
       , _mask(static_cast<word_type>(1u << pos))
       {
       }
@@ -369,7 +369,7 @@ inline namespace fundamental_v3
       }
       JASEL_MUTABLE_CONSTEXPR bit_reference& assign(word_type val, index_type pos)
       {
-          JASEL_CONSTEXPR_ASSERT(pos < binary_digits<word_type>::value);
+          JASEL_ASSERT(pos < binary_digits<word_type>::value);
           val >> pos & 1 ? set() : reset();
           return *this;
       }
@@ -474,7 +474,7 @@ inline namespace fundamental_v3
       {
       }
       constexpr bit_reference(word_type* ptr, index_type pos)
-      : _ptr((JASEL_CONSTEXPR_ASSERT(pos < binary_digits<word_type>::value), ptr))
+      : _ptr((JASEL_ASSERT(pos < binary_digits<word_type>::value), ptr))
       , _mask(static_cast<word_type>(1) << pos)
       {
       }

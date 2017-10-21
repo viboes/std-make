@@ -24,7 +24,7 @@
 #include <experimental/fundamental/v3/bits/bit_ops.hpp>
 #include <experimental/fundamental/v3/word/word.hpp>
 
-#include <experimental/fundamental/v3/contract/constexpr_assert.hpp>
+#include <experimental/contract.hpp>
 #include <experimental/fundamental/v2/config.hpp>
 
 #include <iosfwd>
@@ -71,7 +71,7 @@ inline namespace fundamental_v3
       }
       template <class WordType>
       constexpr subword_value(WordType const& val, index_type pos)
-      : _value((JASEL_CONSTEXPR_ASSERT(pos*subword_digits < binary_digits<WordType>::value), static_cast<word_type>(bit_ops::from_up_to<subword_digits>(val, pos*subword_digits))))
+      : _value((JASEL_ASSERT(pos*subword_digits < binary_digits<WordType>::value), static_cast<word_type>(bit_ops::from_up_to<subword_digits>(val, pos*subword_digits))))
       {
         static_assert(binary_digits<WordType>::value, "");
       }
@@ -103,7 +103,7 @@ inline namespace fundamental_v3
       JASEL_MUTABLE_CONSTEXPR subword_value& assign(WordType const& val, index_type pos)
       {
         static_assert(binary_digits<WordType>::value, "");
-        JASEL_CONSTEXPR_ASSERT(pos < binary_digits<WordType>::value);
+        JASEL_ASSERT(pos < binary_digits<WordType>::value);
         _value = val >> pos & mask();
         return *this;
       }

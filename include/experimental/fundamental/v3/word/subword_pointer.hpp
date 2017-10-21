@@ -24,7 +24,7 @@
 #include <experimental/fundamental/v3/bits/bit_ops.hpp>
 #include <experimental/fundamental/v3/word/word.hpp>
 
-#include <experimental/fundamental/v3/contract/constexpr_assert.hpp>
+#include <experimental/contract.hpp>
 #include <experimental/fundamental/v2/config.hpp>
 
 #include <iosfwd>

@@ -24,7 +24,7 @@
 #include <experimental/fundamental/v3/bits/bit_ops.hpp>
 #include <experimental/fundamental/v3/word/word.hpp>
 
-#include <experimental/fundamental/v3/contract/constexpr_assert.hpp>
+#include <experimental/contract.hpp>
 #include <experimental/fundamental/v2/config.hpp>
 
 #include <iosfwd>
@@ -92,7 +92,7 @@ inline namespace fundamental_v3
       {
       }
       constexpr subword_reference(word_type& ref, index_type pos)
-      : _ptr((JASEL_CONSTEXPR_ASSERT(pos < binary_digits<word_type>::value), &ref))
+      : _ptr((JASEL_ASSERT(pos < binary_digits<word_type>::value), &ref))
       , _pos(pos)
       {
       }
@@ -128,7 +128,7 @@ inline namespace fundamental_v3
       }
       JASEL_CXX14_CONSTEXPR subword_reference& assign(word_type const& val, index_type pos)
       {
-          JASEL_CONSTEXPR_ASSERT(pos < binary_digits<word_type>::value);
+          JASEL_ASSERT(pos < binary_digits<word_type>::value);
           return *this=subword(val, pos);
       }
 
@@ -253,7 +253,7 @@ inline namespace fundamental_v3
       {
       }
       constexpr subword_reference(word_type* ptr, index_type pos)
-      : _ptr((JASEL_CONSTEXPR_ASSERT(pos < binary_digits<word_type>::value), ptr))
+      : _ptr((JASEL_ASSERT(pos < binary_digits<word_type>::value), ptr))
       , _pos(pos)
       {
       }
