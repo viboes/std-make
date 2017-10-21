@@ -226,6 +226,12 @@ int main()
       auto d =  d2 + d1;
       BOOST_TEST_EQ(d.count() , 13);
     }
+    {
+      duration<double, std::ratio<1,100>> d1 {3};
+      duration<double, std::ratio<1,10>> d2{1};
+      auto d =  d2 + d1;
+      BOOST_TEST((d == duration<double, std::ratio<1,100>>(13)));
+    }
     return ::boost::report_errors();
 }
 
