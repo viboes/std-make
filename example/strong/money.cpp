@@ -123,7 +123,7 @@ struct money
 
     friend constexpr bool operator==(money m1, money m2) noexcept
     {
-        return int(m1.value() - m2.value()) == 0 ;
+        return m1.value() == m2.value();
     }
     friend constexpr bool operator!=(money m1, money m2) noexcept
     {
