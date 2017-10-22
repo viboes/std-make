@@ -17,6 +17,8 @@
 #include <experimental/fundamental/v3/strong/mixins/streamable.hpp>
 #include <experimental/fundamental/v3/strong/mixins/ordinal.hpp>
 
+#include <experimental/contract.hpp>
+
 #include <stdexcept>
 #include <limits>
 #include <functional>
@@ -89,9 +91,8 @@ inline namespace fundamental_v3
       }
       static constexpr UT cast(UT x)
       {
-        return ( valid(x) )
-              ? x
-              : throw bad_bounded_int_cast();
+          JASEL_EXPECTS( valid(x) );
+          return x;
       }
       // copy constructor/assignment default
       constexpr strong_bounded_int() noexcept = default;

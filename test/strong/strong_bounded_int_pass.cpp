@@ -5,6 +5,8 @@
 
 // <experimental/strong_ints.hpp>
 
+#define JASEL_CONFIG_CONTRACT_VIOLATION_THROWS_V 1
+
 #include <experimental/strong_bounded_int.hpp>
 #include <sstream>
 
@@ -22,7 +24,6 @@ Frame add(Frame x, Frame y){
 
 int main()
 {
-
   {
       //Frame fn1 = 1;     // error - explicit required
       Frame fn2{1};
@@ -63,10 +64,16 @@ int main()
     BOOST_TEST(oc == Frame{1});
   }
   { // constructor from invalid Int
-    try {
+    try
+    {
       Slot oc{-1};
       BOOST_TEST(false);
-    } catch(stdex::bad_bounded_int_cast& ) {
+    }
+    catch (stdex::contract_failed& ex)
+    {    }
+    catch (... )
+    {
+        BOOST_TEST(false);
     }
   }
   { // copy constructor
