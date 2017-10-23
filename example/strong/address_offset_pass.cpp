@@ -19,7 +19,18 @@
 
 namespace stdex = std::experimental;
 
-using offset = stdex::strong_counter<struct offset_tag, std::int64_t>;
+struct offset_tag {};
+
+namespace std {
+namespace experimental {
+namespace mixin {
+  template <>
+  struct is_compatible_with<offset_tag, offset_tag> : std::true_type {};
+}
+}
+}
+
+using offset = stdex::strong_counter<offset_tag, std::int64_t>;
 
 using address = stdex::strong_random_incrementable<struct address_tag, std::int64_t, offset>;
 

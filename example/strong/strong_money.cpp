@@ -14,13 +14,22 @@
 ///         The compiler could optimize it if the currency is know at compile time, but in general this is not the case.
 ///     Should we have implicit or explicit conversions between currencies?
 
+#include <iostream>
 #include <functional>
 #include <type_traits>
 #include "currency.hpp"
+#include <experimental/strong_counter.hpp>
+
+namespace stdex = std::experimental;
+
+#define STRONG_COUNTER 1
+
+#if STRONG_COUNTER==0
+template <class M>
+using currency_t = typename M::currency_type;
 
 template <class Currency, class Rep = double>
 struct money;
-
 namespace detail
 {
 /// helper function that converts a money to a specific currency using the conversion_factor customization point
@@ -29,21 +38,154 @@ double to_currency(money<C, R> const& m)
 {
     return m.count() * currency::conversion_factor(m.currency(), Currency{});
 }
+
 }
+#else
+template <class M>
+using currency_t = typename M::domain::currency_type;
+
+#endif
+
+template<class Currency>
+struct money_domain
+{
+    using currency_type =  Currency;
+  template <class T, class C, class U
+          , typename std::enable_if <
+              std::conjunction <
+                std::is_convertible<U, T>, // no overflow
+                std::disjunction<
+                      std::is_floating_point<T>,
+                      std::conjunction<
+                          //std::integral_constant<bool, std::ratio_divide<P, Period>::den == 1>,
+                          std::true_type,
+                          std::negation< std::is_floating_point<U> >
+                      >
+                  >
+              >::value
+          >::type* = nullptr
+  >
+  static T inter_domain_convert(money_domain<C>, U const& u)
+  {
+      return T(currency::convert<C,Currency>(u));
+    //return T(
+        //std::chrono::duration_cast<std::chrono::duration<T, Period>>(std::chrono::duration<U,P>(u)).count()
+        //);
+  }
+  template <class T, class C, class U>
+  static T inter_domain_cast(money_domain<C>, U const& u)
+  {
+      return T(currency::convert<C,Currency>(u));
+//    return T(
+//        std::chrono::duration_cast<std::chrono::duration<T, Period>>(std::chrono::duration<U,P>(u)).count()
+//    );
+  }
+  template <class T, class U
+          , typename std::enable_if <
+              std::conjunction <
+                std::is_convertible<U, T>,
+                std::disjunction<
+                      std::is_floating_point<T>,
+                      std::negation< std::is_floating_point<U> >
+                >
+              >::value
+          >::type* = nullptr
+          >
+  static T intra_domain_convert(U const& u) { return T(u); }
+};
+
+namespace std
+{
+#if STRONG_COUNTER==0
+template <class Currency, class UT1, class UT2>
+struct common_type<money<Currency, UT1>, money<Currency, UT2>>
+{
+ using type = money<Currency,common_type_t< UT1, UT2>>;
+};
+
+namespace experimental
+{
+
+namespace mixin {
+template <class Currency, class UT1, class UT2>
+struct is_compatible_with<money<Currency, UT1>, money<Currency, UT2>> : true_type {};
+}
+
+namespace meta
+{
+template <class Currency, class UT1, class UT2>
+struct rebind<money<Currency, UT1>, UT2> : id<money<Currency, UT2>> {};
+}
+}
+#endif
+
+namespace experimental
+{
+namespace mixin {
+  template <class Currency>
+  struct is_compatible_with<money_domain<Currency>, money_domain<Currency>> : std::true_type {};
+}
+
+template <class Currency>
+struct domain_converter<money_domain<Currency>> : money_domain<Currency>  {  };
+}
+
+}
+
+
 
 // fixme: Should be Rep, Currency?
 // fixme: Should we add a Period parameter to count in Million Dollars, or in cents?
 //      Don't having a period , forces almost to work with double.
 //      Having a period allows to work with integers most of the time
 
+#if STRONG_COUNTER==1
+template <class Currency, class Rep=double>
+using money = stdex::strong_counter<money_domain<Currency>, Rep>;
+
+namespace detail
+{
+/// helper function that converts a money to a specific currency using the conversion_factor customization point
+template <class Currency, class C, class R>
+double to_currency(money<C, R> const& m)
+{
+    return m.count() * currency::conversion_factor(C{}, Currency{});
+}
+
+}
+
+//template <class Currency, class Rep>
+//struct money : stdex::strong_counter<money_domain<Currency>, Rep>
+//{
+//    using base_type = stdex::strong_counter<money_domain<Currency>, Rep>;
+//    using base_type::base_type;
+//}
+#else
+
 template <class Currency, class Rep>
 struct money
+    : stdex::strong_type<money<Currency, Rep>, Rep>
+    , stdex::mixin::additive_with_if<money<Currency, Rep>>
+    , stdex::mixin::comparable<money<Currency, Rep>>
+    , stdex::mixin::integer_multiplicative_with<money<Currency, Rep>, Rep>
+    , stdex::mixin::modable<money<Currency, Rep>>
+    , stdex::mixin::hashable<money<Currency, Rep>>
+    //, mixin::streamable<strong_counter<Domain, UT>>
+    //, mixin::ordinal<money<Currency, Rep>>
+
 {
+    using base_type = stdex::strong_type<money<Currency, Rep>, Rep>;
+    using base_type::base_type;
+
+    using currency_type = Currency;
+
+    template <class UT2>
+    using rebind = money<Currency, UT2>;
+
     money() = default;
 
     // todo: Add template <class Rep2> as duration
-    explicit constexpr money(Rep v) : rep(v) {}
-
+    explicit constexpr money(Rep v) : base_type(v) {}
 
     constexpr money(money const& m) = default;
 
@@ -51,7 +193,7 @@ struct money
     // or just define an explicit constructor as does pair.
     template <class C, class R>
     constexpr money(money<C, R> m)
-    : rep (detail::to_currency<Currency>(m))
+    : base_type (currency::convert<C, Currency>(m.count()))
     {
     }
     constexpr money& operator=(money const& m) = default;
@@ -59,115 +201,22 @@ struct money
     template <class C, class R>
     constexpr money& operator=(money<C, R> m)
     {
-        rep = detail::to_currency<Currency>(m);
+        rep = currency::convert<C, Currency>(m.count());
         return *this;
     }
 #endif
 
     // fixme: Should we replace it by count as duration does?
-    constexpr Rep count() const noexcept { return rep; }
-    constexpr Currency currency() const noexcept { return Currency{}; }
+
+    constexpr Rep count() const noexcept
+        { return this->underlying(); }
+
+    //constexpr Currency currency() const noexcept { return Currency{}; }
 
     // todo: add zero, min, max
 
-
-    friend constexpr bool operator==(money m1, money m2) noexcept
-    {
-        return m1.count() == m2.count();
-    }
-    friend constexpr bool operator!=(money m1, money m2) noexcept
-    {
-        return ! (m1 == m2);
-    }
-    friend constexpr money operator+(money m1) noexcept
-    {
-        return m1 ;
-    }
-    friend constexpr money operator+(money m1, money m2) noexcept
-    {
-        return money(m1.count() + m2.count()) ;
-    }
-
-    constexpr money& operator++() noexcept
-    {
-        rep++;
-        return *this ;
-    }
-    constexpr money operator++(int) noexcept
-    {
-        money tmp = *this;
-        rep++;
-        return tmp ;
-    }
-    constexpr money& operator+=(money m) noexcept
-    {
-        rep += m.count();
-        return *this ;
-    }
-
-    friend constexpr money operator-(money m1, money m2) noexcept
-    {
-        return money(m1.count() - m2.count()) ;
-    }
-    friend constexpr money operator-(money m1) noexcept
-    {
-        return money(- m1.count()) ;
-    }
-    constexpr money& operator--() noexcept
-    {
-        rep--;
-        return *this ;
-    }
-    constexpr money operator--(int) noexcept
-    {
-        money tmp = *this;
-        rep--;
-        return tmp ;
-    }
-    constexpr money& operator-=(money m) noexcept
-    {
-        rep -= m.count();
-        return *this ;
-    }
-
-    friend constexpr money operator*(money m, double x) noexcept
-    {
-        return money(m.count() * x) ;
-    }
-    friend constexpr money operator*(double x, money m) noexcept
-    {
-        return m * x;
-    }
-
-    friend constexpr money operator/(money m, double x) noexcept
-    {
-        return money(m.count() / x) ;
-    }
-    constexpr money& operator/=(double x) noexcept
-    {
-        rep /= x;
-        return *this;
-    }
-    friend constexpr money operator%(money m, int s) noexcept
-    {
-        using CR = std::common_type_t<Rep, int>;
-        auto r = CR(m.count()) % s ;
-        return money(r) ;
-    }
-    template <class R1, class R2>
-    friend constexpr money<Currency, std::common_type_t<R1,R2>> operator%(money<Currency, R1> m, money<Currency, R2> n) noexcept
-    {
-        return money(m.count() % n.count()) ;
-    }
-    constexpr money& operator%=(int x) noexcept
-    {
-        rep %= x;
-        return *this;
-    }
-
-private:
-    Rep rep;
 };
+#endif
 
 namespace money_expr
 {
@@ -176,11 +225,13 @@ struct binary
 {
     M1 m1;
     M2 m2;
+    using C1 =  currency_t<M1>;
+    using C2 =  currency_t<M2>;
 
     // fixme:: shouldn't this requires that the representation is convertible from the common_type?
     template <class C, class R>
     constexpr operator money<C,R>() {
-        return money<C,R>( Op{}(detail::to_currency<C>(m1), detail::to_currency<C>(m2)));
+        return money<C,R>( Op{}(currency::convert<C1, C>(m1.count()), currency::convert<C2, C>(m2.count())));
     }
 };
 
@@ -190,11 +241,14 @@ struct add
     M1 m1;
     M2 m2;
 
+    using C1 =  currency_t<M1>;
+    using C2 =  currency_t<M2>;
+
     // fixme:: shouldn't this requires that the representation is convertible from the common_type?
     template <class C, class R>
     constexpr operator money<C,R>()
     {
-        return money<C,R>( detail::to_currency<C>(m1) + detail::to_currency<C>(m2));
+        return money<C,R>( currency::convert<C1, C>(m1.count()) + currency::convert<C2, C>(m2.count()));
     }
 };
 template <class M1, class M2>
@@ -203,10 +257,12 @@ struct substract
     M1 m1;
     M2 m2;
 
+    using C1 =  currency_t<M1>;
+    using C2 =  currency_t<M2>;
     template <class C, class R>
     constexpr operator money<C,R>()
     {
-        return money<C,R>( detail::to_currency<C>(m1) - detail::to_currency<C>(m2));
+        return money<C,R>( currency::convert<C1, C>(m1.count()) - currency::convert<C2, C>(m2.count()));
     }
 };
 
@@ -216,10 +272,12 @@ struct divide
     M1 m1;
     M2 m2;
 
+    using C1 =  currency_t<M1>;
+    using C2 =  currency_t<M2>;
     template <class R>
     constexpr operator R()
     {
-        return  detail::to_currency<C>(m1) / detail::to_currency<C>(m2);
+        return  currency::convert<C1, C>(m1.count()) / currency::convert<C2, C>(m2.count());
     }
 };
 
@@ -229,24 +287,28 @@ struct modulo
     M1 m1;
     M2 m2;
 
+    using C1 =  currency_t<M1>;
+    using C2 =  currency_t<M2>;
     template <class C, class R>
     constexpr operator money<C,R>()
     {
-        return money<C,R>( detail::to_currency<C>(m1) % detail::to_currency<C>(m2));
+        return money<C,R>( currency::convert<C1, C>(m1.count()) % currency::convert<C2, C>(m2.count()));
     }
 };
 
 }
 
 
-template <class C1, class R1, class C2, class R2>
+template <class C1, class R1, class C2, class R2, typename = std::enable_if_t< ! std::is_same<C1, C2>::value>>
 constexpr auto operator+(money<C1,R1> m1, money<C2,R2> m2) noexcept
 {
+    std::cout <<"operator+(" << m1 <<", "<< m2 << ")" << std::endl;
+
     return money_expr::add<money<C1,R1>, money<C2,R2>>{m1, m2} ;
     //return money_expr::binary<money<C1,R1>, money<C2,R2>, std::plus>{m1, m2} ;
 }
 
-template <class C1, class R1, class C2, class R2>
+template <class C1, class R1, class C2, class R2, typename = std::enable_if_t< ! std::is_same<C1, C2>::value>>
 constexpr auto operator-(money<C1,R1> m1, money<C2,R2> m2) noexcept
 {
     return money_expr::substract<money<C1,R1>, money<C2,R2>>{m1, m2} ;
@@ -255,7 +317,7 @@ constexpr auto operator-(money<C1,R1> m1, money<C2,R2> m2) noexcept
 template <class OSTREAM, class C, class R>
 OSTREAM& operator<<(OSTREAM& os, money<C, R> m)
 {
-    os<< m.count() << m.currency().symbol();
+    os<< m.count() << C{}.symbol();
     return os;
 }
 

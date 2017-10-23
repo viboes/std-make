@@ -86,6 +86,11 @@ namespace std {
   };
 
 namespace experimental {
+namespace mixin {
+  template <class Domain1, class Domain2>
+  struct is_compatible_with<duration_domain<Domain1>, duration_domain<Domain2>> : std::true_type {};
+}
+
   template <class Period>
   struct domain_converter<duration_domain<Period>> : duration_domain<Period>  {  };
 }

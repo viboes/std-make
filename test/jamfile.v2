@@ -361,6 +361,7 @@ test-suite numbers
 test-suite money_ts
     : 
       [ run ../example/strong/money.cpp  ]
+      [ run ../example/strong/strong_money.cpp  ]
 
     ;
 

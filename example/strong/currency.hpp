@@ -47,11 +47,22 @@ double conversion_factor(dollar , euro )
 {
     return 2;
 }
-/// Not found
-template <class From, class To>
-double conversion_factor(From , To )
+double conversion_factor(euro , dollar )
 {
-    return 1/conversion_factor(To{}, From{});
+    return 1/2;
+}
+/// Not found
+//template <class From, class To>
+//double conversion_factor(From , To )
+//{
+//    static_assert(false, "No know conversion from currencies");
+//    return 0;
+//}
+
+template <class FromCurrency, class ToCurrency, class R>
+double convert(R r)
+{
+    return r * currency::conversion_factor(FromCurrency{}, ToCurrency{});
 }
 
 }

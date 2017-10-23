@@ -230,7 +230,7 @@ inline namespace fundamental_v3
 
   namespace mixin {
     template <class Domain1, class UT1, class Domain2, class UT2>
-    struct is_compatible_with<strong_counter<Domain1, UT1>, strong_counter<Domain2, UT2>> : true_type {};
+    struct is_compatible_with<strong_counter<Domain1, UT1>, strong_counter<Domain2, UT2>> : is_compatible_with<Domain1,Domain2> {};
   }
 }
 
@@ -268,8 +268,8 @@ inline namespace fundamental_v3
       //! \n<b>Effects:</b> Construct an uninitialized strong_counter
       strong_counter() = default;
 
-      strong_counter(strong_counter<Domain, UT> const&) = default;
-      strong_counter(strong_counter<Domain, UT> &&) = default;
+      strong_counter(strong_counter const&) = default;
+      strong_counter(strong_counter &&) = default;
 
       //! \n<b>Effects:</b> Constructs a strong_counter from its representations
       //! \n<b>Throws:</b> Anything the copy of the conversion throws.
@@ -304,8 +304,8 @@ inline namespace fundamental_v3
       }
 
       // assignment
-      strong_counter& operator=(strong_counter<Domain, UT> const&) = default;
-      strong_counter& operator=(strong_counter<Domain, UT> &&) = default;
+      strong_counter& operator=(strong_counter const&) = default;
+      strong_counter& operator=(strong_counter &&) = default;
 
       constexpr UT count() const noexcept
           { return this->underlying(); }

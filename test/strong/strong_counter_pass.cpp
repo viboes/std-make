@@ -12,9 +12,23 @@
 
 namespace stdex = std::experimental;
 
-using OrangeCount = stdex::strong_counter<class OrangeTag, int>;
-using OrangeCountDC = stdex::strong_counter<class OrangeTag, int>;
-using AppelCount = stdex::strong_counter<class AppelTag, int>;
+class OrangeTag {};
+class AppelTag {};
+
+namespace std {
+namespace experimental {
+namespace mixin {
+template <>
+struct is_compatible_with<OrangeTag, OrangeTag> : std::true_type {};
+template <>
+struct is_compatible_with<AppelTag, AppelTag> : std::true_type {};
+}
+}
+}
+
+using OrangeCount = stdex::strong_counter<OrangeTag, int>;
+using OrangeCountDC = stdex::strong_counter<OrangeTag, int>;
+using AppelCount = stdex::strong_counter<AppelTag, int>;
 
 static_assert(sizeof(OrangeCount)==sizeof(int), "");
 
