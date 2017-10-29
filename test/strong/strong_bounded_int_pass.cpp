@@ -69,7 +69,7 @@ int main()
       Slot oc{-1};
       BOOST_TEST(false);
     }
-    catch (stdex::contract_failed& ex)
+    catch (stdex::contract_failed& )
     {    }
     catch (... )
     {

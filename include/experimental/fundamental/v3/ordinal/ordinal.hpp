@@ -18,7 +18,6 @@
 // fixme: should this be bounded_ordinal as it is bounded
 // fixme: should pos/val/succ/pred be renamed to whole words position/value/successor/predecessor
 // fixme: should the position depend on ordinal type?
-// fixme: should the position be a size_t or an int?
 // fixme: should the position depend on the size?
 // fixme: Shouldn't the size trait be part of ordinal::traits?
 
@@ -30,6 +29,10 @@ inline namespace fundamental_v3
 {
 
 namespace ordinal {
+
+using index_t = long;
+//using index_t = size_t;
+
 namespace detail
 {
     struct not_a_ordinal_tag{};
@@ -47,7 +50,7 @@ namespace detail
     struct traits<T, meta::when<condition>> : detail::not_a_ordinal_tag
     {
       using size = void;
-      using size_type = size_t;
+      using size_type = index_t;
 #if __cplusplus >= 201402L || defined JASEL_DOXYGEN_INVOKED
       template <class U>
       static
@@ -63,7 +66,7 @@ namespace detail
 
     // arithmetic traits: usable by bounded with a step of 1
     // fixme: do we need to make SizeType width enough
-    template <class T, T Low, T High, T Step = T{1}, class SizeType=size_t>
+    template <class T, T Low, T High, index_t Step = 1, class SizeType=index_t>
     struct arithmetic_traits
     {
       static_assert(is_arithmetic<T>::value, "T must be arithmetic");
@@ -71,7 +74,7 @@ namespace detail
       using size_type = SizeType;
       using value_type = T;
 
-      static constexpr size_type size_v = (size_type(High)-size_type(Low)+1u);
+      static constexpr size_type size_v = size_type(High)-size_type(Low)+1u;
       using size = integral_constant<size_type, size_v>;
       static constexpr value_type val(size_type p) { return static_cast<value_type>(p*Step+Low); }
 
@@ -85,9 +88,9 @@ namespace detail
     struct integral_traits: : arithmetic_traits<T, numeric_limits<T>::min(), numeric_limits<T>::max()>
     {
       static_assert(is_integral<T>::value, "T must be integral");
-      static_assert(sizeof(T) <= sizeof(size_t), "The sizeof T must not be greater than the sizeof size_t");
+      static_assert(sizeof(T) <= sizeof(index_t), "The sizeof T must not be greater than the sizeof index_t");
     };
-    // todo specialize ordinal_traits using when<condition> is_integral<T> and sizeof(T) <= sizeof(size_t)
+    // todo specialize ordinal_traits using when<condition> is_integral<T> and sizeof(T) <= sizeof(index_t)
 #endif
 #if 0
     //error: non-type template argument is not a constant expression
@@ -132,7 +135,7 @@ namespace meta {
   struct pos;
 
   // this traits has a sense only for compile time ordinal types
-  template <class O, size_t I>
+  template <class O, index_t I>
   struct val;
 
   // todo Specialize pos/val for integral types.
@@ -159,7 +162,7 @@ namespace meta {
   { return meta::size<O>::value; }
 
   template <class Ord>
-  constexpr auto val(size_t pos) noexcept -> decltype(traits<Ord>::val(pos))
+  constexpr auto val(index_t pos) noexcept -> decltype(traits<Ord>::val(pos))
   {
       //JASEL_EXPECTS(valid_position<Ord>(pos));
       return traits<Ord>::val(pos);

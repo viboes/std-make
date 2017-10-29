@@ -68,7 +68,7 @@ inline namespace fundamental_v3
             typedef typename base_t::reference reference;
 
             ordinal_iterator() : index_(0u) {}
-            explicit ordinal_iterator(size_t x) : index_(x) {}
+            explicit ordinal_iterator(ordinal::index_t x) : index_(x) {}
 
         private:
             void increment()
@@ -102,7 +102,7 @@ inline namespace fundamental_v3
             }
 
             friend class ::boost::iterator_core_access;
-            size_t index_;
+            ordinal::index_t index_;
         };
     } // namespace ordinal_detail
     #endif

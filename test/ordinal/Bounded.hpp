@@ -14,7 +14,7 @@ struct Bounded {
   using underlying_type = T;
   static constexpr const T First = F;
   static constexpr const T Last = F;
-  static constexpr const std::size_t Size = L-F+1;
+  static constexpr const std::experimental::ordinal::index_t Size = L-F+1;
   T value;
 };
 
@@ -28,8 +28,8 @@ inline namespace fundamental_v3
     template <std::intmax_t F1, std::intmax_t L1, class T1>
     struct traits<Bounded<F1,L1, T1>>
     {
-      using size_type = size_t;
-      using size = integral_constant<size_t, Bounded<F1,L1,T1>::Size>;
+      using size_type = index_t;
+      using size = integral_constant<index_t, Bounded<F1,L1,T1>::Size>;
 
       //template <class U>
       static constexpr
@@ -39,7 +39,7 @@ inline namespace fundamental_v3
 
       //template <class U>
       static constexpr
-      size_t pos(Bounded<F1,L1, T1> val)  {
+      size_type pos(Bounded<F1,L1, T1> val)  {
         return val.value-Bounded<F1,L1, T1>::First;
       }
     };

@@ -264,8 +264,8 @@ namespace ordinal {
   template <class D, class SD, class R>
   struct traits<chrono::modulo<D,SD,R>>
   {
-    using size_type = size_t;
-    using size = integral_constant<size_t, chrono::modulo<D,SD,R>::cardinal>;
+    using size_type = ordinal::index_t;
+    using size = integral_constant<ordinal::index_t, chrono::modulo<D,SD,R>::cardinal>;
 
     //template <class U>
     static constexpr

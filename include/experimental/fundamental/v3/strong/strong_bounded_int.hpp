@@ -110,7 +110,7 @@ inline namespace fundamental_v3
     template <class Tag, class T, T Low, T High >
     struct traits<strong_bounded_int<Tag, T, Low, High>>
     {
-      using size_type = size_t;
+      using size_type = ordinal::index_t;
       using size = integral_constant<size_type, High-Low+1>;
       static strong_bounded_int<Tag, T, Low, High> val(size_type p) { return strong_bounded_int<Tag, T, Low, High>{static_cast<T>(p+Low)}; }
 

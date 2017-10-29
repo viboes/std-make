@@ -21,9 +21,9 @@ inline namespace fundamental_v3
   namespace ordinal {
     namespace meta {
       template <>
-      struct pos<Bool, Bool::False> : integral_constant<size_t, 0> {};
+      struct pos<Bool, Bool::False> : integral_constant<index_t, 0> {};
       template <>
-      struct pos<Bool, Bool::True> : integral_constant<size_t, 1> {};
+      struct pos<Bool, Bool::True> : integral_constant<index_t, 1> {};
       template <>
       struct val<Bool, 0> : integral_constant<Bool, Bool::False> {};
       template <>
@@ -32,7 +32,7 @@ inline namespace fundamental_v3
     template <>
     struct traits<Bool>
     {
-      using size_type = size_t;
+      using size_type = index_t;
       using size = integral_constant<size_type, 2>;
       static
       BOOST_CXX14_CONSTEXPR
@@ -45,7 +45,7 @@ inline namespace fundamental_v3
 
       static
       BOOST_CXX14_CONSTEXPR
-      size_t pos(Bool val)    {
+      index_t pos(Bool val)    {
         switch (val) {
         case Bool::False: return 0;
         case Bool::True: return 1;

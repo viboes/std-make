@@ -62,10 +62,10 @@ inline namespace fundamental_v3
      - an overflow error is associated with exceptions of type `std::overflow_error`.
 
      */
-    template<typename T>
+    template <typename T>
     class ordinal_set;
 
-    template<typename T>
+    template <typename T>
     class ordinal_set
     {
     public:
@@ -208,7 +208,7 @@ inline namespace fundamental_v3
       //! - If `I >= pos`, the new value is the previous value of the bit at position `I - pos`.
       //!
       //! <b>Returns:</b> `*this`.
-      ordinal_set &operator<<=(size_t pos) noexcept
+      ordinal_set &operator<<=(ordinal::index_t pos) noexcept
       {
         bits <<= pos;
         return *this;
@@ -220,22 +220,22 @@ inline namespace fundamental_v3
       //!
       //! <b>Returns:</b> `*this`.
 
-      ordinal_set &operator>>=(size_t pos) noexcept
+      ordinal_set &operator>>=(ordinal::index_t pos) noexcept
       {
         bits >>= pos;
         return *this;
       }
 
       //! \n<b>Returns:</b> A count of the number of bits set in `*this`.
-      std::size_t count() const noexcept
+      ordinal::index_t count() const noexcept
       {
-        return bits.count();
+        return static_cast<ordinal::index_t>(bits.count());
       }
 
       //! \n<b>Returns:</b> `static_size`.
-      constexpr std::size_t size() const noexcept
+      constexpr ordinal::index_t size() const noexcept
       {
-        return bits.size();
+        return static_cast<ordinal::index_t>(bits.size());
       }
 
       //! \n<b>Requires:</b> `pos` shall be valid.
@@ -386,7 +386,7 @@ inline namespace fundamental_v3
       }
 
       //! \n<b>Equivalent to:</b> `ordinal_set<T>(*this) <<= pos`.
-      ordinal_set operator<<(std::size_t pos) const noexcept
+      ordinal_set operator<<(ordinal::index_t pos) const noexcept
       {
         ordinal_set r = *this;
         r <<= pos;
@@ -394,7 +394,7 @@ inline namespace fundamental_v3
       }
 
       //! \n<b>Equivalent to:</b> `ordinal_set<T>(*this) >>= pos`.
-      ordinal_set operator>>(std::size_t pos) const noexcept
+      ordinal_set operator>>(ordinal::index_t pos) const noexcept
       {
         ordinal_set r = *this;
         r >>= pos;
@@ -415,9 +415,9 @@ inline namespace fundamental_v3
       }
     private:
 
-      static std::size_t to_bit(T value) noexcept
+      static size_t to_bit(T value) noexcept
       {
-        return ordinal::pos(value);
+        return static_cast<size_t>(ordinal::pos(value));
       }
 
       std::bitset<ordinal::meta::size<T>::value> bits;

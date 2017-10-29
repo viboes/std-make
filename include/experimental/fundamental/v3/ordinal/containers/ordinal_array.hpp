@@ -83,17 +83,17 @@ inline namespace fundamental_v3
 
     public:
         // type definitions
-        typedef T                 value_type;
-        typedef T*                iterator;
-        typedef const T*          const_iterator;
-        typedef T&                reference;
-        typedef const T&          const_reference;
-        typedef value_type*       pointer;
-        typedef const value_type* const_pointer;
-        typedef O                 key_type;
-        typedef std::size_t       size_type;
-        typedef std::ptrdiff_t    difference_type;
-        static const std::size_t  static_size = ordinal::meta::size<O>::value;
+        typedef T                       value_type;
+        typedef T*                      iterator;
+        typedef const T*                const_iterator;
+        typedef T&                      reference;
+        typedef const T&                const_reference;
+        typedef value_type*             pointer;
+        typedef const value_type*       const_pointer;
+        typedef O                       key_type;
+        typedef ordinal::index_t        size_type;
+        typedef std::ptrdiff_t          difference_type;
+        static const ordinal::index_t   static_size = ordinal::meta::size<O>::value;
 
         // iterator support
         //! \n<b>Returns:</b> iterator for the first element
