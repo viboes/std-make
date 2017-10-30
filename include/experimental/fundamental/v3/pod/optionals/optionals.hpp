@@ -495,7 +495,7 @@ public:
     }
     /// @par Pre-condition has_value<T>
     template <class T>
-    constexpr T & get_ref()
+    JASEL_CXX14_CONSTEXPR T & get_ref()
     {
         return get_ref<detail::index<Types, T>::value>();
     }

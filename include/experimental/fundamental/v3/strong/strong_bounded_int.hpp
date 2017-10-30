@@ -89,7 +89,7 @@ inline namespace fundamental_v3
       {
         return (Low <= x && x <= High) ;
       }
-      static constexpr UT cast(UT x)
+      static JASEL_CXX14_CONSTEXPR UT cast(UT x)
       {
           JASEL_EXPECTS( valid(x) );
           return x;

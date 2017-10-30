@@ -52,8 +52,7 @@ inline namespace fundamental_v3
         operator Ptr() const noexcept
         {   return get();}
 
-        auto get() const noexcept
-        {   return _ptr;}
+        auto get() const JASEL_DECLTYPE_RETURN_NOEXCEPT(&*_ptr)
 
         auto operator*() const JASEL_DECLTYPE_RETURN_NOEXCEPT(*_ptr)
         //auto operator*()  JASEL_DECLTYPE_RETURN_NOEXCEPT(*_ptr)
@@ -69,7 +68,7 @@ inline namespace fundamental_v3
     {
         T* _ptr;
     public:
-        explicit constexpr not_null(T* p) : _ptr(p)
+        explicit JASEL_CXX14_CONSTEXPR not_null(T* p) : _ptr(p)
         {
             JASEL_EXPECTS(p != nullptr);
         }
@@ -110,13 +109,10 @@ inline namespace fundamental_v3
         // We don't want to be able to update the pointer from outside
         //T* const& underlying() const { return _ptr; }
 
-        auto get() const noexcept
-        {   return _ptr;}
+        auto get() const JASEL_DECLTYPE_RETURN_NOEXCEPT(_ptr)
 
-        auto operator*() const noexcept
-        {   return *get();}
-        auto operator->() const noexcept
-        {   return get();}
+        auto operator*() const JASEL_DECLTYPE_RETURN_NOEXCEPT(*get())
+        auto operator->() const JASEL_DECLTYPE_RETURN_NOEXCEPT(get())
 
         // fixme: Do we want to be able to compare with other not_null pointers
         // fixme: Do we want to be able to compare with other pointers

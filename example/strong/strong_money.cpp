@@ -19,6 +19,7 @@
 #include <type_traits>
 #include "currency.hpp"
 #include <experimental/strong_counter.hpp>
+#include <experimental/fundamental/v2/config.hpp>
 
 namespace stdex = std::experimental;
 
@@ -230,7 +231,7 @@ struct binary
 
     // fixme:: shouldn't this requires that the representation is convertible from the common_type?
     template <class C, class R>
-    constexpr operator money<C,R>() {
+    JASEL_CXX14_CONSTEXPR operator money<C,R>() {
         return money<C,R>( Op{}(currency::convert<C1, C>(m1.count()), currency::convert<C2, C>(m2.count())));
     }
 };
@@ -246,7 +247,7 @@ struct add
 
     // fixme:: shouldn't this requires that the representation is convertible from the common_type?
     template <class C, class R>
-    constexpr operator money<C,R>()
+    JASEL_CXX14_CONSTEXPR operator money<C,R>()
     {
         return money<C,R>( currency::convert<C1, C>(m1.count()) + currency::convert<C2, C>(m2.count()));
     }
@@ -260,7 +261,7 @@ struct substract
     using C1 =  currency_t<M1>;
     using C2 =  currency_t<M2>;
     template <class C, class R>
-    constexpr operator money<C,R>()
+    JASEL_CXX14_CONSTEXPR operator money<C,R>()
     {
         return money<C,R>( currency::convert<C1, C>(m1.count()) - currency::convert<C2, C>(m2.count()));
     }
@@ -275,7 +276,7 @@ struct divide
     using C1 =  currency_t<M1>;
     using C2 =  currency_t<M2>;
     template <class R>
-    constexpr operator R()
+    JASEL_CXX14_CONSTEXPR operator R()
     {
         return  currency::convert<C1, C>(m1.count()) / currency::convert<C2, C>(m2.count());
     }
@@ -290,7 +291,7 @@ struct modulo
     using C1 =  currency_t<M1>;
     using C2 =  currency_t<M2>;
     template <class C, class R>
-    constexpr operator money<C,R>()
+    JASEL_CXX14_CONSTEXPR operator money<C,R>()
     {
         return money<C,R>( currency::convert<C1, C>(m1.count()) % currency::convert<C2, C>(m2.count()));
     }
@@ -301,15 +302,15 @@ struct modulo
 
 template <class C1, class R1, class C2, class R2, typename = std::enable_if_t< ! std::is_same<C1, C2>::value>>
 constexpr auto operator+(money<C1,R1> m1, money<C2,R2> m2) noexcept
+-> money_expr::add<money<C1,R1>, money<C2,R2>>
 {
-    std::cout <<"operator+(" << m1 <<", "<< m2 << ")" << std::endl;
-
     return money_expr::add<money<C1,R1>, money<C2,R2>>{m1, m2} ;
     //return money_expr::binary<money<C1,R1>, money<C2,R2>, std::plus>{m1, m2} ;
 }
 
 template <class C1, class R1, class C2, class R2, typename = std::enable_if_t< ! std::is_same<C1, C2>::value>>
 constexpr auto operator-(money<C1,R1> m1, money<C2,R2> m2) noexcept
+-> money_expr::substract<money<C1,R1>, money<C2,R2>>
 {
     return money_expr::substract<money<C1,R1>, money<C2,R2>>{m1, m2} ;
 }

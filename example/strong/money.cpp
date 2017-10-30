@@ -17,6 +17,7 @@
 #include <functional>
 #include <type_traits>
 #include "currency.hpp"
+#include <experimental/fundamental/v2/config.hpp>
 
 template <class Currency, class Rep = double>
 struct money;
@@ -54,7 +55,7 @@ struct money
     : rep (detail::to_currency<Currency>(m))
     {
     }
-    constexpr money& operator=(money const& m) = default;
+    JASEL_CXX14_CONSTEXPR money& operator=(money const& m) = default;
 #if 0
     template <class C, class R>
     constexpr money& operator=(money<C, R> m)
@@ -88,18 +89,18 @@ struct money
         return money(m1.count() + m2.count()) ;
     }
 
-    constexpr money& operator++() noexcept
+    JASEL_CXX14_CONSTEXPR money& operator++() noexcept
     {
         rep++;
         return *this ;
     }
-    constexpr money operator++(int) noexcept
+    JASEL_CXX14_CONSTEXPR money operator++(int) noexcept
     {
         money tmp = *this;
         rep++;
         return tmp ;
     }
-    constexpr money& operator+=(money m) noexcept
+    JASEL_CXX14_CONSTEXPR money& operator+=(money m) noexcept
     {
         rep += m.count();
         return *this ;
@@ -113,18 +114,18 @@ struct money
     {
         return money(- m1.count()) ;
     }
-    constexpr money& operator--() noexcept
+    JASEL_CXX14_CONSTEXPR money& operator--() noexcept
     {
         rep--;
         return *this ;
     }
-    constexpr money operator--(int) noexcept
+    JASEL_CXX14_CONSTEXPR money operator--(int) noexcept
     {
         money tmp = *this;
         rep--;
         return tmp ;
     }
-    constexpr money& operator-=(money m) noexcept
+    JASEL_CXX14_CONSTEXPR money& operator-=(money m) noexcept
     {
         rep -= m.count();
         return *this ;
@@ -143,23 +144,23 @@ struct money
     {
         return money(m.count() / x) ;
     }
-    constexpr money& operator/=(double x) noexcept
+    JASEL_CXX14_CONSTEXPR money& operator/=(double x) noexcept
     {
         rep /= x;
         return *this;
     }
-    friend constexpr money operator%(money m, int s) noexcept
+    friend JASEL_CXX14_CONSTEXPR money operator%(money m, int s) noexcept
     {
-        using CR = std::common_type_t<Rep, int>;
+        using CR = typename std::common_type<Rep, int>::type;
         auto r = CR(m.count()) % s ;
         return money(r) ;
     }
     template <class R1, class R2>
-    friend constexpr money<Currency, std::common_type_t<R1,R2>> operator%(money<Currency, R1> m, money<Currency, R2> n) noexcept
+    friend constexpr money<Currency, typename std::common_type<R1,R2>::type> operator%(money<Currency, R1> m, money<Currency, R2> n) noexcept
     {
         return money(m.count() % n.count()) ;
     }
-    constexpr money& operator%=(int x) noexcept
+    JASEL_CXX14_CONSTEXPR money& operator%=(int x) noexcept
     {
         rep %= x;
         return *this;
@@ -179,7 +180,7 @@ struct binary
 
     // fixme:: shouldn't this requires that the representation is convertible from the common_type?
     template <class C, class R>
-    constexpr operator money<C,R>() {
+    JASEL_CXX14_CONSTEXPR operator money<C,R>() {
         return money<C,R>( Op{}(detail::to_currency<C>(m1), detail::to_currency<C>(m2)));
     }
 };
@@ -192,7 +193,7 @@ struct add
 
     // fixme:: shouldn't this requires that the representation is convertible from the common_type?
     template <class C, class R>
-    constexpr operator money<C,R>()
+    JASEL_CXX14_CONSTEXPR operator money<C,R>()
     {
         return money<C,R>( detail::to_currency<C>(m1) + detail::to_currency<C>(m2));
     }
@@ -204,7 +205,7 @@ struct substract
     M2 m2;
 
     template <class C, class R>
-    constexpr operator money<C,R>()
+    JASEL_CXX14_CONSTEXPR operator money<C,R>()
     {
         return money<C,R>( detail::to_currency<C>(m1) - detail::to_currency<C>(m2));
     }
@@ -217,7 +218,7 @@ struct divide
     M2 m2;
 
     template <class R>
-    constexpr operator R()
+    JASEL_CXX14_CONSTEXPR operator R()
     {
         return  detail::to_currency<C>(m1) / detail::to_currency<C>(m2);
     }
@@ -230,7 +231,7 @@ struct modulo
     M2 m2;
 
     template <class C, class R>
-    constexpr operator money<C,R>()
+    JASEL_CXX14_CONSTEXPR operator money<C,R>()
     {
         return money<C,R>( detail::to_currency<C>(m1) % detail::to_currency<C>(m2));
     }
@@ -240,14 +241,14 @@ struct modulo
 
 
 template <class C1, class R1, class C2, class R2>
-constexpr auto operator+(money<C1,R1> m1, money<C2,R2> m2) noexcept
+constexpr auto operator+(money<C1,R1> m1, money<C2,R2> m2) noexcept -> money_expr::add<money<C1,R1>, money<C2,R2>>
 {
     return money_expr::add<money<C1,R1>, money<C2,R2>>{m1, m2} ;
     //return money_expr::binary<money<C1,R1>, money<C2,R2>, std::plus>{m1, m2} ;
 }
 
 template <class C1, class R1, class C2, class R2>
-constexpr auto operator-(money<C1,R1> m1, money<C2,R2> m2) noexcept
+constexpr auto operator-(money<C1,R1> m1, money<C2,R2> m2) noexcept -> money_expr::substract<money<C1,R1>, money<C2,R2>>
 {
     return money_expr::substract<money<C1,R1>, money<C2,R2>>{m1, m2} ;
 }

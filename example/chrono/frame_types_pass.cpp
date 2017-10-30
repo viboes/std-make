@@ -136,7 +136,7 @@ public:
         return subframes(x) + subframes(y);
     }
 
-    friend constexpr x_subframe_numbers operator+(x_subframe_numbers const& xsfn, const subframes& dsf) noexcept
+    friend JASEL_CXX14_CONSTEXPR x_subframe_numbers operator+(x_subframe_numbers const& xsfn, const subframes& dsf) noexcept
     {
         const int cardinal = subframe_number::cardinal;
         auto dsfni = xsfn.sfn.count() + dsf.count();
@@ -144,32 +144,32 @@ public:
         dsfni = dsfni - dfni * cardinal;
         return { xsfn.fn + frames(dfni), xsfn.sfn + subframes(dsfni) };
     }
-    friend constexpr x_subframe_numbers operator+(const subframes& dsf, x_subframe_numbers const& xsfn) noexcept
+    friend JASEL_CXX14_CONSTEXPR x_subframe_numbers operator+(const subframes& dsf, x_subframe_numbers const& xsfn) noexcept
     {
         return xsfn + dsf;
     }
-    friend constexpr x_subframe_numbers operator-(x_subframe_numbers const& xsfn, const subframes& dsf) noexcept
+    friend JASEL_CXX14_CONSTEXPR x_subframe_numbers operator-(x_subframe_numbers const& xsfn, const subframes& dsf) noexcept
     {
         return xsfn + -dsf;
     }
 
-    constexpr x_subframe_numbers& operator+=(const frames& df) noexcept
+    JASEL_CXX14_CONSTEXPR x_subframe_numbers& operator+=(const frames& df) noexcept
     {
         *this = *this + df;
         return *this;
     }
-    constexpr x_subframe_numbers& operator-=(const frames& df) noexcept
+    JASEL_CXX14_CONSTEXPR x_subframe_numbers& operator-=(const frames& df) noexcept
     {
         *this = *this - df;
         return *this;
     }
 
-    constexpr x_subframe_numbers& operator+=(const subframes& dsf) noexcept
+    JASEL_CXX14_CONSTEXPR x_subframe_numbers& operator+=(const subframes& dsf) noexcept
     {
         *this = *this + dsf;
         return *this;
     }
-    constexpr x_subframe_numbers& operator-=(const subframes& dsf) noexcept
+    JASEL_CXX14_CONSTEXPR x_subframe_numbers& operator-=(const subframes& dsf) noexcept
     {
         *this = *this - dsf;
         return *this;

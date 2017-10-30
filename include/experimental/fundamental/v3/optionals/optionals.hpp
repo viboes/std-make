@@ -449,7 +449,7 @@ public:
     }
     /// @pre has_value<T>
     template <class T>
-    constexpr T & get_ref()
+    JASEL_CXX14_CONSTEXPR T & get_ref()
     {
         return get_ref<detail::index<Types, T>::value>();
     }
@@ -491,7 +491,7 @@ public:
         return detail::optional_ref_fact<I, T>::make(mask, get_ref<I>());
     }
     template <size_t I>
-    constexpr optional_ref<I, const typename tuple_element<I, Types>::type> get_opt() const noexcept
+    JASEL_CXX14_CONSTEXPR optional_ref<I, const typename tuple_element<I, Types>::type> get_opt() const noexcept
     {
         using T = typename tuple_element<I, Types>::type;
         return detail::optional_ref_fact<I, T>::make(mask, get_ref<I>());
