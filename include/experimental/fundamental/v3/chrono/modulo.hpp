@@ -58,36 +58,61 @@ namespace chrono
       using super_duration_t = SuperDuration;
       using rep = Rep;
 
-      explicit modulo() = default;
+      explicit constexpr modulo() = default;
 
       //! @par Pre-condition:
       //!   v is in the range [0,cardinal)
       //! @par Effects:<br> constructs a modulo from its representations
-      constexpr explicit modulo(Rep v) : m_value(v) {}
+      constexpr explicit modulo(Rep v)
+          : m_value(v)
+      {}
 
       //! @par Requires:<br> is_convertible<Rep2, Rep>
       //! @par Effects:<br> constructs a modulo converting the representations
       template <class Rep2>
-      constexpr modulo(modulo<Duration, SuperDuration, Rep2> const& v) : m_value(static_cast<rep>(v.count())) {}
+      constexpr modulo(modulo<Duration, SuperDuration, Rep2> const& v)
+          : m_value(static_cast<rep>(v.count()))
+      {}
 
       //! @par Effects:<br> constructs a modulo doing the modulo of the representation
-      constexpr explicit modulo(duration_t v) : m_value(static_cast<rep>(v.count()) % cardinal) {}
+      constexpr explicit modulo(duration_t v)
+          : m_value(static_cast<rep>(v.count()) % cardinal)
+      {}
 
       //! @par Returns:<br> conversion to duration
-      constexpr explicit operator duration_t() const { return duration_t(this->m_value); }
-      constexpr duration_t to_duration() const { return duration_t(this->m_value); }
+      constexpr explicit operator duration_t() const
+      {
+          return duration_t(this->m_value);
+      }
+      constexpr duration_t to_duration() const
+      {
+          return duration_t(this->m_value);
+      }
 
       //! @par Returns:<br> conversion to the representation
-      constexpr explicit operator Rep() const noexcept {return m_value;}
-      constexpr Rep value() const noexcept {return m_value;}
-      constexpr Rep count() const noexcept {return m_value;}
+      constexpr explicit operator Rep() const noexcept
+      {
+          return m_value;
+      }
+      constexpr Rep value() const noexcept
+      {
+          return m_value;
+      }
+      constexpr Rep count() const noexcept
+      {
+          return m_value;
+      }
 
       //! @par Returns:
       //!   0 <= count() && count() < cardinal
-      bool valid() const { return m_value >= 0 && m_value < cardinal; }
+      bool valid() const
+      {
+          return m_value >= 0 && m_value < cardinal;
+      }
 
       template <class OSTREAM>
-      friend OSTREAM& operator<<(OSTREAM& os, modulo const& m) {
+      friend OSTREAM& operator<<(OSTREAM& os, modulo const& m)
+      {
           os << uintmax_t(m.count());
           return os;
       }
@@ -95,72 +120,120 @@ namespace chrono
       //! @par Returns:
       //!   *this.
       constexpr modulo operator+() const noexcept
-          { return *this; }
-      //fixme: Is this really needed
+      {
+          return *this;
+      }
       //! @par Returns:<br> modulo{-Rep(*this)}.
       constexpr modulo operator-() const noexcept
-          { return modulo(-m_value); }
+      {
+          return modulo(cardinal - m_value);
+      }
 
-      //! @par Effects: <br>If m_value < candinal, ++m_value. Otherwise sets m_value to 0.
+      //! @par Effects: <br>If m_value < cardinal, ++m_value. Otherwise sets m_value to 0.
       //! @par Returns:<br> *this.
       JASEL_MUTABLE_CONSTEXPR modulo& operator++() noexcept
-          { if (m_value == cardinal-1) m_value=0; else ++m_value; return *this; }
+      {
+          if (m_value == cardinal-1)
+              m_value = 0;
+          else
+              ++m_value;
+          return *this;
+      }
 
       //! @par Effects: <br>++(*this).
       //! @par Returns:<br> Returns: A copy of *this as it existed on entry to this member function.
       JASEL_MUTABLE_CONSTEXPR modulo operator++(int) noexcept
-          { auto tmp(*this); ++(*this); return tmp; }
+      {
+          auto tmp(*this); ++(*this);
+          return tmp;
+      }
 
       //! @par Effects: <br>If m_value > 0, --m_value. Otherwise sets m_value to cardinal.
       //! @par Returns:<br> *this.
       JASEL_MUTABLE_CONSTEXPR modulo& operator--() noexcept
-          { if (m_value == 0) m_value=cardinal; else --m_value; return *this;}
+      {
+          if (m_value == 0)
+              m_value = cardinal;
+          else
+              --m_value;
+          return *this;
+      }
 
       //! @par Effects: <br>--(*this).
       //! @par Returns:<br> Returns: A copy of *this as it existed on entry to this member function.
       JASEL_MUTABLE_CONSTEXPR modulo operator--(int) noexcept
-          { auto tmp(*this); --(*this); return tmp; }
+      {
+          auto tmp(*this); --(*this);
+          return tmp;
+      }
 
       //! @par Effects: <br>*this = *this + d.
       //! @par Returns:<br> *this.
       JASEL_MUTABLE_CONSTEXPR modulo& operator+=(const duration_t& d) noexcept
-          { *this = *this + d; return *this; }
+      {
+          *this = *this + d;
+          return *this;
+      }
       //! @par Effects: <br>*this = *this - d.
       //! @par Returns:<br> *this.
       JASEL_MUTABLE_CONSTEXPR modulo& operator-=(const duration_t& d) noexcept
-          { *this = *this - d; return *this; }
+      {
+          *this = *this - d;
+          return *this;
+      }
 
       //! @par Returns:<br> Rep{x} == Rep{y}.
       friend constexpr bool operator==(const modulo& x, const modulo& y) noexcept
-          { return x.count() == y.count(); }
+      {
+          return x.count() == y.count();
+      }
       //! @par Returns:<br> Rep{x} != Rep{y}.
       friend constexpr bool operator!=(const modulo& x, const modulo& y) noexcept
-          { return x.count() != y.count(); }
+      {
+          return x.count() != y.count();
+      }
       //! @par Returns:<br> Rep{x} < Rep{y}.
       friend constexpr bool operator< (const modulo& x, const modulo& y) noexcept
-          { return x.count() < y.count(); }
+      {
+          return x.count() < y.count();
+      }
       //! @par Returns:<br> Rep{x} > Rep{y}.
       friend constexpr bool operator> (const modulo& x, const modulo& y) noexcept
-          { return x.count() > y.count(); }
+      {
+          return x.count() > y.count();
+      }
       //! @par Returns:<br> Rep{x} <= Rep{y}.
       friend constexpr bool operator<=(const modulo& x, const modulo& y) noexcept
-          { return x.count() <= y.count(); }
+      {
+          return x.count() <= y.count();
+      }
       //! @par Returns:<br> Rep{x} >= Rep{y}.
       friend constexpr bool operator>=(const modulo& x, const modulo& y) noexcept
-          { return x.count() >= y.count(); }
+      {
+          return x.count() >= y.count();
+      }
 
       //! @par Returns:<br> A modulo constructed by the addition of the respective representation.
       friend constexpr modulo  operator+(const modulo&  x, const duration_t& y) noexcept
-          { return modulo(x.count() + y.count()); }
+      {
+          return modulo((x.count() + y.count()) % cardinal);
+      }
       //! @par Returns:<br> y + x.
       friend constexpr modulo  operator+(const duration_t& x,  const modulo& y) noexcept
-          { return y + x; }
+      {
+          return y + x;
+      }
       //! @par Returns:<br> A modulo constructed by the difference of the respective representation.
       friend constexpr modulo  operator-(const modulo&  x, const duration_t& y) noexcept
-          { return x + -y; }
+      {
+          //return modulo((cardinal + x.count() - y.count()) % cardinal);
+          return x + -y;
+      }
       //! @par Returns:<br> The difference in duration_t between the respective durations.
       friend constexpr duration_t operator-(const modulo& x,  const modulo& y) noexcept
-          { return x.count() - y.count(); }
+      {
+          return x.count() - y.count();
+      }
 
       //@ @par Returns:<br> modulo{0}.
       static constexpr modulo min() noexcept
@@ -182,7 +255,10 @@ namespace chrono
   // common_type subframes
   // so the result must be modulo<subframes, XXX, RRR>
   // XXX must be the super duration => frames
-  // RRR must be the
+  // RRR must be the representation able to store the value
+
+  // HH's Date library uses hour/minute/second to concatenate relative units
+
 
   // bi_frame_number + subframe_number?
   // What will be the result? bi_subframe_number. Can it be deduced?

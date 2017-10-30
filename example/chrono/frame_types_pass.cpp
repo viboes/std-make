@@ -10,15 +10,15 @@
 namespace stdex = std::experimental;
 
 // Basic frame durations
-using frames       = std::chrono::duration<uint32_t,  std::ratio_multiply<std::ratio<10>,  std::chrono::milliseconds::period>::type>;
-using subframes    = std::chrono::duration<uint32_t,  std::ratio_divide<frames::period,    std::ratio<10>>::type>;
-using slots        = std::chrono::duration<uint32_t,  std::ratio_divide<subframes::period, std::ratio<2>>::type>;
-using symbols      = std::chrono::duration<uint32_t,  std::ratio_divide<slots::period,     std::ratio<7>>::type>;
+using frames       = std::chrono::duration<int32_t,  std::ratio_multiply<std::ratio<10>,  std::chrono::milliseconds::period>::type>;
+using subframes    = std::chrono::duration<int32_t,  std::ratio_divide<frames::period,    std::ratio<10>>::type>;
+using slots        = std::chrono::duration<int32_t,  std::ratio_divide<subframes::period, std::ratio<2>>::type>;
+using symbols      = std::chrono::duration<int32_t,  std::ratio_divide<slots::period,     std::ratio<7>>::type>;
 
-using bi_frames     = std::chrono::duration<uint32_t,  std::ratio_multiply<std::ratio<2>,    frames::period>::type>;
-using x_frames     = std::chrono::duration<uint32_t,  std::ratio_multiply<std::ratio<1024>, frames::period>::type>;
-using h_frames     = std::chrono::duration<uint32_t,  std::ratio_multiply<std::ratio<1024>, x_frames::period>::type>;
-using bi_slots      = std::chrono::duration<uint32_t,  std::ratio_multiply<std::ratio<2>,    slots::period>::type>;
+using bi_frames     = std::chrono::duration<int32_t,  std::ratio_multiply<std::ratio<2>,    frames::period>::type>;
+using x_frames     = std::chrono::duration<int32_t,  std::ratio_multiply<std::ratio<1024>, frames::period>::type>;
+using h_frames     = std::chrono::duration<int32_t,  std::ratio_multiply<std::ratio<1024>, x_frames::period>::type>;
+using bi_slots      = std::chrono::duration<int32_t,  std::ratio_multiply<std::ratio<2>,    slots::period>::type>;
 
 // relative numbers
 using h_frame_number    = stdex::chrono::modulo<x_frames,  h_frames,  uint16_t>; //1024
@@ -86,14 +86,102 @@ constexpr symbol_number to_symbol_number(stdex::chrono::modulo<SubDuration, Dura
   return stdex::chrono::modulo_cast<symbol_number, h_frames>(m);
 }
 
+
+
+// what about defining x_subframe_numbers using tuples as underlying type.
+// This will allow to define it as a strong type inheriting from all the relational operators
+
+// x_subframe_numbers =  tuple<frame_number, subframe_number>
+// x_subframe_numbers =  tuple<modulo<x_frames, frames>, modulo<frames, subframes>>
+// todo: define a tuple_modulo where
+// tuple_modulo<T1, T2, T3> = tuple<modulo<T1, T2>, modulo<T2, T3>>
+//template <class T1, T2, T3>
+//using tuple_modulo = std::tuple<modulo<T1, T2>, modulo<T2, T3>>;
+//  convertible to T3 and modulo<T1, T3>
+//  access to modulo<T1, T2> and modulo<T2, T3>
+// tuple_modulo<T1, T2, T3, T4> = tuple<modulo<T1, T2>, modulo<T2, T3>, modulo<T3, T4>>
 struct x_subframe_numbers {
+private:
     frame_number fn;
     subframe_number sfn;
-    x_subframe_numbers() = default;
+
+    //constexpr frame_number& frame() {return fn;}
+    //constexpr subframe_number& subframe() {return sfn;}
+public:
+    constexpr frame_number frame() const {return fn;}
+    constexpr subframe_number subframe() const {return sfn;}
+
+    constexpr x_subframe_numbers() = default;
     constexpr x_subframe_numbers(frame_number fn, subframe_number sfn) : fn(fn), sfn(sfn) {}
     constexpr operator x_subframe_number() const { return make_x_subframe_number(fn, sfn); }
+    constexpr operator subframes() const { return subframes(frames(fn)) + subframes(sfn); }
     //explicit operator bi_subframe_number() { return make_bi_subframe_number(fn, sfn); }
+
+    friend constexpr x_subframe_numbers operator+(x_subframe_numbers const& xsfn, const frames& df) noexcept
+    {
+        return { xsfn.fn + df, xsfn.sfn };
+    }
+
+    friend constexpr x_subframe_numbers operator-(x_subframe_numbers const& xsfn, const frames& df) noexcept
+    {
+        return { xsfn.fn - df, xsfn.sfn };
+    }
+    friend constexpr x_subframe_numbers operator+(const frames& df, x_subframe_numbers const& xsfn) noexcept
+    {
+        return xsfn + df;
+    }
+
+    friend constexpr subframes operator-(x_subframe_numbers const& x, const x_subframe_numbers& y) noexcept
+    {
+        return subframes(x) + subframes(y);
+    }
+
+    friend constexpr x_subframe_numbers operator+(x_subframe_numbers const& xsfn, const subframes& dsf) noexcept
+    {
+        const int cardinal = subframe_number::cardinal;
+        auto dsfni = xsfn.sfn.count() + dsf.count();
+        auto dfni = ((dsfni >= 0)  ? dsfni : dsfni-cardinal+1 ) / cardinal;
+        dsfni = dsfni - dfni * cardinal;
+        return { xsfn.fn + frames(dfni), xsfn.sfn + subframes(dsfni) };
+    }
+    friend constexpr x_subframe_numbers operator+(const subframes& dsf, x_subframe_numbers const& xsfn) noexcept
+    {
+        return xsfn + dsf;
+    }
+    friend constexpr x_subframe_numbers operator-(x_subframe_numbers const& xsfn, const subframes& dsf) noexcept
+    {
+        return xsfn + -dsf;
+    }
+
+    constexpr x_subframe_numbers& operator+=(const frames& df) noexcept
+    {
+        *this = *this + df;
+        return *this;
+    }
+    constexpr x_subframe_numbers& operator-=(const frames& df) noexcept
+    {
+        *this = *this - df;
+        return *this;
+    }
+
+    constexpr x_subframe_numbers& operator+=(const subframes& dsf) noexcept
+    {
+        *this = *this + dsf;
+        return *this;
+    }
+    constexpr x_subframe_numbers& operator-=(const subframes& dsf) noexcept
+    {
+        *this = *this - dsf;
+        return *this;
+    }
 };
+
+// operator/ play the role of a factory as it does on Date library.
+// Note that there is no sense to divide a frame_number and subframe_number, we need to first convert to duration
+x_subframe_numbers operator/(frame_number fn, subframe_number sfn)
+{
+    return {fn, sfn};
+}
 
 // Should the following be members?
 // No because for modulo types it is a non-member function
@@ -103,11 +191,11 @@ inline constexpr h_frame_number to_h_frame_number(x_subframe_numbers )
 }
 inline constexpr frame_number to_frame_number(x_subframe_numbers xsfn)
 {
-    return xsfn.fn;
+    return xsfn.frame();
 }
 inline constexpr subframe_number to_subframe_number(x_subframe_numbers xsfn)
 {
-    return xsfn.sfn;
+    return xsfn.subframe();
 }
 inline constexpr slot_number to_slot_number(x_subframe_numbers )
 {

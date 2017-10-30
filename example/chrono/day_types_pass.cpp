@@ -21,6 +21,17 @@ using months   = std::chrono::duration<int32_t,  std::ratio_divide<years::period
 
 
 // relative numbers
+// The interface provided here differs to the one provided in p0355r4
+// Missing interfaces
+//constexpr weekday(const sys_days& dp) noexcept;
+//constexpr explicit weekday(const local_days& dp) noexcept;
+//constexpr explicit operator unsigned() const noexcept;
+//constexpr bool ok() const noexcept;
+//constexpr weekday_indexed operator[](unsigned index) const noexcept;
+//constexpr weekday_last    operator[](last_spec) const noexcept;
+// operator<<(OSTREAM) differes
+
+using month = stdex::chrono::modulo<months,   years,    std::uint8_t>; //12
 using weekday = stdex::chrono::modulo<days,   weeks,    std::uint8_t>; //7
 using am_pm   = stdex::chrono::modulo<half_days,   days,    std::uint8_t>; //24
 using hour   = stdex::chrono::modulo<std::chrono::hours,   days,    std::uint8_t>; //24
@@ -28,9 +39,12 @@ using am_pm_hour   = stdex::chrono::modulo<std::chrono::hours,   half_days,    s
 using minute = stdex::chrono::modulo<std::chrono::minutes, std::chrono::hours,   std::uint8_t>; //60
 using second = stdex::chrono::modulo<std::chrono::seconds, std::chrono::minutes, std::uint8_t>; //60
 
+// todo: time_of_day must be specialized to provide access to hour/minute/second/subseconds depending on Duration
+// So the following can be only a representation, not the interface
 template <class Duration>
-using time_of_day = stdex::chrono::modulo<Duration, days, std::int32_t >;
+using time_of_day = stdex::chrono::modulo<Duration, days, std::uint32_t >;
 
+// fixme: Should the following conversions work only for time_of_day?
 template <class ModuloFrom>
 hour to_hour(ModuloFrom m)
 {
@@ -48,6 +62,8 @@ am_pm_hour to_am_pm_hour(ModuloFrom m)
   return stdex::chrono::modulo_cast<am_pm_hour, days>(m);
 }
 
+// This doesn't works if the time_of_day is in hours
+// todo: use SFINAE to remove the overload when the precision of ModuloFrom is less fine grained than minutes
 template <class ModuloFrom>
 minute to_minute(ModuloFrom m)
 {
@@ -59,6 +75,9 @@ second to_second(ModuloFrom m)
 {
   return stdex::chrono::modulo_cast<second, days>(m);
 }
+
+// todo: add to_subsecond
+
 static_assert(am_pm_hour::cardinal  == 12, "12 hours are not a half-day");
 static_assert(am_pm::cardinal  == 2, "2 half-days are not a day");
 static_assert(hour::cardinal  == 24, "24 hours are not a day");
