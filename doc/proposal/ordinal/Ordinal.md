@@ -55,7 +55,7 @@ using B = bounded_int<1,10> ;
 using S = std::bitset<B::size> ;
 S set;
 B b;
-do_somthing(set[int(b)-1]);
+do_something(set[int(b)-1]);
 ```
 
 With `ordinal_set<B>`
@@ -65,7 +65,7 @@ using B = bounded_int<1,10> ;
 using S = ordinal_set<B> ;
 S set;
 B b;
-do_somthing(set[b]);
+do_something(set[b]);
 ```
 
 We have that types as `bounded_int` cannot be used as index of arrays. The same mapping can be used to implement arrays having a `bounded_int` type as index type. 
@@ -75,7 +75,7 @@ using B = bounded_int<1,10> ;
 using A = array<X,B::size> ;
 A arr;
 B b;
-do_somthing(arr[int(b)-1]);
+do_something(arr[int(b)-1]);
 ```
 
 With
