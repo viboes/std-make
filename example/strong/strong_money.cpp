@@ -41,7 +41,7 @@ double to_currency(money<C, R> const& m)
 }
 
 }
-#else
+#else // STRONG_COUNTER==1
 template <class M>
 using currency_t = typename M::domain::currency_type;
 
@@ -51,7 +51,7 @@ template<class Currency>
 struct money_domain
 {
     using currency_type =  Currency;
-  template <class T, class C, class U
+    template <class T, class C, class U
           , typename std::enable_if <
               std::conjunction <
                 std::is_convertible<U, T>, // no overflow
@@ -65,23 +65,19 @@ struct money_domain
                   >
               >::value
           >::type* = nullptr
-  >
-  static T inter_domain_convert(money_domain<C>, U const& u)
-  {
-      return T(currency::convert<C,Currency>(u));
-    //return T(
-        //std::chrono::duration_cast<std::chrono::duration<T, Period>>(std::chrono::duration<U,P>(u)).count()
-        //);
-  }
-  template <class T, class C, class U>
-  static T inter_domain_cast(money_domain<C>, U const& u)
-  {
-      return T(currency::convert<C,Currency>(u));
-//    return T(
-//        std::chrono::duration_cast<std::chrono::duration<T, Period>>(std::chrono::duration<U,P>(u)).count()
-//    );
-  }
-  template <class T, class U
+    >
+    static T inter_domain_convert(money_domain<C>, U const& u)
+    {
+        return T(currency::convert<C,Currency>(u));
+    }
+
+    template <class T, class C, class U>
+    static T inter_domain_cast(money_domain<C>, U const& u)
+    {
+        return T(currency::convert<C,Currency>(u));
+    }
+
+    template <class T, class U
           , typename std::enable_if <
               std::conjunction <
                 std::is_convertible<U, T>,
@@ -92,7 +88,10 @@ struct money_domain
               >::value
           >::type* = nullptr
           >
-  static T intra_domain_convert(U const& u) { return T(u); }
+    static T intra_domain_convert(U const& u)
+    {
+        return T(u);
+    }
 };
 
 namespace std
@@ -133,11 +132,9 @@ struct domain_converter<money_domain<Currency>> : money_domain<Currency>  {  };
 
 }
 
-
-
 // fixme: Should be Rep, Currency?
 // fixme: Should we add a Period parameter to count in Million Dollars, or in cents?
-//      Don't having a period , forces almost to work with double.
+//      Don't having a period, forces almost to work with double.
 //      Having a period allows to work with integers most of the time
 
 #if STRONG_COUNTER==1
@@ -150,17 +147,12 @@ namespace detail
 template <class Currency, class C, class R>
 double to_currency(money<C, R> const& m)
 {
-    return m.count() * currency::conversion_factor(C{}, Currency{});
+    //return m.count() * currency::conversion_factor(C{}, Currency{});
+    return currency::convert<C, Currency>(m.count());
 }
 
 }
 
-//template <class Currency, class Rep>
-//struct money : stdex::strong_counter<money_domain<Currency>, Rep>
-//{
-//    using base_type = stdex::strong_counter<money_domain<Currency>, Rep>;
-//    using base_type::base_type;
-//}
 #else
 
 template <class Currency, class Rep>
@@ -207,8 +199,6 @@ struct money
     }
 #endif
 
-    // fixme: Should we replace it by count as duration does?
-
     constexpr Rep count() const noexcept
         { return this->underlying(); }
 
@@ -229,7 +219,7 @@ struct binary
     using C1 =  currency_t<M1>;
     using C2 =  currency_t<M2>;
 
-    // fixme:: shouldn't this requires that the representation is convertible from the common_type?
+    // fixme:: shouldn't this require that the representation is convertible from the common_type?
     template <class C, class R>
     JASEL_CXX14_CONSTEXPR operator money<C,R>() {
         return money<C,R>( Op{}(currency::convert<C1, C>(m1.count()), currency::convert<C2, C>(m2.count())));
