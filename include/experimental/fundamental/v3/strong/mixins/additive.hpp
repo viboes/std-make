@@ -67,40 +67,53 @@ namespace std
       };
       // Single arg
       template <class Final>
-      struct addable_base
+      struct increase_base
       {
         friend constexpr Final operator+(Final const&x)  noexcept
         {
           return x;
         }
 
-        friend JASEL_MUTABLE_CONSTEXPR Final operator++(Final& x) noexcept
-        {
-          return Final(++x._backdoor()._underlying());
-        }
         friend JASEL_MUTABLE_CONSTEXPR Final operator++(Final& x, int) noexcept
         {
-          return Final(x._backdoor()._underlying()++);
+          Final tmp(x);
+          ++x;
+          return tmp;
         }
 
       };
       template <class Final>
-      struct substractable_base
+      struct addable_base : increase_base<Final>
+      {
+        friend JASEL_MUTABLE_CONSTEXPR Final& operator++(Final& x) noexcept
+        {
+          ++x._backdoor()._underlying();
+          return x;
+        }
+      };
+      template <class Final>
+      struct decrease_base
+      {
+        friend JASEL_MUTABLE_CONSTEXPR Final operator--(Final& x, int) noexcept
+        {
+          Final tmp(x);
+          --x;
+          return tmp;
+        }
+
+      };
+      template <class Final>
+      struct substractable_base : decrease_base<Final>
       {
         friend constexpr Final operator-(Final const&x)  noexcept
         {
           return Final(-x._backdoor()._underlying());
         }
-
         friend JASEL_MUTABLE_CONSTEXPR Final operator--(Final& x ) noexcept
         {
-          return Final(--x._backdoor()._underlying());
+          --x._backdoor()._underlying();
+          return x;
         }
-        friend JASEL_MUTABLE_CONSTEXPR Final operator--(Final& x, int) noexcept
-        {
-          return Final(x._backdoor()._underlying()--);
-        }
-
       };
       template <class Final>
       struct additive_base : addable_base<Final>, substractable_base<Final>      {      };
