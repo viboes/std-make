@@ -106,7 +106,7 @@ inline namespace fundamental_v3
       template <class B>
       JASEL_CXX14_CONSTEXPR safe_bool& operator=(safe_bool<B> b) noexcept
       {
-        this->value = b.underlying();
+        this->_value = b.underlying();
         return *this;
       }
 
@@ -155,7 +155,7 @@ inline namespace fundamental_v3
       template <class B>
       JASEL_CXX14_CONSTEXPR safe_bool& operator=(safe_bool<B> b) noexcept
       {
-        this->value = b.underlying();
+        this->_value = b.underlying();
         return *this;
       }
 

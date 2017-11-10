@@ -9,10 +9,23 @@
 
 #include <experimental/fundamental/v2/config.hpp>
 
+#include <experimental/fundamental/v3/strong/strong_type.hpp>
+#include <experimental/fundamental/v3/strong/underlying_type.hpp>
+#include <experimental/fundamental/v3/strong/mixins/additive.hpp>
+#include <experimental/fundamental/v3/strong/mixins/comparable.hpp>
+#include <experimental/fundamental/v3/strong/mixins/integer_multiplicative.hpp>
+#include <experimental/fundamental/v3/strong/mixins/hashable.hpp>
+#include <experimental/fundamental/v3/strong/mixins/streamable.hpp>
+#include <experimental/fundamental/v3/strong/mixins/ordinal.hpp>
+
+#include <experimental/meta/v1/rebind.hpp>
+#include <experimental/type_traits.hpp>
+
+#include <experimental/ordinal.hpp>
+
 #include <ratio>
 #include <chrono>
 #include <limits>
-#include <experimental/ordinal.hpp>
 
 namespace std
 {
@@ -40,17 +53,20 @@ namespace chrono
   //!   using weekday = modulo<days,   weeks,    std::uint8_t>; //7
   //! @endcode
 
-  //fixme:: Couldn't the representation be deduced from the cardinality?
+  // todo: Couldn't the representation be deduced from the cardinality?
+  // todo: define it using strong_type and mixins: This will need to define modulo arithmetic mixins.
   template <class Duration, class SuperDuration, class Rep>
-  class modulo final
-  {
-      Rep m_value;
+  struct modulo final
+      : strong_type<modulo<Duration, SuperDuration, Rep>, Rep>
+      , mixin::comparable<modulo<Duration, SuperDuration, Rep>>
+      , mixin::increase_base<modulo<Duration, SuperDuration, Rep>>
+      , mixin::decrease_base<modulo<Duration, SuperDuration, Rep>>
 
+  {
   public:
-      //fixme: shouldn't the representation be unsigned?
-      //fixme: shouldn't the representation be able to represent all the values in 0..cardinal?
-      //fixme: shouldn't the representation of the durations be integral?
-      // Otherwise we need to upcast it before increasing
+      static_assert(std::is_unsigned<Rep>::value, "Representation must be unsigned");
+      static_assert(std::is_integral<typename Duration::rep>::value, "Duration representation must be integral");
+      static_assert(std::is_integral<typename SuperDuration::rep>::value, "SuperDuration representation must be integral");
       using period = typename ratio_divide<typename SuperDuration::period, typename Duration::period>::type;
       static_assert(period::den==1, "SuperDuration must be a multiple of Duration");
       static const constexpr intmax_t cardinal = period::num;
@@ -60,56 +76,71 @@ namespace chrono
       using super_duration_t = SuperDuration;
       using rep = Rep;
 
+      using base_type = strong_type<modulo<Duration, SuperDuration, Rep>, Rep>;
+      using base_type::base_type;
+
+      template <class UT2>
+      using rebind = modulo<Duration, SuperDuration, UT2>;
+
+
       explicit constexpr modulo() = default;
+      modulo(modulo const&) = default;
+      modulo(modulo &&) = default;
 
       //! @par Pre-condition:
       //!   v is in the range [0,cardinal)
       //! @par Effects:<br> constructs a modulo from its representations
       constexpr explicit modulo(Rep v)
-          : m_value(v)
+          : base_type(v)
       {}
 
       //! @par Requires:<br> is_convertible<Rep2, Rep>
       //! @par Effects:<br> constructs a modulo converting the representations
-      template <class Rep2>
+      template <class Rep2
+      //, typename = enable_if
+      >
       constexpr modulo(modulo<Duration, SuperDuration, Rep2> const& v)
-          : m_value(static_cast<rep>(v.count()))
+          : base_type(static_cast<rep>(v.count()))
       {}
 
       //! @par Effects:<br> constructs a modulo doing the modulo of the representation
       constexpr explicit modulo(duration_t v)
-          : m_value(static_cast<rep>(v.count()) % cardinal)
+          : base_type(static_cast<rep>(v.count()) % cardinal)
       {}
+
+      // assignment
+      modulo& operator=(modulo const&) = default;
+      modulo& operator=(modulo &&) = default;
 
       //! @par Returns:<br> conversion to duration
       constexpr explicit operator duration_t() const
       {
-          return duration_t(this->m_value);
+          return duration_t(count());
       }
       constexpr duration_t to_duration() const
       {
-          return duration_t(this->m_value);
+          return duration_t(count());
       }
 
       //! @par Returns:<br> conversion to the representation
       constexpr explicit operator Rep() const noexcept
       {
-          return m_value;
+          return this->underlying();
       }
       constexpr Rep value() const noexcept
       {
-          return m_value;
+          return this->underlying();
       }
       constexpr Rep count() const noexcept
       {
-          return m_value;
+          return this->underlying();
       }
 
       //! @par Returns:
       //!   0 <= count() && count() < cardinal
-      bool valid() const
+      constexpr bool valid() const
       {
-          return m_value >= 0 && m_value < cardinal;
+          return count() >= 0 && count() < cardinal;
       }
 
       template <class OSTREAM>
@@ -121,56 +152,52 @@ namespace chrono
 
       //! @par Returns:
       //!   *this.
-      constexpr modulo operator+() const noexcept
-      {
-          return *this;
-      }
+//      constexpr modulo operator+() const noexcept
+//      {
+//          return *this;
+//      }
       //! @par Returns:<br> modulo{-Rep(*this)}.
+      // modulo arithmetic
       constexpr modulo operator-() const noexcept
       {
-          return modulo(cardinal - m_value);
+          return modulo(cardinal - count());
       }
 
-      //! @par Effects: <br>If m_value < cardinal, ++m_value. Otherwise sets m_value to 0.
+      //! @par Effects: <br>If count() < cardinal, ++_backdoor()._underlying(). Otherwise sets _backdoor()._underlying() to 0.
       //! @par Returns:<br> *this.
+      // modulo arithmetic
       JASEL_MUTABLE_CONSTEXPR modulo& operator++() noexcept
       {
-          if (m_value == cardinal-1)
-              m_value = 0;
+          if (this->_backdoor()._underlying() == cardinal-1)
+              this->_backdoor()._underlying() = 0;
           else
-              ++m_value;
+              ++this->_backdoor()._underlying();
           return *this;
       }
 
       //! @par Effects: <br>++(*this).
       //! @par Returns:<br> Returns: A copy of *this as it existed on entry to this member function.
-      JASEL_MUTABLE_CONSTEXPR modulo operator++(int) noexcept
-      {
-          auto tmp(*this); ++(*this);
-          return tmp;
-      }
+      // JASEL_MUTABLE_CONSTEXPR modulo operator++(int) noexcept;
 
-      //! @par Effects: <br>If m_value > 0, --m_value. Otherwise sets m_value to cardinal.
+      //! @par Effects: <br>If _backdoor()._underlying() > 0, --_backdoor()._underlying(). Otherwise sets _backdoor()._underlying() to cardinal.
       //! @par Returns:<br> *this.
+      // modulo arithmetic
       JASEL_MUTABLE_CONSTEXPR modulo& operator--() noexcept
       {
-          if (m_value == 0)
-              m_value = cardinal;
+          if (this->_backdoor()._underlying() == 0)
+              this->_backdoor()._underlying() = cardinal;
           else
-              --m_value;
+              --this->_backdoor()._underlying();
           return *this;
       }
 
       //! @par Effects: <br>--(*this).
       //! @par Returns:<br> Returns: A copy of *this as it existed on entry to this member function.
-      JASEL_MUTABLE_CONSTEXPR modulo operator--(int) noexcept
-      {
-          auto tmp(*this); --(*this);
-          return tmp;
-      }
+      // JASEL_MUTABLE_CONSTEXPR modulo operator--(int) noexcept;
 
       //! @par Effects: <br>*this = *this + d.
       //! @par Returns:<br> *this.
+      // modulo arithmetic
       JASEL_MUTABLE_CONSTEXPR modulo& operator+=(const duration_t& d) noexcept
       {
           *this = *this + d;
@@ -178,60 +205,37 @@ namespace chrono
       }
       //! @par Effects: <br>*this = *this - d.
       //! @par Returns:<br> *this.
+      // modulo arithmetic
       JASEL_MUTABLE_CONSTEXPR modulo& operator-=(const duration_t& d) noexcept
       {
           *this = *this - d;
           return *this;
       }
 
-      //! @par Returns:<br> Rep{x} == Rep{y}.
-      friend constexpr bool operator==(const modulo& x, const modulo& y) noexcept
-      {
-          return x.count() == y.count();
-      }
-      //! @par Returns:<br> Rep{x} != Rep{y}.
-      friend constexpr bool operator!=(const modulo& x, const modulo& y) noexcept
-      {
-          return x.count() != y.count();
-      }
-      //! @par Returns:<br> Rep{x} < Rep{y}.
-      friend constexpr bool operator< (const modulo& x, const modulo& y) noexcept
-      {
-          return x.count() < y.count();
-      }
-      //! @par Returns:<br> Rep{x} > Rep{y}.
-      friend constexpr bool operator> (const modulo& x, const modulo& y) noexcept
-      {
-          return x.count() > y.count();
-      }
-      //! @par Returns:<br> Rep{x} <= Rep{y}.
-      friend constexpr bool operator<=(const modulo& x, const modulo& y) noexcept
-      {
-          return x.count() <= y.count();
-      }
-      //! @par Returns:<br> Rep{x} >= Rep{y}.
-      friend constexpr bool operator>=(const modulo& x, const modulo& y) noexcept
-      {
-          return x.count() >= y.count();
-      }
-
       //! @par Returns:<br> A modulo constructed by the addition of the respective representation.
+      //! e.g. hour + hours -> hour
+      // modulo arithmetic
       friend constexpr modulo  operator+(const modulo&  x, const duration_t& y) noexcept
       {
           return modulo((x.count() + y.count()) % cardinal);
       }
       //! @par Returns:<br> y + x.
+      //! e.g. hours + hour -> hour
+      // modulo arithmetic
       friend constexpr modulo  operator+(const duration_t& x,  const modulo& y) noexcept
       {
           return y + x;
       }
       //! @par Returns:<br> A modulo constructed by the difference of the respective representation.
+      //! e.g. hour - hours -> hour
+      // modulo arithmetic
       friend constexpr modulo  operator-(const modulo&  x, const duration_t& y) noexcept
       {
           //return modulo((cardinal + x.count() - y.count()) % cardinal);
           return x + -y;
       }
       //! @par Returns:<br> The difference in duration_t between the respective durations.
+      //! e.g. hour + hour -> hours
       friend constexpr duration_t operator-(const modulo& x,  const modulo& y) noexcept
       {
           return x.count() - y.count();
@@ -252,11 +256,11 @@ namespace chrono
   // hour + minute?
   // frame_number + subframe_number?
   // What will be the result? x_subframe_number. Can it be deduced?
-  // frame_number -> frames
-  // subframe_number -> subframes
-  // common_type subframes
-  // so the result must be modulo<subframes, XXX, RRR>
-  // XXX must be the super duration => frames
+  // frame_number -> frames/x_frames
+  // subframe_number -> subframes/frames
+  // so the result must be modulo<SUB, SUPER, RRR>
+  // SUB must be the common_type of sub duration => subframes
+  // SUPER must be the the other type of the common_type of the super durations => x_frames
   // RRR must be the representation able to store the value
 
   // HH's Date library uses hour/minute/second to concatenate relative units
@@ -264,12 +268,12 @@ namespace chrono
 
   // bi_frame_number + subframe_number?
   // What will be the result? bi_subframe_number. Can it be deduced?
-  // by_frame_number -> bi_frames
-  // subframe_number -> subframes
-  // common_type subframes
-  // so the result must be modulo<subframes, XXX, RRR>
-  // XXX must be the super duration => bi_frames
-  // RRR must be the
+  // bi_frame_number -> frames/bi_frames
+  // subframe_number -> subframes/frames
+  // so the result must be modulo<SUB, SUPER, RRR>
+  // SUB must be the common_type of sub duration => subframes
+  // SUPER must be the the other type of the common_type of the super durations => bi_frames
+  // RRR must be the representation able to store the value
 
   // frame_number + bi_subframe_number?
   // What will be the result? bi_subframe_number. Can it be deduced?

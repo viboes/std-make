@@ -95,8 +95,8 @@ inline namespace fundamental_v3
       constexpr enum_wrapper() noexcept = default;
       constexpr enum_wrapper(enum_type v) noexcept : base_type(UT(v)) {}
 
-      enum_type to_enum() const noexcept { return enum_type(this->value); }
-      explicit operator enum_type() const noexcept { return enum_type(this->value); }
+      enum_type to_enum() const noexcept { return enum_type(this->_value); }
+      explicit operator enum_type() const noexcept { return enum_type(this->_value); }
 
   };
 

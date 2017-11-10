@@ -32,17 +32,17 @@ inline  namespace fundamental_v3
 
       //! explicit conversion from the underlying type
       //! @par Effects Constructs a wrapper from its underlying type
-      explicit constexpr wrapper(underlying_type v): value(v) {}
+      explicit constexpr wrapper(underlying_type v): _value(v) {}
 
       //! underlying value access
       //! @par Returns the underlying value
       constexpr underlying_type underlying() const noexcept
-      { return value; }
+      { return _value; }
 
 
     protected:
       //! the wrapped value
-      underlying_type value;
+      underlying_type _value;
     };
 
 #if 0
@@ -85,7 +85,7 @@ inline  namespace fundamental_v3
 
       //! @par Returns the underlying value
       constexpr operator UT () const noexcept
-      { return this->value;}
+      { return this->_value;}
     };
 
     //! protected_wrapper is a wrapper that provides explicit conversion to the underlying type
@@ -102,7 +102,7 @@ inline  namespace fundamental_v3
 
       //! @par Returns the underlying value
       explicit constexpr operator UT () const noexcept
-      { return this->value;}
+      { return this->_value;}
     };
 
     //! private_wrapper is a wrapper that provides no conversion to the underlying type

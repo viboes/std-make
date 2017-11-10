@@ -47,12 +47,12 @@ inline  namespace fundamental_v3
 
       //! explicit conversion from a base const class to the @c Final class.
       template<typename F>
-      static Final const& _final(F const* f)  {
+      static constexpr Final const& _final(F const* f)  {
         return static_cast<Final const&>(*f);
       }
       //! explicit conversion from a base class to the @c Final class.
       template<typename F>
-      static Final& _final(F* f) {
+      static constexpr Final& _final(F* f) {
         return static_cast<Final&>(*f);
       }
 
@@ -68,7 +68,7 @@ inline  namespace fundamental_v3
         //! explicit conversion to the underlying type.
         //template<typename F>
         JASEL_CXX14_CONSTEXPR underlying_type& _underlying() const {
-          return that->value;
+          return that->_value;
         }
       private:
         Final* that;
@@ -81,7 +81,7 @@ inline  namespace fundamental_v3
         //! explicit conversion to the underlying type.
         //template<typename F>
         JASEL_CXX14_CONSTEXPR underlying_type const& _underlying() const {
-          return that->value;
+          return that->_value;
         }
       private:
         Final const* that;
@@ -89,17 +89,17 @@ inline  namespace fundamental_v3
 
     public:
       template<typename F>
-      static const_backdoor _backdoor(F const* f)  {
+      static constexpr const_backdoor _backdoor(F const* f)  {
         return const_backdoor(_final(f));
       }
-      const_backdoor _backdoor() const {
+      constexpr const_backdoor _backdoor() const {
         return const_backdoor(_final(this));
       }
       template<typename F>
-      static backdoor _backdoor(F* f) {
+      static constexpr backdoor _backdoor(F* f) {
         return backdoor(_final(f));
       }
-      backdoor _backdoor() {
+      constexpr backdoor _backdoor() {
         return backdoor(_final(this));
       }
     };
