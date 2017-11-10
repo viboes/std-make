@@ -24,31 +24,69 @@
 namespace stdex = std::experimental;
 
 template <class M>
-using currency_t = typename M::currency_type;
+using currency_t = typename M::domain::currency_type;
 
-template <class Currency, class Rep = double>
-struct money;
+template<class Currency>
+struct money_domain
+{
+    using currency_type =  Currency;
+    template <class T, class C, class U
+          , typename std::enable_if <
+              std::conjunction <
+                std::is_convertible<U, T>, // no overflow
+                std::disjunction<
+                      std::is_floating_point<T>,
+                      std::conjunction<
+                          //std::integral_constant<bool, std::ratio_divide<P, Period>::den == 1>,
+                          std::true_type,
+                          std::negation< std::is_floating_point<U> >
+                      >
+                  >
+              >::value
+          >::type* = nullptr
+    >
+    static T inter_domain_convert(money_domain<C>, U const& u)
+    {
+        return T(currency::convert<C,Currency>(u));
+    }
+
+    template <class T, class C, class U>
+    static T inter_domain_cast(money_domain<C>, U const& u)
+    {
+        return T(currency::convert<C,Currency>(u));
+    }
+
+    template <class T, class U
+          , typename std::enable_if <
+              std::conjunction <
+                std::is_convertible<U, T>,
+                std::disjunction<
+                      std::is_floating_point<T>,
+                      std::negation< std::is_floating_point<U> >
+                >
+              >::value
+          >::type* = nullptr
+          >
+    static T intra_domain_convert(U const& u)
+    {
+        return T(u);
+    }
+};
 
 namespace std
 {
-template <class Currency, class UT1, class UT2>
-struct common_type<money<Currency, UT1>, money<Currency, UT2>>
-{
- using type = money<Currency,common_type_t< UT1, UT2>>;
-};
+
 namespace experimental
 {
-namespace mixin
-{
-template <class Currency, class UT1, class UT2>
-struct is_compatible_with<money<Currency, UT1>, money<Currency, UT2>> : true_type {};
+namespace mixin {
+  template <class Currency>
+  struct is_compatible_with<money_domain<Currency>, money_domain<Currency>> : std::true_type {};
 }
-namespace meta
-{
-template <class Currency, class UT1, class UT2>
-struct rebind<money<Currency, UT1>, UT2> : id<money<Currency, UT2>> {};
+
+template <class Currency>
+struct domain_converter<money_domain<Currency>> : money_domain<Currency>  {  };
 }
-}
+
 }
 
 // fixme: Should be Rep, Currency?
@@ -56,58 +94,8 @@ struct rebind<money<Currency, UT1>, UT2> : id<money<Currency, UT2>> {};
 //      Don't having a period, forces almost to work with double.
 //      Having a period allows to work with integers most of the time
 
-template <class Currency, class Rep>
-struct money
-    : stdex::strong_type<money<Currency, Rep>, Rep>
-    , stdex::mixin::additive_with_if<money<Currency, Rep>>
-    , stdex::mixin::comparable<money<Currency, Rep>>
-    , stdex::mixin::integer_multiplicative_with<money<Currency, Rep>, Rep>
-    , stdex::mixin::modable<money<Currency, Rep>>
-    , stdex::mixin::hashable<money<Currency, Rep>>
-    //, mixin::streamable<strong_counter<Domain, UT>>
-    //, mixin::ordinal<money<Currency, Rep>>
-
-{
-    using base_type = stdex::strong_type<money<Currency, Rep>, Rep>;
-    using base_type::base_type;
-
-    using currency_type = Currency;
-
-    template <class UT2>
-    using rebind = money<Currency, UT2>;
-
-    money() = default;
-
-    // todo: Add template <class Rep2> as duration
-    explicit constexpr money(Rep v) : base_type(v) {}
-
-    constexpr money(money const& m) = default;
-
-    // fixme: Should we restrict it as do duration and require a money_cast?
-    // or just define an explicit constructor as does pair.
-    template <class C, class R>
-    constexpr money(money<C, R> m)
-    : base_type (currency::convert<C, Currency>(m.count()))
-    {
-    }
-    constexpr money& operator=(money const& m) = default;
-#if 0
-    template <class C, class R>
-    constexpr money& operator=(money<C, R> m)
-    {
-        rep = currency::convert<C, Currency>(m.count());
-        return *this;
-    }
-#endif
-
-    constexpr Rep count() const noexcept
-        { return this->underlying(); }
-
-    //constexpr Currency currency() const noexcept { return Currency{}; }
-
-    // todo: add zero, min, max
-
-};
+template <class Currency, class Rep=double>
+using money = stdex::strong_counter<money_domain<Currency>, Rep>;
 
 namespace money_expr
 {
