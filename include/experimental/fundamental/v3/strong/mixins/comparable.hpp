@@ -8,6 +8,7 @@
 #define JASEL_FUNDAMENTAL_V3_STRONG_MIXIN_COMPARABLE_HPP
 
 #include <experimental/fundamental/v3/strong/mixins/equality_comparable.hpp>
+#include <type_traits>
 
 namespace std
 {
@@ -37,6 +38,7 @@ namespace std
       template <class Final, class Other>
       struct comparable_with : comparable<Final>, equality_comparable_with<Final, Other>
       {
+        static_assert(is_same<Final, Other>::value==false, "Final and Other must be different");
         //!@{
         //! relational operators
         //!

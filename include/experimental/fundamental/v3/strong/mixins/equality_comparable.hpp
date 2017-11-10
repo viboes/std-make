@@ -9,6 +9,7 @@
 
 #include <experimental/fundamental/v3/strong/mixins/is_compatible_with.hpp>
 #include <experimental/meta.hpp>
+#include <type_traits>
 
 namespace std
 {
@@ -32,6 +33,7 @@ namespace std
       template <class Final, class Other>
       struct equality_comparable_with : equality_comparable<Final>
       {
+        static_assert(is_same<Final, Other>::value==false, "Final and Other must be different");
         //! Forwards to the underlying value
         friend constexpr bool operator==(Final const& x, Other const& y) noexcept
         { return x._backdoor()._underlying() == y._backdoor()._underlying();}
