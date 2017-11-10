@@ -23,9 +23,6 @@ namespace std
       template <class T, class U>
       struct is_compatible_with : false_type {};
 
-      //template <class T>
-      //struct is_compatible_with<T,T> : true_type {};
-
     }
   }
 }
