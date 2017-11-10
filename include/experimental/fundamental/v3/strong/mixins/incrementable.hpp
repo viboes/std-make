@@ -21,26 +21,32 @@ namespace std
       template <class Final>
       struct forward_incrementable
       {
-        friend JASEL_MUTABLE_CONSTEXPR Final operator++(Final& x) noexcept
+        friend JASEL_MUTABLE_CONSTEXPR Final& operator++(Final& x) noexcept
         {
-          return Final(++x._backdoor()._underlying());
+            ++x._backdoor()._underlying();
+            return x;
         }
         friend JASEL_MUTABLE_CONSTEXPR Final operator++(Final& x, int) noexcept
         {
-          return Final(x._backdoor()._underlying()++);
+            Final tmp(x);
+            ++x;
+            return tmp;
         }
       };
 
       template <class Final>
       struct bidirectional_incrementable : forward_incrementable<Final>
       {
-        friend JASEL_MUTABLE_CONSTEXPR Final operator--(Final& x ) noexcept
+        friend JASEL_MUTABLE_CONSTEXPR Final& operator--(Final& x ) noexcept
         {
-          return Final(--x._backdoor()._underlying());
+            --x._backdoor()._underlying();
+            return x;
         }
         friend JASEL_MUTABLE_CONSTEXPR Final operator--(Final& x, int) noexcept
         {
-          return Final(x._backdoor()._underlying()--);
+            Final tmp(x);
+            --x;
+            return tmp;
         }
       };
 
