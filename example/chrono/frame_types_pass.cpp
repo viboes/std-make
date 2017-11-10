@@ -32,7 +32,7 @@ using slot_number       = stdex::chrono::modulo<slots,     subframes,  uint8_t>;
 using symbol_number     = stdex::chrono::modulo<symbols,   slots,      uint8_t>; //7
 using bi_frame_number    = stdex::chrono::modulo<frames,    bi_frames,   uint8_t>; //2
 
-using h_subframe_number = stdex::chrono::modulo<subframes, h_frames, uint16_t>; // 10*1240*1024
+using h_subframe_number = stdex::chrono::modulo<subframes, h_frames, uint32_t>; // 10*1240*1024
 using x_subframe_number = stdex::chrono::modulo<subframes, x_frames, uint16_t>; // 10*1240
 using bi_subframe_number = stdex::chrono::modulo<subframes, bi_frames, uint8_t>; // 10*2
 using bi_symbol_number = stdex::chrono::modulo<symbols, bi_slots, uint8_t>;      // 7*2

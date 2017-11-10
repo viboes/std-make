@@ -20,7 +20,7 @@ namespace experimental
 {
 inline  namespace fundamental_v3
 {
-
+// todo: Generalize to any counter that has associated a period and a representation.
 namespace chrono
 {
 
@@ -47,12 +47,14 @@ namespace chrono
       Rep m_value;
 
   public:
-      //fixme:: shouldn't the representation be unsigned?
-      //fixme:: shouldn't the representation be able to represent all the values in 0..cardinal?
+      //fixme: shouldn't the representation be unsigned?
+      //fixme: shouldn't the representation be able to represent all the values in 0..cardinal?
+      //fixme: shouldn't the representation of the durations be integral?
       // Otherwise we need to upcast it before increasing
       using period = typename ratio_divide<typename SuperDuration::period, typename Duration::period>::type;
       static_assert(period::den==1, "SuperDuration must be a multiple of Duration");
       static const constexpr intmax_t cardinal = period::num;
+      static_assert(period::num <= numeric_limits<Rep>::max(), "The number of elements must be smaller than the max of the representation");
 
       using duration_t = Duration;
       using super_duration_t = SuperDuration;
