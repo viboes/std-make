@@ -60,6 +60,15 @@ namespace std
       };
 
     }
+    namespace meta_mixin
+    {
+      template <class DiffType>
+      struct random_incrementable
+      {
+        template <class Final>
+        using type = mixin::random_incrementable<Final, DiffType>;
+      };
+    }
   }
 }
 }

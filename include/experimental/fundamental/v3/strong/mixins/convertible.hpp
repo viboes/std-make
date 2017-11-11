@@ -38,6 +38,15 @@ namespace std
       };
 
     }
+    namespace meta_mixin
+    {
+    template <class T>
+    struct explicit_convertible_to
+    {
+      template <class Final>
+      using type = mixin::explicit_convertible_to<Final, T>;
+    };
+    }
   }
 }
 }

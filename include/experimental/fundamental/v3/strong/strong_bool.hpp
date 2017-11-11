@@ -91,13 +91,14 @@ inline namespace fundamental_v3
 
   template <class Tag, class Bool = bool>
   struct strong_bool final
-     : strong_type<strong_bool<Tag, Bool>, Bool>
-     , mixin::comparable<strong_bool<Tag, Bool>>
-     , mixin::explicit_convertible_to<strong_bool<Tag, Bool>, bool>
-     , mixin::logical<strong_bool<Tag, Bool>>
-     , mixin::hashable<strong_bool<Tag, Bool>>
-     , mixin::streamable<strong_bool<Tag, Bool>>
-     , mixin::ordinal<strong_bool<Tag, Bool>>
+     : strong_type<strong_bool<Tag, Bool>, Bool>, mixins<strong_bool<Tag, Bool>
+         , meta_mixin::comparable<>
+         , meta_mixin::explicit_convertible_to<bool>
+         , meta_mixin::logical<>
+         , meta_mixin::hashable<>
+         , meta_mixin::streamable<>
+         , meta_mixin::ordinal<>
+     >
   {
       using base_type = strong_type<strong_bool<Tag, Bool>, Bool>;
       using base_type::base_type;

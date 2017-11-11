@@ -59,10 +59,10 @@ inline namespace fundamental_v3
     // this has the drawback to repeat strong_id<Tag, UT> once and repeat the base_type :(
     template <class Tag, class UT = int>
     struct strong_id final : strong_type<strong_id<Tag, UT>, UT>, mixins<strong_id<Tag, UT>
-        , meta_mixin::comparable
-        , meta_mixin::hashable
-        , meta_mixin::streamable
-        , meta_mixin::ordinal
+        , meta_mixin::comparable<>
+        , meta_mixin::hashable<>
+        , meta_mixin::streamable<>
+        , meta_mixin::ordinal<>
       >
     {
         using base_type = strong_type<strong_id<Tag, UT>, UT>;
@@ -71,33 +71,33 @@ inline namespace fundamental_v3
 
 #endif
 #if 0
-      // this has the drawback to repeat all the mixins in the vase_type :(
+      // this has the drawback to repeat all the mixins in the base_type :(
     template <class Tag, class UT = int>
     struct strong_id final : new_class<strong_id<Tag, UT>, UT
-        , meta_mixin::comparable
-        , meta_mixin::hashable
-        , meta_mixin::streamable
-        , meta_mixin::ordinal
+        , meta_mixin::comparable<>
+        , meta_mixin::hashable<>
+        , meta_mixin::streamable<>
+        , meta_mixin::ordinal<>
         >
     {
         using base_type = new_class<strong_id<Tag, UT>, UT
-            , meta_mixin::comparable
-            , meta_mixin::hashable
-            , meta_mixin::streamable
-            , meta_mixin::ordinal
+            , meta_mixin::comparable<>
+            , meta_mixin::hashable<>
+            , meta_mixin::streamable<>
+            , meta_mixin::ordinal<>
             >;
         using base_type::base_type;
     };
 #endif
 #if 1
-  // This doesn't repeat anything. However we don't have really a new type strong_id, but the Tag it enough to make it different.
+  // This doesn't repeat anything. However we don't have really a new type strong_id, but the Tag is enough to make it different.
   // It has the advantage of avoiding an explicit std::hash specialization.
   template <class Tag, class UT = int>
   using strong_id = new_type<Tag, UT
-      , meta_mixin::comparable
-      , meta_mixin::hashable
-      , meta_mixin::streamable
-      , meta_mixin::ordinal
+      , meta_mixin::comparable<>
+      , meta_mixin::hashable<>
+      , meta_mixin::streamable<>
+      , meta_mixin::ordinal<>
     >;
 #endif
 

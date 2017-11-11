@@ -144,6 +144,15 @@ namespace std
 
       };
     }
+    namespace meta_mixin
+    {
+    template <class Check=mixin::no_check, template <class, class> class Pred=mixin::is_compatible_with>
+    struct bitwise_with_if
+    {
+      template <class Final>
+      using type = mixin::bitwise_with_if<Final, Check, Pred>;
+    };
+    }
   }
 }
 }

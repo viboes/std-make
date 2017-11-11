@@ -59,17 +59,18 @@ inline namespace fundamental_v3
   }
 
   template <class Tag, class UT>
-  struct strong_integral final : strong_type<strong_integral<Tag, UT>, UT>
-    , mixin::additive_with_if<strong_integral<Tag, UT>>
-    , mixin::bitwise_with_if<strong_integral<Tag, UT>>
-    , mixin::comparable_with_if<strong_integral<Tag, UT>>
-    , mixin::integer_multiplicative_with_if<strong_integral<Tag, UT>>
-    , mixin::hashable<strong_integral<Tag, UT>>
-    , mixin::streamable<strong_integral<Tag, UT>>
-    , mixin::ordinal<strong_integral<Tag, UT>>
+  struct strong_integral final : strong_type<strong_integral<Tag, UT>, UT>, mixins<strong_integral<Tag, UT>
+      , meta_mixin::additive_with_if<>
+      , meta_mixin::bitwise_with_if<>
+      , meta_mixin::comparable_with_if<>
+      , meta_mixin::integer_multiplicative_with_if<>
+      , meta_mixin::hashable<>
+      , meta_mixin::streamable<>
+      , meta_mixin::ordinal<>
+  >
   {
-    static_assert(is_integral<UT>::value, "UT must be integral");
-    static_assert(! is_same<UT, bool>::value, "UT cannot be bool");
+      static_assert(is_integral<UT>::value, "UT must be integral");
+      static_assert(! is_same<UT, bool>::value, "UT cannot be bool");
 
       using base_type = strong_type<strong_integral<Tag, UT>, UT>;
       using base_type::base_type;

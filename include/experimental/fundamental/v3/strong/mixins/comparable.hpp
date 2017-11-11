@@ -87,10 +87,17 @@ namespace std
     }
     namespace meta_mixin
     {
+      template <class = void>
       struct comparable
       {
         template <class Final>
         using type = mixin::comparable<Final>;
+      };
+      template <template <class, class> class Pred=mixin::is_compatible_with>
+      struct comparable_with_if
+      {
+        template <class Final>
+        using type = mixin::comparable_with_if<Final, Pred>;
       };
     }
   }

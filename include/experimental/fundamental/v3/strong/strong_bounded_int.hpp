@@ -68,13 +68,14 @@ inline namespace fundamental_v3
 
   template <class Tag, class UT, UT Low, UT High>
   struct strong_bounded_int final
-    : strong_type<strong_bounded_int<Tag, UT, Low, High>, UT>
-    , mixin::additive_with_if<strong_bounded_int<Tag, UT, Low, High>, mixin::check>
-    , mixin::bitwise_with_if<strong_bounded_int<Tag, UT, Low, High>, mixin::check>
-    , mixin::comparable_with_if<strong_bounded_int<Tag, UT, Low, High>>
-    , mixin::integer_multiplicative_with_if<strong_bounded_int<Tag, UT, Low, High>, mixin::check>
-    , mixin::hashable<strong_bounded_int<Tag, UT, Low, High>>
-    , mixin::streamable<strong_bounded_int<Tag, UT, Low, High>>
+    : strong_type<strong_bounded_int<Tag, UT, Low, High>, UT>, mixins<strong_bounded_int<Tag, UT, Low, High>
+        , meta_mixin::additive_with_if<mixin::check>
+        , meta_mixin::bitwise_with_if<mixin::check>
+        , meta_mixin::comparable_with_if<>
+        , meta_mixin::integer_multiplicative_with_if<mixin::check>
+        , meta_mixin::hashable<>
+        , meta_mixin::streamable<>
+    >
   {
       static_assert(is_integral<UT>::value, "UT must be integral");
       static_assert(Low <= High, "Low must be less equal than High");

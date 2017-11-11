@@ -26,6 +26,7 @@ namespace std
     }
     namespace meta_mixin
     {
+      template <class = void>
       struct ordinal
       {
         template <class Final>

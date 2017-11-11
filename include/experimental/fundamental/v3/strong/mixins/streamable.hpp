@@ -55,6 +55,7 @@ inline namespace fundamental_v3
   }
   namespace meta_mixin
   {
+    template <class = void>
     struct streamable
     {
       template <class Final>

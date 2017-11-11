@@ -81,6 +81,15 @@ namespace std
       };
 
     }
+    namespace meta_mixin
+    {
+    template <class Check=mixin::no_check>
+    struct modable
+    {
+      template <class Final>
+      using type = mixin::modable<Final, Check>;
+    };
+    }
   }
 }
 }

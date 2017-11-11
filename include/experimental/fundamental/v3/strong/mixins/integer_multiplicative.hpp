@@ -37,6 +37,21 @@ namespace std
       };
 
     }
+    namespace meta_mixin
+    {
+        template <class Check=mixin::no_check, template <class, class> class Pred=mixin::is_compatible_with>
+        struct integer_multiplicative_with_if
+        {
+          template <class Final>
+          using type = mixin::integer_multiplicative_with_if<Final, Check, Pred>;
+        };
+        template <class UT>
+        struct integer_multiplicative_with
+        {
+          template <class Final>
+          using type = mixin::integer_multiplicative_with<Final, UT>;
+        };
+    }
   }
 }
 }

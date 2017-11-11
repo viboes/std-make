@@ -32,6 +32,7 @@ namespace std
     }
     namespace meta_mixin
     {
+      template <class = void>
       struct hashable
       {
         template <class Final>

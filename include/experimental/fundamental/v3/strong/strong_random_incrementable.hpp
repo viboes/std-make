@@ -43,11 +43,12 @@ inline namespace fundamental_v3
   /// strong_random_incrementable is a strong number with restricted arithmetic close to the pointer arithmetic.
   template <class Tag, class UT, class DiffType>
   struct strong_random_incrementable final
-    : strong_type<strong_random_incrementable<Tag, UT, DiffType>, UT>
-    , mixin::comparable<strong_random_incrementable<Tag, UT, DiffType>>
-    , mixin::random_incrementable<strong_random_incrementable<Tag, UT, DiffType>, DiffType>
-    , mixin::hashable<strong_random_incrementable<Tag, UT, DiffType>>
-    , mixin::streamable<strong_random_incrementable<Tag, UT, DiffType>>
+    : strong_type<strong_random_incrementable<Tag, UT, DiffType>, UT>, mixins<strong_random_incrementable<Tag, UT, DiffType>
+        , meta_mixin::comparable<>
+        , meta_mixin::random_incrementable<DiffType>
+        , meta_mixin::hashable<>
+        , meta_mixin::streamable<>
+      >
   {
       // associated types
       using domain = Tag;

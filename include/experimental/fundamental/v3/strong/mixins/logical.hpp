@@ -27,6 +27,15 @@ inline namespace fundamental_v3
         friend constexpr Final operator!(Final x)  noexcept { return Final(! x.underlying()); }
     };
   }
+  namespace meta_mixin
+  {
+  template <class =void>
+  struct logical
+  {
+    template <class Final>
+    using type = mixin::logical<Final>;
+  };
+  }
 }
 }
 }
