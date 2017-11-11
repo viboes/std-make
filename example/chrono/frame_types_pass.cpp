@@ -119,10 +119,13 @@ public:
     /// pre-condition: sfn is valid
     constexpr subframe_number subframe() const {return sfn;}
     /// pre-condition: fn and sfn are valid
-    constexpr x_subframe_number x_subframe() const { return make_x_subframe_number(fn, sfn); }
 
-    constexpr operator x_subframe_number() const { return make_x_subframe_number(fn, sfn); }
-    constexpr operator subframes() const { return subframes(frames(fn)) + subframes(sfn); }
+    constexpr subframes get_duration() const { return frames(fn) + subframes(sfn); }
+    constexpr x_subframe_number get_modulo() const { return x_subframe_number(get_duration()); }
+
+    constexpr operator subframes() const { return get_duration(); }
+    constexpr x_subframe_number x_subframe() const { return get_modulo(); }
+    constexpr operator x_subframe_number() const { return get_modulo(); }
 
     // pre-condition 0 <= xsfn.frame() + df < 1024
     friend constexpr x_subframe_tuple operator+(x_subframe_tuple const& xsfn, const frames& df) noexcept
@@ -143,7 +146,7 @@ public:
 
     friend constexpr subframes operator-(x_subframe_tuple const& x, const x_subframe_tuple& y) noexcept
     {
-        return subframes(x) + subframes(y);
+        return subframes(x) - subframes(y);
     }
 
     // pre-condition 0 <= xsfn.subframes() + dsf < 1024*10
@@ -153,7 +156,7 @@ public:
         auto dsfni = xsfn.sfn.count() + dsf.count();
         auto dfni = ((dsfni >= 0)  ? dsfni : dsfni-cardinal+1 ) / cardinal;
         dsfni = dsfni - dfni * cardinal;
-        return x_subframe_tuple( xsfn.fn + frames(dfni), subframe_number(0) + subframes(dsfni) );
+        return x_subframe_tuple( xsfn.fn + frames(dfni), subframe_number(subframes(dsfni)) );
     }
     // pre-condition 0 <= xsfn.subframes() + dsf < 1024*10
     friend JASEL_CXX14_CONSTEXPR x_subframe_tuple operator+(const subframes& dsf, x_subframe_tuple const& xsfn) noexcept
@@ -417,6 +420,14 @@ int main()
       auto x2 = xsfn--;
       BOOST_TEST(x2.x_subframe().count()==66);
       BOOST_TEST(xsfn.x_subframe().count()==65);
+
+  }
+  {
+      frame_number fn {1};
+      subframe_number sfn {2};
+      x_subframe_tuple xsfn = fn/sfn;
+      auto x = xsfn - xsfn;
+      BOOST_TEST(x.count()==0);
 
   }
 
