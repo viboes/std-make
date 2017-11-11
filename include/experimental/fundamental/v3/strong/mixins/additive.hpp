@@ -69,11 +69,6 @@ namespace std
       template <class Final>
       struct increase_base
       {
-        friend constexpr Final operator+(Final const&x)  noexcept
-        {
-          return x;
-        }
-
         friend JASEL_MUTABLE_CONSTEXPR Final operator++(Final& x, int) noexcept
         {
           Final tmp(x);
@@ -82,15 +77,25 @@ namespace std
         }
 
       };
-      template <class Final>
+      template <class Final, class Check=no_check>
       struct addable_base : increase_base<Final>
       {
+        friend constexpr Final operator+(Final const&x)  noexcept
+        {
+          return x;
+        }
+
         friend JASEL_MUTABLE_CONSTEXPR Final& operator++(Final& x) noexcept
         {
           ++x._backdoor()._underlying();
           return x;
         }
       };
+      template <class Final>
+      struct addable_base<Final, void> : increase_base<Final>
+      {
+      };
+
       template <class Final>
       struct decrease_base
       {
@@ -102,7 +107,7 @@ namespace std
         }
 
       };
-      template <class Final>
+      template <class Final, class Check=no_check>
       struct substractable_base : decrease_base<Final>
       {
         friend constexpr Final operator-(Final const&x)  noexcept
@@ -116,10 +121,14 @@ namespace std
         }
       };
       template <class Final>
-      struct additive_base : addable_base<Final>, substractable_base<Final>      {      };
+      struct substractable_base<Final, void> : decrease_base<Final>
+      {
+      };
+      template <class Final, class Check=no_check>
+      struct additive_base : addable_base<Final, Check>, substractable_base<Final, Check>      {      };
 
       template <class Final, class Check=no_check>
-      struct addable_assign : addable_base<Final>
+      struct addable_assign : addable_base<Final, Check>
       {
         // todo These should be moved to homogeneous when I'll add heterogeneous
         //! Forwards to the underlying value
@@ -132,7 +141,16 @@ namespace std
 
       //arithmetic assignment when checked relies in the assignment of the result of the arithmetic operation
       template <class Final>
-      struct addable_assign<Final, check> : addable_base<Final>
+      struct addable_assign<Final, check> : addable_base<Final, check>
+      {
+        friend JASEL_MUTABLE_CONSTEXPR Final& operator+=(Final& x, Final const& y) noexcept
+        {
+          x = x + y;
+          return x;
+        }
+      };
+      template <class Final>
+      struct addable_assign<Final, void> : addable_base<Final, void>
       {
         friend JASEL_MUTABLE_CONSTEXPR Final& operator+=(Final& x, Final const& y) noexcept
         {
@@ -142,7 +160,7 @@ namespace std
       };
 
       template <class Final, class Check=no_check>
-      struct substractable_assign : substractable_base<Final>
+      struct substractable_assign : substractable_base<Final, Check>
       {
         friend JASEL_MUTABLE_CONSTEXPR Final& operator-=(Final& x, Final const& y) noexcept
         {
@@ -154,7 +172,16 @@ namespace std
 
       //arithmetic assignment when checked relies in the assignment of the result of the arithmetic operation
       template <class Final>
-      struct substractable_assign<Final, check> : substractable_base<Final>
+      struct substractable_assign<Final, check> : substractable_base<Final, check>
+      {
+        friend JASEL_MUTABLE_CONSTEXPR Final& operator-=(Final& x, Final const& y) noexcept
+        {
+          x = x - y;
+          return x;
+        }
+      };
+      template <class Final>
+      struct substractable_assign<Final, void> : substractable_base<Final, void>
       {
         friend JASEL_MUTABLE_CONSTEXPR Final& operator-=(Final& x, Final const& y) noexcept
         {
