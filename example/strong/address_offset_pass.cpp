@@ -98,6 +98,28 @@ int main()
     a -=  o;
     BOOST_TEST_EQ(a.underlying() , 0);
   }
+  {
+    address a {4};
+    offset o {4};
+    advance(a,o);
+    BOOST_TEST_EQ(a.underlying() , 8);
+  }
+  {
+    address a {4};
+    address b {4};
+    auto x =  distance(a,b);
+    BOOST_TEST_EQ(x.underlying() , 0);
+  }
+  {
+    address a {4};
+    auto x =  next(a);
+    BOOST_TEST_EQ(x.underlying() , 5);
+  }
+  {
+    address a {4};
+    auto x =  prev(a);
+    BOOST_TEST_EQ(x.underlying() , 3);
+  }
     return ::boost::report_errors();
 }
 

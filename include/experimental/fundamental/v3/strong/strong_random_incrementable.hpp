@@ -59,6 +59,32 @@ inline namespace fundamental_v3
       using base_type::base_type;
   };
 
+    // algorithms specialization
+
+    template <class Tag, class UT, class DiffType>
+    inline void advance(strong_random_incrementable<Tag, UT, DiffType>& index, const DiffType& dist)
+    {
+          index += dist;
+    }
+
+    template <class Tag, class UT, class DiffType>
+    inline DiffType distance(strong_random_incrementable<Tag, UT, DiffType> const& a, strong_random_incrementable<Tag, UT, DiffType> const& b)
+    {
+          return a - b;
+    }
+
+
+    template <class Tag, class UT, class DiffType>
+    constexpr strong_random_incrementable<Tag, UT, DiffType> next(const strong_random_incrementable<Tag, UT, DiffType>& index, const DiffType& dist = DiffType(1))
+    {
+        return index + dist;
+    }
+
+    template <class Tag, class UT, class DiffType>
+    constexpr strong_random_incrementable<Tag, UT, DiffType> prev(const strong_random_incrementable<Tag, UT, DiffType>& index, const DiffType& dist = DiffType(1))
+    {
+        return index - dist;
+    }
 }
 }
 
