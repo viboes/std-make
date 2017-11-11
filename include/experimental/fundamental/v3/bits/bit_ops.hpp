@@ -105,12 +105,12 @@ inline namespace fundamental_v3
       return __builtin_clz(x);
 
     }
-    inline constexpr int countl_zero(unsigned long x) noexcept
+    constexpr int countl_zero(unsigned long x) noexcept
     {
       return __builtin_clzl(x);
 
     }
-    inline constexpr int countl_zero(unsigned long long x) noexcept
+    constexpr int countl_zero(unsigned long long x) noexcept
     {
       return __builtin_clzll(x);
 
@@ -128,11 +128,11 @@ inline namespace fundamental_v3
     {
       return __builtin_ctz(x);
     }
-    inline constexpr int countr_zero(unsigned long x) noexcept
+    constexpr int countr_zero(unsigned long x) noexcept
         {
           return __builtin_ctzl(x);
         }
-    inline constexpr int countr_zero(unsigned long long x) noexcept
+    constexpr int countr_zero(unsigned long long x) noexcept
         {
           return __builtin_ctzll(x);
         }

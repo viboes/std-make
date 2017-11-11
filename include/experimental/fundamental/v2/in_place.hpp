@@ -31,7 +31,7 @@ constexpr struct in_place_t{} in_place{};
 
 struct in_place_tag{};
 using in_place_t = in_place_tag (&)();
-inline constexpr in_place_tag in_place() { return {}; }
+constexpr in_place_tag in_place() { return {}; }
 
 #endif
 

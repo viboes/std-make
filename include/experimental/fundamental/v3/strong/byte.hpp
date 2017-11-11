@@ -36,18 +36,18 @@ inline  namespace fundamental_v3
     }
 
     //! helper function to cast from byte to the underlying unsigned char
-    inline constexpr unsigned char to_uchar( byte b ) noexcept
+    constexpr unsigned char to_uchar( byte b ) noexcept
     {
         return to_integer<unsigned char>( b );
     }
-    inline constexpr unsigned char to_uchar( int i ) noexcept
+    constexpr unsigned char to_uchar( int i ) noexcept
     {
         return static_cast<unsigned char>( i );
     }
 
     //! helper function to cast from IntegralType to byte
     template< class IntegralType, typename = enable_if_t<is_integral<IntegralType>::value> >
-    inline constexpr byte to_byte( IntegralType v ) noexcept
+    constexpr byte to_byte( IntegralType v ) noexcept
     {
       return byte{ static_cast<unsigned char>(v) };
     }
@@ -121,7 +121,7 @@ inline  namespace fundamental_v3
 
     //! helper function to cast from IntegralType to byte
     template< class IntegralType, typename = enable_if_t<is_integral<IntegralType>::value> >
-    inline constexpr byte to_byte( IntegralType v ) noexcept
+    constexpr byte to_byte( IntegralType v ) noexcept
     {
       return { static_cast<byte>( static_cast<unsigned char>(v) ) };
     }
@@ -132,11 +132,11 @@ inline  namespace fundamental_v3
       return static_cast<IntegerType>(b.underlying());
     }
 
-    inline constexpr unsigned char to_uchar( byte b ) noexcept
+    constexpr unsigned char to_uchar( byte b ) noexcept
     {
         return b.underlying();
     }
-    inline constexpr unsigned char to_uchar( int i ) noexcept
+    constexpr unsigned char to_uchar( int i ) noexcept
     {
         return static_cast<unsigned char>( i );
     }

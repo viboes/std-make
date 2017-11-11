@@ -69,7 +69,7 @@ inline namespace fundamental_v3
     }
 
     template <class Tag, class UT, class DiffType>
-    inline DiffType distance(strong_random_incrementable<Tag, UT, DiffType> const& a, strong_random_incrementable<Tag, UT, DiffType> const& b)
+    constexpr DiffType distance(strong_random_incrementable<Tag, UT, DiffType> const& a, strong_random_incrementable<Tag, UT, DiffType> const& b)
     {
           return a - b;
     }
