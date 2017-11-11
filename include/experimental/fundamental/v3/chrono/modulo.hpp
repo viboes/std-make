@@ -152,10 +152,10 @@ namespace chrono
 
       //! @par Returns:
       //!   *this.
-//      constexpr modulo operator+() const noexcept
-//      {
-//          return *this;
-//      }
+      constexpr modulo operator+() const noexcept
+      {
+          return *this;
+      }
       //! @par Returns:<br> modulo{-Rep(*this)}.
       // modulo arithmetic
       constexpr modulo operator-() const noexcept
