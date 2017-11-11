@@ -90,7 +90,7 @@ struct money
     : base_type (currency::convert<C, Currency>(m.count()))
     {
     }
-    constexpr money& operator=(money const& m) = default;
+    JASEL_CXX14_CONSTEXPR money& operator=(money const& m) = default;
 #if 0
     template <class C, class R>
     constexpr money& operator=(money<C, R> m)

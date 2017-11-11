@@ -24,10 +24,10 @@ namespace std
       {
         //! Forwards to the underlying value
         friend constexpr bool operator==(Final const& x, Final const& y) noexcept
-        { return x._backdoor()._underlying() == y._backdoor()._underlying();}
+        { return x.underlying() == y.underlying();}
         //! Forwards to the underlying value
         friend constexpr bool operator!=(Final const& x, Final const& y) noexcept
-        { return x._backdoor()._underlying() != y._backdoor()._underlying();}
+        { return x.underlying() != y.underlying();}
       };
 
       template <class Final, class Other>
@@ -36,14 +36,14 @@ namespace std
         static_assert(is_same<Final, Other>::value==false, "Final and Other must be different");
         //! Forwards to the underlying value
         friend constexpr bool operator==(Final const& x, Other const& y) noexcept
-        { return x._backdoor()._underlying() == y._backdoor()._underlying();}
+        { return x.underlying() == y.underlying();}
         friend constexpr bool operator==(Other const& x, Final const& y) noexcept
-        { return x._backdoor()._underlying() == y._backdoor()._underlying();}
+        { return x.underlying() == y.underlying();}
         //! Forwards to the underlying value
         friend constexpr bool operator!=(Final const& x, Other const& y) noexcept
-        { return x._backdoor()._underlying() != y._backdoor()._underlying();}
+        { return x.underlying() != y.underlying();}
         friend constexpr bool operator!=(Other const& x, Final const& y) noexcept
-        { return x._backdoor()._underlying() != y._backdoor()._underlying();}
+        { return x.underlying() != y.underlying();}
       };
 
       template <class Final, template <class, class> class Pred=is_compatible_with>
@@ -52,12 +52,12 @@ namespace std
         //! Forwards to the underlying value
         template <class Other, typename = enable_if_t<Pred<Final, Other>::value>>
         friend constexpr bool operator==(Final const& x, Other const& y) noexcept
-        { return x._backdoor()._underlying() == y._backdoor()._underlying();}
+        { return x.underlying() == y.underlying();}
 
         //! Forwards to the underlying value
         template <class Other, typename = enable_if_t<Pred<Final, Other>::value>>
         friend constexpr bool operator!=(Final const& x, Other const& y) noexcept
-        { return x._backdoor()._underlying() != y._backdoor()._underlying();}
+        { return x.underlying() != y.underlying();}
       };
     }
   }

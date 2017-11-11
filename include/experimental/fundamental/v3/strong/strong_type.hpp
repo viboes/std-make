@@ -99,7 +99,7 @@ inline  namespace fundamental_v3
       static constexpr backdoor _backdoor(F* f) {
         return backdoor(_final(f));
       }
-      constexpr backdoor _backdoor() {
+      JASEL_CXX14_CONSTEXPR backdoor _backdoor() {
         return backdoor(_final(this));
       }
     };
