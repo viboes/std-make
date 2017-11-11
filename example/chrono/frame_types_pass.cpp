@@ -88,11 +88,11 @@ constexpr symbol_number to_symbol_number(stdex::chrono::modulo<SubDuration, Dura
 
 
 
-// what about defining x_subframe_numbers using tuples as underlying type.
+// what about defining x_subframe_tuple using tuples as underlying type.
 // This will allow to define it as a strong type inheriting from all the relational operators
 
-// x_subframe_numbers =  tuple<frame_number, subframe_number>
-// x_subframe_numbers =  tuple<modulo<x_frames, frames>, modulo<frames, subframes>>
+// x_subframe_tuple =  tuple<frame_number, subframe_number>
+// x_subframe_tuple =  tuple<modulo<x_frames, frames>, modulo<frames, subframes>>
 // todo: define a tuple_modulo where
 // tuple_modulo<T1, T2, T3> = tuple<modulo<T1, T2>, modulo<T2, T3>>
 //template <class T1, T2, T3>
@@ -100,19 +100,19 @@ constexpr symbol_number to_symbol_number(stdex::chrono::modulo<SubDuration, Dura
 //  convertible to T3 and modulo<T1, T3>
 //  access to modulo<T1, T2> and modulo<T2, T3>
 // tuple_modulo<T1, T2, T3, T4> = tuple<modulo<T1, T2>, modulo<T2, T3>, modulo<T3, T4>>
-// x_subframe_numbers must define the same operations than x_subframe_number
-struct x_subframe_numbers {
+// x_subframe_tuple must define the same operations than x_subframe_number
+struct x_subframe_tuple {
 private:
     frame_number fn;
     subframe_number sfn;
 public:
 
-    constexpr x_subframe_numbers() = default;
+    constexpr x_subframe_tuple() = default;
 
     /// pre-condition: fn and sfn are valid
-    constexpr x_subframe_numbers(frame_number fn, subframe_number sfn) : fn(fn), sfn(sfn) {}
+    constexpr x_subframe_tuple(frame_number fn, subframe_number sfn) : fn(fn), sfn(sfn) {}
     /// pre-condition: xsfn is valid
-    constexpr x_subframe_numbers(x_subframe_number xsfn) : fn(to_frame_number(xsfn)), sfn(to_subframe_number(xsfn)) {}
+    constexpr x_subframe_tuple(x_subframe_number xsfn) : fn(to_frame_number(xsfn)), sfn(to_subframe_number(xsfn)) {}
 
     /// pre-condition: fn  isvalid
     constexpr frame_number frame() const {return fn;}
@@ -125,95 +125,95 @@ public:
     constexpr operator subframes() const { return subframes(frames(fn)) + subframes(sfn); }
 
     // pre-condition 0 <= xsfn.frame() + df < 1024
-    friend constexpr x_subframe_numbers operator+(x_subframe_numbers const& xsfn, const frames& df) noexcept
+    friend constexpr x_subframe_tuple operator+(x_subframe_tuple const& xsfn, const frames& df) noexcept
     {
         return { xsfn.fn + df, xsfn.sfn };
     }
 
     // pre-condition 0 <= xsfn.frame() - df < 1024
-    friend constexpr x_subframe_numbers operator-(x_subframe_numbers const& xsfn, const frames& df) noexcept
+    friend constexpr x_subframe_tuple operator-(x_subframe_tuple const& xsfn, const frames& df) noexcept
     {
         return { xsfn.fn - df, xsfn.sfn };
     }
     // pre-condition 0 <= xsfn.frame() - df < 1024
-    friend constexpr x_subframe_numbers operator+(const frames& df, x_subframe_numbers const& xsfn) noexcept
+    friend constexpr x_subframe_tuple operator+(const frames& df, x_subframe_tuple const& xsfn) noexcept
     {
         return xsfn + df;
     }
 
-    friend constexpr subframes operator-(x_subframe_numbers const& x, const x_subframe_numbers& y) noexcept
+    friend constexpr subframes operator-(x_subframe_tuple const& x, const x_subframe_tuple& y) noexcept
     {
         return subframes(x) + subframes(y);
     }
 
     // pre-condition 0 <= xsfn.subframes() + dsf < 1024*10
-    friend JASEL_CXX14_CONSTEXPR x_subframe_numbers operator+(x_subframe_numbers const& xsfn, const subframes& dsf) noexcept
+    friend JASEL_CXX14_CONSTEXPR x_subframe_tuple operator+(x_subframe_tuple const& xsfn, const subframes& dsf) noexcept
     {
         const int cardinal = subframe_number::cardinal;
         auto dsfni = xsfn.sfn.count() + dsf.count();
         auto dfni = ((dsfni >= 0)  ? dsfni : dsfni-cardinal+1 ) / cardinal;
         dsfni = dsfni - dfni * cardinal;
-        return x_subframe_numbers( xsfn.fn + frames(dfni), subframe_number(0) + subframes(dsfni) );
+        return x_subframe_tuple( xsfn.fn + frames(dfni), subframe_number(0) + subframes(dsfni) );
     }
     // pre-condition 0 <= xsfn.subframes() + dsf < 1024*10
-    friend JASEL_CXX14_CONSTEXPR x_subframe_numbers operator+(const subframes& dsf, x_subframe_numbers const& xsfn) noexcept
+    friend JASEL_CXX14_CONSTEXPR x_subframe_tuple operator+(const subframes& dsf, x_subframe_tuple const& xsfn) noexcept
     {
         return xsfn + dsf;
     }
     // pre-condition 0 <= xsfn.subframes() - dsf < 1024*10
-    friend JASEL_CXX14_CONSTEXPR x_subframe_numbers operator-(x_subframe_numbers const& xsfn, const subframes& dsf) noexcept
+    friend JASEL_CXX14_CONSTEXPR x_subframe_tuple operator-(x_subframe_tuple const& xsfn, const subframes& dsf) noexcept
     {
         return xsfn + -dsf;
     }
 
     // pre-condition 0 <= this->subframes() + df < 1024*10
-    JASEL_CXX14_CONSTEXPR x_subframe_numbers& operator+=(const frames& df) noexcept
+    JASEL_CXX14_CONSTEXPR x_subframe_tuple& operator+=(const frames& df) noexcept
     {
         *this = *this + df;
         return *this;
     }
     // pre-condition 0 <= this->subframes() - df < 1024*10
-    JASEL_CXX14_CONSTEXPR x_subframe_numbers& operator-=(const frames& df) noexcept
+    JASEL_CXX14_CONSTEXPR x_subframe_tuple& operator-=(const frames& df) noexcept
     {
         *this = *this - df;
         return *this;
     }
 
     // pre-condition 0 <= this->subframes() +dsf < 1024*10
-    JASEL_CXX14_CONSTEXPR x_subframe_numbers& operator+=(const subframes& dsf) noexcept
+    JASEL_CXX14_CONSTEXPR x_subframe_tuple& operator+=(const subframes& dsf) noexcept
     {
         *this = *this + dsf;
         return *this;
     }
     // pre-condition 0 <= this->subframes() + subframe(1) < 1024*10
-    JASEL_CXX14_CONSTEXPR x_subframe_numbers& operator++() noexcept
+    JASEL_CXX14_CONSTEXPR x_subframe_tuple& operator++() noexcept
     {
         *this = *this + subframes(1);
         return *this;
     }
     // pre-condition 0 <= this->subframes() + subframe(1) < 1024*10
-    JASEL_CXX14_CONSTEXPR x_subframe_numbers operator++(int) noexcept
+    JASEL_CXX14_CONSTEXPR x_subframe_tuple operator++(int) noexcept
     {
-        x_subframe_numbers tmp (*this);
+        x_subframe_tuple tmp (*this);
         ++(*this);
         return tmp;
     }
     // pre-condition 0 <= this->subframes() - dsf < 1024*10
-    JASEL_CXX14_CONSTEXPR x_subframe_numbers& operator-=(const subframes& dsf) noexcept
+    JASEL_CXX14_CONSTEXPR x_subframe_tuple& operator-=(const subframes& dsf) noexcept
     {
         *this = *this - dsf;
         return *this;
     }
     // pre-condition 0 <= this->subframes() - subframe(1) < 1024*10
-    JASEL_CXX14_CONSTEXPR x_subframe_numbers& operator--() noexcept
+    JASEL_CXX14_CONSTEXPR x_subframe_tuple& operator--() noexcept
     {
         *this = *this - subframes(1);
         return *this;
     }
     // pre-condition 0 <= this->subframes() - subframe(1) < 1024*10
-    JASEL_CXX14_CONSTEXPR x_subframe_numbers operator--(int) noexcept
+    JASEL_CXX14_CONSTEXPR x_subframe_tuple operator--(int) noexcept
     {
-        x_subframe_numbers tmp (*this);
+        x_subframe_tuple tmp (*this);
         --(*this);
         return tmp;
     }
@@ -221,69 +221,69 @@ public:
 
 // operator/ play the role of a factory as it does on Date library.
 // Note that there is no sense to divide a frame_number and subframe_number, we need to first convert to duration
-x_subframe_numbers operator/(frame_number fn, subframe_number sfn)
+x_subframe_tuple operator/(frame_number fn, subframe_number sfn)
 {
     return {fn, sfn};
 }
 
 // Should the following be members?
 // No because for modulo types it is a non-member function
-inline constexpr h_frame_number to_h_frame_number(x_subframe_numbers )
+inline constexpr h_frame_number to_h_frame_number(x_subframe_tuple )
 {
     return h_frame_number(0);
 }
-inline constexpr x_subframe_number to_x_subframe_number(x_subframe_numbers xsfn)
+inline constexpr x_subframe_number to_x_subframe_number(x_subframe_tuple xsfn)
 {
     //return xsfn.x_subframe();
     return make_x_subframe_number(xsfn.frame(), xsfn.subframe());
 }
-inline constexpr frame_number to_frame_number(x_subframe_numbers xsfn)
+inline constexpr frame_number to_frame_number(x_subframe_tuple xsfn)
 {
     return xsfn.frame();
 }
-inline constexpr subframe_number to_subframe_number(x_subframe_numbers xsfn)
+inline constexpr subframe_number to_subframe_number(x_subframe_tuple xsfn)
 {
     return xsfn.subframe();
 }
-inline constexpr slot_number to_slot_number(x_subframe_numbers )
+inline constexpr slot_number to_slot_number(x_subframe_tuple )
 {
     return slot_number(0);
 }
-inline constexpr symbol_number to_symbol_number(x_subframe_numbers )
+inline constexpr symbol_number to_symbol_number(x_subframe_tuple )
 {
     return symbol_number(0);
 }
 
-struct h_subframe_numbers {
+struct h_subframe_tuple {
     x_frame_number xfn;
     frame_number fn;
     subframe_number sfn;
-    h_subframe_numbers() = default;
-    constexpr h_subframe_numbers(x_frame_number xfn, frame_number fn, subframe_number sfn) : xfn(xfn), fn(fn) , sfn(sfn) {}
+    h_subframe_tuple() = default;
+    constexpr h_subframe_tuple(x_frame_number xfn, frame_number fn, subframe_number sfn) : xfn(xfn), fn(fn) , sfn(sfn) {}
     constexpr operator h_subframe_number() const { return make_h_subframe_number(xfn, fn, sfn); }
 };
 
-inline constexpr h_subframe_number to_h_frame_number(h_subframe_numbers hsfn)
+inline constexpr h_subframe_number to_h_frame_number(h_subframe_tuple hsfn)
 {
     return h_subframe_number(hsfn);
 }
-inline constexpr x_frame_number to_x_frame_number(h_subframe_numbers hsfn)
+inline constexpr x_frame_number to_x_frame_number(h_subframe_tuple hsfn)
 {
     return hsfn.xfn;
 }
-inline constexpr frame_number to_frame_number(h_subframe_numbers hsfn)
+inline constexpr frame_number to_frame_number(h_subframe_tuple hsfn)
 {
     return hsfn.fn;
 }
-inline constexpr subframe_number to_subframe_number(h_subframe_numbers hsfn)
+inline constexpr subframe_number to_subframe_number(h_subframe_tuple hsfn)
 {
     return hsfn.sfn;
 }
-inline constexpr slot_number to_slot_number(h_subframe_numbers )
+inline constexpr slot_number to_slot_number(h_subframe_tuple )
 {
     return slot_number(0);
 }
-inline constexpr symbol_number to_symbol_number(h_subframe_numbers )
+inline constexpr symbol_number to_symbol_number(h_subframe_tuple )
 {
     return symbol_number(0);
 }
@@ -387,7 +387,7 @@ int main()
   {
       frame_number fn {1};
       subframe_number sfn {2};
-      x_subframe_numbers xsfn = fn/sfn;
+      x_subframe_tuple xsfn = fn/sfn;
       BOOST_TEST(xsfn.frame().count()==1);
       BOOST_TEST(xsfn.subframe().count()==2);
       BOOST_TEST(xsfn.x_subframe().count()==12);
