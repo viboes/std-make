@@ -105,6 +105,12 @@ jasel_add_tests(
     bit_mask_pass
 )
 
+jasel_add_examples(
+    bits bits
+    ######
+    bit
+)
+
 jasel_add_tests(
     callable_wrapper callable_wrapper
     ######

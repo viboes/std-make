@@ -26,12 +26,12 @@ namespace std
         //! Forwards to the underlying value
         friend JASEL_MUTABLE_CONSTEXPR Final& operator*=(Final& x, Final const& y) noexcept
         {
-          x._backdoor()._underlying() *= y._backdoor()._underlying();
+          x._backdoor()._underlying() *= y.underlying();
           return x;
         }
         friend JASEL_MUTABLE_CONSTEXPR Final& operator/=(Final& x, Final const& y) noexcept
         {
-          x._backdoor()._underlying() /= y._backdoor()._underlying();
+          x._backdoor()._underlying() /= y.underlying();
           return x;
         }
       };
@@ -55,11 +55,11 @@ namespace std
       {
         friend constexpr Final operator*(Final const& x, Final const& y)  noexcept
         {
-          return Final(x._backdoor()._underlying() * y._backdoor()._underlying());
+          return Final(x.underlying() * y.underlying());
         }
         friend constexpr Final operator/(Final const& x, Final const& y)  noexcept
         {
-          return Final(x._backdoor()._underlying() / y._backdoor()._underlying());
+          return Final(x.underlying() / y.underlying());
         }
       };
 
@@ -72,14 +72,14 @@ namespace std
         friend constexpr common_type_t<Final, Other> operator*(Final const& x, Other const& y)  noexcept
         {
           using CT = common_type_t<Final, Other>;
-          return CT(CT(x)._backdoor()._underlying() * CT(y)._backdoor()._underlying());
+          return CT(CT(x).underlying() * CT(y).underlying());
         }
 
         template <class Other, typename = enable_if_t<Pred<Final, Other>::value>>
         friend constexpr common_type_t<Final, Other> operator/(Final const& x, Other const& y)  noexcept
         {
           using CT = common_type_t<Final, Other>;
-          return CT(CT(x)._backdoor()._underlying() / CT(y)._backdoor()._underlying());
+          return CT(CT(x).underlying() / CT(y).underlying());
         }
       };
 
@@ -105,7 +105,7 @@ namespace std
         {
           using CR = common_type_t<UT, UT2>;
           using CT = meta::rebind_t<Final, CR>;
-          return CT(CT(x)._backdoor()._underlying() * CR(y));
+          return CT(CT(x).underlying() * CR(y));
         }
 
         template <class UT2
@@ -124,7 +124,7 @@ namespace std
         {
           using CR = common_type_t<UT, UT2>;
           using CT = meta::rebind_t<Final, CR>;
-          return CT(CT(x)._backdoor()._underlying() / CR(y));
+          return CT(CT(x).underlying() / CR(y));
         }
       };
     }
