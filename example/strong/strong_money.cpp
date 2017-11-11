@@ -58,14 +58,15 @@ struct rebind<money<Currency, UT1>, UT2> : id<money<Currency, UT2>> {};
 
 template <class Currency, class Rep>
 struct money
-    : stdex::strong_type<money<Currency, Rep>, Rep>
-    , stdex::mixin::additive_with_if<money<Currency, Rep>>
-    , stdex::mixin::comparable<money<Currency, Rep>>
-    , stdex::mixin::integer_multiplicative_with<money<Currency, Rep>, Rep>
-    , stdex::mixin::modable<money<Currency, Rep>>
-    , stdex::mixin::hashable<money<Currency, Rep>>
-    //, mixin::streamable<strong_counter<Domain, UT>>
-    //, mixin::ordinal<money<Currency, Rep>>
+    : stdex::strong_type<money<Currency, Rep>, Rep>, stdex::mixins<money<Currency, Rep>
+        , stdex::meta_mixin::additive_with_if<>
+        , stdex::meta_mixin::comparable<>
+        , stdex::meta_mixin::integer_multiplicative_with<Rep>
+        , stdex::meta_mixin::modable<>
+        , stdex::meta_mixin::hashable<>
+        //, mixin::streamable<>
+        //, mixin::ordinal<>
+    >
 
 {
     using base_type = stdex::strong_type<money<Currency, Rep>, Rep>;
