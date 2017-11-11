@@ -101,6 +101,7 @@ jasel_add_tests(
 jasel_add_tests(
     bits bits
     ######
+    bit_pass
     bit_mask_pass
 )
 
@@ -120,8 +121,11 @@ jasel_add_tests(
 jasel_add_tests(
     factory make
     ######
-    make_pass
+    emplace_ready_future_pass
+    #make_boost_expected_pass
     #make_boost_optional_pass
+    make_pass
+    make_ready_future_pass
     make_std_array_pass
     make_std_expected_pass
     make_std_future_pass
@@ -157,6 +161,14 @@ jasel_add_tests(
     ######
     monad_std_expected_pass
     #monad_std_optinal_pass
+)
+
+jasel_add_tests(
+    monad_error monad_error
+    ######
+    monad_error_std_expected_pass
+    #monad_error_std_optinal_pass
+    monad_error_std_unique_ptr_pass
 )
 
 jasel_add_tests(
@@ -284,7 +296,11 @@ jasel_add_tests(
 jasel_add_examples(
     strong strong/
     ######
+    address_offset_pass
     duration_pass
+    money
+    money3
+    strong_money
 )
 
 jasel_add_examples(
