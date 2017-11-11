@@ -97,7 +97,9 @@ namespace std
           return x;
         }
 
-        template <class UT2>
+        template <class UT2
+            , typename = enable_if_t<is_convertible<UT2,UT>::value>
+        >
         friend constexpr
         meta::rebind_t<Final, common_type_t<UT, UT2>> operator*(Final const& x, UT2 const& y)  noexcept
         {
@@ -106,7 +108,9 @@ namespace std
           return CT(CT(x)._backdoor()._underlying() * CR(y));
         }
 
-        template <class UT2>
+        template <class UT2
+            , typename = enable_if_t<is_convertible<UT2,UT>::value>
+        >
         friend constexpr
         meta::rebind_t<Final, common_type_t<UT, UT2>> operator*(UT2 const& x, Final const& y)  noexcept
         {
@@ -114,7 +118,7 @@ namespace std
         }
 
         template <class UT2
-          , typename = enable_if_t<is_convertible<UT2,UT>::value>
+            , typename = enable_if_t<is_convertible<UT2,UT>::value>
         >
         friend constexpr meta::rebind_t<Final, common_type_t<UT, UT2>> operator/(Final const& x, UT2 const& y)  noexcept
         {
