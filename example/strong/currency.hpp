@@ -3,6 +3,9 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#ifndef JASEL_FUNDAMENTAL_V3_STRONG_MONEY_CURRENCY_HPP
+#define JASEL_FUNDAMENTAL_V3_STRONG_MONEY_CURRENCY_HPP
+
 //#include <functional>
 //#include <type_traits>
 
@@ -67,3 +70,4 @@ double convert(R r)
 
 }
 
+#endif
