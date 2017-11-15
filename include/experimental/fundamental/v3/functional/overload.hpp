@@ -159,7 +159,7 @@ namespace detail
       {  \
           using base = function_member_wrapper<R (C::*)(Args...) cv_ref_qual, C, R, Args...>; \
           using base::base; \
-      };
+      }
 
       WRAP_CALL_FOR_MEMBER_FUNCTION();
       WRAP_CALL_FOR_MEMBER_FUNCTION(const);
