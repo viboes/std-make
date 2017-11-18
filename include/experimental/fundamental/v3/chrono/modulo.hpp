@@ -59,8 +59,8 @@ namespace chrono
   struct modulo final
       : strong_type<modulo<Duration, SuperDuration, Rep>, Rep>
       , mixin::comparable<modulo<Duration, SuperDuration, Rep>>
-      , mixin::increase_base<modulo<Duration, SuperDuration, Rep>>
-      , mixin::decrease_base<modulo<Duration, SuperDuration, Rep>>
+      , mixin::strong_type_post_increment_derived<modulo<Duration, SuperDuration, Rep>>
+      , mixin::strong_type_post_decrement_derived<modulo<Duration, SuperDuration, Rep>>
 
   {
   public:

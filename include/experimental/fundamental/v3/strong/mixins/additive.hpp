@@ -17,236 +17,245 @@
 
 namespace std
 {
-  namespace experimental
-  {
-    inline  namespace fundamental_v3
-  {
-    namespace mixin
+namespace experimental
+{
+inline namespace fundamental_v3
+{
+namespace mixin
+{
+    template <class Final, class Other=Final>
+    struct strong_type_plus_assign_with
     {
-
-      template <class Final, class Other>
-      struct addable_with
-      {
         friend JASEL_MUTABLE_CONSTEXPR Final& operator+=(Final& x, Other const& y) noexcept
         {
-          x._backdoor()._underlying() += y.underlying();
-          return x;
+            x._backdoor()._underlying() += y.underlying();
+            return x;
         }
-        friend constexpr
-        Final operator+(Final const& x, Other const& y)  noexcept
+    };
+    template <class Final, class Other=Final>
+    struct strong_type_plus_assign_with_other_derived
+    {
+        friend JASEL_MUTABLE_CONSTEXPR Final& operator+=(Final& x, Other const& y) noexcept
         {
-          return Final(x.underlying() + y.underlying());
+            x = x + y;
+            return x;
         }
-
+    };
+    template <class Final, class Other=Final, class Result=Final>
+    struct strong_type_plus_with
+    {
         friend constexpr
-        Final operator+(Other const& x, Final const& y)  noexcept
+        Result operator+(Final const& x, Other const& y) noexcept
         {
-          return y + x;
+            return Result(x.underlying() + y.underlying());
         }
+    };
+    template <class Final, class Other, class Result=Final>
+    struct strong_type_plus_other_with_commut
+    {
+        friend constexpr
+        Result operator+(Other const& x, Final const& y) noexcept
+        {
+            return y + x;
+        }
+    };
 
-      };
+    template <class Final, class Other, class Result=Final>
+    struct addable_with
+        : strong_type_plus_assign_with<Final, Other>
+        , strong_type_plus_with<Final, Other, Result>
+        , strong_type_plus_other_with_commut<Final, Other, Result>
+    {};
 
-      template <class Final, class Other>
-      struct substractable_with
-      {
+    template <class Final, class Other=Final>
+    struct strong_type_minus_assign_with
+    {
         friend JASEL_MUTABLE_CONSTEXPR Final& operator-=(Final& x, Other const& y) noexcept
         {
-          x._backdoor()._underlying() -= y.underlying();
-          return x;
+            x._backdoor()._underlying() -= y.underlying();
+            return x;
         }
-
-        friend constexpr Final operator-(Final const& x, Other const& y)  noexcept
+    };
+    template <class Final, class Other=Final>
+    struct strong_type_minus_assign_with_other_derived
+    {
+        friend JASEL_MUTABLE_CONSTEXPR Final& operator-=(Final& x, Other const& y) noexcept
         {
-          return Final(x.underlying() - y.underlying());
+            x = x - y;
+            return x;
         }
-
-        friend constexpr Other operator-(Final const& x, Final const& y)  noexcept
+    };
+    template <class Lhs, class Rhs=Lhs, class Result=Lhs>
+    struct strong_type_minus_with
+    {
+        friend constexpr Result operator-(Lhs const& x, Rhs const& y) noexcept
         {
-          return Other(x.underlying() - y.underlying());
+            return Result(x.underlying() - y.underlying());
         }
-      };
-      // Single arg
-      template <class Final>
-      struct increase_base
-      {
+    };
+    template <class Final, class Other>
+    struct substractable_with
+        : strong_type_minus_assign_with<Final, Other>
+        , strong_type_minus_with<Final, Other, Final>
+        , strong_type_minus_with<Final, Final, Other>
+    {};
+    template <class Final>
+    struct strong_type_post_increment_derived
+    {
         friend JASEL_MUTABLE_CONSTEXPR Final operator++(Final& x, int) noexcept
         {
-          Final tmp(x);
-          ++x;
-          return tmp;
+            Final tmp(x);
+            ++x;
+            return tmp;
         }
-
-      };
-      template <class Final, class Check=no_check>
-      struct addable_base : increase_base<Final>
-      {
-        friend constexpr Final operator+(Final const&x)  noexcept
+    };
+    template <class Final>
+    struct unary_plus
+    {
+        friend constexpr Final operator+(Final const&x) noexcept
         {
-          return x;
+            return x;
         }
-
+    };
+    template <class Final>
+    struct strong_type_pre_increment
+    {
         friend JASEL_MUTABLE_CONSTEXPR Final& operator++(Final& x) noexcept
         {
-          ++x._backdoor()._underlying();
-          return x;
+            ++x._backdoor()._underlying();
+            return x;
         }
-      };
-      template <class Final>
-      struct addable_base<Final, void> : increase_base<Final>
-      {
-      };
+    };
+    template <class Final, class Check=no_check>
+    struct addable_base
+        : strong_type_post_increment_derived<Final>
+        , unary_plus<Final>
+        , strong_type_pre_increment<Final>
+    {};
+    template <class Final>
+    struct addable_base<Final, void> : strong_type_post_increment_derived<Final>
+    {};
 
-      template <class Final>
-      struct decrease_base
-      {
+    template <class Final>
+    struct strong_type_post_decrement_derived
+    {
         friend JASEL_MUTABLE_CONSTEXPR Final operator--(Final& x, int) noexcept
         {
-          Final tmp(x);
-          --x;
-          return tmp;
+            Final tmp(x);
+            --x;
+            return tmp;
         }
-
-      };
-      template <class Final, class Check=no_check>
-      struct substractable_base : decrease_base<Final>
-      {
-        friend constexpr Final operator-(Final const&x)  noexcept
+    };
+    template <class Final, class Check=no_check>
+    struct strong_type_unary_minus
+    {
+        friend constexpr Final operator-(Final const&x) noexcept
         {
-          return Final(-x.underlying());
+            return Final(-x.underlying());
         }
+    };
+    template <class Final, class Check=no_check>
+    struct strong_type_pre_decrement
+    {
         friend JASEL_MUTABLE_CONSTEXPR Final operator--(Final& x ) noexcept
         {
-          --x._backdoor()._underlying();
-          return x;
+            --x._backdoor()._underlying();
+            return x;
         }
-      };
-      template <class Final>
-      struct substractable_base<Final, void> : decrease_base<Final>
-      {
-      };
-      template <class Final, class Check=no_check>
-      struct additive_base : addable_base<Final, Check>, substractable_base<Final, Check>      {      };
+    };
 
-      template <class Final, class Check=no_check>
-      struct addable_assign : addable_base<Final, Check>
-      {
-        // todo These should be moved to homogeneous when I'll add heterogeneous
-        //! Forwards to the underlying value
-        friend JASEL_MUTABLE_CONSTEXPR Final& operator+=(Final& x, Final const& y) noexcept
-        {
-          x._backdoor()._underlying() += y.underlying();
-          return x;
-        }
-      };
+    template <class Final, class Check=no_check>
+    struct substractable_base
+        : strong_type_post_decrement_derived<Final>
+        , strong_type_unary_minus<Final>
+        , strong_type_pre_decrement<Final>
+    {};
+    template <class Final>
+    struct substractable_base<Final, void>
+        : strong_type_post_decrement_derived<Final>
+    {};
 
-      //arithmetic assignment when checked relies in the assignment of the result of the arithmetic operation
-      template <class Final>
-      struct addable_assign<Final, check> : addable_base<Final, check>
-      {
-        friend JASEL_MUTABLE_CONSTEXPR Final& operator+=(Final& x, Final const& y) noexcept
-        {
-          x = x + y;
-          return x;
-        }
-      };
-      template <class Final>
-      struct addable_assign<Final, void> : addable_base<Final, void>
-      {
-        friend JASEL_MUTABLE_CONSTEXPR Final& operator+=(Final& x, Final const& y) noexcept
-        {
-          x = x + y;
-          return x;
-        }
-      };
+    template <class Final, class Check=no_check>
+    struct additive_base: addable_base<Final, Check>
+        , substractable_base<Final, Check>
+    {};
 
-      template <class Final, class Check=no_check>
-      struct substractable_assign : substractable_base<Final, Check>
-      {
-        friend JASEL_MUTABLE_CONSTEXPR Final& operator-=(Final& x, Final const& y) noexcept
-        {
-          x._backdoor()._underlying() -= y.underlying();
-          return x;
-        }
+    template <class Final, class Check=no_check>
+    struct addable_assign: addable_base<Final, Check>
+        , strong_type_plus_assign_with<Final>
+    {};
 
-      };
+    //arithmetic assignment when checked relies in the assignment of the result of the arithmetic operation
+    template <class Final>
+    struct addable_assign<Final, check>: addable_base<Final, check>
+        , strong_type_plus_assign_with_other_derived<Final>
+    {};
+    template <class Final>
+    struct addable_assign<Final, void>: addable_base<Final, void>
+        , strong_type_plus_assign_with_other_derived<Final>
+    {};
 
-      //arithmetic assignment when checked relies in the assignment of the result of the arithmetic operation
-      template <class Final>
-      struct substractable_assign<Final, check> : substractable_base<Final, check>
-      {
-        friend JASEL_MUTABLE_CONSTEXPR Final& operator-=(Final& x, Final const& y) noexcept
-        {
-          x = x - y;
-          return x;
-        }
-      };
-      template <class Final>
-      struct substractable_assign<Final, void> : substractable_base<Final, void>
-      {
-        friend JASEL_MUTABLE_CONSTEXPR Final& operator-=(Final& x, Final const& y) noexcept
-        {
-          x = x - y;
-          return x;
-        }
-      };
+    template <class Final, class Check=no_check>
+    struct substractable_assign: substractable_base<Final, Check>
+        , strong_type_minus_assign_with<Final>
+    {};
 
+    //arithmetic assignment when checked relies in the assignment of the result of the arithmetic operation
+    template <class Final>
+    struct substractable_assign<Final, check>: substractable_base<Final, check>
+        , strong_type_minus_assign_with_other_derived<Final>
+    {};
+    template <class Final>
+    struct substractable_assign<Final, void>: substractable_base<Final, void>
+        , strong_type_minus_assign_with_other_derived<Final>
+    {};
 
-      template <class Final, class Check=no_check>
-      struct additive_assign : addable_assign<Final, Check>, substractable_assign<Final, Check>      {      };
-
-
-      template <class Final, class Check=no_check>
-      struct addable : addable_assign<Final, Check>
-      {
-        friend constexpr Final operator+(Final const& x, Final const& y)  noexcept
-        {
-          return Final(x.underlying() + y.underlying());
-        }
-      };
-      template <class Final, class Check=no_check>
-      struct substractable : substractable_assign<Final, Check>
-      {
-        friend constexpr Final operator-(Final const& x, Final const& y)  noexcept
-        {
-          return Final(x.underlying() - y.underlying());
-        }
-      };
-      template <class Final, class Check=no_check>
-      struct additive : addable<Final, Check>, substractable<Final, Check>      {      };
-
-      // additive heterogeneous
-      template <class Final, class Check=no_check, template <class, class> class Pred=is_compatible_with>
-      struct additive_with_if : additive_assign<Final, Check>
-      {
-        template <class Other, typename = enable_if_t<Pred<Final, Other>::value>>
-        friend constexpr
-        common_type_t<Final, Other> operator+(Final const& x, Other const& y)  noexcept
-        {
-          using CT = common_type_t<Final, Other>;
-          return CT(CT(x).underlying() + CT(y).underlying());
-        }
-
-        template <class Other, typename = enable_if_t<Pred<Final, Other>::value>>
-        friend constexpr
-        common_type_t<Final, Other> operator-(Final const& x, Other const& y)  noexcept
-        {
-          using CT = common_type_t<Final, Other>;
-          return CT(CT(x).underlying() - CT(y).underlying());
-        }
-
-      };
-
-    }
-    namespace meta_mixin
+    template <class Final, class Check=no_check>
+    struct additive_assign : addable_assign<Final, Check>, substractable_assign<Final, Check>
+    {};
+    template <class Final, class Check=no_check>
+    struct addable: addable_assign<Final, Check>
+        , strong_type_plus_with<Final>
+    {};
+    template <class Final, class Check=no_check>
+    struct substractable: substractable_assign<Final, Check>
+        , strong_type_minus_with<Final>
     {
+    };
+    template <class Final, class Check=no_check>
+    struct additive: addable<Final, Check>, substractable<Final, Check>
+    {};
+
+    // additive heterogeneous
+    template <class Final, class Check=no_check, template <class, class> class Pred=is_compatible_with>
+    struct additive_with_if : additive_assign<Final, Check>
+    {
+        template <class Other, typename = enable_if_t<Pred<Final, Other>::value>>
+        friend constexpr
+        common_type_t<Final, Other> operator+(Final const& x, Other const& y) noexcept
+        {
+            using CT = common_type_t<Final, Other>;
+            return CT(CT(x).underlying() + CT(y).underlying());
+        }
+        template <class Other, typename = enable_if_t<Pred<Final, Other>::value>>
+        friend constexpr
+        common_type_t<Final, Other> operator-(Final const& x, Other const& y) noexcept
+        {
+            using CT = common_type_t<Final, Other>;
+            return CT(CT(x).underlying() - CT(y).underlying());
+        }
+    };
+}
+namespace meta_mixin
+{
     template <class Check=mixin::no_check, template <class, class> class Pred=mixin::is_compatible_with>
     struct additive_with_if
     {
-      template <class Final>
-      using type = mixin::additive_with_if<Final, Check, Pred>;
+        template <class Final>
+        using type = mixin::additive_with_if<Final, Check, Pred>;
     };
-    }
-  }
+}
+}
 }
 }
 

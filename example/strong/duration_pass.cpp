@@ -76,6 +76,8 @@ template<
 >
 using duration = stdex::strong_counter<duration_domain<Period>, Rep>;
 
+// fixme: duration stream insertion/extraction can be more specialized.
+// Wondering if streamable, should be part of strong_counter.
 
 namespace std {
   template <class P1, class P2>

@@ -9,13 +9,16 @@
  * This example tries to see how close we can define address/offset using strong_type
  *
  */
+// todo These types are isomorphic to index_t and difference_t when we use
+// an index_t to address an array and
+// difference_t to for the result of subtracting two indexes as the offset between the two indexes.
+
 #include <boost/detail/lightweight_test.hpp>
 #include <iostream>
 #include <cstdint>
 
 #include <experimental/strong_counter.hpp>
 #include <experimental/strong_random_incrementable.hpp>
-
 
 namespace stdex = std::experimental;
 
@@ -33,8 +36,6 @@ namespace mixin {
 using offset = stdex::strong_counter<offset_tag, std::int64_t>;
 
 using address = stdex::strong_random_incrementable<struct address_tag, std::int64_t, offset>;
-
-
 
 template <class T> struct check;
 int main()

@@ -229,6 +229,7 @@ inline namespace fundamental_v3
   struct strong_counter;
 
   namespace mixin {
+    // fixme: Shouldn't we add a constraint on UT1 and UT2?
     template <class Domain1, class UT1, class Domain2, class UT2>
     struct is_compatible_with<strong_counter<Domain1, UT1>, strong_counter<Domain2, UT2>> : is_compatible_with<Domain1,Domain2> {};
   }
