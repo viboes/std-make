@@ -34,13 +34,13 @@ namespace type_constructible
   }
   template <typename T>
   struct traits_constructor {
-    template <class M, class ...Xs>
-    static constexpr
-    auto make(Xs&& ...xs)
-    -> decltype(M(std::forward<Xs>(xs)...))
-    {
-      return M(std::forward<Xs>(xs)...);
-    }
+      template <class M, class ...Xs>
+      static constexpr
+      auto make(Xs&& ...xs)
+      -> decltype(M(std::forward<Xs>(xs)...))
+      {
+        return M(std::forward<Xs>(xs)...);
+      }
   };
   template <class T, class Enabler=void>
     struct traits
@@ -54,17 +54,17 @@ namespace type_constructible
   template <typename T, bool condition>
   struct traits<T, meta::when<condition>> : traits_constructor<T> {};
 
-  template <class T>
-  struct traits<T*>
-  {
-    template <class M, class ...Xs>
-    static
-    auto make(Xs&& ...xs)
-    -> decltype(new T(std::forward<Xs>(xs)...))
-    {
-      return new T(std::forward<Xs>(xs)...);
-    }
-  };
+//  template <class T>
+//  struct traits<T*>
+//  {
+//    template <class M, class ...Xs>
+//    static
+//    auto make(Xs&& ...xs)
+//    -> decltype(new T(std::forward<Xs>(xs)...))
+//    {
+//      return new T(std::forward<Xs>(xs)...);
+//    }
+//  };
 
   // make() overload
   template <class TC, int = 0, int...>
@@ -86,7 +86,7 @@ namespace type_constructible
   }
 
   // make overload: requires a type constructor, deduces the underlying type
-  template <class TC, int = 0, int..., class ...Xs>
+  template <class TC, class ...Xs>
   constexpr enable_if_t<
     meta::is_callable<TC(meta::decay_unwrap_t<Xs>...)>::value,
     meta::invoke<TC, meta::decay_unwrap_t<Xs>...>
@@ -98,7 +98,7 @@ namespace type_constructible
   }
 
   // make overload: requires a type with a specific underlying type, don't deduce the underlying type from Xs
-  template <class M, int = 0, int..., class ...Xs>
+  template <class M, class ...Xs>
   constexpr enable_if_t<
     ! meta::is_callable<M(meta::decay_unwrap_t<Xs>...)>::value
     , M
@@ -109,7 +109,7 @@ namespace type_constructible
   }
 
   // make overload: requires a template class, deduces the underlying type
-  template <template <class ...> class M, int = 0, int..., class ...Xs>
+  template <template <class ...> class M, class ...Xs>
   constexpr M<meta::decay_unwrap_t<Xs>...>
   make(Xs&& ...xs)
   {
@@ -118,7 +118,7 @@ namespace type_constructible
   }
 
   // emplace() overload
-  template <class TC, int = 0, int...>
+  template <class TC>
   constexpr
   enable_if_t<
       meta::is_callable<TC(void)>::value,
@@ -137,7 +137,7 @@ namespace type_constructible
   }
 
   // make overload: requires a type constructor, deduces the underlying type
-  template <class TC, int = 0, int..., class ...Xs>
+  template <class TC, class ...Xs>
   constexpr enable_if_t<
     meta::is_callable<TC(meta::decay_unwrap_t<Xs>...)>::value,
     meta::invoke<TC, meta::decay_unwrap_t<Xs>...>
@@ -148,7 +148,7 @@ namespace type_constructible
     return traits<M>::template emplace<M>(std::forward<Xs>(xs)...);
   }
   // make overload: requires a type with a specific underlying type, don't deduce the underlying type from Xs
-  template <class M, int = 0, int..., class ...Xs>
+  template <class M, class ...Xs>
   constexpr enable_if_t<
     ! meta::is_callable<M(meta::decay_unwrap_t<Xs>...)>::value
     , M
@@ -159,7 +159,7 @@ namespace type_constructible
   }
 
   // make overload: requires a template class, deduces the underlying type
-  template <template <class ...> class M, int = 0, int..., class ...Xs>
+  template <template <class ...> class M, class ...Xs>
   constexpr M<meta::decay_unwrap_t<Xs>...>
   emplace(Xs&& ...xs)
   {

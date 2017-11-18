@@ -87,7 +87,13 @@ namespace type_constructible
 namespace value_or_none
 {
   template <class T>
-  struct traits<optional<T>> : traits_pointer_like {
+  struct traits<optional<T>>  {
+      template <class U>
+      static constexpr
+      auto deref(U && ptr)
+      JASEL_DECLTYPE_RETURN (
+             *(forward<U>(ptr))
+      )
   };
 }
 

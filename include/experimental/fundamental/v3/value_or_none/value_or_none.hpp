@@ -18,8 +18,6 @@
 #include <functional>
 
 #include <utility>
-#include <experimental/type_traits.hpp>
-
 
 // the operation deref_none make Nullable something more like Error-able.
 // It allows to forward errors from one Nullable to another.
@@ -33,7 +31,9 @@ inline namespace fundamental_v3
 
 namespace value_or_none
 {
-    using namespace nullable;
+    using nullable::none;
+    using nullable::none_type_t;
+    using nullable::has_value;
 
     namespace detail {
         struct not_a_value_or_none_tag{};
@@ -59,6 +59,7 @@ namespace value_or_none
 #endif
     };
 
+#if 0
     struct traits_pointer_like
     {
         template <class U>
@@ -75,20 +76,13 @@ namespace value_or_none
     template <class T>
     struct traits<T*> : traits_pointer_like
     {};
-
+#endif
     template <class T>
     constexpr
     auto deref(T && x)
     JASEL_DECLTYPE_RETURN (
             traits<meta::uncvref_t<T>>::deref(x)
     )
-
-//    template <class T>
-//    constexpr
-//    T& deref(T* ptr) noexcept
-//    {
-//        return *ptr;
-//    }
 
     template <class T>
     struct value_type;
@@ -107,13 +101,6 @@ namespace value_or_none
     JASEL_DECLTYPE_RETURN (
             none<meta::uncvref_t<T>>()
     )
-
-//    template <class T>
-//    constexpr
-//    std::nullptr_t deref_none(T*) noexcept
-//    {
-//        return nullptr;
-//    }
 
 }
 
@@ -146,12 +133,6 @@ namespace value_or_none
   constexpr bool is_value_or_none_v = is_value_or_none<T>::value ;
 #endif
 
-//  template <class T>
-//  struct is_value_or_none<T*>
-//#if ! defined JASEL_DOXYGEN_INVOKED
-//  : true_type {}
-//#endif
-//  ;
 
 namespace value_or_error
 {

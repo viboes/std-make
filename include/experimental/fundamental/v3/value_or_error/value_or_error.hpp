@@ -17,7 +17,6 @@
 #include <functional>
 
 #include <utility>
-#include <experimental/type_traits.hpp>
 
 namespace std
 {
@@ -91,24 +90,12 @@ inline namespace fundamental_v3
       traits<meta::uncvref_t<T>>::failed(forward<T>(x))
     )
 
-//    template <class T>
-//    constexpr
-//    bool succeeded(T const* ptr) noexcept {
-//      return ptr != nullptr;
-//    }
-
     template <class T>
     constexpr
     auto success_value(T && x)
       JASEL_DECLTYPE_RETURN (
         traits<meta::uncvref_t<T>>::success_value(x)
       )
-
-//    template <class T>
-//    constexpr
-//    T& success_value(T* ptr) noexcept {
-//      return *ptr ;
-//    }
 
     template <class T>
       struct success_type;
@@ -125,12 +112,6 @@ inline namespace fundamental_v3
           traits<meta::uncvref_t<T>>::failure_value(forward<T>(x))
       )
 
-//    template <class T>
-//    constexpr
-//    std::nullptr_t failure_value(T* ) noexcept {
-//      return nullptr ;
-//    }
-
     template <class T>
       struct failure_type { using type = remove_reference_t<decltype(value_or_error::failure_value(declval<T>()))>; };
 
@@ -144,23 +125,12 @@ inline namespace fundamental_v3
         traits<meta::uncvref_t<T>>::has_value(forward<T>(x))
       )
 
-//    template <class T>
-//    constexpr
-//    bool has_value(T const* ptr) noexcept {
-//      return ptr != nullptr;
-//    }
-
     template <class T>
     constexpr
     auto has_error(T && x)
     JASEL_DECLTYPE_RETURN_NOEXCEPT (
       ! traits<meta::uncvref_t<T>>::has_value(forward<T>(x))
     )
-//    template <class T>
-//    constexpr
-//    bool has_error(T const* ptr) noexcept {
-//      return ptr == nullptr;
-//    }
 
     template <class T>
     constexpr
@@ -168,12 +138,6 @@ inline namespace fundamental_v3
       JASEL_DECLTYPE_RETURN (
         traits<meta::uncvref_t<T>>::deref(x)
       )
-
-//    template <class T>
-//    constexpr
-//    T& deref(T* ptr) noexcept {
-//      return *ptr ;
-//    }
 
     template <class T>
       struct value_type;
@@ -206,61 +170,11 @@ inline namespace fundamental_v3
           traits<meta::uncvref_t<T>>::error(forward<T>(x))
       )
 
-//    template <class T>
-//    constexpr
-//    std::nullptr_t error(T* ) noexcept {
-//      return nullptr ;
-//    }
-
     template <class T>
       struct error_type { using type = remove_reference_t<decltype(value_or_error::error(declval<T>()))>; };
 
     template <class TC>
     using error_type_t = typename error_type<TC>::type;
-
-//    struct traits_pointer_like
-//    {
-//        template <class U>
-//        static constexpr
-//        bool succeeded(U const& ptr) noexcept { return bool(ptr); }
-//
-//        template <class U>
-//        static constexpr
-//        bool failed(U const& ptr) noexcept { return ! bool(ptr); }
-//
-//        template <class U>
-//        static constexpr
-//        auto success_value(U && ptr)
-//          JASEL_DECLTYPE_RETURN (
-//              *(forward<U>(ptr))
-//          )
-//
-//        template <class U>
-//        static constexpr
-//        nullptr_t failure_value(U && ) noexcept { return nullptr; }
-//
-//        template <class U>
-//        static constexpr
-//        bool has_value(U const& ptr) noexcept { return bool(ptr); }
-//
-//        template <class U>
-//        static constexpr
-//        auto deref(U && ptr)
-//          JASEL_DECLTYPE_RETURN (
-//              *(ptr)
-//          )
-//
-//        template <class U>
-//        static constexpr
-//        nullptr_t error(U && ) noexcept { return nullptr; }
-//    };
-
-    // fixme
-    //template <>
-    //struct traits<add_pointer<_t>> : traits_pointer_like {};
-//    template <class T>
-//    struct traits<T*> : traits_pointer_like {};
-
 
     // mcd for typed defining the SuccessOrFailure types.
     struct mcd_success_or_failure
@@ -320,13 +234,6 @@ inline namespace fundamental_v3
   template <class T>
   constexpr bool is_value_or_error_v = is_value_or_error<T>::value ;
 #endif
-
-//  template <class T>
-//  struct is_value_or_error<T*>
-//#if ! defined JASEL_DOXYGEN_INVOKED
-//  : true_type {}
-//#endif
-//  ;
 
 }
 }
