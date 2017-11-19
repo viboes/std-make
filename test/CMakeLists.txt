@@ -138,9 +138,9 @@ jasel_add_tests(
     #make_std_optional_pass
     make_std_pair_pass
     make_std_shared_future_pass
-    make_std_shared_ptr_pass
+    #make_std_shared_ptr_pass
     make_std_tuple_pass
-    make_std_unique_ptr_pass
+    #make_std_unique_ptr_pass
 )
 
 jasel_add_tests(
@@ -157,9 +157,9 @@ jasel_add_tests(
     functor_std_expected_pass
     #functor_std_optional_pass
     functor_std_pair_pass
-    functor_std_shared_ptr_pass
+    #functor_std_shared_ptr_pass
     functor_std_tuple_pass
-    functor_std_unique_ptr_pass
+    #functor_std_unique_ptr_pass
 )
 
 jasel_add_tests(
@@ -174,7 +174,7 @@ jasel_add_tests(
     ######
     monad_error_std_expected_pass
     #monad_error_std_optinal_pass
-    monad_error_std_unique_ptr_pass
+    #monad_error_std_unique_ptr_pass
 )
 
 jasel_add_tests(
