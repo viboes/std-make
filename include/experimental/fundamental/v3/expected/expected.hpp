@@ -2080,7 +2080,9 @@ public:
       else
       {
         unexpected_t t = move(rhs.contained_unexpected());
+        rhs.unexpectedptr()->~unexpected<E>();
         ::new (rhs.dataptr()) value_type(move(contained_val()));
+        dataptr()->~T();
         ::new (unexpectedptr()) unexpected_t(t);
         using std::swap;
         swap(contained_has_value(), rhs.contained_has_value());
