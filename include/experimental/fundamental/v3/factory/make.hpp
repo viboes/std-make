@@ -54,18 +54,6 @@ namespace type_constructible
   template <typename T, bool condition>
   struct traits<T, meta::when<condition>> : traits_constructor<T> {};
 
-//  template <class T>
-//  struct traits<T*>
-//  {
-//    template <class M, class ...Xs>
-//    static
-//    auto make(Xs&& ...xs)
-//    -> decltype(new T(std::forward<Xs>(xs)...))
-//    {
-//      return new T(std::forward<Xs>(xs)...);
-//    }
-//  };
-
   // make() overload
   template <class TC, int = 0, int...>
   constexpr
