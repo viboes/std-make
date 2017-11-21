@@ -8,7 +8,8 @@
 #define JASEL_FUNDAMENTAL_V3_STRONG_MIXIN_HASHABLE_HPP
 
 #include <experimental/fundamental/v2/config.hpp>
-#include <experimental/fundamental/v3/strong/underlying_type.hpp>
+#include <experimental/wrapped.hpp>
+
 #include <experimental/fundamental/v3/strong/strong_type.hpp>
 
 #include <functional>
@@ -45,9 +46,9 @@ namespace std
     template <class W
     //, class = enable_if_t<is_hashable<underlying_type_t<W>{}>
     >
-    struct wrapped_hash  {
+    struct wrapping_hash  {
       using argument_type = W;
-      using UT = underlying_type_t<W> ;
+      using UT = experimental::unwrapped_type_t<W> ;
       using result_type = std::size_t;
       result_type operator()(argument_type const& s) const
       {
@@ -71,7 +72,7 @@ namespace std
   >
   struct hash<experimental::new_type<Tag, UT, MetaMixins...>>
   :
-    experimental::wrapped_hash<experimental::new_type<Tag, UT, MetaMixins...>>
+    experimental::wrapping_hash<experimental::new_type<Tag, UT, MetaMixins...>>
   {
     using enabler = enable_if_t<experimental::new_type<Tag, UT, MetaMixins...>::is_hashable, void>;
   };

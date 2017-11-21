@@ -8,7 +8,6 @@
 #define JASEL_FUNDAMENTAL_V3_STRONG_STRONG_ID_HPP
 
 #include <experimental/fundamental/v3/strong/strong_type.hpp>
-#include <experimental/fundamental/v3/strong/underlying_type.hpp>
 #include <experimental/fundamental/v3/strong/mixins/comparable.hpp>
 #include <experimental/fundamental/v3/strong/mixins/hashable.hpp>
 #include <experimental/fundamental/v3/strong/mixins/streamable.hpp>

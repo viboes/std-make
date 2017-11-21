@@ -92,7 +92,7 @@ inline namespace fundamental_v3
   /// Hash specialization forwarding to the hash of underlying type
   template <class Tag, class UT, class DT>
   struct hash<experimental::strong_random_incrementable<Tag,UT, DT>>
-    : experimental::wrapped_hash<experimental::strong_random_incrementable<Tag, UT, DT>> {};
+    : experimental::wrapping_hash<experimental::strong_random_incrementable<Tag, UT, DT>> {};
 
 }
 #endif // header

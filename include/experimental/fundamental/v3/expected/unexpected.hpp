@@ -201,12 +201,12 @@ inline namespace fundamental_v3
     return unexpected<exception_ptr> (current_exception());
   }
 
-  namespace wrapped  {
+  namespace wrapping  {
       template <class T>
       struct traits<unexpected<T>>
       {
           template <class U>
-          static auto unwrap(U&& u)
+          static auto underlying(U&& u)
           JASEL_DECLTYPE_RETURN_NOEXCEPT (
                   u.value()
           )

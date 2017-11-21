@@ -60,7 +60,7 @@ int main()
 
   {
       auto u = stde::unexpected<bool>(true);
-      auto b = stde::wrapped::unwrap(u);
+      auto b = stde::wrapping::underlying(u);
       static_assert(std::is_same<
           decltype(b),
           bool

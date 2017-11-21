@@ -8,9 +8,9 @@
 #define JASEL_FUNDAMENTAL_V3_STRONG_MIXIN_ORDINAL_HPP
 
 #include <experimental/fundamental/v2/config.hpp>
-#include <experimental/fundamental/v3/strong/underlying_type.hpp>
 #include <experimental/fundamental/v3/strong/strong_type.hpp>
 #include <experimental/ordinal.hpp>
+#include <experimental/wrapped.hpp>
 
 namespace std
 {
@@ -35,11 +35,11 @@ namespace std
     }
 
     template <class W
-    , class = enable_if_t<is_ordinal<typename W::underlying_type>{}>
+    , class = enable_if_t<is_ordinal<wrapping::unwrapped_type_t<W>>{}>
     >
     struct wrapped_ordinal_traits
     {
-      using T =  typename W::underlying_type;
+      using T =  wrapping::unwrapped_type_t<W>;
       using size_type = typename ordinal::traits<T>::size_type;
       using size = typename ordinal::traits<T>::size;
       static W val(size_type p) { return W{ordinal::val<T>(p)}; }

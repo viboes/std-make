@@ -7,10 +7,10 @@
 #ifndef JASEL_FUNDAMENTAL_V3_STRONG_WRAPPER_HPP
 #define JASEL_FUNDAMENTAL_V3_STRONG_WRAPPER_HPP
 
-#include <experimental/fundamental/v3/strong/underlying_type.hpp>
 #include <experimental/ordinal.hpp>
 #include <experimental/fundamental/v2/config.hpp>
 #include <experimental/type_traits.hpp>
+#include <experimental/wrapped.hpp>
 
 namespace std
 {
@@ -45,31 +45,18 @@ inline  namespace fundamental_v3
       underlying_type _value;
     };
 
-#if 0
-    // todo: this could help to find out the underlying type of any type inheriting from wrapper
-    // This comes from type_safe library.
-    namespace detail
-    {
-        template <typename T>
-        T underlying_type(wrapper<T>&);
-    } // namespace detail
-
-    /// The underlying type of the [ts::strong_typedef]().
-    /// \exclude target
-    template <class T>
-    using underlying_type_t2 =
-        decltype(detail::underlying_type(std::declval<T>()));
-
-#endif
-
-    //! underlying_type specialization for wrapper
-//    template <class UT>
-//    struct underlying_type<wrapper<UT>>
-//    { typedef UT type; };
-
+    namespace wrapping {
     template <typename T>
-    struct underlying_type<T, meta::when<is_base_of<wrapper_base, T>::value>>
-    { using type = typename T::underlying_type; };
+    struct traits<T, meta::when<is_base_of<wrapper_base, T>::value>>
+    {
+        template <class U>
+        static
+        auto underlying(U && u)
+        JASEL_DECLTYPE_RETURN_NOEXCEPT (
+                        forward<U>(u).underlying()
+        )
+    };
+    };
 
     //! public_wrapper is a wrapper that provides implicit conversion to the underlying type
     //!

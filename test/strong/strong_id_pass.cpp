@@ -17,7 +17,7 @@ using BoardId     = stdex::strong_id<class BoardIdTag>;
 using UEngineId = stdex::strong_id<class EngineIdTag, unsigned int>;
 using UCEngineId = stdex::strong_id<class EngineIdTag, unsigned char>;
 
-static_assert(std::is_same<stdex::underlying_type_t<EngineId>, int>::value, "");
+static_assert(std::is_same<stdex::unwrapped_type_t<EngineId>, int>::value, "");
 static_assert(stdex::is_ordinal<int>::value, "");
 static_assert(stdex::is_ordinal<EngineId>::value, "");
 

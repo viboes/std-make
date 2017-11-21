@@ -192,14 +192,14 @@ inline namespace fundamental_v3
         static constexpr
         auto deref(U && u)
         JASEL_DECLTYPE_RETURN_NOEXCEPT (
-                wrapped::unwrap(value_or_error::success_value(forward<U>(u)))
+                underlying_or_identity(value_or_error::success_value(forward<U>(u)))
         )
 
         template <class U>
         static constexpr
         auto error(U && u)
         JASEL_DECLTYPE_RETURN_NOEXCEPT (
-                wrapped::unwrap(value_or_error::failure_value(forward<U>(u)))
+                underlying_or_identity(value_or_error::failure_value(forward<U>(u)))
         )
 
     };

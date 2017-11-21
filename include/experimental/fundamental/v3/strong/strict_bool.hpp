@@ -8,7 +8,6 @@
 #define JASEL_FUNDAMENTAL_V3_STRONG_STRICT_BOOL_HPP
 
 #include <experimental/fundamental/v3/strong/strong_type.hpp>
-#include <experimental/fundamental/v3/strong/underlying_type.hpp>
 #include <experimental/fundamental/v3/strong/mixins/comparable.hpp>
 #include <experimental/fundamental/v3/strong/mixins/logical.hpp>
 #include <experimental/fundamental/v3/strong/mixins/hashable.hpp>
@@ -122,7 +121,7 @@ inline namespace fundamental_v3
 
   template <class Tag, class UT>
   struct hash<experimental::strict_bool<Tag,UT>> :
-    experimental::wrapped_hash<experimental::strict_bool<Tag,UT>> {};
+    experimental::wrapping_hash<experimental::strict_bool<Tag,UT>> {};
 
 }
 

@@ -8,7 +8,6 @@
 #define JASEL_FUNDAMENTAL_V3_STRONG_SAFE_BOOL_HPP
 
 #include <experimental/fundamental/v3/strong/strong_type.hpp>
-#include <experimental/fundamental/v3/strong/underlying_type.hpp>
 #include <experimental/fundamental/v3/strong/mixins/convertible.hpp>
 #include <experimental/fundamental/v3/strong/mixins/comparable.hpp>
 #include <experimental/fundamental/v3/strong/mixins/hashable.hpp>
@@ -177,7 +176,7 @@ inline namespace fundamental_v3
   //! Hash specialization forward to underlying type
   template <class UT>
   struct hash<experimental::safe_bool<UT>> :
-    experimental::wrapped_hash<experimental::safe_bool<UT>> {};
+    experimental::wrapping_hash<experimental::safe_bool<UT>> {};
 
 
 }

@@ -8,7 +8,6 @@
 #define JASEL_FUNDAMENTAL_V3_STRONG_STRONG_ENUMS_HPP
 
 #include <experimental/fundamental/v3/strong/strong_type.hpp>
-#include <experimental/fundamental/v3/strong/underlying_type.hpp>
 #include <experimental/fundamental/v3/strong/mixins/comparable.hpp>
 #include <experimental/fundamental/v3/strong/mixins/hashable.hpp>
 #include <experimental/fundamental/v3/strong/mixins/streamable.hpp>
@@ -164,13 +163,13 @@ inline namespace fundamental_v3
 
   template <class E, class UT>
   struct hash<experimental::strong_enum<E,UT>>
-    : experimental::wrapped_hash<experimental::strong_enum<E,UT>> {};
+    : experimental::wrapping_hash<experimental::strong_enum<E,UT>> {};
   template <class E, class UT>
   struct hash<experimental::safe_enum<E,UT>>
-    : experimental::wrapped_hash<experimental::safe_enum<E,UT>> {};
+    : experimental::wrapping_hash<experimental::safe_enum<E,UT>> {};
   template <class E, class UT>
   struct hash<experimental::ordinal_enum<E,UT>>
-    : experimental::wrapped_hash<experimental::ordinal_enum<E,UT>> {};
+    : experimental::wrapping_hash<experimental::ordinal_enum<E,UT>> {};
 }
 
 #endif // header

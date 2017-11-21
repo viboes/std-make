@@ -8,7 +8,6 @@
 #define JASEL_FUNDAMENTAL_V3_STRONG_STRONG_INT_HPP
 
 #include <experimental/fundamental/v3/strong/strong_type.hpp>
-#include <experimental/fundamental/v3/strong/underlying_type.hpp>
 #include <experimental/fundamental/v3/strong/mixins/additive.hpp>
 #include <experimental/fundamental/v3/strong/mixins/bitwise.hpp>
 #include <experimental/fundamental/v3/strong/mixins/comparable.hpp>
@@ -150,7 +149,7 @@ inline namespace fundamental_v3
   /// Hash specialization forwarding to the hash of underlying type
   template <class Tag, class UT>
   struct hash<experimental::strong_integral<Tag,UT>>
-    : experimental::wrapped_hash<experimental::strong_integral<Tag, UT>> {};
+    : experimental::wrapping_hash<experimental::strong_integral<Tag, UT>> {};
 
   /// numeric_limits specialization forwarding to the numeric_limits of underlying type
   template <class Tag, class UT>
