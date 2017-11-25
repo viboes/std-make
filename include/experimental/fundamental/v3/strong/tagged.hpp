@@ -34,6 +34,7 @@ inline  namespace fundamental_v3
       using base_type::base_type;
     };
 
+#if 0
     //! public_tagged is a tagged wrapper that provides implicit conversion to the underlying type
     //!
     //! @tparam Tag the tag type
@@ -72,7 +73,7 @@ inline  namespace fundamental_v3
       using base_type = private_wrapper<UT>;
       using base_type::base_type;
     };
-
+#endif
 }
 }
 }

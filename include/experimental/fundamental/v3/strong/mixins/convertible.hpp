@@ -20,22 +20,46 @@ namespace std
   {
     namespace mixin
     {
-      template <class Final, class T>
-      struct explicit_convertible_to
-      {
-        constexpr explicit operator T () const noexcept
+    template <class Final, class T>
+    struct explicit_convertible_to_ref
+    {
+        JASEL_CXX14_CONSTEXPR explicit operator T& () noexcept
         {
+            return static_cast<T>(Final::_final(this)._backdoor()._underlying());
+        }
+        constexpr explicit operator T const& () const noexcept
+        {
+            return static_cast<T>(Final::_final(this)._backdoor()._underlying());
+        }
+    };
+    template <class Final, class T>
+    struct explicit_convertible_to
+    {
+      constexpr explicit operator T () const noexcept
+      {
           return static_cast<T>(Final::_final(this).underlying());
-        }
-      };
-      template <class Final, class T>
-      struct implicit_convertible_to
-      {
-        constexpr operator T () const noexcept
+      }
+    };
+    template <class Final, class T>
+    struct implicit_convertible_to_ref
+    {
+        constexpr operator T const& () const noexcept
         {
-          return Final::_final(this).underlying();
+            return Final::_final(this)._backdoor()._underlying();
         }
-      };
+        JASEL_CXX14_CONSTEXPR operator T& () noexcept
+        {
+            return Final::_final(this)._backdoor()._underlying();
+        }
+    };
+    template <class Final, class T>
+    struct implicit_convertible_to
+    {
+      constexpr operator T () const noexcept
+      {
+          return Final::_final(this).underlying();
+      }
+    };
 
     }
     namespace meta_mixin

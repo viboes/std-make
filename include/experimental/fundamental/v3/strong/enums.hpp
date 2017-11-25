@@ -62,6 +62,7 @@ inline namespace fundamental_v3
 
   // This template must be specialized for enum wrappers
 
+  // this is equivalent to the boost::native_enum
   template <class E>
   enable_if_t<is_enum<E>::value, E> to_enum(E v)
   { return v; }
@@ -95,8 +96,12 @@ inline namespace fundamental_v3
       constexpr enum_wrapper(enum_type v) noexcept : base_type(UT(v)) {}
 
       enum_type to_enum() const noexcept { return enum_type(this->_value); }
-      explicit operator enum_type() const noexcept { return enum_type(this->_value); }
+      // Should the enum conversion be explicit?
+      // As the tag for the strong type would depend on the type enum E, it seems valid to have an implicit conversion
+      // If we had an additional tag the conversion shoul dbe explicit, as several classes enum_wrapper classes could wrap the same enum.
+      operator enum_type() const noexcept { return enum_type(this->_value); }
 
+      // Shouldn't we provide a UT conversion as enums do?
   };
 
   //! strong_enum ensures that static_cast is not allowed between two strong_enums
@@ -133,9 +138,6 @@ inline namespace fundamental_v3
 
   };
 
-//  template <class E, class UT>
-//  struct underlying_type<safe_enum<E,UT>> { typedef UT type; };
-
   // ordinal_enum is a strong enum that checks the validity of the values of the enum using is_enumerator
   // is_enumerator is specialized for ordinal enums
   template <class E, class UT=underlying_type<E>>
@@ -154,9 +156,6 @@ inline namespace fundamental_v3
       // Note that ordinal_enum order is based on the underlying type not the position
 
   };
-
-//  template <class E, class UT>
-//  struct underlying_type<ordinal_enum<E,UT>> { typedef UT type; };
 
 }
 }

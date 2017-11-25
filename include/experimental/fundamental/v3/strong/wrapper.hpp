@@ -58,6 +58,8 @@ inline  namespace fundamental_v3
     };
     };
 
+#if 0
+
     //! public_wrapper is a wrapper that provides implicit conversion to the underlying type
     //!
     //! @tparam UT the underlying type
@@ -106,7 +108,7 @@ inline  namespace fundamental_v3
       operator UT () const = delete;
     };
 
-
+#endif
 }
 }
 }
