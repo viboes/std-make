@@ -369,6 +369,12 @@ test-suite money_ts
 
     ;
 
+
+test-suite non_zero_integer
+    : 
+      [ run ../example/strong/non_zero_integer/flat_non_zero_integer.cpp  ]
+    ;
+
 explicit fix ;
 test-suite fix
     : 
