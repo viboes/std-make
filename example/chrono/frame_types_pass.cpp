@@ -107,7 +107,11 @@ private:
     subframe_number sfn;
 public:
 
-    constexpr x_subframe_tuple() = default;
+#if defined __clang__
+    // gcc doesn't accepts this
+    constexpr
+#endif
+    x_subframe_tuple() = default;
 
     /// pre-condition: fn and sfn are valid
     constexpr x_subframe_tuple(frame_number fn, subframe_number sfn) : fn(fn), sfn(sfn) {}

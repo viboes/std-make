@@ -17,6 +17,7 @@
 #include <chrono>
 #include <utility>
 #include <type_traits>
+#include <experimental/fundamental/v3/strong/mixins/is_compatible_with.hpp>
 
 namespace stdex = std::experimental;
 
@@ -88,6 +89,7 @@ namespace std {
   };
 
 namespace experimental {
+inline  namespace fundamental_v3{
 namespace mixin {
   template <class Domain1, class Domain2>
   struct is_compatible_with<duration_domain<Domain1>, duration_domain<Domain2>> : std::true_type {};
@@ -95,6 +97,7 @@ namespace mixin {
 
   template <class Period>
   struct domain_converter<duration_domain<Period>> : duration_domain<Period>  {  };
+}
 }
 }
 

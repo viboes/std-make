@@ -18,7 +18,7 @@
 
 #include <experimental/contract.hpp>
 
-#if __cplusplus > 201402L
+#if __cplusplus > 201402L && defined __clang__
 #include <optional>
 #endif
 
@@ -109,7 +109,7 @@ inline namespace fundamental_v3
       // This constructor is needed by the mixins that use the constructor from from underlying.
       constexpr explicit strong_bounded_int(UT v) : base_type(check_it(v)) {}
 
-#if __cplusplus > 201402L
+#if __cplusplus > 201402L && defined __clang__
       // safe construction
       static auto make( int v ) -> std::optional<strong_bounded_int> {
           if (v == 0) return std::nullopt;

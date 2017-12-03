@@ -26,9 +26,11 @@ struct offset_tag {};
 
 namespace std {
 namespace experimental {
+inline  namespace fundamental_v3{
 namespace mixin {
   template <>
   struct is_compatible_with<offset_tag, offset_tag> : std::true_type {};
+}
 }
 }
 }

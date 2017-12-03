@@ -78,9 +78,11 @@ namespace std
 
 namespace experimental
 {
+inline  namespace fundamental_v3 {
 namespace mixin {
   template <class Currency>
   struct is_compatible_with<money_domain<Currency>, money_domain<Currency>> : std::true_type {};
+}
 }
 
 template <class Currency>

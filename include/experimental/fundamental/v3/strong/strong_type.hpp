@@ -47,7 +47,9 @@ inline  namespace fundamental_v3
       using typename base_type::underlying_type;
 
       //! explicit conversion from a base const class to the @c Final class.
-      //! this should be accessible only to the mixin classes, but there is no risk to provide it as public interface, as
+      //! this should be accessible only to the mixin classes, but there is no risk to provide it as public interface,
+      //! as it doesn't provide additional access to the clients of the class `Final.
+      //! The use of the prefix `_` is intended as make his use less friendly.
       template<typename F>
       static constexpr Final const& _final(F const* f)  {
         return static_cast<Final const&>(*f);
@@ -88,10 +90,12 @@ inline  namespace fundamental_v3
 
     public:
       // The following should be accessible only to mixins of the Final class.
-      // But there is no way to declare friendship transitively or by inheritance
-      // We use a prefixed _
+      // But there is no way to declare friendship transitively or by inheritance.
+      // In order to have this access safe, we would need to add the mixin concept in the language and say that any mixing has friend access to the class.
+      // Until then, we use a prefixed _ to signal that this functions are almost private and usable only by mixins.
       // This is a way to limit the access to the underlying storage
-      // Alternatively the the access to a reference to the underlying type should be public.
+      // Alternatively the access to a reference to the underlying type should be public,
+      // but this opens too much the strong type.
       template<typename F>
       static constexpr const_backdoor _backdoor(F const* f)  {
         return const_backdoor(_final(f));

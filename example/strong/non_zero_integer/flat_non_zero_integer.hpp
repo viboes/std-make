@@ -8,7 +8,7 @@
 
 #include <cassert>
 
-#if __cplusplus > 201402L
+#if __cplusplus > 201402L && defined __clang__
 #include <optional>
 #endif
 
@@ -17,7 +17,7 @@ struct non_zero_integer
 public:
     using underlying_type = int;
 
-#if __cplusplus > 201402L
+#if __cplusplus > 201402L && defined __clang__
     // safe construction
     static auto make( int v ) -> std::optional<non_zero_integer> {
         if (v == 0) return std::nullopt;
@@ -103,7 +103,7 @@ private:
     underlying_type _value;
 };
 
-#if __cplusplus > 201402L
+#if __cplusplus > 201402L && defined __clang__
 using opt_non_zero_integer = std::optional<non_zero_integer>;
 #endif
 // implicit
@@ -125,7 +125,7 @@ using opt_non_zero_integer = std::optional<non_zero_integer>;
 //   optional<non_zero_integer> onzi;
 //   os >> onzi;
 
-#if __cplusplus > 201402L
+#if __cplusplus > 201402L && defined __clang__
 template <class ISTREAM>
 ISTREAM& operator>>(ISTREAM& is, std::optional<non_zero_integer>& onzi)
 {

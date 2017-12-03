@@ -38,10 +38,13 @@ struct common_type<money<Currency, UT1>, money<Currency, UT2>>
 };
 namespace experimental
 {
+inline  namespace fundamental_v3
+{
 namespace mixin
 {
 template <class Currency, class UT1, class UT2>
 struct is_compatible_with<money<Currency, UT1>, money<Currency, UT2>> : true_type {};
+}
 }
 namespace meta
 {

@@ -7,6 +7,7 @@
 
 #include <experimental/strong_counter.hpp>
 #include <sstream>
+#include <experimental/fundamental/v3/strong/mixins/is_compatible_with.hpp>
 
 #include <boost/detail/lightweight_test.hpp>
 
@@ -17,11 +18,13 @@ class AppelTag {};
 
 namespace std {
 namespace experimental {
+inline  namespace fundamental_v3{
 namespace mixin {
 template <>
 struct is_compatible_with<OrangeTag, OrangeTag> : std::true_type {};
 template <>
 struct is_compatible_with<AppelTag, AppelTag> : std::true_type {};
+}
 }
 }
 }

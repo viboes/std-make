@@ -155,11 +155,14 @@ struct money
         auto r = CR(m.count()) % s ;
         return money(r) ;
     }
+#if defined __clang__
+    // gcc doesn't accepts this
     template <class R1, class R2>
     friend constexpr money<Currency, typename std::common_type<R1,R2>::type> operator%(money<Currency, R1> m, money<Currency, R2> n) noexcept
     {
         return money(m.count() % n.count()) ;
     }
+#endif
     JASEL_CXX14_CONSTEXPR money& operator%=(int x) noexcept
     {
         rep %= x;

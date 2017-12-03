@@ -17,7 +17,7 @@ int main()
     }
 #endif
 
-#if __cplusplus > 201402L
+#if __cplusplus > 201402L && defined __clang__
     {
         opt_non_zero_integer onzi = non_zero_integer::make(5);
         BOOST_TEST(bool(onzi));
