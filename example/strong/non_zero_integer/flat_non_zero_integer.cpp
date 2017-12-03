@@ -17,6 +17,7 @@ int main()
     }
 #endif
 
+#if __cplusplus > 201402L
     {
         opt_non_zero_integer onzi = non_zero_integer::make(5);
         BOOST_TEST(bool(onzi));
@@ -28,9 +29,9 @@ int main()
         opt_non_zero_integer onzi = non_zero_integer::make(0);
         BOOST_TEST( ! bool(onzi) );
     }
+#endif
     {
-        opt_non_zero_integer onzi = non_zero_integer::make(5);
-        non_zero_integer a = *onzi;
+        non_zero_integer a = non_zero_integer::cast(5);
         BOOST_TEST(a == a);
     }
     {
@@ -50,90 +51,79 @@ int main()
     }
 #endif
     {
-        opt_non_zero_integer onzi = non_zero_integer::make(5);
-        non_zero_integer a = *onzi;
-        static_assert(std::is_same<decltype(-a), non_zero_integer>::value);
+        non_zero_integer a = non_zero_integer::cast(5);
+        static_assert(std::is_same<decltype(-a), non_zero_integer>::value, "");
         BOOST_TEST(a == -(-a));
         BOOST_TEST(-a == -5);
     }
     {
-        opt_non_zero_integer onzi = non_zero_integer::make(5);
-        non_zero_integer a = *onzi;
-        static_assert(std::is_same<decltype(+a), non_zero_integer>::value);
+        non_zero_integer a = non_zero_integer::cast(5);
+        static_assert(std::is_same<decltype(+a), non_zero_integer>::value, "");
         BOOST_TEST(a == +a);
         BOOST_TEST(a == 5);
     }
     {
-        opt_non_zero_integer onzi = non_zero_integer::make(5);
-        non_zero_integer a = *onzi;
+        non_zero_integer a = non_zero_integer::cast(5);
         BOOST_TEST(a+1 == 1+a);
-        static_assert(std::is_same<decltype(a+1), int>::value);
-        static_assert(std::is_same<decltype(1+a), int>::value);
+        static_assert(std::is_same<decltype(a+1), int>::value, "");
+        static_assert(std::is_same<decltype(1+a), int>::value, "");
     }
     {
-        opt_non_zero_integer onzi = non_zero_integer::make(5);
-        non_zero_integer a = *onzi;
+        non_zero_integer a = non_zero_integer::cast(5);
         non_zero_integer b = a;
         BOOST_TEST(a == b);
         BOOST_TEST(a+b == b+a);
-        static_assert(std::is_same<decltype(a+b), non_zero_integer>::value);
-        static_assert(std::is_same<decltype(b+a), non_zero_integer>::value);
+        static_assert(std::is_same<decltype(a+b), non_zero_integer>::value, "");
+        static_assert(std::is_same<decltype(b+a), non_zero_integer>::value, "");
         BOOST_TEST(a+b == 10);
     }
     {
-        opt_non_zero_integer onzi = non_zero_integer::make(5);
-        non_zero_integer a = *onzi;
+        non_zero_integer a = non_zero_integer::cast(5);
         non_zero_integer b = a;
         a += b;
         BOOST_TEST(a == 10);
         BOOST_TEST(b == 5);
     }
     {
-        opt_non_zero_integer onzi = non_zero_integer::make(5);
-        non_zero_integer a = *onzi;
+        non_zero_integer a = non_zero_integer::cast(5);
         BOOST_TEST(a-1 == 4);
         BOOST_TEST(1-a == -4);
         BOOST_TEST(a-1 == -(1-a));
-        static_assert(std::is_same<decltype(a-1), int>::value);
-        static_assert(std::is_same<decltype(1-a), int>::value);
+        static_assert(std::is_same<decltype(a-1), int>::value, "");
+        static_assert(std::is_same<decltype(1-a), int>::value, "");
     }
     {
-        opt_non_zero_integer onzi = non_zero_integer::make(5);
-        non_zero_integer a = *onzi;
+        non_zero_integer a = non_zero_integer::cast(5);
         non_zero_integer b = a;
         BOOST_TEST(a-b == 0);
-        static_assert(std::is_same<decltype(a-b), int>::value);
+        static_assert(std::is_same<decltype(a-b), int>::value, "");
     }
 
 #ifdef COMPILE_FAILS
     {
-        opt_non_zero_integer onzi = non_zero_integer::make(5);
-        non_zero_integer a = *onzi;
+        non_zero_integer a = non_zero_integer::cast(5);
         non_zero_integer b = a;
         a -= b; // compile fails
     }
 #endif
     {
-        opt_non_zero_integer onzi = non_zero_integer::make(5);
-        non_zero_integer a = *onzi;
+        non_zero_integer a = non_zero_integer::cast(5);
         BOOST_TEST(a*1 == 1*a);
         BOOST_TEST(a*1 == a);
-        static_assert(std::is_same<decltype(a*1), int>::value);
-        static_assert(std::is_same<decltype(1*a), int>::value);
+        static_assert(std::is_same<decltype(a*1), int>::value, "");
+        static_assert(std::is_same<decltype(1*a), int>::value, "");
     }
     {
-        opt_non_zero_integer onzi = non_zero_integer::make(5);
-        non_zero_integer a = *onzi;
+        non_zero_integer a = non_zero_integer::cast(5);
         non_zero_integer b = a;
         BOOST_TEST(a == b);
         BOOST_TEST(a*b == b*a);
-        static_assert(std::is_same<decltype(a*b), non_zero_integer>::value);
-        static_assert(std::is_same<decltype(b*a), non_zero_integer>::value);
+        static_assert(std::is_same<decltype(a*b), non_zero_integer>::value, "");
+        static_assert(std::is_same<decltype(b*a), non_zero_integer>::value, "");
         BOOST_TEST(a*b == 25);
     }
     {
-        opt_non_zero_integer onzi = non_zero_integer::make(5);
-        non_zero_integer a = *onzi;
+        non_zero_integer a = non_zero_integer::cast(5);
         non_zero_integer b = a;
         a *= b;
         BOOST_TEST(a == b*b);

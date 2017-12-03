@@ -7,18 +7,23 @@
 #define JASEL_FUNDAMENTAL_V3_STRONG_NON_ZERO_INTEGER_HPP
 
 #include <cassert>
+
+#if __cplusplus > 201402L
 #include <optional>
+#endif
 
 struct non_zero_integer
 {
 public:
     using underlying_type = int;
 
+#if __cplusplus > 201402L
     // safe construction
     static auto make( int v ) -> std::optional<non_zero_integer> {
         if (v == 0) return std::nullopt;
         return non_zero_integer(v);
     }
+#endif
 
     // unsafe construction
     static auto cast( int v ) -> non_zero_integer {
@@ -98,8 +103,9 @@ private:
     underlying_type _value;
 };
 
+#if __cplusplus > 201402L
 using opt_non_zero_integer = std::optional<non_zero_integer>;
-
+#endif
 // implicit
 //template <class OSTREAM>
 //OSTREAM& operator<<(OSTREAM& os, non_zero_integer x);
@@ -119,6 +125,7 @@ using opt_non_zero_integer = std::optional<non_zero_integer>;
 //   optional<non_zero_integer> onzi;
 //   os >> onzi;
 
+#if __cplusplus > 201402L
 template <class ISTREAM>
 ISTREAM& operator>>(ISTREAM& is, std::optional<non_zero_integer>& onzi)
 {
@@ -127,7 +134,7 @@ ISTREAM& operator>>(ISTREAM& is, std::optional<non_zero_integer>& onzi)
     onzi = non_zero_integer::make(i);
     return is;
 }
-
+#endif
 
 
 
