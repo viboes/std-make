@@ -18,6 +18,10 @@
 
 #include <experimental/contract.hpp>
 
+#if __cplusplus > 201402L
+#include <optional>
+#endif
+
 #include <stdexcept>
 #include <limits>
 #include <functional>
@@ -76,6 +80,8 @@ inline namespace fundamental_v3
         , meta_mixin::streamable<>
     >
   {
+      struct no_check{};
+
       static_assert(is_integral<UT>::value, "UT must be integral");
       static_assert(Low <= High, "Low must be less equal than High");
 
@@ -85,18 +91,40 @@ inline namespace fundamental_v3
 
       enum bounds : UT { low=Low, high=High };
 
+            // copy constructor/assignment default
+      constexpr strong_bounded_int() noexcept = default;
+
       static constexpr bool valid(UT x) noexcept
       {
         return (Low <= x && x <= High) ;
       }
-      static JASEL_CXX14_CONSTEXPR UT cast(UT x)
+  private:
+      static JASEL_CXX14_CONSTEXPR UT check_it(UT x)
       {
           JASEL_EXPECTS( valid(x) );
           return x;
       }
-      // copy constructor/assignment default
-      constexpr strong_bounded_int() noexcept = default;
-      constexpr explicit strong_bounded_int(UT v) : base_type(cast(v)) {}
+  public:
+
+      // This constructor is needed by the mixins that use the constructor from from underlying.
+      constexpr explicit strong_bounded_int(UT v) : base_type(check_it(v)) {}
+
+#if __cplusplus > 201402L
+      // safe construction
+      static auto make( int v ) -> std::optional<strong_bounded_int> {
+          if (v == 0) return std::nullopt;
+          return strong_bounded_int(no_check{}, v);
+      }
+#endif
+      // unsafe construction
+      static auto cast( UT v ) -> strong_bounded_int {
+          JASEL_EXPECTS( valid(v) );
+          //assert (valid(v)  && "v must be in range");
+          return strong_bounded_int(no_check{}, v);
+      }
+  private:
+      constexpr explicit strong_bounded_int(no_check, UT v) : base_type(v) {}
+  public:
   };
 
   static_assert(std::is_pod<strong_bounded_int<bool,int,0,3>>::value, "");
