@@ -151,7 +151,7 @@ namespace detail
       };
 
       /* Function version */
-      /* I just ignore eplisis, there is no way to wrap it */
+      /* I just ignore ellipsis, there is no way to wrap it */
       #define WRAP_CALL_FOR_MEMBER_FUNCTION(cv_ref_qual) \
       template<typename C, typename R, typename... Args> \
       struct wrap_call<R (C::*)(Args...) cv_ref_qual>  \
