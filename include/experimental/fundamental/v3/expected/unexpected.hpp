@@ -24,10 +24,18 @@ inline namespace fundamental_v3
 {
 
   template <typename ErrorType = error_code>
+  class unexpected;
+  template <typename ErrorType>
   class unexpected
   {
+#if ! defined __clang__
+      // fixme:: gcc needs this to be public or declare expected as friend
   public:
-    ErrorType error_;
+#endif
+      ErrorType error_;
+      template < class Err >
+      friend class unexpected;
+  public:
     unexpected() = delete;
 
     JASEL_0_REQUIRES(is_copy_constructible<ErrorType>::value)
@@ -71,6 +79,25 @@ inline namespace fundamental_v3
     {
     }
 
+#if 0
+    BOOST_CONSTEXPR unexpected(unexpected const& e) = default;
+    BOOST_CONSTEXPR unexpected(unexpected<Err>&& e) = default;
+    template < class Err >
+    BOOST_FORCEINLINE BOOST_CONSTEXPR unexpected& operator=(unexpected<Err> const& e
+        , JASEL_REQUIRES( is_constructible<ErrorType, Err>::value)
+        )
+    {
+        error_ = e.error_;
+    }
+    template < class Err >
+    BOOST_FORCEINLINE BOOST_CONSTEXPR unexpected& operator=(unexpected<Err>&& e
+        , JASEL_REQUIRES( is_constructible<ErrorType, Err&&>::value)
+        )
+    {
+        error_ = move(e.error_);
+    }
+#endif
+
 #if ! defined JASEL_NO_CXX11_RVALUE_REFERENCE_FOR_THIS
 
     BOOST_CXX14_CONSTEXPR
@@ -85,6 +112,11 @@ inline namespace fundamental_v3
     }
     JASEL_CONSTEXPR_IF_MOVE_ACCESSORS
     BOOST_FORCEINLINE ErrorType&& value() &&
+    {
+      return constexpr_move(error_);
+    }
+    JASEL_CONSTEXPR_IF_MOVE_ACCESSORS
+    BOOST_FORCEINLINE const ErrorType&& value() const&&
     {
       return constexpr_move(error_);
     }
@@ -111,6 +143,10 @@ inline namespace fundamental_v3
   template <>
   struct unexpected<exception_ptr>
   {
+#if ! defined __clang__
+      // fixme:: gcc needs this to be public or declare expected as friend
+  public:
+#endif
     exception_ptr error_;
   public:
     unexpected() = delete;
@@ -131,10 +167,50 @@ inline namespace fundamental_v3
       error_(make_exception_ptr(e))
     {
     }
+#if defined __clang__
+#if ! defined JASEL_NO_CXX11_RVALUE_REFERENCE_FOR_THIS
+
+    BOOST_CXX14_CONSTEXPR
+    BOOST_FORCEINLINE exception_ptr const& value() const&
+    {
+      return error_;
+    }
+    BOOST_CXX14_CONSTEXPR
+    BOOST_FORCEINLINE exception_ptr& value() &
+    {
+      return error_;
+    }
+    JASEL_CONSTEXPR_IF_MOVE_ACCESSORS
+    BOOST_FORCEINLINE exception_ptr&& value() &&
+    {
+      return constexpr_move(error_);
+    }
+    JASEL_CONSTEXPR_IF_MOVE_ACCESSORS
+    BOOST_FORCEINLINE const exception_ptr&& value() const&&
+    {
+      return constexpr_move(error_);
+    }
+#else
+    BOOST_CONSTEXPR
     BOOST_FORCEINLINE exception_ptr const& value() const
     {
       return error_;
     }
+    BOOST_FORCEINLINE exception_ptr& value()
+    {
+      return error_;
+    }
+#endif
+#else
+    BOOST_FORCEINLINE exception_ptr const& value() const
+    {
+      return error_;
+    }
+    BOOST_FORCEINLINE exception_ptr& value()
+    {
+      return error_;
+    }
+#endif
   };
 #endif
 

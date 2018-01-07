@@ -261,9 +261,15 @@ union no_trivial_expected_storage
   BOOST_CXX14_CONSTEXPR const unexpected_t &unexpected_() const& { return _unexpected; }
   BOOST_CXX14_CONSTEXPR unexpected_t &unexpected_() &{ return _unexpected; }
   JASEL_CONSTEXPR_IF_MOVE_ACCESSORS unexpected_t &&unexpected_() &&{ return move(_unexpected); }
+  JASEL_CONSTEXPR_IF_MOVE_ACCESSORS const unexpected_t &&unexpected_() const &&{ return move(_unexpected); }
   BOOST_CXX14_CONSTEXPR const error_type &err() const& { return _unexpected.value(); }
+#if defined __clang__
+  BOOST_CXX14_CONSTEXPR error_type &err() & { return _unexpected.value(); }
+#else
   BOOST_CXX14_CONSTEXPR error_type &err() & { return _unexpected.error_; } // fixme
+#endif
   JASEL_CONSTEXPR_IF_MOVE_ACCESSORS error_type &&err() && { return move(_unexpected.value()); }
+  JASEL_CONSTEXPR_IF_MOVE_ACCESSORS const error_type &&err() const && { return move(_unexpected.value()); }
 #else
   constexpr const unexpected_t &unexpected_() const { return _unexpected; }
   constexpr unexpected_t &unexpected_() { return _unexpected; }
@@ -459,6 +465,8 @@ struct trivial_expected_base
   }
   JASEL_CONSTEXPR_IF_MOVE_ACCESSORS
   value_type&& contained_val() && { return move(storage.val()); }
+  JASEL_CONSTEXPR_IF_MOVE_ACCESSORS
+  const value_type&& contained_val() const && { return move(storage.val()); }
 
   constexpr const unexpected_t& contained_unexpected() const&
   {
@@ -468,12 +476,16 @@ struct trivial_expected_base
   unexpected_t& contained_unexpected_t() & { return storage.unexpected_(); }
   JASEL_CONSTEXPR_IF_MOVE_ACCESSORS
   unexpected_t&& contained_unexpected_t() && { return move(storage.unexpected_()); }
+  JASEL_CONSTEXPR_IF_MOVE_ACCESSORS
+  const unexpected_t&& contained_unexpected_t() const && { return move(storage.unexpected_()); }
 
   constexpr const error_type& contained_err() const& { return storage.err(); }
   JASEL_CONSTEXPR_IF_MOVE_ACCESSORS
   error_type& contained_err() & { return storage.err(); }
   JASEL_CONSTEXPR_IF_MOVE_ACCESSORS
   error_type&& contained_err() && { return move(storage.err()); }
+  JASEL_CONSTEXPR_IF_MOVE_ACCESSORS
+  const error_type&& contained_err() const && { return move(storage.err()); }
 
 #else
   constexpr const value_type& contained_val() const { return storage.val(); }
@@ -616,12 +628,16 @@ struct trivial_expected_base<void, E, AreCopyConstructible, AreMoveConstructible
   unexpected_t& contained_unexpected() & { return storage.unexpected_(); }
   JASEL_CONSTEXPR_IF_MOVE_ACCESSORS
   unexpected_t&& contained_unexpected() && { return move(storage.unexpected_()); }
+  JASEL_CONSTEXPR_IF_MOVE_ACCESSORS
+  const unexpected_t&& contained_unexpected() const && { return move(storage.unexpected_()); }
 
   constexpr const error_type& contained_err() const& { return storage.err(); }
   JASEL_CONSTEXPR_IF_MOVE_ACCESSORS
   error_type& contained_err() & { return storage.err(); }
   JASEL_CONSTEXPR_IF_MOVE_ACCESSORS
   error_type&& contained_err() && { return move(storage.err()); }
+  JASEL_CONSTEXPR_IF_MOVE_ACCESSORS
+  const error_type&& contained_err() const && { return move(storage.err()); }
 
 #else
   constexpr const unexpected_t& contained_unexpected() const { return storage.unexpected_(); }
@@ -788,6 +804,8 @@ struct no_trivial_expected_base
   }
   JASEL_CONSTEXPR_IF_MOVE_ACCESSORS
   value_type&& contained_val() && { return move(storage.val()); }
+  JASEL_CONSTEXPR_IF_MOVE_ACCESSORS
+  const value_type&& contained_val() const&& { return move(storage.val()); }
 
   constexpr const unexpected_t& contained_unexpected() const& { return storage.unexpected_(); }
   JASEL_CONSTEXPR_IF_MOVE_ACCESSORS
@@ -797,12 +815,16 @@ struct no_trivial_expected_base
   }
   JASEL_CONSTEXPR_IF_MOVE_ACCESSORS
   unexpected_t&& contained_unexpected() && { return move(storage.unexpected_()); }
+  JASEL_CONSTEXPR_IF_MOVE_ACCESSORS
+  const unexpected_t&& contained_unexpected() const&& { return move(storage.unexpected_()); }
 
   constexpr const error_type& contained_err() const& { return storage.err(); }
   JASEL_CONSTEXPR_IF_MOVE_ACCESSORS
   error_type& contained_err() & { return storage.err(); }
   JASEL_CONSTEXPR_IF_MOVE_ACCESSORS
   error_type&& contained_err() && { return move(storage.err()); }
+  JASEL_CONSTEXPR_IF_MOVE_ACCESSORS
+  const error_type&& contained_err() const&& { return move(storage.err()); }
 
 #else
   constexpr const value_type& contained_val() const { return storage.val(); }
@@ -968,18 +990,24 @@ struct no_trivial_expected_base<T, E, false, AreMoveConstructible>
   value_type& contained_val() & { return storage.val(); }
   JASEL_CONSTEXPR_IF_MOVE_ACCESSORS
   value_type&& contained_val() && { return move(storage.val()); }
+  JASEL_CONSTEXPR_IF_MOVE_ACCESSORS
+  const value_type&& contained_val() const && { return move(storage.val()); }
 
   constexpr const unexpected_t& contained_unexpected() const& { return storage.unexpected_(); }
   JASEL_CONSTEXPR_IF_MOVE_ACCESSORS
   unexpected_t& contained_unexpected() & { return storage.unexpected_(); }
   JASEL_CONSTEXPR_IF_MOVE_ACCESSORS
   unexpected_t&& contained_unexpected() && { return move(storage.unexpected_()); }
+  JASEL_CONSTEXPR_IF_MOVE_ACCESSORS
+  const unexpected_t&& contained_unexpected() const && { return move(storage.unexpected_()); }
 
   constexpr const error_type& contained_err() const& { return storage.err(); }
   JASEL_CONSTEXPR_IF_MOVE_ACCESSORS
   error_type& contained_err() & { return storage.err(); }
   JASEL_CONSTEXPR_IF_MOVE_ACCESSORS
   error_type&& contained_err() && { return move(storage.err()); }
+  JASEL_CONSTEXPR_IF_MOVE_ACCESSORS
+  const error_type&& contained_err() const&& { return move(storage.err()); }
 
 #else
   constexpr const value_type& contained_val() const { return storage.val(); }
@@ -1111,18 +1139,24 @@ struct no_trivial_expected_base<T, E, AreCopyConstructible, false>
   value_type& contained_val() & { return storage.val(); }
   JASEL_CONSTEXPR_IF_MOVE_ACCESSORS
   value_type&& contained_val() && { return move(storage.val()); }
+  JASEL_CONSTEXPR_IF_MOVE_ACCESSORS
+  const value_type&& contained_val() const && { return move(storage.val()); }
 
   constexpr const error_type& contained_err() const& { return storage.err(); }
   JASEL_CONSTEXPR_IF_MOVE_ACCESSORS
   error_type& contained_err() & { return storage.err(); }
   JASEL_CONSTEXPR_IF_MOVE_ACCESSORS
   error_type&& contained_err() && { return move(storage.err()); }
+  JASEL_CONSTEXPR_IF_MOVE_ACCESSORS
+  const error_type&& contained_err() const && { return move(storage.err()); }
 
   constexpr const unexpected_t& contained_unexpected() const& { return storage.unexpected_(); }
   JASEL_CONSTEXPR_IF_MOVE_ACCESSORS
   unexpected_t& contained_unexpected() & { return storage.unexpected_(); }
   JASEL_CONSTEXPR_IF_MOVE_ACCESSORS
   unexpected_t&& contained_unexpected() && { return move(storage.unexpected_()); }
+  JASEL_CONSTEXPR_IF_MOVE_ACCESSORS
+  const unexpected_t&& contained_unexpected() const && { return move(storage.unexpected_()); }
 
 #else
   constexpr const value_type& contained_val() const { return storage.val(); }
@@ -1233,18 +1267,24 @@ struct no_trivial_expected_base<T, E, false, false>
   value_type& contained_val() & { return storage.val(); }
   JASEL_CONSTEXPR_IF_MOVE_ACCESSORS
   value_type&& contained_val() && { return move(storage.val()); }
+  JASEL_CONSTEXPR_IF_MOVE_ACCESSORS
+  const value_type&& contained_val() const&& { return move(storage.val()); }
 
   constexpr const error_type& contained_err() const& { return storage.err(); }
   JASEL_CONSTEXPR_IF_MOVE_ACCESSORS
   error_type& contained_err() & { return storage.err(); }
   JASEL_CONSTEXPR_IF_MOVE_ACCESSORS
   error_type&& contained_err() && { return move(storage.err()); }
+  JASEL_CONSTEXPR_IF_MOVE_ACCESSORS
+  const error_type&& contained_err() const&& { return move(storage.err()); }
 
   constexpr const unexpected_t& contained_unexpected() const& { return storage.unexpected_(); }
   JASEL_CONSTEXPR_IF_MOVE_ACCESSORS
   unexpected_t& contained_unexpected() & { return storage.unexpected_(); }
   JASEL_CONSTEXPR_IF_MOVE_ACCESSORS
   unexpected_t&& contained_unexpected() && { return move(storage.unexpected_()); }
+  JASEL_CONSTEXPR_IF_MOVE_ACCESSORS
+  const unexpected_t&& contained_unexpected() const && { return move(storage.unexpected_()); }
 
 #else
   constexpr const value_type& contained_val() const { return storage.val(); }
@@ -1317,6 +1357,8 @@ struct no_trivial_expected_base<void, E, AreCopyConstructible, AreMoveConstructi
   error_type& contained_err() & { return storage.err(); }
   JASEL_CONSTEXPR_IF_MOVE_ACCESSORS
   error_type&& contained_err() && { return move(storage.err()); }
+  JASEL_CONSTEXPR_IF_MOVE_ACCESSORS
+  const error_type&& contained_err() const && { return move(storage.err()); }
 
   constexpr const unexpected_t& contained_unexpected() const& { return storage.unexpected_(); }
   JASEL_CONSTEXPR_IF_MOVE_ACCESSORS
@@ -1326,6 +1368,8 @@ struct no_trivial_expected_base<void, E, AreCopyConstructible, AreMoveConstructi
   }
   JASEL_CONSTEXPR_IF_MOVE_ACCESSORS
   unexpected_t&& contained_unexpected() && { return move(storage.unexpected_()); }
+  JASEL_CONSTEXPR_IF_MOVE_ACCESSORS
+  const unexpected_t&& contained_unexpected() const && { return move(storage.unexpected_()); }
 
 #else
   constexpr const error_type& contained_err() const { return storage.err(); }
@@ -1457,12 +1501,16 @@ struct no_trivial_expected_base<void, E, false, AreMoveConstructible> {
   error_type& contained_err() & { return storage.err(); }
   JASEL_CONSTEXPR_IF_MOVE_ACCESSORS
   error_type&& contained_err() && { return move(storage.err()); }
+  JASEL_CONSTEXPR_IF_MOVE_ACCESSORS
+  const error_type&& contained_err() const && { return move(storage.err()); }
 
   constexpr const unexpected_t& contained_unexpected() const& { return storage.unexpected_(); }
   JASEL_CONSTEXPR_IF_MOVE_ACCESSORS
   unexpected_t& contained_unexpected() & { return storage.unexpected_(); }
   JASEL_CONSTEXPR_IF_MOVE_ACCESSORS
   unexpected_t&& contained_unexpected() && { return move(storage.unexpected_()); }
+  JASEL_CONSTEXPR_IF_MOVE_ACCESSORS
+  const unexpected_t&& contained_unexpected() const && { return move(storage.unexpected_()); }
 
 #else
   constexpr const error_type& contained_err() const { return storage.err(); }
@@ -1544,12 +1592,16 @@ struct no_trivial_expected_base<void, E, AreCopyConstructible, false> {
   error_type& contained_err() & { return storage.err(); }
   JASEL_CONSTEXPR_IF_MOVE_ACCESSORS
   error_type&& contained_err() && { return move(storage.err()); }
+  JASEL_CONSTEXPR_IF_MOVE_ACCESSORS
+  const error_type&& contained_err() const&& { return move(storage.err()); }
 
   constexpr const unexpected_t& contained_unexpected() const& { return storage.unexpected_(); }
   JASEL_CONSTEXPR_IF_MOVE_ACCESSORS
   unexpected_t& contained_unexpected() & { return storage.unexpected_(); }
   JASEL_CONSTEXPR_IF_MOVE_ACCESSORS
   unexpected_t&& contained_unexpected() && { return move(storage.unexpected_()); }
+  JASEL_CONSTEXPR_IF_MOVE_ACCESSORS
+  const unexpected_t&& contained_unexpected() const && { return move(storage.unexpected_()); }
 
 #else
   constexpr const error_type& contained_err() const { return storage.err(); }
@@ -1770,6 +1822,8 @@ private:
   bool& contained_has_value() & { return base_type::has_value; }
   JASEL_CONSTEXPR_IF_MOVE_ACCESSORS
   bool&& contained_has_value() && { return move(base_type::has_value); }
+  JASEL_CONSTEXPR_IF_MOVE_ACCESSORS
+  const bool&& contained_has_value() const && { return move(base_type::has_value); }
 
   constexpr const value_type& contained_val() const&
   {
@@ -1782,12 +1836,16 @@ private:
   }
   JASEL_CONSTEXPR_IF_MOVE_ACCESSORS
   value_type&& contained_val() && { return move(base_type::storage.val()); }
+  JASEL_CONSTEXPR_IF_MOVE_ACCESSORS
+  const value_type&& contained_val() const && { return move(base_type::storage.val()); }
 
   constexpr const error_type& contained_err() const& { return base_type::storage.err(); }
   JASEL_CONSTEXPR_IF_MOVE_ACCESSORS
   error_type& contained_err() & { return base_type::storage.err(); }
   JASEL_CONSTEXPR_IF_MOVE_ACCESSORS
   error_type&& contained_err() && { return move(base_type::storage.err()); }
+  JASEL_CONSTEXPR_IF_MOVE_ACCESSORS
+  const error_type&& contained_err() const && { return move(base_type::storage.err()); }
 
   constexpr const unexpected_t& contained_unexpected() const&
   {
@@ -1800,6 +1858,8 @@ private:
   }
   JASEL_CONSTEXPR_IF_MOVE_ACCESSORS
   unexpected_t&& contained_unexpected() && { return move(base_type::storage.unexpected_()); }
+  JASEL_CONSTEXPR_IF_MOVE_ACCESSORS
+  const unexpected_t&& contained_unexpected() const && { return move(base_type::storage.unexpected_()); }
 
 #else
   constexpr const bool& contained_has_value() const BOOST_NOEXCEPT { return base_type::has_value; }
@@ -2141,6 +2201,11 @@ public:
     if (!valid()) error_traits<error_type>::rethrow(contained_err());
     return move(contained_val());
   }
+  JASEL_CONSTEXPR_IF_MOVE_ACCESSORS const value_type&& value() const&&
+  {
+    if (!valid()) error_traits<error_type>::rethrow(contained_err());
+    return move(contained_val());
+  }
 
 #else
   value_type& value()
@@ -2171,6 +2236,10 @@ public:
     return contained_val();
   }
   JASEL_CONSTEXPR_IF_MOVE_ACCESSORS value_type&& operator*() && BOOST_NOEXCEPT
+  {
+    return constexpr_move(contained_val());
+  }
+  JASEL_CONSTEXPR_IF_MOVE_ACCESSORS const value_type&& operator*() const && BOOST_NOEXCEPT
   {
     return constexpr_move(contained_val());
   }
@@ -2210,6 +2279,10 @@ public:
   {
     return constexpr_move(contained_err());
   }
+  JASEL_CONSTEXPR_IF_MOVE_ACCESSORS const error_type&& error() const && BOOST_NOEXCEPT
+  {
+    return constexpr_move(contained_err());
+  }
 #else
   constexpr error_type const& error() const BOOST_NOEXCEPT
   {
@@ -2233,6 +2306,10 @@ public:
   }
 
   JASEL_CONSTEXPR_IF_MOVE_ACCESSORS unexpected<error_type>&& get_unexpected() && BOOST_NOEXCEPT
+  {
+    return constexpr_move(contained_unexpected());
+  }
+  JASEL_CONSTEXPR_IF_MOVE_ACCESSORS const unexpected<error_type>&& get_unexpected() const && BOOST_NOEXCEPT
   {
     return constexpr_move(contained_unexpected());
   }
@@ -2725,12 +2802,16 @@ private:
   bool& contained_has_value() & { return base_type::has_value; }
   JASEL_CONSTEXPR_IF_MOVE_ACCESSORS
   bool&& contained_has_value() && { return move(base_type::has_value); }
+  JASEL_CONSTEXPR_IF_MOVE_ACCESSORS
+  const bool&& contained_has_value() const && { return move(base_type::has_value); }
 
   constexpr const error_type& contained_err() const& { return base_type::storage.err(); }
   JASEL_CONSTEXPR_IF_MOVE_ACCESSORS
   error_type& contained_err() & { return base_type::storage.err(); }
   JASEL_CONSTEXPR_IF_MOVE_ACCESSORS
   error_type&& contained_err() && { return move(base_type::storage.err()); }
+  JASEL_CONSTEXPR_IF_MOVE_ACCESSORS
+  const error_type&& contained_err() const && { return move(base_type::storage.err()); }
 
 #else
   constexpr const bool& contained_has_value() const BOOST_NOEXCEPT { return base_type::has_value; }
