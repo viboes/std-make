@@ -38,60 +38,57 @@ inline namespace fundamental_v3
   public:
     unexpected() = delete;
 
-    JASEL_0_REQUIRES(is_copy_constructible<ErrorType>::value)
-    BOOST_FORCEINLINE BOOST_CONSTEXPR explicit unexpected(ErrorType const& e) :
-      error_(e)
-    {
-    }
-    JASEL_0_REQUIRES(is_move_constructible<ErrorType>::value)
-    BOOST_FORCEINLINE BOOST_CONSTEXPR explicit unexpected(ErrorType&& e) :
+    template < class Err >
+    BOOST_FORCEINLINE BOOST_CONSTEXPR explicit unexpected(Err&& e
+        , JASEL_REQUIRES( is_constructible<ErrorType, decay_t<Err>&&>::value )
+        ) :
       error_(move(e))
     {
     }
 
     template < class Err >
     BOOST_FORCEINLINE BOOST_CONSTEXPR explicit unexpected(unexpected<Err> const& e
-        , JASEL_REQUIRES( is_constructible<ErrorType, Err>::value)
+        , JASEL_REQUIRES( is_constructible<ErrorType, Err>::value && ! is_convertible<Err, ErrorType>::value)
+        ) :
+      error_(e.error_)
+    {
+    }
+    template < class Err >
+    BOOST_FORCEINLINE BOOST_CONSTEXPR unexpected(unexpected<Err> const& e
+        , JASEL_REQUIRES( is_constructible<ErrorType, Err>::value && is_convertible<Err, ErrorType>::value)
         ) :
       error_(e.error_)
     {
     }
     template < class Err >
     BOOST_FORCEINLINE BOOST_CONSTEXPR explicit unexpected(unexpected<Err>&& e
-        , JASEL_REQUIRES( is_constructible<ErrorType, Err&&>::value)
+        , JASEL_REQUIRES( is_constructible<ErrorType, Err&&>::value && ! is_convertible<Err&&, ErrorType>::value)
+        ) :
+      error_(move(e.error_))
+    {
+    }
+    template < class Err >
+    BOOST_FORCEINLINE BOOST_CONSTEXPR unexpected(unexpected<Err>&& e
+        , JASEL_REQUIRES( is_constructible<ErrorType, Err&&>::value && is_convertible<Err&&, ErrorType>::value)
         ) :
       error_(move(e.error_))
     {
     }
 
-    template < class Err >
-    BOOST_FORCEINLINE BOOST_CONSTEXPR explicit unexpected(Err const& e
-        , JASEL_REQUIRES( is_constructible<ErrorType, Err>::value)
-        ) :
-      error_(e)
-    {
-    }
-    template < class Err >
-    BOOST_FORCEINLINE BOOST_CONSTEXPR explicit unexpected(ErrorType&& e
-        , JASEL_REQUIRES( is_constructible<ErrorType, Err&&>::value)
-        ) :
-      error_(move(e))
-    {
-    }
-
 #if 0
     BOOST_CONSTEXPR unexpected(unexpected const& e) = default;
-    BOOST_CONSTEXPR unexpected(unexpected<Err>&& e) = default;
+    BOOST_CONSTEXPR unexpected(unexpected&& e) = default;
+
     template < class Err >
     BOOST_FORCEINLINE BOOST_CONSTEXPR unexpected& operator=(unexpected<Err> const& e
-        , JASEL_REQUIRES( is_constructible<ErrorType, Err>::value)
+        , JASEL_REQUIRES( is_constructible<ErrorType, Err>::value && is_convertible<Err, ErrorType>::value)
         )
     {
         error_ = e.error_;
     }
     template < class Err >
     BOOST_FORCEINLINE BOOST_CONSTEXPR unexpected& operator=(unexpected<Err>&& e
-        , JASEL_REQUIRES( is_constructible<ErrorType, Err&&>::value)
+        , JASEL_REQUIRES( is_constructible<ErrorType, Err&&>::value && is_convertible<Err&&, ErrorType>::value)
         )
     {
         error_ = move(e.error_);
@@ -131,6 +128,11 @@ inline namespace fundamental_v3
       return error_;
     }
 #endif
+
+    void swap(unexpected & e) {
+        using std::swap;
+        swap(error_, e.error_);
+    }
   };
 
   template <class E>
@@ -202,6 +204,7 @@ inline namespace fundamental_v3
     }
 #endif
 #else
+    //fixme:: issue with gcc
     BOOST_FORCEINLINE exception_ptr const& value() const
     {
       return error_;
@@ -211,18 +214,29 @@ inline namespace fundamental_v3
       return error_;
     }
 #endif
+
+    void swap(unexpected & e) {
+        using std::swap;
+        swap(error_, e.error_);
+    }
+
   };
 #endif
 
-  template <class E>
-  BOOST_CONSTEXPR bool operator==(const unexpected<E>& x, const unexpected<E>& y)
+  // fixme: Add is_comparable
+  template <class E1, class E2
+      , JASEL_REQUIRES( is_convertible<E1, E2>::value || is_convertible<E2, E1>::value)
+  >
+  BOOST_CONSTEXPR bool operator==(const unexpected<E1>& x, const unexpected<E2>& y)
   {
     return x.value() == y.value();
   }
-  template <class E>
-  BOOST_CONSTEXPR bool operator!=(const unexpected<E>& x, const unexpected<E>& y)
+  template <class E1, class E2
+      , JASEL_REQUIRES( is_convertible<E1, E2>::value || is_convertible<E2, E1>::value)
+  >
+  BOOST_CONSTEXPR bool operator!=(const unexpected<E1>& x, const unexpected<E2>& y)
   {
-    return !(x == y);
+    return x != y;
   }
 
   template <class E>
@@ -234,19 +248,19 @@ inline namespace fundamental_v3
   template <class E>
   BOOST_CONSTEXPR bool operator>(const unexpected<E>& x, const unexpected<E>& y)
   {
-    return (y < x);
+      return x.value() > y.value();
   }
 
   template <class E>
   BOOST_CONSTEXPR bool operator<=(const unexpected<E>& x, const unexpected<E>& y)
   {
-    return !(y < x);
+      return x.value() <= y.value();
   }
 
   template <class E>
   BOOST_CONSTEXPR bool operator>=(const unexpected<E>& x, const unexpected<E>& y)
   {
-    return !(x < y);
+      return x.value() >= y.value();
   }
 #if 1
   inline BOOST_CONSTEXPR bool operator<(const unexpected<exception_ptr>&, const unexpected<exception_ptr>&)

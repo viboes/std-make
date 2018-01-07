@@ -119,6 +119,7 @@ test-suite stde_expected
     : 
       [ compile-fail expected/expected_no_move_constructible_fail.cpp  ]
       [ run expected/expected_pass.cpp  ]
+      [ run expected/unexpected_pass.cpp  ]
     ;
 
 explicit possibly_valued ;
