@@ -12,22 +12,27 @@
 #include <optional>
 #endif
 
+// non_zero_integer is seen as int ~ 0 and as such non_zero_integer is an int, so implicit conversion applies
 struct non_zero_integer
 {
 public:
     using underlying_type = int;
 
+    static bool valid( int v )  {
+        return (v != 0);
+    }
+
 #if __cplusplus > 201402L && defined __clang__
     // safe construction
     static auto make( int v ) -> std::optional<non_zero_integer> {
-        if (v == 0) return std::nullopt;
+        if ( !valid(v) ) return std::nullopt;
         return non_zero_integer(v);
     }
 #endif
 
     // unsafe construction
     static auto cast( int v ) -> non_zero_integer {
-        assert (v != 0 && "v cannot be 0");
+        assert (valid(v) && "v cannot be 0");
         return non_zero_integer(v);
     }
 
