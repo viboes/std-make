@@ -36,7 +36,7 @@ inline  namespace fundamental_v3
 
       //! underlying value access
       //! @par Returns the underlying value
-      constexpr underlying_type underlying() const noexcept
+      constexpr const underlying_type& underlying() const noexcept
       { return _value; }
 
 
@@ -44,6 +44,8 @@ inline  namespace fundamental_v3
       //! the wrapped value
       underlying_type _value;
     };
+
+    // fixme: do we need an heterogeneous_wrapper that is constructible from convertibles?
 
     namespace wrapping {
     template <typename T>

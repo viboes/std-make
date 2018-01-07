@@ -89,7 +89,7 @@ inline namespace fundamental_v3
         using unwrapped_type_t = typename unwrapped_type<T>::type;
 
     template <class T>
-      struct unwrapped_type { using type = remove_reference_t<decltype(wrapping::underlying(declval<T>()))>; };
+      struct unwrapped_type { using type = remove_cv_t<remove_reference_t<decltype(wrapping::underlying(declval<T>()))>>; };
 
   }
 
