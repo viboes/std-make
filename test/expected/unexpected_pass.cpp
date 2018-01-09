@@ -1,7 +1,6 @@
-//! \file test_expected.cpp
+//! \file unexpected_pass.cpp
 
-// Copyright Pierre Talbot 2013.
-// Copyright Vicente J. Botet Escriba 2013,2014.
+// Copyright Vicente J. Botet Escriba 2018.
 
 // Use, modification and distribution are subject to the
 // Boost Software License, Version 1.0.
@@ -15,30 +14,6 @@
 
 namespace stde = std::experimental;
 
-struct CopyableAndMovable
-{
-};
-
-struct NoDefaultConstructible
-{
-  NoDefaultConstructible() = delete;
-};
-
-struct NoCopyConstructible
-{
-  NoCopyConstructible()  {}
-  NoCopyConstructible(NoCopyConstructible const&) = delete;
-  NoCopyConstructible(NoCopyConstructible &&) noexcept = default;
-};
-struct NoMoveConstructible
-{
-  NoMoveConstructible()  {}
-  NoMoveConstructible(NoMoveConstructible const&) noexcept = default;
-  NoMoveConstructible(NoMoveConstructible &&) = delete;
-  NoMoveConstructible& operator=(NoMoveConstructible const&) noexcept = default;
-  NoMoveConstructible& operator=(NoMoveConstructible &&) = delete;
-};
-
 struct X {};
 inline bool operator==(const X&,const X&) { return true;}
 
@@ -50,23 +25,14 @@ struct Z {
     explicit operator X() const  { return X{}; }
 };
 
+static_assert( std::is_constructible<stde::unexpected<X>, stde::unexpected<Y>>::value, "");
+static_assert( std::is_convertible<stde::unexpected<Y>, stde::unexpected<X>>::value, "");
+static_assert( std::is_constructible<stde::unexpected<X>, stde::unexpected<Z>>::value, "");
+static_assert( ! std::is_convertible<stde::unexpected<Z>, stde::unexpected<X>>::value, "");
+
 int main()
 {
-#if 0
-  static_assert(! std::is_default_constructible<NoDefaultConstructible>::value, "");
-  static_assert(! std::is_default_constructible<expected_sc<NoDefaultConstructible>>::value, "");
 
-  static_assert(! std::is_copy_constructible<NoCopyConstructible>::value, "");
-  static_assert(! std::is_constructible<expected_sc<NoCopyConstructible>, NoCopyConstructible const& >::value, "");
-  static_assert(! std::is_constructible<stde::exception_or<NoCopyConstructible>, stde::exception_or<NoCopyConstructible> const& >::value, "");
-  static_assert(! std::is_copy_constructible<stde::exception_or<NoCopyConstructible>>::value, "");
-
-
-  static_assert(! std::is_move_constructible<NoMoveConstructible>::value, "");
-  static_assert( std::is_constructible<expected_sc<NoMoveConstructible>, NoMoveConstructible && >::value, "");
-  static_assert( std::is_move_constructible<expected_sc<NoMoveConstructible>>::value, "");
-
-#endif
 
 #if 0
   {
@@ -140,12 +106,13 @@ int main()
     stde::unexpected<int> e(5);
     stde::unexpected<int> e2(8);
 
-    e.swap(e2);
+    using std::swap;
+    swap(e, e2);
 
     BOOST_TEST_EQ(e.value(), 8);
     BOOST_TEST_EQ(e2.value(), 5);
 
-    e2.swap(e);
+    swap(e2, e);
 
     BOOST_TEST_EQ(e.value(), 5);
     BOOST_TEST_EQ(e2.value(), 8);

@@ -37,10 +37,14 @@ inline namespace fundamental_v3
       friend class unexpected;
   public:
     unexpected() = delete;
+    BOOST_CONSTEXPR unexpected(unexpected const& e) = default;
+    BOOST_CONSTEXPR unexpected(unexpected&& e) = default;
+    BOOST_CXX14_CONSTEXPR unexpected& operator=(unexpected const& e) = default;
+    BOOST_CXX14_CONSTEXPR unexpected& operator=(unexpected&& e) = default;
 
     template < class Err >
     BOOST_FORCEINLINE BOOST_CONSTEXPR explicit unexpected(Err&& e
-        , JASEL_REQUIRES( is_constructible<ErrorType, decay_t<Err>&&>::value )
+        , JASEL_REQUIRES( is_constructible<ErrorType, Err&&>::value )
         ) :
       error_(move(e))
     {
@@ -48,14 +52,14 @@ inline namespace fundamental_v3
 
     template < class Err >
     BOOST_FORCEINLINE BOOST_CONSTEXPR explicit unexpected(unexpected<Err> const& e
-        , JASEL_REQUIRES( is_constructible<ErrorType, Err>::value && ! is_convertible<Err, ErrorType>::value)
+        , JASEL_REQUIRES( is_constructible<ErrorType, const Err&>::value && ! is_convertible<const Err&, ErrorType>::value)
         ) :
       error_(e.error_)
     {
     }
     template < class Err >
     BOOST_FORCEINLINE BOOST_CONSTEXPR unexpected(unexpected<Err> const& e
-        , JASEL_REQUIRES( is_constructible<ErrorType, Err>::value && is_convertible<Err, ErrorType>::value)
+        , JASEL_REQUIRES( is_constructible<ErrorType, const Err&>::value && is_convertible<const Err&, ErrorType>::value)
         ) :
       error_(e.error_)
     {
@@ -76,8 +80,6 @@ inline namespace fundamental_v3
     }
 
 #if 0
-    BOOST_CONSTEXPR unexpected(unexpected const& e) = default;
-    BOOST_CONSTEXPR unexpected(unexpected&& e) = default;
 
     template < class Err >
     BOOST_FORCEINLINE BOOST_CONSTEXPR unexpected& operator=(unexpected<Err> const& e
@@ -128,11 +130,6 @@ inline namespace fundamental_v3
       return error_;
     }
 #endif
-
-    void swap(unexpected & e) {
-        using std::swap;
-        swap(error_, e.error_);
-    }
   };
 
   template <class E>
@@ -214,52 +211,46 @@ inline namespace fundamental_v3
       return error_;
     }
 #endif
-
-    void swap(unexpected & e) {
-        using std::swap;
-        swap(error_, e.error_);
-    }
-
   };
 #endif
 
-  // fixme: Add is_comparable
-  template <class E1, class E2
-      , JASEL_REQUIRES( is_convertible<E1, E2>::value || is_convertible<E2, E1>::value)
-  >
+  template <class E1, class E2>
   BOOST_CONSTEXPR bool operator==(const unexpected<E1>& x, const unexpected<E2>& y)
   {
+    static_assert(is_convertible<decltype(x.value() == y.value()), bool>::value, "");
     return x.value() == y.value();
   }
-  template <class E1, class E2
-      , JASEL_REQUIRES( is_convertible<E1, E2>::value || is_convertible<E2, E1>::value)
-  >
+  template <class E1, class E2>
   BOOST_CONSTEXPR bool operator!=(const unexpected<E1>& x, const unexpected<E2>& y)
   {
-    return x != y;
+    static_assert(is_convertible<decltype(x.value() != y.value()), bool>::value, "");
+    return x.value() != y.value();
   }
-
-  template <class E>
-  BOOST_CONSTEXPR bool operator<(const unexpected<E>& x, const unexpected<E>& y)
+  template <class E1, class E2>
+  BOOST_CONSTEXPR bool operator<(const unexpected<E1>& x, const unexpected<E2>& y)
   {
+    static_assert(is_convertible<decltype(x.value() < y.value()), bool>::value, "");
     return x.value() < y.value();
   }
 
-  template <class E>
-  BOOST_CONSTEXPR bool operator>(const unexpected<E>& x, const unexpected<E>& y)
+  template <class E1, class E2>
+  BOOST_CONSTEXPR bool operator>(const unexpected<E1>& x, const unexpected<E2>& y)
   {
+      static_assert(is_convertible<decltype(x.value() > y.value()), bool>::value, "");
       return x.value() > y.value();
   }
 
-  template <class E>
-  BOOST_CONSTEXPR bool operator<=(const unexpected<E>& x, const unexpected<E>& y)
+  template <class E1, class E2>
+  BOOST_CONSTEXPR bool operator<=(const unexpected<E1>& x, const unexpected<E2>& y)
   {
+      static_assert(is_convertible<decltype(x.value() <= y.value()), bool>::value, "");
       return x.value() <= y.value();
   }
 
-  template <class E>
-  BOOST_CONSTEXPR bool operator>=(const unexpected<E>& x, const unexpected<E>& y)
+  template <class E1, class E2>
+  BOOST_CONSTEXPR bool operator>=(const unexpected<E1>& x, const unexpected<E2>& y)
   {
+      static_assert(is_convertible<decltype(x.value() >= y.value()), bool>::value, "");
       return x.value() >= y.value();
   }
 #if 1
