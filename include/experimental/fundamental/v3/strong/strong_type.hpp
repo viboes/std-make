@@ -92,7 +92,7 @@ inline  namespace fundamental_v3
       // The following should be accessible only to mixins of the Final class.
       // But there is no way to declare friendship transitively or by inheritance.
       // In order to have this access safe, we would need to add the mixin concept in the language and say that any mixing has friend access to the class.
-      // Until then, we use a prefixed _ to signal that this functions are almost private and usable only by mixins.
+      // Until then, we use a prefix _ to signal that these functions are almost private and usable only by mixins.
       // This is a way to limit the access to the underlying storage
       // Alternatively the access to a reference to the underlying type should be public,
       // but this opens too much the strong type.
