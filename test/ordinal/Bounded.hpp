@@ -16,6 +16,9 @@ struct Bounded {
   static constexpr const T Last = F;
   static constexpr const std::experimental::ordinal::index_t Size = L-F+1;
   T value;
+
+  friend bool operator==(Bounded const& x, Bounded const& y) { return x.value == y.value; }
+  friend bool operator!=(Bounded const& x, Bounded const& y) { return x.value != y.value; }
 };
 
 namespace std

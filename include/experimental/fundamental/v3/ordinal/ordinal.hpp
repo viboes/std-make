@@ -2,7 +2,7 @@
 // accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 //
-// Copyright (C) 2014-2016 Vicente J. Botet Escriba
+// Copyright (C) 2014-2018 Vicente J. Botet Escriba
 
 #ifndef JASEL_FUNDAMENTAL_V3_ORDINAL_ORDINAL_HPP
 #define JASEL_FUNDAMENTAL_V3_ORDINAL_ORDINAL_HPP
@@ -197,6 +197,57 @@ namespace meta {
   {
     return ordinal::val<Ord>(ordinal::pos(val)-1) ;
   }
+
+  template <class Ord>
+  constexpr auto compare(Ord const& x, Ord const& y) noexcept
+  {
+    return compare(ordinal::pos(x), ordinal::pos(x));
+  }
+
+  template <class Ord>
+  struct less
+  {
+      bool operator()(Ord const& x, Ord const& y) const noexcept
+      {
+        return ordinal::pos(x) < ordinal::pos(y);
+      }
+      typedef Ord first_argument_type;
+      typedef Ord second_argument_type;
+      typedef bool result_type;
+  };
+  template <class Ord>
+  struct less_equal
+  {
+      bool operator()(Ord const& x, Ord const& y) const noexcept
+      {
+        return ordinal::pos(x) <= ordinal::pos(y);
+      }
+      typedef Ord first_argument_type;
+      typedef Ord second_argument_type;
+      typedef bool result_type;
+  };
+  template <class Ord>
+  struct greater
+  {
+      bool operator()(Ord const& x, Ord const& y) const noexcept
+      {
+        return ordinal::pos(x) > ordinal::pos(y);
+      }
+      typedef Ord first_argument_type;
+      typedef Ord second_argument_type;
+      typedef bool result_type;
+  };
+  template <class Ord>
+  struct greater_equal
+  {
+      bool operator()(Ord const& x, Ord const& y) const noexcept
+      {
+        return ordinal::pos(x) >= ordinal::pos(y);
+      }
+      typedef Ord first_argument_type;
+      typedef Ord second_argument_type;
+      typedef bool result_type;
+  };
 
 }
 

@@ -181,6 +181,16 @@ test-suite ordinal_range
       [ run ordinal/container/ordinal_range/ordinal_range_pass.cpp  ]
     ;
 
+test-suite ordinal_ordered_set
+    : 
+      [ run ordinal/container/ordinal_ordered_set/ordinal_ordered_set_pass.cpp  ]
+    ;
+
+test-suite ordinal_ordered_map
+    : 
+      [ run ordinal/container/ordinal_ordered_map/ordinal_ordered_map_pass.cpp  ]
+    ;
+
 test-suite bits
     : 
       [ run ../example/bits/bit.cpp  ]
