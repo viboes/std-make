@@ -74,12 +74,12 @@ public:
     {}
 #endif
 
-    //! You should use instead
+    //! In C++98 you should use instead
     //!   pod::optional<T> opt;
-    //!   opt.construct();
-    //!   opt = nullopt;
+    //!   opt.construct(); // or
+    //!   opt = nullopt; // or
     //!   opt.reset();
-    //!
+    //! or
     //!   pod::optional<T> opt = {};
     //!
     //! @par Effects Constructs the object that does not contain a value.
@@ -98,6 +98,7 @@ public:
     //! opt1.copy_assign(opt2);
     //! which will copy the value type only if m_present.
     //! Note that copy and assignment will copy all the bytes
+    //! up to you to see which is more efficient in a particular case
     void copy_assign(optional const& other) noexcept
     {
         m_present = other.m_present;
