@@ -199,9 +199,9 @@ namespace meta {
   }
 
   template <class Ord>
-  constexpr auto compare(Ord const& x, Ord const& y) noexcept -> decltype(compare(ordinal::pos(x), ordinal::pos(x)))
+  constexpr auto compare(Ord const& x, Ord const& y) noexcept -> decltype(compare(ordinal::pos(x), ordinal::pos(y)))
   {
-    return compare(ordinal::pos(x), ordinal::pos(x));
+    return compare(ordinal::pos(x), ordinal::pos(y));
   }
 
   template <class Ord>
