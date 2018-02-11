@@ -25,6 +25,9 @@ inline namespace fundamental_v3
 {
 namespace detail
 {
+      // fixme: check if we need to declare the operator() constexpr
+#define JASEL_CONSTEXPR_CWG_1581 constexpr
+
       template< class F>
       struct wrap_call {
           using type = F;
@@ -38,39 +41,28 @@ namespace detail
                    && is_constructible<F, U>::value, bool> = true>
           constexpr wrap_call(U&& fct) : f(forward<U>(fct)) { }
 
-          /* You may want to use invoke to handle member pointers here */
+          /* todo: using std::invoke would allow to handle anything std::invoke manage already C++17 */
           template< class ...Xs >
-          constexpr auto operator () (Xs &&... xs) const &
-            noexcept(noexcept( f(forward<Xs>(xs)...) ))
-            -> decltype(f(forward<Xs>(xs)...))
-          {
-              return f(forward<Xs>(xs)...);
-          }
+          JASEL_CONSTEXPR_CWG_1581 auto operator () (Xs &&... xs) const &
+          JASEL_NOEXCEPT_DECLTYPE_RETURN( f(forward<Xs>(xs)...) )
+
           template< class ...Xs >
-          constexpr auto operator () (Xs &&... xs) const &&
-            noexcept(noexcept( move(f)(forward<Xs>(xs)...) ))
-            -> decltype(move(f)(forward<Xs>(xs)...))
-          {
-              return move(f)(forward<Xs>(xs)...);
-          }
+          JASEL_CONSTEXPR_CWG_1581 auto operator () (Xs &&... xs) const &&
+          JASEL_NOEXCEPT_DECLTYPE_RETURN( move(f)(forward<Xs>(xs)...) )
+
           template< class ...Xs >
-          constexpr auto operator () (Xs &&... xs) &
-            noexcept(noexcept( f(forward<Xs>(xs)...) ))
-            -> decltype(f(forward<Xs>(xs)...))
-          {
-              return f(forward<Xs>(xs)...);
-          }
+          JASEL_CONSTEXPR_CWG_1581 auto operator () (Xs &&... xs) &
+          JASEL_NOEXCEPT_DECLTYPE_RETURN( f(forward<Xs>(xs)...) )
+
           template< class ...Xs >
           constexpr auto operator () (Xs &&... xs) &&
-            noexcept(noexcept( move(f)(forward<Xs>(xs)...) ))
-            -> decltype(move(f)(forward<Xs>(xs)...))
-          {
-              return move(f)(forward<Xs>(xs)...);
-          }
+          JASEL_NOEXCEPT_DECLTYPE_RETURN( move(f)(forward<Xs>(xs)...) )
+
       };
 
       /* Function version */
-      /* I just ignore eplisis, there is no way to wrap it */
+      /* Ignoring ellipsis, there is no way to wrap it */
+
       template<typename R, typename... Args>
       struct wrap_call<R(*)(Args...)>
       {
@@ -79,18 +71,9 @@ namespace detail
 
           constexpr wrap_call(type fct) : f(fct) {}
 
-          /* Really need to not select other overload based on constness */
-          #if 0
-          constexpr R operator()(Args... args)
-          {
-              /* Esentially does an move for values and rvalue reference, normal operation otherwise */
-              return f(forward<Args>(args)...);
-          }
-          #endif
-          constexpr R operator()(Args... args) const
-          {
-              return f(forward<Args>(args)...);
-          }
+          JASEL_CONSTEXPR_CWG_1581 auto operator()(Args... args) const
+          JASEL_NOEXCEPT_DECLTYPE_RETURN( f(forward<Args>(args)...) )
+
       };
       template<typename R, typename... Args>
       struct wrap_call<R(&)(Args...)>
@@ -100,22 +83,35 @@ namespace detail
 
           constexpr wrap_call(type fct) : f(fct) {}
 
-          /* Really need to not select other overload based on constness */
-          #if 0
-          constexpr R operator()(Args... args)
-          {
-              /* Esentially does an move for values and rvalue reference, normal operation otherwise */
-              return f(forward<Args>(args)...);
-          }
-          #endif
-
-          constexpr R operator()(Args... args) const
-          {
-              return f(forward<Args>(args)...);
-          }
+          JASEL_CONSTEXPR_CWG_1581 auto operator()(Args... args) const
+          JASEL_NOEXCEPT_DECLTYPE_RETURN( f(forward<Args>(args)...) )
       };
 
-      //Probably there is also need to have version for noexcept pointer/reference
+#if __cplusplus > 201402L && defined __clang__
+      template<typename R, typename... Args>
+      struct wrap_call<R(*)(Args...) noexcept>
+      {
+          using type = R(*)(Args...);
+          type f;
+
+          constexpr wrap_call(type fct) : f(fct) {}
+
+          JASEL_CONSTEXPR_CWG_1581 auto operator()(Args... args) const
+          JASEL_NOEXCEPT_DECLTYPE_RETURN( f(forward<Args>(args)...) )
+
+      };
+      template<typename R, typename... Args>
+      struct wrap_call<R(&)(Args...) noexcept>
+      {
+          using type = R(&)(Args...);
+          type f;
+
+          constexpr wrap_call(type fct) : f(fct) {}
+
+          JASEL_CONSTEXPR_CWG_1581 auto operator()(Args... args) const
+          JASEL_NOEXCEPT_DECLTYPE_RETURN( f(forward<Args>(args)...) )
+      };
+#endif
 
       template<typename PointerType, typename Clazz, typename R, typename... Args>
       struct function_member_wrapper
@@ -127,26 +123,23 @@ namespace detail
 
           template<typename U,
                    enable_if_t<is_base_of<Clazz, decay_t<U>>::value
-                                 && is_convertible<decltype((declval<U>().*f)(declval<Args>()...)), R>::value, bool> = true>
-          constexpr R operator()(U&& obj, Args... args) const
-          {
-             return (forward<U>(obj).*f)(forward<Args>(args)...);
-          }
+                                // && is_convertible<decltype((declval<U>().*f)(declval<Args>()...)), R>::value
+                                 , bool> = true>
+          JASEL_CONSTEXPR_CWG_1581 auto operator()(U&& obj, Args... args) const
+          JASEL_NOEXCEPT_DECLTYPE_RETURN( (forward<U>(obj).*f)(forward<Args>(args)...) )
 
-          template<typename U,
-                   enable_if_t<is_convertible<decltype((declval<U&>().*f)(declval<Args>()...)), R>::value, bool> = true>
-          constexpr R operator()(reference_wrapper<U> ref, Args... args) const
-          {
-             return (ref.get().*f)(forward<Args>(args)...);
-          }
+          template<typename U
+                   //, enable_if_t<is_convertible<decltype((declval<U&>().*f)(declval<Args>()...)), R>::value, bool> = true
+                   >
+          JASEL_CONSTEXPR_CWG_1581 auto operator()(reference_wrapper<U> ref, Args... args) const
+          JASEL_NOEXCEPT_DECLTYPE_RETURN( (ref.get().*f)(forward<Args>(args)...) )
 
           template<typename U,
                    enable_if_t<!is_base_of<Clazz, decay_t<U>>::value
-                                 && is_convertible<decltype(((*declval<U>()).*f)(declval<Args>()...)), R>::value, bool> = true>
-          constexpr R operator()(U&& ptr, Args... args) const
-          {
-             return ((*forward<U>(ptr)).*f)(forward<Args>(args)...);
-          }
+                                 //&& is_convertible<decltype(((*declval<U>()).*f)(declval<Args>()...)), R>::value
+                                 , bool> = true>
+          JASEL_CONSTEXPR_CWG_1581 auto operator()(U&& ptr, Args... args) const
+          JASEL_NOEXCEPT_DECLTYPE_RETURN( ((*forward<U>(ptr)).*f)(forward<Args>(args)...) )
 
       };
 
@@ -176,12 +169,31 @@ namespace detail
       WRAP_CALL_FOR_MEMBER_FUNCTION(volatile&&);
       WRAP_CALL_FOR_MEMBER_FUNCTION(const volatile&&);
 
-      // You may also need to add noexcept version of each of them
+#if __cplusplus > 201402L && defined __clang__
+
+      WRAP_CALL_FOR_MEMBER_FUNCTION(noexcept);
+      WRAP_CALL_FOR_MEMBER_FUNCTION(const noexcept);
+      WRAP_CALL_FOR_MEMBER_FUNCTION(volatile noexcept);
+      WRAP_CALL_FOR_MEMBER_FUNCTION(const volatile noexcept);
+
+      WRAP_CALL_FOR_MEMBER_FUNCTION(& noexcept);
+      WRAP_CALL_FOR_MEMBER_FUNCTION(const& noexcept);
+      WRAP_CALL_FOR_MEMBER_FUNCTION(volatile& noexcept);
+      WRAP_CALL_FOR_MEMBER_FUNCTION(const volatile& noexcept);
+
+      WRAP_CALL_FOR_MEMBER_FUNCTION(&& noexcept);
+      WRAP_CALL_FOR_MEMBER_FUNCTION(const&& noexcept);
+      WRAP_CALL_FOR_MEMBER_FUNCTION(volatile&& noexcept);
+      WRAP_CALL_FOR_MEMBER_FUNCTION(const volatile&& noexcept);
+#endif
 
       #undef WRAP_CALL_FOR_MEMBER_FUNCTION
 
-      /* If F is not final class make it direct base of the overload, otherwise wrap in into a call.
-         Notice that both F and wrap_call<F> will be constructible from same object (prefect forwarding constructor) */
+      // todo: Add for data memeber
+
+      // If F is not final class make it direct base of the overload, otherwise wrap in into a call.
+      // Notice that both F and wrap_call<F> will be constructible from same object (perfect forwarding constructor)
+      // todo: Check if the class has a final virtual destructor, which inhibits also inheriting
       template<typename F>
       struct overload_storage
          : conditional<is_class<F>::value && !is_final<F>::value, F, wrap_call<F>>

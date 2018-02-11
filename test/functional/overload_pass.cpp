@@ -50,7 +50,15 @@ struct Bar final
 
 
 struct function_with_state {
-  void operator ()(int ) { invoked = true; }
+  void operator ()(int ) {
+      invoked = true;
+  }
+  bool invoked = false;
+};
+struct function_with_state_2 {
+  void operator ()(float ) {
+      invoked = true;
+  }
   bool invoked = false;
 };
 struct function_without_state {
@@ -110,12 +118,32 @@ int nonMember( float ) {
   std::cout << "int(float)" << std::endl;
   return 42;
 }
+int nonMemberNoExcept( float ) noexcept {
+  std::cout << "int(float)" << std::endl;
+  return 42;
+}
 int nonMember_throw( float ) {
   throw 1;;
 }
 struct XXXX {};
 void freefnx(XXXX ) {  std::cout <<"X\n"; }
 
+namespace pitti98 {
+//Purpose: https://github.com/viboes/std-make/issues/16
+//         Show that we cannot overload two final classes when the overload overlap
+
+struct X;
+struct Y {
+//  Y(const X&){} // enable this to fail
+};
+struct X {
+//  operator Y() const { return Y(); }  // or enable this to fail
+};
+
+struct Foo final { void operator()(X) const { printf("X\n"); } };
+struct Bar final { void operator()(Y) const { printf("Y\n"); } };
+
+}
 
 namespace cppljevans {
   //Purpose:
@@ -742,7 +770,7 @@ int main()
     BOOST_TEST(0 ==overload(function_with_cv_q{})(1));
   }
 #if 0
-  // This couldn't work :(
+  // This couldn't work as it is ambiguous:(
   {
     const auto ol = std::experimental::overload(
           Foo()
@@ -752,6 +780,93 @@ int main()
     ol(1234);
   }
 #endif
+  {
+      function_with_state foo;
+
+      BOOST_TEST(! foo.invoked);
+
+      bool called = false;
+      std::experimental::overload(function_without_state{}, [&called](float) {
+          std::cout << "float" << std::endl;
+          called = true;
+      })(1.0f);
+      BOOST_TEST(called);
+
+
+
+#if 0
+      // fails as ambiguous. However it shouldn't as foo doesn't define a const function ?
+      // fixme, is this a bug on the implementation?
+      std::experimental::overload(foo, [](float) {
+      })(1.0f);
+#endif
+#if 0
+      std::experimental::overload(
+                      [](int) mutable {      },
+                      [](float) { }
+                      )(1.0f);
+#endif
+
+      std::experimental::overload(std::ref(foo), [](float) { })(1);
+      BOOST_TEST(foo.invoked);
+
+      std::experimental::overload(
+          [](int) {
+              BOOST_TEST(false);
+          }
+          ,
+          [](float) {
+              BOOST_TEST(true);
+          }
+      )(1.0f);
+
+
+      std::experimental::overload(std::ref(foo), [](float) { })(1.0f);
+      // this should call the float overload, however the perfect forwarding of reference_wrapper is preferred.
+      BOOST_TEST(foo.invoked);
+
+  }
+#if 0
+  {
+      function_with_state foo;
+      function_with_state_2 foo2;
+
+      BOOST_TEST(! foo.invoked);
+      BOOST_TEST(! foo2.invoked);
+
+      // This couldn't work as it is ambiguous. Both reference wrappers provide perfect forwarding calls :(
+      std::experimental::overload(std::ref(foo), std::ref(foo2))(1.0f);
+      BOOST_TEST(foo2.invoked);
+
+  }
+#endif
+  // workaround
+  {
+      function_with_state foo;
+      function_with_state_2 foo2;
+
+      BOOST_TEST(! foo.invoked);
+      BOOST_TEST(! foo2.invoked);
+
+      std::experimental::overload(
+                      [&foo](int i) { return foo(i); },
+                      [&foo2](float f) { return foo2(f); }
+                      )(1.0f);
+      BOOST_TEST(foo2.invoked);
+
+  }
+  {
+    function_without_state foo;
+
+    auto f = overload(foo,
+        [](std::string ) {
+            BOOST_TEST(false);
+        },
+        nonMemberNoExcept
+        );
+    f(1.0f);
+
+  }
   return boost::report_errors();
 }
 #else
