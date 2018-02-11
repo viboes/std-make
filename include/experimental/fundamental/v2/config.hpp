@@ -82,10 +82,13 @@
 #define JASEL_INVOKE(F, ...) F(__VA_ARGS__)
 #endif
 
-#define JASEL_DECLTYPE_RETURN_NOEXCEPT(...)                 \
+#define JASEL_NOEXCEPT_DECLTYPE_RETURN(...)                 \
     noexcept(noexcept(decltype(__VA_ARGS__)(__VA_ARGS__)))  \
     -> decltype(__VA_ARGS__)                                \
     { return (__VA_ARGS__); }                               \
+
+#define JASEL_DECLTYPE_RETURN_NOEXCEPT(...)                 \
+    JASEL_NOEXCEPT_DECLTYPE_RETURN(__VA_ARGS__)
 
 #define JASEL_DECLTYPE_RETURN(...)                          \
     -> decltype(__VA_ARGS__)                                \
