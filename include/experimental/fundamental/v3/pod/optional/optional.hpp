@@ -2,7 +2,7 @@
 // accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 //
-// Copyright (C) 2017 Vicente J. Botet Escriba
+// Copyright (C) 2017-2018 Vicente J. Botet Escriba
 
 // todo
 // * add view::optional that contains a pointer to a class C and is parameterized by the present data member pointer and
@@ -26,6 +26,7 @@
 #endif
 
 # include <experimental/fundamental/v2/config.hpp>
+# include <experimental/fundamental/v3/config/requires.hpp>
 # include <experimental/utility.hpp>
 # include <experimental/type_traits.hpp>
 
@@ -65,14 +66,7 @@ public:
     using bool_type = Bool;
     using value_type = T;
 
-    // fixme: is this really needed to be a POD, in C++11?
-    // do we really need that optional<T> is a POD, or just that it is trivially_copyable?
-#if 1
     constexpr optional() = default; // optional is a POD
-#else
-    constexpr optional() : m_present(false)
-    {}
-#endif
 
     //! In C++98 you should use instead
     //!   pod::optional<T> opt;
@@ -97,7 +91,7 @@ public:
     //! You could use
     //! opt1.copy_assign(opt2);
     //! which will copy the value type only if m_present.
-    //! Note that copy and assignment will copy all the bytes
+    //! Note that default copy and assignment will copy all the bytes
     //! up to you to see which is more efficient in a particular case
     void copy_assign(optional const& other) noexcept
     {
@@ -193,30 +187,24 @@ public:
         m_present = bool_type(false);
         return *this;
     }
-#if 1
-    optional& operator=(T&& value) noexcept
-    {
-        m_value = move(value);
-        m_present = bool_type(true);
-        return *this;
-    }
-
-    optional& operator=(T const& value) noexcept
-    {
-        m_value = value;
-        m_present = bool_type(true);
-        return *this;
-    }
-#else
-    // todo: Add constraints to this operation
-    template <class U=T>
+    template <class U=T
+                    , JASEL_REQUIRES(
+                            is_constructible<T, U>::value
+                            && ! is_same<meta::uncvref_t<U>, optional<T>>::value
+                            && is_assignable<T&, U>::value
+                            && (
+                                  ! is_same<meta::uncvref_t<U>, T>::value
+                               ||
+                                   ! is_scalar<T>::value
+                                            )
+                    )
+                    >
     optional& operator=(U&& value) noexcept
     {
         m_value = move(value);
         m_present = bool_type(true);
         return *this;
     }
-#endif
 
 #if 0
     // todo: Add constraints to this operation
@@ -309,28 +297,36 @@ public:
 
     JASEL_CXX14_CONSTEXPR value_type& value() &
     {
-        if (has_value())
-            return m_value;
-        throw bad_optional_access();
+        if (! has_value())
+        {
+            throw bad_optional_access();
+        }
+        return m_value;
     }
     JASEL_CXX14_CONSTEXPR value_type const& value() const&
     {
-        if (has_value())
-            return m_value;
-        throw bad_optional_access();
+        if (! has_value())
+        {
+            throw bad_optional_access();
+        }
+        return m_value;
     }
 
     JASEL_CXX14_CONSTEXPR value_type&& value() &&
     {
-        if (has_value())
-            return m_value;
-        throw bad_optional_access();
+        if (! has_value())
+        {
+            throw bad_optional_access();
+        }
+        return m_value;
     }
     JASEL_CXX14_CONSTEXPR value_type const&& value() const&&
     {
-        if (has_value())
-            return m_value;
-        throw bad_optional_access();
+        if (! has_value())
+        {
+            throw bad_optional_access();
+        }
+        return m_value;
     }
 
     template< class U >
@@ -552,7 +548,7 @@ constexpr bool operator>=(const T& v, const optional<T, B>& x)
 
 // 20.5.12, Specialized algorithms
 template <class T, class B>
-void swap(optional<T, B>& x, optional<T, B>& y) noexcept(noexcept(x.swap(y)))
+void swap(optional<T, B>& x, optional<T, B>& y) noexcept
 {
     x.swap(y);
 }
@@ -577,6 +573,10 @@ constexpr optional<T, B> make_optional( initializer_list<U> il, Args&&... args)
 }
 #endif
 }
+static_assert(is_pod<pod::optional<int> >::value, "");
+static_assert(is_standard_layout<pod::optional<int> >::value, "");
+static_assert(is_trivial<pod::optional<int> >::value, "");
+
 }
 }
 }

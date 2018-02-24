@@ -1,4 +1,4 @@
-// Copyright (C) 2017 Vicente J. Botet Escriba
+// Copyright (C) 2017-2018 Vicente J. Botet Escriba
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -30,10 +30,22 @@ static_assert(std::is_pod<stdex::pod::optional<P, std::int16_t>>::value, "pod::o
 static_assert(sizeof(stdex::pod::optional<P>) == 6, "sizeof(stdex::pod::optional<P>)  must be 6");
 static_assert(sizeof(stdex::pod::optional<P, std::int16_t>) == 6, "sizeof(stdex::pod::optional<P, std::int16_t>)  must be 6");
 
+#include <boost/endian/conversion.hpp>
+#include <boost/endian/arithmetic.hpp>
+
+using big_int16_t = boost::endian::big_int16_t;
+
+static_assert(std::is_pod<stdex::pod::optional<big_int16_t>>::value, "pod::optional<big_int16_t> is not a POD");
+static_assert(sizeof(stdex::pod::optional<big_int16_t>) == 3, "sizeof(stdex::pod::optional<char>)  must be 3");
+
 int main()
 {
   {
     stdex::pod::optional<int> o1 = {};
+    BOOST_TEST (!o1);
+  }
+  {
+    stdex::pod::optional<big_int16_t> o1 = {};
     BOOST_TEST (!o1);
   }
   {
@@ -78,6 +90,7 @@ int main()
     BOOST_TEST (o3 == o2);
 
   }
+
   {
       stdex::pod::optional<int> oi;
       oi = stdex::pod::optional<int>{1};
@@ -87,9 +100,67 @@ int main()
       BOOST_TEST (!oi);
 
       oi = 2;
+      BOOST_TEST (oi);
       BOOST_TEST (*oi == 2);
 
-      oi = {}; // fails !oi - function is called?
+      oi.reset();
+      BOOST_TEST (!oi);
+      oi = 2;
+      BOOST_TEST (oi);
+      oi = {}; // fixme: fails !oi - function is called?
+      BOOST_TEST (!bool(oi));
+      BOOST_TEST (!oi);
+  }
+#if defined JASEL_STD_HAVE_OPTIONAL
+  {
+      std::optional<int> oi;
+      oi = std::optional<int>{1};
+      BOOST_TEST (*oi == 1);
+
+      oi = std::nullopt;
+      BOOST_TEST (!oi);
+
+      oi = 2;
+      BOOST_TEST (*oi == 2);
+      oi = {};
+      BOOST_TEST (!oi);
+      oi = 2;
+      BOOST_TEST (oi);
+      oi.reset();
+      BOOST_TEST (!oi);
+  }
+  {
+      std::optional<big_int16_t> oi;
+      oi = std::optional<big_int16_t>{1};
+      BOOST_TEST (*oi == 1);
+
+      oi = std::nullopt;
+      BOOST_TEST (!oi);
+
+      oi = 2;
+      BOOST_TEST (*oi == 2);
+      oi = {};
+      BOOST_TEST (!oi);
+      oi = 2;
+      BOOST_TEST (oi);
+      oi.reset();
+      BOOST_TEST (!oi);
+  }
+#endif
+  {
+      stdex::pod::optional<big_int16_t> oi;
+      oi = stdex::pod::optional<big_int16_t>{1};
+      BOOST_TEST (*oi == 1);
+
+      oi = stdex::pod::nullopt;
+      BOOST_TEST (!oi);
+
+      oi = 2;
+      BOOST_TEST (*oi == 2);
+      oi = {};
+      BOOST_TEST (!oi);
+      oi = 2;
+      BOOST_TEST (oi);
       oi.reset();
       BOOST_TEST (!oi);
   }
@@ -182,6 +253,10 @@ int main()
     constexpr auto ooi = stdex::pod::make_optional(oi);
     static_assert( std::is_same<const stdex::pod::optional<stdex::pod::optional<int>>, decltype(ooi)>::value, "");
 
+    {
+
+
+    }
   }
 
   return ::boost::report_errors();

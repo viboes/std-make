@@ -1,6 +1,6 @@
 //////////////////////////////////////////////////////////////////////////////
 //
-// (C) Copyright Vicente J. Botet Escriba 2017.
+// (C) Copyright Vicente J. Botet Escriba 2017-2018.
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file // LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
@@ -18,13 +18,16 @@ namespace std
     // 20.5.7, Disengaged state indicator
     struct nullopt_t
     {
-      struct init
-      {};
-      constexpr explicit nullopt_t(init) noexcept
-      {}
+        struct init
+        {};
+        constexpr explicit nullopt_t(init) noexcept
+        {}
     };
+#if (__clang_major__ >= 4) && (__cplusplus > 201402L)
+    inline
+#endif
     constexpr nullopt_t nullopt
-    { nullopt_t::init()};
+    { nullopt_t::init() };
 
   }
   }
