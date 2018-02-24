@@ -106,4 +106,4 @@
 
 /**/
 
-#endif // BOOST_ENUMS_CONFIG_HPP
+#endif // header
