@@ -90,6 +90,40 @@ int main()
     BOOST_TEST (o3 == o2);
 
   }
+  {
+    stdex::pod::optional<big_int16_t> o1;
+    o1 = std::nullopt;
+
+    stdex::pod::optional<big_int16_t> o2 = std::nullopt;
+    BOOST_TEST (!o2);
+
+    stdex::pod::optional<big_int16_t> o3;
+    o3 = o2;
+    BOOST_TEST (!o3);
+
+    BOOST_TEST (o1 == stdex::pod::nullopt);
+    BOOST_TEST (o1 == stdex::pod::optional<big_int16_t>{});
+    BOOST_TEST (!o1);
+    BOOST_TEST (bool(o1) == false);
+
+    BOOST_TEST (o2 == stdex::pod::nullopt);
+    BOOST_TEST (o2 == stdex::pod::optional<big_int16_t>{});
+    BOOST_TEST (!o2);
+    BOOST_TEST (bool(o2) == false);
+
+    BOOST_TEST (o3 == stdex::pod::nullopt);
+    BOOST_TEST (o3 == stdex::pod::optional<big_int16_t>{});
+    BOOST_TEST (!o3);
+    BOOST_TEST (bool(o3) == false);
+
+    BOOST_TEST (o1 == o2);
+    BOOST_TEST (o2 == o1);
+    BOOST_TEST (o1 == o3);
+    BOOST_TEST (o3 == o1);
+    BOOST_TEST (o2 == o3);
+    BOOST_TEST (o3 == o2);
+
+  }
 
   {
       stdex::pod::optional<int> oi;
@@ -169,6 +203,10 @@ int main()
     BOOST_TEST (!oi);
   }
   {
+    constexpr stdex::pod::optional<big_int16_t> oi = {}; // no default constructor
+    BOOST_TEST (!oi);
+  }
+  {
     stdex::pod::optional<int> oi = {}; // no default constructor
     stdex::pod::optional<int> oj = oi;
 
@@ -195,10 +233,22 @@ int main()
   {
     stdex::pod::optional<int> oi {stdex::pod::in_place};
     BOOST_TEST (oi != stdex::pod::nullopt);
+    BOOST_TEST (*oi == 0);
+    BOOST_TEST (bool(oi));
+  }
+  {
+    stdex::pod::optional<big_int16_t> oi {stdex::pod::in_place};
+    BOOST_TEST (oi != stdex::pod::nullopt);
+    BOOST_TEST (*oi == 0);
     BOOST_TEST (bool(oi));
   }
   {
     stdex::pod::optional<int> oi {stdex::pod::in_place, 1};
+    BOOST_TEST (oi != stdex::pod::nullopt);
+    BOOST_TEST (bool(oi));
+  }
+  {
+    stdex::pod::optional<big_int16_t> oi {stdex::pod::in_place, 1};
     BOOST_TEST (oi != stdex::pod::nullopt);
     BOOST_TEST (bool(oi));
   }
