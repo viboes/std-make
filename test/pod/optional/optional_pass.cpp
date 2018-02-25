@@ -7,6 +7,7 @@
 
 #include <experimental/pod/optional.hpp>
 #include <sstream>
+#include <memory>
 
 #include <boost/detail/lightweight_test.hpp>
 
@@ -34,9 +35,130 @@ static_assert(sizeof(stdex::pod::optional<P, std::int16_t>) == 6, "sizeof(stdex:
 #include <boost/endian/arithmetic.hpp>
 
 using big_int16_t = boost::endian::big_int16_t;
+using big_int16_buf_t = boost::endian::big_int16_buf_t;
 
 static_assert(std::is_pod<stdex::pod::optional<big_int16_t>>::value, "pod::optional<big_int16_t> is not a POD");
+static_assert(std::is_pod<stdex::pod::optional<big_int16_buf_t>>::value, "pod::optional<big_int16_buf_t> is not a POD");
 static_assert(sizeof(stdex::pod::optional<big_int16_t>) == 3, "sizeof(stdex::pod::optional<char>)  must be 3");
+
+struct BigP {
+    big_int16_t x;
+    big_int16_t y;
+
+    BigP() = default;
+    BigP(P const& p)
+    {
+        x =  p.x;
+        y =  p.y;
+    }
+    P value() const {
+//        P res;
+//        res.x = x.value();
+//        res.y = y.value();
+//        return res;
+        return { x.value(), y.value() };
+    }
+    operator P() const { return value(); }
+
+};
+static_assert(std::is_pod<stdex::pod::optional<BigP>>::value, "pod::optional<BigP> is not a POD");
+
+struct BigBufP {
+    big_int16_buf_t x;
+    big_int16_buf_t y;
+
+    BigBufP() = default;
+    BigBufP(P const& p)
+    {
+        x =  p.x;
+        y =  p.y;
+    }
+
+    P value() const {
+//        P res;
+//        res.x = x.value();
+//        res.y = y.value();
+//        return res;
+        return { x.value(), y.value() };
+    }
+};
+static_assert(std::is_pod<stdex::pod::optional<BigBufP>>::value, "pod::optional<BigBufP> is not a POD");
+
+namespace std {
+namespace experimental {
+inline namespace fundamental_v3 {
+namespace pod {
+    stdex::pod::optional<int16_t> to_pod_optional(stdex::pod::optional<big_int16_buf_t> const& x) {
+        if (x) return x->value();
+        return std::nullopt;
+    }
+#if defined JASEL_STD_HAVE_OPTIONAL
+    std::optional<int16_t> to_std_optional(stdex::pod::optional<big_int16_buf_t> const& x) {
+        if (x) return x->value();
+        return std::nullopt;
+    }
+    template <>
+    class optional_buf<big_int16_buf_t>
+    {
+    public:
+        optional_buf() = default;
+        using logical_type = std::optional<int16_t>;
+        explicit optional_buf(logical_type const& x)
+        {
+            data.m_present =  bool(x);
+            if ( bool(x) )
+            {
+                data.m_value =  *x;
+            }
+        }
+
+        logical_type value() const
+        {
+            if ( data.m_present )
+            {
+                return data.m_value.value();
+            }
+            return nullopt;
+        }
+
+    private:
+        optional_data<big_int16_buf_t> data;
+    };
+
+    template <>
+    class optional_buf<BigBufP>
+    {
+    public:
+        optional_buf() = default;
+        using logical_type = std::optional<P>;
+        explicit optional_buf(logical_type const& op)
+        {
+            data.m_present =  bool(op);
+            if ( bool(op) )
+            {
+                data.m_value =  *op;
+                //data.m_value.x =  op->x;
+                //data.m_value.y =  op->y;
+            }
+        }
+
+        logical_type value() const
+        {
+            if ( data.m_present )
+            {
+                return data.m_value.value();
+            }
+            return nullopt;
+        }
+
+    private:
+        optional_data<BigBufP> data;
+    };
+#endif
+}
+}
+}
+}
 
 int main()
 {
@@ -49,13 +171,37 @@ int main()
     BOOST_TEST (!o1);
   }
   {
+    stdex::pod::optional<big_int16_buf_t> o1 = {};
+    BOOST_TEST (!o1);
+  }
+  {
     stdex::pod::optional<P> o1 = {};
     BOOST_TEST (!o1);
   }
   {
-    stdex::pod::optional<P> o1{};
+    stdex::pod::optional<BigP> o1{};
     BOOST_TEST (!o1);
   }
+  {
+    stdex::pod::optional<BigBufP> o1{};
+    BOOST_TEST (!o1);
+  }
+  {
+    unsigned char arr[] = {1, 2, 3, 4};
+    static_assert(sizeof(arr)==sizeof(stdex::pod::optional<short>), "");
+    stdex::pod::optional<short> *po1 = new (&arr) stdex::pod::optional<short>;
+    BOOST_TEST (arr[0] == 1);
+    *po1 = std::nullopt;
+    BOOST_TEST (! *po1);
+    BOOST_TEST (arr[0] == 0);
+  }
+  {
+    unsigned char arr[] = {1, 2, 3, 4};
+    stdex::pod::optional<short> *po1 = new (&arr) stdex::pod::optional<short>{};
+    BOOST_TEST (arr[0] == 0);
+    BOOST_TEST (! *po1);
+  }
+
   {
     stdex::pod::optional<int> o1;
     o1 = std::nullopt;
@@ -122,6 +268,45 @@ int main()
     BOOST_TEST (o3 == o1);
     BOOST_TEST (o2 == o3);
     BOOST_TEST (o3 == o2);
+
+  }
+  {
+    // fixme: some operations on pod::optional<endian_buffer> don't work as endian_buffer is not regular
+    // we need to extract a pod::optional<native>.
+    // We can do it with non-member function and ADL or a trait
+    // We could as well define a pod::optional_transform<endian_buffer> that returns the nested value_type of its parameter
+    // However this pod::optional_transform couldn't return references.
+    stdex::pod::optional<big_int16_buf_t> o1;
+    o1 = std::nullopt;
+
+    stdex::pod::optional<big_int16_buf_t> o2 = std::nullopt;
+    BOOST_TEST (!o2);
+
+    stdex::pod::optional<big_int16_buf_t> o3;
+    o3 = o2;
+    BOOST_TEST (!o3);
+
+    BOOST_TEST (o1 == stdex::pod::nullopt);
+    //BOOST_TEST (o1 == stdex::pod::optional<big_int16_buf_t>{});
+    BOOST_TEST (!o1);
+    BOOST_TEST (bool(o1) == false);
+
+    BOOST_TEST (o2 == stdex::pod::nullopt);
+    //BOOST_TEST (o2 == stdex::pod::optional<big_int16_buf_t>{});
+    BOOST_TEST (!o2);
+    BOOST_TEST (bool(o2) == false);
+
+    BOOST_TEST (o3 == stdex::pod::nullopt);
+    //BOOST_TEST (o3 == stdex::pod::optional<big_int16_buf_t>{});
+    BOOST_TEST (!o3);
+    BOOST_TEST (bool(o3) == false);
+
+    //BOOST_TEST (o1 == o2);
+    //BOOST_TEST (o2 == o1);
+    //BOOST_TEST (o1 == o3);
+    //BOOST_TEST (o3 == o1);
+    //BOOST_TEST (o2 == o3);
+    //BOOST_TEST (o3 == o2);
 
   }
 
@@ -199,6 +384,40 @@ int main()
       BOOST_TEST (!oi);
   }
   {
+      stdex::pod::optional<big_int16_buf_t> oi;
+      oi = stdex::pod::optional<big_int16_buf_t>{1};
+      //BOOST_TEST (*oi == 1);
+      BOOST_TEST (oi->value() == 1);
+
+      oi = stdex::pod::nullopt;
+      BOOST_TEST (!oi);
+
+      oi = 2;
+      //BOOST_TEST (*oi == 2);
+      BOOST_TEST (oi->value() == 2);
+      oi = {};
+      BOOST_TEST (!oi);
+      oi = 2;
+      BOOST_TEST (oi);
+      oi.reset();
+      BOOST_TEST (!oi);
+  }
+#if defined JASEL_STD_HAVE_OPTIONAL
+  {
+      stdex::pod::optional_buf<big_int16_buf_t> obi { std::optional<int16_t>{1} };
+      std::optional<int16_t> oi = obi.value();
+      BOOST_TEST (oi);
+      BOOST_TEST (*oi == 1);
+  }
+  {
+      stdex::pod::optional_buf<BigBufP> ob { std::optional<P>{P{1,2}} };
+      std::optional<P> o = ob.value();
+      BOOST_TEST (o);
+      BOOST_TEST (o->x == 1);
+      BOOST_TEST (o->y == 2);
+  }
+#endif
+  {
     constexpr stdex::pod::optional<int> oi = {}; // no default constructor
     BOOST_TEST (!oi);
   }
@@ -256,6 +475,8 @@ int main()
     stdex::pod::optional<P> oi {stdex::pod::in_place};
     BOOST_TEST (oi != stdex::pod::nullopt);
     BOOST_TEST (bool(oi));
+    BOOST_TEST (oi->x == 0);
+    BOOST_TEST (oi->y == 0);
   }
 #if 0
   // fixme: needs a different in_place that does aggregate initialization
@@ -265,6 +486,20 @@ int main()
     BOOST_TEST (bool(oi));
   }
 #endif
+  {
+    stdex::pod::optional<BigP> oi {stdex::pod::in_place};
+    BOOST_TEST (oi != stdex::pod::nullopt);
+    BOOST_TEST (bool(oi));
+    BOOST_TEST (oi->x == 0);
+    BOOST_TEST (oi->y == 0);
+  }
+  {
+    stdex::pod::optional<BigBufP> oi {stdex::pod::in_place};
+    BOOST_TEST (oi != stdex::pod::nullopt);
+    BOOST_TEST (bool(oi));
+    BOOST_TEST (oi->value().x== 0);
+    BOOST_TEST (oi->value().y== 0);
+  }
   {
     stdex::pod::optional<stdex::pod::optional<int>> oi1 = stdex::pod::nullopt;
     BOOST_TEST (oi1 == stdex::pod::nullopt);

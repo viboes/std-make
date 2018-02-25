@@ -53,6 +53,26 @@ using std::in_place_t;
 using std::in_place;
 using std::bad_optional_access;
 
+template <class T, class Bool = unsigned char>
+class optional_data
+{
+public:
+
+    static_assert(is_pod<T>::value, "T must be a POD");
+    static_assert(is_pod<Bool>::value, "Bool must be a POD");
+
+    using bool_type = Bool;
+    using value_type = T;
+
+    constexpr optional_data() = default; // optional is a POD
+
+    bool_type m_present;
+    value_type m_value;
+};
+
+template <class T, class Bool = unsigned char>
+class optional_buf;
+
 // todo: Bool should be defaulted to uintxx_t where uintxx_t has the same alignment as T.
 // We can see pod::optional as a specialization of std::optional<T> when T is a POD (trivial)
 // fixme: Can we request less than POD? is_trivially_copyable?
@@ -81,7 +101,19 @@ public:
     {
         m_present = bool_type(false);
     }
-
+    static JASEL_CXX14_CONSTEXPR optional none() noexcept
+    {
+        optional<T> res;
+        res.m_present = bool_type(false);
+        return res;
+    }
+    static JASEL_CXX14_CONSTEXPR optional some(T const& x) noexcept
+    {
+        optional<T> res;
+        res.m_present = bool_type(true);
+        res.m_value = x;
+        return res;
+    }
     optional(optional const&) = default; // optional is a POD
     optional(optional &&) = default; // optional is a POD
     optional& operator=(optional const&) = default; // optional is a POD
@@ -222,6 +254,12 @@ public:
         m_value = value;
         return *this;
     }
+#endif
+
+#if defined JASEL_STD_HAVE_OPTIONAL
+    // todo
+    template <class U>
+    optional& operator=(std::optional<U>&& value) noexcept;
 #endif
 
     template <class... Args
@@ -573,6 +611,7 @@ constexpr optional<T, B> make_optional( initializer_list<U> il, Args&&... args)
 }
 #endif
 }
+
 static_assert(is_pod<pod::optional<int> >::value, "");
 static_assert(is_standard_layout<pod::optional<int> >::value, "");
 static_assert(is_trivial<pod::optional<int> >::value, "");
