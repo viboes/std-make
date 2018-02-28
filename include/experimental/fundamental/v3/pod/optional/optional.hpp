@@ -53,37 +53,35 @@ using std::in_place_t;
 using std::in_place;
 using std::bad_optional_access;
 
-template <class T, class Bool = unsigned char>
-class optional_data
+template <class T>
+struct optional_data
 {
-public:
-
     static_assert(is_pod<T>::value, "T must be a POD");
-    static_assert(is_pod<Bool>::value, "Bool must be a POD");
 
-    using bool_type = Bool;
+    using bool_type = unsigned char;
     using value_type = T;
 
     constexpr optional_data() = default; // optional is a POD
+
+    constexpr bool has_value() const { return m_present; }
+    explicit constexpr operator bool() const { return has_value(); }
 
     bool_type m_present;
     value_type m_value;
 };
 
-template <class T, class Bool = unsigned char>
+template <class T>
 class optional_buf;
 
-// todo: Bool should be defaulted to uintxx_t where uintxx_t has the same alignment as T.
-// We can see pod::optional as a specialization of std::optional<T> when T is a POD (trivial)
-// fixme: Can we request less than POD? is_trivially_copyable?
-template <class T, class Bool = unsigned char>
+// We can see pod::optional as a specialization of std::optional<T> when T is a POD (trivial),
+// that is itself a POD, that is, no specific default construction.
+template <class T>
 class optional
 {
 public:
     static_assert(is_pod<T>::value, "T must be a POD");
-    static_assert(is_pod<Bool>::value, "Bool must be a POD");
 
-    using bool_type = Bool;
+    using bool_type = unsigned char;
     using value_type = T;
 
     constexpr optional() = default; // optional is a POD
@@ -101,19 +99,7 @@ public:
     {
         m_present = bool_type(false);
     }
-    static JASEL_CXX14_CONSTEXPR optional none() noexcept
-    {
-        optional<T> res;
-        res.m_present = bool_type(false);
-        return res;
-    }
-    static JASEL_CXX14_CONSTEXPR optional some(T const& x) noexcept
-    {
-        optional<T> res;
-        res.m_present = bool_type(true);
-        res.m_value = x;
-        return res;
-    }
+
     optional(optional const&) = default; // optional is a POD
     optional(optional &&) = default; // optional is a POD
     optional& operator=(optional const&) = default; // optional is a POD
@@ -146,6 +132,12 @@ public:
             : m_present( bool_type(false) )
     {
     }
+    static JASEL_CXX14_CONSTEXPR optional none() noexcept
+    {
+        optional<T> res;
+        res.m_present = bool_type(false);
+        return res;
+    }
 
     template < class U = value_type
             , JASEL_REQUIRES(
@@ -173,13 +165,47 @@ public:
             , m_value( constexpr_move(value) )
     {
     }
+    template <class U = value_type
+                    , JASEL_REQUIRES(
+                            is_constructible<T, U&&>::value
+                            && ! is_same<meta::uncvref_t<U>, in_place_t>::value
+                            && ! is_same<meta::uncvref_t<U>, optional<T>>::value
+                            && ! is_convertible<U&&, T>::value
+                    )
+    >
+    static JASEL_CXX14_CONSTEXPR optional some(U && value) noexcept
+    {
+        optional<T> res;
+        res.m_present = bool_type(true);
+        res.m_value = constexpr_move(value);
+        return res;
+    }
 
 #if 0
     // todo: define these operations
-    template < class U, class B >
-    /* EXPLICIT */optional( const optional<U, B>& other ) noexcept;
-    template < class U, class B >
-    /* EXPLICIT */optional( optional<U, B>&& other ) noexcept;
+    template < class U >
+    /* EXPLICIT */optional( const optional<U>& other ) noexcept;
+    template < class U >
+    /* EXPLICIT */optional( optional<U>&& other ) noexcept;
+
+    template < class U >
+    void copy_assign(optional<U> const& other) noexcept
+    {
+        m_present = other.m_present;
+        if ( bool(m_present) )
+        {
+            m_value = other.m_value;
+        }
+    }
+    template < class U >
+    void move_assign(optional<U> && other) noexcept
+    {
+        if ( bool(m_present) )
+        {
+            m_value = move(other.m_value);
+        }
+        m_present = other.m_present;
+    }
 #endif
 
     template< class... Args
@@ -241,25 +267,40 @@ public:
 #if 0
     // todo: Add constraints to this operation
     template <class U>
-    optional& operator=(optional<U>&& value) noexcept
+    optional& operator=(optional<U>&& x) noexcept
     {
-        m_present = bool_type(true);
-        m_value = move(value);
+        m_present = x.m_present;
+        if (x.m_present)
+            m_value = move(x.m_value);
         return *this;
     }
     template <class U>
-    optional& operator=(optional<U> const& value) noexcept
+    optional& operator=(optional<U> const& x) noexcept
     {
-        m_present = bool_type(true);
-        m_value = value;
+        m_present = x.m_present;
+        if (x.m_present)
+            m_value = x.m_value;
         return *this;
     }
 #endif
 
 #if defined JASEL_STD_HAVE_OPTIONAL
-    // todo
     template <class U>
-    optional& operator=(std::optional<U>&& value) noexcept;
+    optional& operator=(std::optional<U>&& x) noexcept {
+        m_present = bool(x);
+        if (x)
+            m_value = move(*x);
+        return *this;
+
+    }
+    template <class U>
+    optional& operator=(std::optional<U> const& x) noexcept {
+        m_present = bool(x);
+        if (x)
+            m_value = *x;
+        return *this;
+
+    }
 #endif
 
     template <class... Args
@@ -292,7 +333,7 @@ public:
     }
 #endif
 
-    void swap(optional<T,Bool>& rhs) noexcept
+    void swap(optional& rhs) noexcept
     {
         swap(m_value, rhs.m_value);
         swap(m_present, rhs.m_present);
@@ -389,38 +430,38 @@ private:
 };
 
 // 20.5.8, Relational operators
-template <class T, class B>
-constexpr bool operator==(const optional<T, B>& x, const optional<T, B>& y)
+template <class T>
+constexpr bool operator==(const optional<T>& x, const optional<T>& y)
 {
     return bool(x) != bool(y) ? false : bool(x) == false ? true : *x == *y;
 }
 
-template <class T, class B>
-constexpr bool operator!=(const optional<T, B>& x, const optional<T, B>& y)
+template <class T>
+constexpr bool operator!=(const optional<T>& x, const optional<T>& y)
 {
     return ! ( x == y );
 }
 
-template <class T, class B>
-constexpr bool operator<(const optional<T, B>& x, const optional<T, B>& y)
+template <class T>
+constexpr bool operator<(const optional<T>& x, const optional<T>& y)
 {
     return ( !y ) ? false : ( !x ) ? true : *x < *y;
 }
 
-template <class T, class B>
-constexpr bool operator>(const optional<T, B>& x, const optional<T, B>& y)
+template <class T>
+constexpr bool operator>(const optional<T>& x, const optional<T>& y)
 {
     return ( y < x );
 }
 
-template <class T, class B>
-constexpr bool operator<=(const optional<T, B>& x, const optional<T, B>& y)
+template <class T>
+constexpr bool operator<=(const optional<T>& x, const optional<T>& y)
 {
     return ! ( y < x );
 }
 
-template <class T, class B>
-constexpr bool operator>=(const optional<T, B>& x, const optional<T, B>& y)
+template <class T>
+constexpr bool operator>=(const optional<T>& x, const optional<T>& y)
 {
     return ! ( x < y );
 }
@@ -437,177 +478,177 @@ constexpr bool operator!=(nullopt_t, nullopt_t) noexcept
 }
 #endif
 
-template <class T, class B>
-constexpr bool operator==(const optional<T, B>& x, nullopt_t) noexcept
+template <class T>
+constexpr bool operator==(const optional<T>& x, nullopt_t) noexcept
 {
     return ( !x );
 }
 
-template <class T, class B>
-constexpr bool operator==(nullopt_t, const optional<T, B>& x) noexcept
+template <class T>
+constexpr bool operator==(nullopt_t, const optional<T>& x) noexcept
 {
     return ( !x );
 }
 
-template <class T, class B>
-constexpr bool operator!=(const optional<T, B>& x, nullopt_t) noexcept
+template <class T>
+constexpr bool operator!=(const optional<T>& x, nullopt_t) noexcept
 {
     return bool(x);
 }
 
-template <class T, class B>
-constexpr bool operator!=(nullopt_t, const optional<T, B>& x) noexcept
+template <class T>
+constexpr bool operator!=(nullopt_t, const optional<T>& x) noexcept
 {
     return bool(x);
 }
 
-template <class T, class B>
-constexpr bool operator<(const optional<T, B>&, nullopt_t) noexcept
+template <class T>
+constexpr bool operator<(const optional<T>&, nullopt_t) noexcept
 {
     return false;
 }
 
-template <class T, class B>
-constexpr bool operator<(nullopt_t, const optional<T, B>& x) noexcept
+template <class T>
+constexpr bool operator<(nullopt_t, const optional<T>& x) noexcept
 {
     return bool(x);
 }
 
-template <class T, class B>
-constexpr bool operator<=(const optional<T, B>& x, nullopt_t) noexcept
+template <class T>
+constexpr bool operator<=(const optional<T>& x, nullopt_t) noexcept
 {
     return ( !x );
 }
 
-template <class T, class B>
-constexpr bool operator<=(nullopt_t, const optional<T, B>&) noexcept
+template <class T>
+constexpr bool operator<=(nullopt_t, const optional<T>&) noexcept
 {
     return true;
 }
 
-template <class T, class B>
-constexpr bool operator>(const optional<T, B>& x, nullopt_t) noexcept
+template <class T>
+constexpr bool operator>(const optional<T>& x, nullopt_t) noexcept
 {
     return bool(x);
 }
 
-template <class T, class B>
-constexpr bool operator>(nullopt_t, const optional<T, B>&) noexcept
+template <class T>
+constexpr bool operator>(nullopt_t, const optional<T>&) noexcept
 {
     return false;
 }
 
-template <class T, class B>
-constexpr bool operator>=(const optional<T, B>&, nullopt_t) noexcept
+template <class T>
+constexpr bool operator>=(const optional<T>&, nullopt_t) noexcept
 {
     return true;
 }
 
-template <class T, class B>
-constexpr bool operator>=(nullopt_t, const optional<T, B>& x) noexcept
+template <class T>
+constexpr bool operator>=(nullopt_t, const optional<T>& x) noexcept
 {
     return ( !x );
 }
 
 #if 0
 // 20.5.10, Comparison with T
-template <class T, class B>
+template <class T>
 constexpr bool operator==(const optional<T>& x, const T& v)
 {
     return bool(x) ? *x == v : false;
 }
 
-template <class T, class B>
+template <class T>
 constexpr bool operator==(const T& v, const optional<T>& x)
 {
     return bool(x) ? v == *x : false;
 }
 
-template <class T, class B>
+template <class T>
 constexpr bool operator!=(const optional<T>& x, const T& v)
 {
     return bool(x) ? *x != v : true;
 }
 
-template <class T, class B>
-constexpr bool operator!=(const T& v, const optional<T, B>& x)
+template <class T>
+constexpr bool operator!=(const T& v, const optional<T>& x)
 {
     return bool(x) ? v != *x : true;
 }
 
-template <class T, class B>
-constexpr bool operator<(const optional<T, B>& x, const T& v)
+template <class T>
+constexpr bool operator<(const optional<T>& x, const T& v)
 {
     return bool(x) ? *x < v : true;
 }
 
-template <class T, class B>
-constexpr bool operator>(const T& v, const optional<T, B>& x)
+template <class T>
+constexpr bool operator>(const T& v, const optional<T>& x)
 {
     return bool(x) ? v > *x : true;
 }
 
-template <class T, class B>
-constexpr bool operator>(const optional<T, B>& x, const T& v)
+template <class T>
+constexpr bool operator>(const optional<T>& x, const T& v)
 {
     return bool(x) ? *x > v : false;
 }
 
-template <class T, class B>
-constexpr bool operator<(const T& v, const optional<T, B>& x)
+template <class T>
+constexpr bool operator<(const T& v, const optional<T>& x)
 {
     return bool(x) ? v < *x : false;
 }
 
-template <class T, class B>
-constexpr bool operator>=(const optional<T, B>& x, const T& v)
+template <class T>
+constexpr bool operator>=(const optional<T>& x, const T& v)
 {
     return bool(x) ? *x >= v : false;
 }
 
-template <class T, class B>
-constexpr bool operator<=(const T& v, const optional<T, B>& x)
+template <class T>
+constexpr bool operator<=(const T& v, const optional<T>& x)
 {
     return bool(x) ? v <= *x : false;
 }
 
-template <class T, class B>
-constexpr bool operator<=(const optional<T, B>& x, const T& v)
+template <class T>
+constexpr bool operator<=(const optional<T>& x, const T& v)
 {
     return bool(x) ? *x <= v : true;
 }
 
-template <class T, class B>
-constexpr bool operator>=(const T& v, const optional<T, B>& x)
+template <class T>
+constexpr bool operator>=(const T& v, const optional<T>& x)
 {
     return bool(x) ? v >= *x : true;
 }
 #endif
 
 // 20.5.12, Specialized algorithms
-template <class T, class B>
-void swap(optional<T, B>& x, optional<T, B>& y) noexcept
+template <class T>
+void swap(optional<T>& x, optional<T>& y) noexcept
 {
     x.swap(y);
 }
 
 template <class T>
-constexpr optional<meta::uncvref_t<T>, unsigned char> make_optional(T&& v)
+constexpr optional<meta::uncvref_t<T>> make_optional(T&& v)
 {
-    return optional<meta::uncvref_t<T>, unsigned char>(constexpr_forward<T>(v));
+    return optional<meta::uncvref_t<T>>(constexpr_forward<T>(v));
 }
 
 #if 0
-template <class T, class B, class ... Args>
-constexpr optional<T, B> make_optional(Args&&... args)
+template <class T, class ... Args>
+constexpr optional<T> make_optional(Args&&... args)
 {
-    return optional<T, B>(forward<Args>(args)...);
+    return optional<T>(forward<Args>(args)...);
 }
 
-template <class T, class B, class U, class ... Args>
-constexpr optional<T, B> make_optional( initializer_list<U> il, Args&&... args)
+template <class T, class U, class ... Args>
+constexpr optional<T> make_optional( initializer_list<U> il, Args&&... args)
 {
-    return optional<T, B>(il, forward<Args>(args)...);
+    return optional<T>(il, forward<Args>(args)...);
 }
 #endif
 }
@@ -621,11 +662,11 @@ static_assert(is_trivial<pod::optional<int> >::value, "");
 }
 namespace std
 {
-template <typename T, class B>
-struct hash<std::experimental::pod::optional<T, B>>
+template <typename T>
+struct hash<std::experimental::pod::optional<T>>
 {
 typedef typename hash<T>::result_type result_type;
-typedef std::experimental::pod::optional<T, B> argument_type;
+typedef std::experimental::pod::optional<T> argument_type;
 
     constexpr result_type operator()(argument_type const& arg) const
     {

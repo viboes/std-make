@@ -16,9 +16,9 @@ namespace stdex = std::experimental;
 template <class T> struct show;
 
 static_assert(std::is_pod<stdex::pod::optional<int>>::value, "pod::optional<int> is not a POD");
-static_assert(sizeof(stdex::pod::optional<char, std::int8_t>) == 2, "sizeof(stdex::pod::optional<char, std::int8_t>)  must be 2");
 static_assert(sizeof(stdex::pod::optional<char>) == 2, "sizeof(stdex::pod::optional<char>)  must be 2");
-static_assert(sizeof(stdex::pod::optional<int, std::int8_t>) == 8, "sizeof(stdex::pod::optional<int, std::int8_t>)  must be 8");
+static_assert(sizeof(stdex::pod::optional<char>) == 2, "sizeof(stdex::pod::optional<char>)  must be 2");
+static_assert(sizeof(stdex::pod::optional<int>) == 8, "sizeof(stdex::pod::optional<int>)  must be 8");
 
 
 struct P {
@@ -27,9 +27,8 @@ struct P {
 };
 
 static_assert(std::is_pod<stdex::pod::optional<P>>::value, "pod::optional<P> is not a POD");
-static_assert(std::is_pod<stdex::pod::optional<P, std::int16_t>>::value, "pod::optional<P> is not a POD");
+static_assert(std::is_pod<stdex::pod::optional<P>>::value, "pod::optional<P> is not a POD");
 static_assert(sizeof(stdex::pod::optional<P>) == 6, "sizeof(stdex::pod::optional<P>)  must be 6");
-static_assert(sizeof(stdex::pod::optional<P, std::int16_t>) == 6, "sizeof(stdex::pod::optional<P, std::int16_t>)  must be 6");
 
 #include <boost/endian/conversion.hpp>
 #include <boost/endian/arithmetic.hpp>
@@ -52,10 +51,6 @@ struct BigP {
         y =  p.y;
     }
     P value() const {
-//        P res;
-//        res.x = x.value();
-//        res.y = y.value();
-//        return res;
         return { x.value(), y.value() };
     }
     operator P() const { return value(); }
@@ -137,8 +132,6 @@ namespace pod {
             if ( bool(op) )
             {
                 data.m_value =  *op;
-                //data.m_value.x =  op->x;
-                //data.m_value.y =  op->y;
             }
         }
 
