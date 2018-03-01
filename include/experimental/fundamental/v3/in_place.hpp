@@ -21,8 +21,29 @@ namespace std
   inline  namespace fundamental_v3
   {
     // 20.5.6, In-place construction
-    constexpr struct in_place_t {} in_place {};
+    struct in_place_t {
 
+      explicit in_place_t() = default;
+    };
+    //inline
+    constexpr in_place_t in_place{};
+
+    template <class T> struct in_place_type_t {
+        explicit in_place_type_t() = default;
+    };
+#if __cplusplus >= 201402L
+    template <class T>
+    //inline
+    constexpr in_place_type_t<T> in_place_type{};
+#endif
+    template <size_t I> struct in_place_index_t {
+        explicit in_place_index_t() = default;
+    };
+#if __cplusplus >= 201402L
+    template <size_t I>
+    //inline
+    constexpr in_place_index_t<I> in_place_index{};
+#endif
   }
   }
   using std::experimental::in_place_t;
