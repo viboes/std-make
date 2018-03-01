@@ -37,8 +37,69 @@ namespace experimental
 inline namespace fundamental_v3
 {
 
+namespace result_detail
+{
+struct check_implicit {
+  template <class U>
+  static constexpr bool enable_implicit() {
+      return true;
+  }
+
+  template <class U>
+  static constexpr bool enable_explicit() {
+      return false;
+  }
+};
+
+struct check_fail {
+  template <class U>
+  static constexpr bool enable_implicit() {
+      return false;
+  }
+
+  template <class U>
+  static constexpr bool enable_explicit() {
+      return false;
+  }
+};
+template <class T, class QualU>
+struct check_constructible {
+  template <class U>
+  static constexpr bool enable_implicit() {
+      return is_constructible<T, QualU>::value &&
+             is_convertible<QualU, T>::value;
+  }
+
+  template <class U>
+  static constexpr bool enable_explicit() {
+      return is_constructible<T, QualU>::value &&
+             !is_convertible<QualU, T>::value;
+  }
+};
+
+template <class T, class U, class QualU>
+using check_void_or_constructible = conditional_t<
+    !is_void<T>::value,
+    check_constructible<T, QualU>,
+    result_detail::check_implicit
+>;
+
+template <class T, class U, class QualU>
+using check_diff_or_constructible = conditional_t<
+    !is_same<T, U>::value,
+    check_constructible<T, QualU>,
+    result_detail::check_fail
+>;
+
+}
+
 template <class T>
 struct success {
+private:
+    template <class U, class QualU>
+    using check_success_ctor = result_detail::check_diff_or_constructible<T, U, QualU>;
+
+public:
     T value;
 
     success() = delete;
@@ -52,9 +113,34 @@ struct success {
     {
     }
     constexpr explicit success(T&& v) :
-        value(move(v))
+        value(std::move(v))
     {
     }
+
+    template < class U = T, enable_if_t<
+                    check_success_ctor<U, U const&>::template enable_implicit<U>()
+                , int> = 0>
+    constexpr success(success<U> const& other) :
+        value(other.value)
+    {}
+    template < class U = T, enable_if_t<
+                    check_success_ctor<U, U const&>::template enable_explicit<U>()
+                , int> = 0>
+    explicit constexpr success(success<U> const& other) :
+        value(other.value)
+    {}
+    template < class U = T, enable_if_t<
+                    check_success_ctor<U, U &&>::template enable_implicit<U>()
+                , int> = 0>
+    constexpr success(success<U> && other) :
+        value(std::move(other.value))
+    {}
+    template < class U = T, enable_if_t<
+                    check_success_ctor<U, U &&>::template enable_explicit<U>()
+                , int> = 0>
+    explicit constexpr success(success<U> && other) :
+        value(std::move(other.value))
+    {}
 };
 
 template <class T>
@@ -85,6 +171,11 @@ success<void> make_success()
 
 template <class E>
 struct failure {
+private:
+    template <class U, class QualU>
+    using check_success_ctor = result_detail::check_diff_or_constructible<E, U, QualU>;
+
+public:
     E value;
 
     static_assert(! is_same<E,void>::value, "The E of failure<E> can not be void.");
@@ -100,9 +191,34 @@ struct failure {
     {
     }
     constexpr explicit failure(E&& e) :
-                value(move(e))
+                value(std::move(e))
     {
     }
+
+    template < class U = E, enable_if_t<
+                    check_success_ctor<U, U const&>::template enable_implicit<U>()
+                , int> = 0>
+    constexpr failure(failure<U> const& other) :
+        value(other.value)
+    {}
+    template < class U = E, enable_if_t<
+                    check_success_ctor<U, U const&>::template enable_explicit<U>()
+                , int> = 0>
+    explicit constexpr failure(failure<U> const& other) :
+        value(other.value)
+    {}
+    template < class U = E, enable_if_t<
+                    check_success_ctor<U, U &&>::template enable_implicit<U>()
+                , int> = 0>
+    constexpr failure(failure<U> && other) :
+        value(std::move(other.value))
+    {}
+    template < class U = E, enable_if_t<
+                    check_success_ctor<U, U &&>::template enable_explicit<U>()
+                , int> = 0>
+    explicit constexpr failure(failure<U> && other) :
+        value(std::move(other.value))
+    {}
 };
 
 template <class E>
@@ -477,11 +593,7 @@ struct result_move_base<T, E, false> : result_copy_base<T, E>
     }
 
 };
-template <class T, class E>
-struct result_base : result_move_base<T, E>
-{
-    using result_move_base<T, E>::result_move_base;
-};
+
 
 // move to sfinae_delete_base
 template <bool CanCopy, bool CanMove>
@@ -531,45 +643,131 @@ using result_sfinae_ctor_base = sfinae_ctor_base<
                 is_move_constructible_or_void<T>::value && is_move_constructible<E>::value
 >;
 
-}
+
 
 template <class T, class E>
-class result : private result_detail::result_base<T,E>
-             , private result_detail::result_sfinae_ctor_base<T,E>
+class result_base : private result_move_base<T,E>
+             , private result_sfinae_ctor_base<T,E>
 {
     static_assert(is_destructible<T>::value || is_void<T>::value,
         "instantiation of result with a non-destructible non-void T type is ill-formed");
     static_assert(is_destructible<E>::value,
         "instantiation of result with a non-destructible E type is ill-formed");
 
-    using base_type = result_detail::result_base<T, E>;
+    using base_type = result_detail::result_move_base<T, E>;
+
+    template <class U, class QualU>
+    using check_result_failure_ctor = check_constructible<U, QualU>;
 
 public:
-    result() = delete;
-    result(const result& rhs) = default;
-    result(result&& rhs)  = default;
-    result& operator=(result const& e) = delete;
-    result& operator=(result && e) = delete;
-    ~result() = default;
+    using base_type::base_type;
 
-    constexpr result(success<T> const& value) :
-        base_type(in_place_type<success<T>>, value)
-    {}
-    constexpr result(success<T> && value) :
-        base_type(in_place_type<success<T>>, std::move(value))
-    {}
-    constexpr result(failure<E> const& error) :
+    result_base() = delete;
+    result_base(const result_base& rhs) = default;
+    result_base(result_base&& rhs)  = default;
+    result_base& operator=(result_base const& e) = delete;
+    result_base& operator=(result_base && e) = delete;
+    ~result_base() = default;
+#if 0
+    constexpr result_base(failure<E> const& error) :
         base_type(in_place_type<failure<E>>, error)
     {}
-    constexpr result(failure<E> && error) :
+    constexpr result_base(failure<E> && error) :
         base_type(in_place_type<failure<E>>, std::move(error))
     {}
-
+#else
+    template < class U = E, enable_if_t<
+                    check_result_failure_ctor<U, U const&>::template enable_implicit<U>()
+                , int> = 0>
+    constexpr result_base(failure<U> const& other) :
+    base_type(in_place_type<failure<E>>, other)
+    {}
+    template < class U = E, enable_if_t<
+                    check_result_failure_ctor<U, U const&>::template enable_explicit<U>()
+                , int> = 0>
+    explicit constexpr result_base(failure<U> const& other) :
+    base_type(in_place_type<failure<E>>, other)
+    {}
+    template < class U = E, enable_if_t<
+                    check_result_failure_ctor<U, U &&>::template enable_implicit<U>()
+                , int> = 0>
+    constexpr result_base(failure<U> && other) :
+    base_type(in_place_type<failure<E>>, std::move(other))
+    {}
+    template < class U = E, enable_if_t<
+                    check_result_failure_ctor<U, U &&>::template enable_explicit<U>()
+                , int> = 0>
+    explicit constexpr result_base(failure<U> && other) :
+    base_type(in_place_type<failure<E>>, std::move(other))
+    {}
+#endif
     using base_type::has_value;
     using base_type::value;
     using base_type::get_success;
     using base_type::error;
     using base_type::get_failure;
+};
+
+
+
+}
+
+template <class T, class E>
+class result : public result_detail::result_base<T, E>
+{
+    static_assert(is_destructible<T>::value,
+        "instantiation of result with a non-destructible non-void T type is ill-formed");
+
+    using base_type = result_detail::result_base<T, E>;
+
+
+    template <class U, class QualU>
+    using check_result_success_ctor = result_detail::check_void_or_constructible<T, U, QualU>;
+
+public:
+    using base_type::base_type;
+
+    template < class U = T, enable_if_t<
+                    check_result_success_ctor<U, U const&>::template enable_implicit<U>()
+                , int> = 0>
+    constexpr result(success<U> const& value) :
+        base_type(in_place_type<success<T>>, value)
+    {}
+    template < class U = T, enable_if_t<
+                    check_result_success_ctor<U, U const&>::template enable_explicit<U>()
+                , int> = 0>
+    explicit constexpr result(success<U> const& value) :
+        base_type(in_place_type<success<T>>, value)
+    {}
+    template < class U = T, enable_if_t<
+                    check_result_success_ctor<U, U &&>::template enable_implicit<U>()
+                , int> = 0>
+    constexpr result(success<U> && value) :
+        base_type(in_place_type<success<T>>, std::move(value))
+    {}
+    template < class U = T, enable_if_t<
+                    check_result_success_ctor<U, U &&>::template enable_explicit<U>()
+                , int> = 0>
+    explicit constexpr result(success<U> && value) :
+        base_type(in_place_type<success<T>>, std::move(value))
+    {}
+};
+
+template <class E>
+class result<void, E> : public result_detail::result_base<void, E>
+{
+    using T = void;
+    using base_type = result_detail::result_base<T, E>;
+
+public:
+    using base_type::base_type;
+
+    constexpr result(success<void> const& value) :
+        base_type(in_place_type<success<T>>, value)
+    {}
+    constexpr result(success<void> && value) :
+        base_type(in_place_type<success<T>>, std::move(value))
+    {}
 };
 
 }

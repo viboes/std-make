@@ -28,7 +28,7 @@ stdex::result<int, short> f(int v, int w) {
     if (w != 0)
         return stdex::make_success(v/w);
     else
-        return stdex::make_failure(short(-1));
+        return stdex::make_failure(-1);
 }
 
 template <class A>
@@ -39,12 +39,25 @@ auto g(A&& x)
 int main()
 {
     {
+        stdex::success<short> x =  stdex::make_success(1);
+        BOOST_TEST(x.value == 1);
+    }
+    {
+        stdex::failure<short> x =  stdex::make_failure(1);
+        BOOST_TEST(x.value == 1);
+    }
+    {
         auto x =  stdex::make_success(std::string(""));
         static_assert(! std::is_same<decltype(x),std::string>::value, "ERROR");
         BOOST_TEST(x.value == "");
     }
     {
-        auto x =  stdex::make_success(std::string(""));
+        stdex::success<std::string> x =  stdex::make_success(std::string(""));
+        auto y = x;
+        BOOST_TEST(y.value == "");
+    }
+    {
+        stdex::success<std::string> x =  stdex::make_success("");
         auto y = x;
         BOOST_TEST(y.value == "");
     }
@@ -74,14 +87,19 @@ int main()
         stdex::result<int, short> res = stdex::make_success(1);
         BOOST_TEST(res.has_value());
         BOOST_TEST(res.value() == 1);
-        //res = stdex::make_failure(short(-1));
+        //res = stdex::make_failure(-1);
+    }
+    {
+        stdex::result<short, int> res = stdex::make_success(1);
+        BOOST_TEST(res.has_value());
+        BOOST_TEST(res.value() == 1);
     }
     {
         stdex::result<void, short> res = stdex::success<void>();
         BOOST_TEST(res.has_value());
     }
     {
-        stdex::result<void, short> res = stdex::make_failure(short(-1));
+        stdex::result<void, short> res = stdex::make_failure(-1);
         BOOST_TEST(! res.has_value());
         BOOST_TEST( res.error() == -1);
     }
@@ -96,7 +114,7 @@ int main()
         BOOST_TEST( res.error() == -1);
     }
     {
-        stdex::result<std::string, short> res = stdex::make_success(std::string(""));
+        stdex::result<std::string, short> res = stdex::make_success("");
         BOOST_TEST(res.has_value());
         BOOST_TEST(res.value() == "");
     }
