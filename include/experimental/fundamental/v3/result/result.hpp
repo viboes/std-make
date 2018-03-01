@@ -117,6 +117,13 @@ public:
     {
     }
 
+    template <class... _Args, class = enable_if_t<
+        is_constructible<T, _Args...>::value>
+    >
+    _LIBCPP_INLINE_VISIBILITY
+    constexpr explicit success(in_place_t, _Args&&... __args)
+        : value(std::forward<_Args>(__args)...) {}
+
     template < class U = T, enable_if_t<
                     check_success_ctor<U, U const&>::template enable_implicit<U>()
                 , int> = 0>
@@ -195,6 +202,14 @@ public:
     {
     }
 
+    template <class... _Args, class = enable_if_t<
+        is_constructible<E, _Args...>::value>
+    >
+    _LIBCPP_INLINE_VISIBILITY
+    constexpr explicit failure(in_place_t, _Args&&... __args)
+        : value(std::forward<_Args>(__args)...) {}
+
+
     template < class U = E, enable_if_t<
                     check_success_ctor<U, U const&>::template enable_implicit<U>()
                 , int> = 0>
@@ -270,15 +285,6 @@ struct result_destruct_base<T, E, false>
     constexpr explicit result_destruct_base(in_place_type_t<failure<E>>, Args&&... args)
         :  _failure(std::forward<Args>(args)...),
            _has_value(false) {}
-    template <class... Args>
-    constexpr explicit result_destruct_base(in_place_type_t<T>, Args&&... args)
-        :  _success(value_type(std::forward<Args>(args)...)),
-           _has_value(true) {}
-    template <class... Args>
-    constexpr explicit result_destruct_base(in_place_type_t<E>, Args&&... args)
-        :  _failure(error_type(std::forward<Args>(args)...)),
-           _has_value(false) {}
-
 };
 
 template <class T, class E>
@@ -309,15 +315,6 @@ struct result_destruct_base<T, E, true>
     constexpr explicit result_destruct_base(in_place_type_t<failure<E>>, Args&&... args)
         :  _failure(std::forward<Args>(args)...),
            _has_value(false) {}
-    template <class... Args>
-    constexpr explicit result_destruct_base(in_place_type_t<T>, Args&&... args)
-        :  _success(value_type(std::forward<Args>(args)...)),
-           _has_value(true) {}
-    template <class... Args>
-    constexpr explicit result_destruct_base(in_place_type_t<E>, Args&&... args)
-        :  _failure(error_type(std::forward<Args>(args)...)),
-           _has_value(false) {}
-
 };
 
 template <class T, class E, bool = is_reference<T>::value>

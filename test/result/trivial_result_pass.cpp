@@ -39,6 +39,16 @@ auto g(A&& x)
 int main()
 {
     {
+        stdex::success<std::pair<int, short>> x =  stdex::make_success(std::make_pair(1,2));
+        BOOST_TEST(x.value.first == 1);
+        BOOST_TEST(x.value.second == 2);
+    }
+    {
+        stdex::success<std::pair<int, short>> x {std::in_place, 1,2};
+        BOOST_TEST(x.value.first == 1);
+        BOOST_TEST(x.value.second == 2);
+    }
+    {
         stdex::success<short> x =  stdex::make_success(1);
         BOOST_TEST(x.value == 1);
     }
@@ -95,9 +105,28 @@ int main()
         BOOST_TEST(res.value() == 1);
     }
     {
+        //stdex::result<void, short> res; // compile fails as expected
+    }
+    {
         stdex::result<void, short> res = stdex::success<void>();
         BOOST_TEST(res.has_value());
     }
+    {
+        stdex::result<void, short> res = stdex::make_success();
+        BOOST_TEST(res.has_value());
+    }
+    {
+        stdex::result<std::pair<int, short>, short> res {std::in_place_type<stdex::success<std::pair<int, short>>>, std::in_place, 1, 2};
+        BOOST_TEST(res.has_value());
+        BOOST_TEST(res.value().first == 1);
+        BOOST_TEST(res.value().second == 2);
+    }
+    {
+        stdex::result<std::pair<int, short>, short> res {std::in_place_type<stdex::failure<short>>, std::in_place, 1};
+        BOOST_TEST(! res.has_value());
+        BOOST_TEST(res.error() == 1);
+    }
+
     {
         stdex::result<void, short> res = stdex::make_failure(-1);
         BOOST_TEST(! res.has_value());
