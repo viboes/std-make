@@ -431,9 +431,6 @@ public:
         base_type(in_place_type<success<T>>, std::move(value))
     {}
 
-
-
-
     template < class U = T, class G = E, enable_if_t<
                     check_result_result_ctor<U, G, U const&, G const&>::template enable_implicit<U, G>()
                 , int> = 0>

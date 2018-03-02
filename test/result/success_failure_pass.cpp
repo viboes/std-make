@@ -62,6 +62,39 @@ int main()
         BOOST_TEST(x.value == "");
         BOOST_TEST(y.value == "aaa");
     }
+#if __cplusplus > 201402L && defined __clang__
+    {
+        stdex::success<std::pair<int, short>> x =  stdex::success(std::make_pair(1,2));
+        BOOST_TEST(x.value.first == 1);
+        BOOST_TEST(x.value.second == 2);
+    }
+    {
+        stdex::success<short> x =  stdex::success(1);
+        BOOST_TEST(x.value == 1);
+    }
+    {
+        stdex::failure<short> x =  stdex::failure(1);
+        BOOST_TEST(x.value == 1);
+    }
+    {
+        auto x =  stdex::success(std::string(""));
+        static_assert(! std::is_same<decltype(x),std::string>::value, "ERROR");
+        BOOST_TEST(x.value == "");
+    }
+    {
+        stdex::success<std::string> x =  stdex::success("");
+        auto y = x;
+        BOOST_TEST(x == y);
+        BOOST_TEST(y.value == "");
+    }
+    {
+        auto x = stdex::success(std::string("aaa"));
+        auto y = std::move(x);
+        BOOST_TEST(x != y);
+        BOOST_TEST(x.value == "");
+        BOOST_TEST(y.value == "aaa");
+    }
+#endif
 
 #if __cplusplus >= 201402L
     {

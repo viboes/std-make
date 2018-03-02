@@ -51,6 +51,13 @@ failure<typename std::decay<E>::type> make_failure(E&& error)
     return failure<typename std::decay<E>::type>(std::forward<E>(error));
 }
 
+#if __cplusplus > 201402L && defined __clang__
+template <class T>
+explicit success(T a) -> success<T>;
+template <class T>
+explicit failure(T a) -> failure<T>;
+#endif
+
 }
 }
 }
