@@ -19,8 +19,9 @@
 
 #if __cplusplus >= 201402L && defined __clang__
 
-
 #include <experimental/fundamental/v2/config.hpp>
+#include <experimental/fundamental/v3/result/helpers_detail.hpp>
+#include <experimental/fundamental/v3/result/success_failure.hpp>
 
 #include <type_traits>
 #include <utility>
@@ -37,179 +38,8 @@ namespace experimental
 {
 inline namespace fundamental_v3
 {
-
 namespace result_detail
 {
-struct check_implicit {
-  template <class U>
-  static constexpr bool enable_implicit() {
-      return true;
-  }
-
-  template <class U>
-  static constexpr bool enable_explicit() {
-      return false;
-  }
-};
-
-struct check_fail {
-  template <class U>
-  static constexpr bool enable_implicit() {
-      return false;
-  }
-
-  template <class U>
-  static constexpr bool enable_explicit() {
-      return false;
-  }
-};
-template <class T, class QualU>
-struct check_constructible {
-  template <class U>
-  static constexpr bool enable_implicit() {
-      return is_constructible<T, QualU>::value &&
-             is_convertible<QualU, T>::value;
-  }
-
-  template <class U>
-  static constexpr bool enable_explicit() {
-      return is_constructible<T, QualU>::value &&
-             !is_convertible<QualU, T>::value;
-  }
-};
-
-template <class T, class U, class QualU>
-using check_void_or_constructible = conditional_t<
-    !is_void<T>::value,
-    check_constructible<T, QualU>,
-    result_detail::check_implicit
->;
-
-template <class T, class U, class QualU>
-using check_diff_or_constructible = conditional_t<
-    !is_same<T, U>::value,
-    check_constructible<T, QualU>,
-    result_detail::check_fail
->;
-
-}
-
-template <class Tag, class T>
-struct immutable_wrapper {
-private:
-    template <class U, class QualU>
-    using check_success_ctor = result_detail::check_diff_or_constructible<T, U, QualU>;
-public:
-    static_assert(is_object<T>::value,
-        "instantiation of immutable_wrapper with a non-object type is ill defined");
-    static_assert(! std::is_array<T>::value,
-        "instantiation of immutable_wrapper with a array type is ill defined");
-
-    T value;
-
-    immutable_wrapper() = delete;
-    constexpr immutable_wrapper(immutable_wrapper const& e) = default;
-    constexpr immutable_wrapper(immutable_wrapper&& e) = default;
-    constexpr immutable_wrapper& operator=(immutable_wrapper const& e) = delete;
-    constexpr immutable_wrapper& operator=(immutable_wrapper&& e) = delete;
-
-    constexpr explicit immutable_wrapper(T const& v) :
-        value(v)
-    {
-    }
-    constexpr explicit immutable_wrapper(T&& v) :
-        value(std::move(v))
-    {
-    }
-
-    template <class... _Args, class = enable_if_t<
-        is_constructible<T, _Args...>::value>
-    >
-    _LIBCPP_INLINE_VISIBILITY
-    constexpr explicit immutable_wrapper(in_place_t, _Args&&... __args)
-        : value(std::forward<_Args>(__args)...) {}
-
-    template < class U = T, enable_if_t<
-                    check_success_ctor<U, U const&>::template enable_implicit<U>()
-                , int> = 0>
-    constexpr immutable_wrapper(immutable_wrapper<Tag, U> const& other) :
-        value(other.value)
-    {}
-    template < class U = T, enable_if_t<
-                    check_success_ctor<U, U const&>::template enable_explicit<U>()
-                , int> = 0>
-    explicit constexpr immutable_wrapper(immutable_wrapper<Tag, U> const& other) :
-        value(other.value)
-    {}
-    template < class U = T, enable_if_t<
-                    check_success_ctor<U, U &&>::template enable_implicit<U>()
-                , int> = 0>
-    constexpr immutable_wrapper(immutable_wrapper<Tag, U> && other) :
-        value(std::move(other.value))
-    {}
-    template < class U = T, enable_if_t<
-                    check_success_ctor<U, U &&>::template enable_explicit<U>()
-                , int> = 0>
-    explicit constexpr immutable_wrapper(immutable_wrapper<Tag, U> && other) :
-        value(std::move(other.value))
-    {}
-};
-
-template <class Tag, class T>
-struct degenerated_immutable_wrapper : immutable_wrapper<Tag, T>
-{
-        using immutable_wrapper<Tag, T>::immutable_wrapper;
-};
-
-template <class Tag>
-struct degenerated_immutable_wrapper<Tag, void> {
-
-    constexpr degenerated_immutable_wrapper(degenerated_immutable_wrapper const& e) = default;
-    constexpr degenerated_immutable_wrapper(degenerated_immutable_wrapper&& e) = default;
-    constexpr degenerated_immutable_wrapper& operator=(degenerated_immutable_wrapper const& e) = delete;
-    constexpr degenerated_immutable_wrapper& operator=(degenerated_immutable_wrapper&& e) = delete;
-
-    constexpr explicit degenerated_immutable_wrapper()
-    {
-    }
-};
-
-struct success_tag {};
-
-template <class T>
-struct success : degenerated_immutable_wrapper<success_tag, T>
-{
-    using degenerated_immutable_wrapper<success_tag, T>::degenerated_immutable_wrapper;
-};
-
-template <class T>
-success<std::decay_t<T>> make_success(T&& value)
-{
-    return success<std::decay_t<T>>(std::forward<T>(value));
-}
-
-success<void> make_success()
-{
-    return success<void>();
-}
-
-struct failure_tag {};
-
-template <class T>
-struct failure : immutable_wrapper<failure_tag, T>
-{
-    using immutable_wrapper<failure_tag, T>::immutable_wrapper;
-};
-
-template <class E>
-failure<std::decay_t<E>> make_failure(E&& error)
-{
-    return failure<std::decay_t<E>>(std::forward<E>(error));
-}
-
-namespace result_detail {
-
-struct uninitialized_t {};
 
 template <class T, class E, bool = (is_void<T>::value || is_trivially_destructible<T>::value) && is_trivially_destructible<E>::value>
 struct result_destruct_base;
@@ -452,11 +282,6 @@ struct result_storage_base<T, E, true>
     //static_assert(false, "Neither T nor E cannot be reference types");
 };
 
-template <class T>
-struct is_trivially_copy_constructible_or_void : is_trivially_copy_constructible<T> {};
-template <>
-struct is_trivially_copy_constructible_or_void<void> : true_type {};
-
 template <class T, class E, bool = is_trivially_copy_constructible_or_void<T>::value && is_trivially_copy_constructible<E>::value>
 struct result_copy_base : result_storage_base<T, E>
 {
@@ -477,10 +302,6 @@ struct result_copy_base<T, E, false> : result_storage_base<T, E>
     result_copy_base(result_copy_base&&) = default;
 };
 
-template <class T>
-struct is_trivially_move_constructible_or_void : is_trivially_move_constructible<T> {};
-template <>
-struct is_trivially_move_constructible_or_void<void> : true_type {};
 
 template <class T, class E, bool = is_trivially_move_constructible_or_void<T>::value && is_trivially_move_constructible<E>::value>
 struct result_move_base : result_copy_base<T, E>
@@ -507,50 +328,8 @@ struct result_move_base<T, E, false> : result_copy_base<T, E>
     }
 };
 
-
-// move to sfinae_delete_base
-template <bool CanCopy, bool CanMove>
-struct sfinae_ctor_base {};
-template <>
-struct sfinae_ctor_base<false, false>
-{
-  sfinae_ctor_base() = default;
-  sfinae_ctor_base(sfinae_ctor_base const&) = delete;
-  sfinae_ctor_base(sfinae_ctor_base &&) = delete;
-  sfinae_ctor_base& operator=(sfinae_ctor_base const&) = default;
-  sfinae_ctor_base& operator=(sfinae_ctor_base&&) = default;
-};
-template <>
-struct sfinae_ctor_base<true, false>
-{
-  sfinae_ctor_base() = default;
-  sfinae_ctor_base(sfinae_ctor_base const&) = default;
-  sfinae_ctor_base(sfinae_ctor_base &&) = delete;
-  sfinae_ctor_base& operator=(sfinae_ctor_base const&) = default;
-  sfinae_ctor_base& operator=(sfinae_ctor_base&&) = default;
-};
-template <>
-struct sfinae_ctor_base<false, true>
-{
-  sfinae_ctor_base() = default;
-  sfinae_ctor_base(sfinae_ctor_base const&) = delete;
-  sfinae_ctor_base(sfinae_ctor_base &&) = default;
-  sfinae_ctor_base& operator=(sfinae_ctor_base const&) = default;
-  sfinae_ctor_base& operator=(sfinae_ctor_base&&) = default;
-};
-
-template <class T>
-struct is_copy_constructible_or_void : is_copy_constructible<T> {};
-template <>
-struct is_copy_constructible_or_void<void> : true_type {};
-
-template <class T>
-struct is_move_constructible_or_void : is_move_constructible<T> {};
-template <>
-struct is_move_constructible_or_void<void> : true_type {};
-
 template <class T, class E>
-using result_sfinae_ctor_base = sfinae_ctor_base<
+using result_sfinae_ctor_base = helpers_detail::sfinae_ctor_base<
                 is_copy_constructible_or_void<T>::value && is_copy_constructible<E>::value,
                 is_move_constructible_or_void<T>::value && is_move_constructible<E>::value
 >;
@@ -567,7 +346,7 @@ class result_base : private result_move_base<T,E>
     using base_type = result_detail::result_move_base<T, E>;
 
     template <class U, class QualU>
-    using check_result_failure_ctor = check_constructible<U, QualU>;
+    using check_result_failure_ctor = helpers_detail::check_constructible<U, QualU>;
 
 public:
     using base_type::base_type;
@@ -619,7 +398,7 @@ class result : public result_detail::result_base<T, E>
     using base_type = result_detail::result_base<T, E>;
 
     template <class U, class QualU>
-    using check_result_success_ctor = result_detail::check_void_or_constructible<T, U, QualU>;
+    using check_result_success_ctor = helpers_detail::check_void_or_constructible<T, U, QualU>;
 
 public:
     using base_type::base_type;
