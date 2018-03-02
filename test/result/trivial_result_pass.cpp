@@ -197,6 +197,26 @@ int main()
         stdex::result<int, short> x = stdex::make_failure(1);
         BOOST_TEST(stdex::make_success(2) != x);
     }
+    {
+        stdex::result<void, short> x = stdex::make_success();
+        stdex::result<void, int> y = x;
+        BOOST_TEST(x == y);
+    }
+    {
+        stdex::result<void, short> x = stdex::make_failure(1);
+        stdex::result<void, int> y = x;
+        BOOST_TEST(x == y);
+    }
+    {
+        stdex::result<short, short> x = stdex::make_success(1);
+        stdex::result<int, int> y = x;
+        BOOST_TEST(x == y);
+    }
+    {
+        stdex::result<short, short> x = stdex::make_failure(1);
+        stdex::result<int, int> y = x;
+        BOOST_TEST(x == y);
+    }
     return ::boost::report_errors();
 }
 

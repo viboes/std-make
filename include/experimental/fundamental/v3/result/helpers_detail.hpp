@@ -86,24 +86,24 @@ struct sfinae_ctor_base<false, true>
 };
 
 struct check_implicit {
-  template <class U>
+  template <class ...U>
   static constexpr bool enable_implicit() {
       return true;
   }
 
-  template <class U>
+  template <class ...U>
   static constexpr bool enable_explicit() {
       return false;
   }
 };
 
 struct check_fail {
-  template <class U>
+  template <class ...U>
   static constexpr bool enable_implicit() {
       return false;
   }
 
-  template <class U>
+  template <class ...U>
   static constexpr bool enable_explicit() {
       return false;
   }
@@ -123,7 +123,7 @@ struct check_constructible {
   }
 };
 
-template <class T, class U, class QualU>
+template <class T, class QualU>
 using check_void_or_constructible = typename conditional<
     !is_void<T>::value,
     helpers_detail::check_constructible<T, QualU>,
@@ -136,6 +136,38 @@ using check_diff_or_constructible = typename conditional<
     helpers_detail::check_constructible<T, QualU>,
     helpers_detail::check_fail
 >::type;
+
+
+template <class T, class E, class QualU, class QualG>
+struct check_constructibles {
+  template <class U, class G>
+  static constexpr bool enable_implicit() {
+      return is_constructible<T, QualU>::value && is_constructible<E, QualG>::value &&
+             is_convertible<QualU, T>::value && is_convertible<QualG, E>::value;
+  }
+
+  template <class U, class G>
+  static constexpr bool enable_explicit() {
+      return is_constructible<T, QualU>::value && is_constructible<E, QualG>::value &&
+             ! ( is_convertible<QualU, T>::value && is_convertible<QualG, E>::value );
+  }
+};
+
+//template <class T, class E, class QualU, class QualG>
+//using check_void_or_constructibles = typename conditional<
+//    !is_void<T>::value,
+//    helpers_detail::check_constructible<T, E, QualU, QualG>,
+//    helpers_detail::check_implicit
+//>::type;
+//
+template <class T, class E, class U, class G, class QualU, class QualG>
+using check_diffs_or_constructibles = typename conditional<
+    !is_same<T, U>::value || !is_same<E, G>::value,
+    helpers_detail::check_constructibles<T, E, QualU, QualG>,
+    helpers_detail::check_fail
+>::type;
+
+
 
 }
 }

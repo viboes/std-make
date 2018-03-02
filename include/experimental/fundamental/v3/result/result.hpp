@@ -335,7 +335,7 @@ using result_sfinae_ctor_base = helpers_detail::sfinae_ctor_base<
 >;
 
 template <class T, class E>
-class result_base : private result_move_base<T,E>
+class result_base : protected result_move_base<T,E>
              , private result_sfinae_ctor_base<T,E>
 {
     static_assert(is_destructible<T>::value || is_void<T>::value,
@@ -397,36 +397,76 @@ class result : public result_detail::result_base<T, E>
 {
     using base_type = result_detail::result_base<T, E>;
 
-    template <class U, class QualU>
-    using check_result_success_ctor = helpers_detail::check_void_or_constructible<T, U, QualU>;
+    template <class QualU>
+    using check_result_success_ctor = helpers_detail::check_void_or_constructible<T, QualU>;
+
+    template <class U, class G, class QualU, class QualG>
+    using check_result_result_ctor = helpers_detail::check_diffs_or_constructibles<T, E, U, G, QualU, QualG>;
 
 public:
     using base_type::base_type;
 
     template < class U = T, enable_if_t<
-                    check_result_success_ctor<U, U const&>::template enable_implicit<U>()
+                    check_result_success_ctor<U const&>::template enable_implicit<U>()
                 , int> = 0>
     constexpr result(success<U> const& value) :
         base_type(in_place_type<success<T>>, value)
     {}
     template < class U = T, enable_if_t<
-                    check_result_success_ctor<U, U const&>::template enable_explicit<U>()
+                    check_result_success_ctor<U const&>::template enable_explicit<U>()
                 , int> = 0>
     explicit constexpr result(success<U> const& value) :
         base_type(in_place_type<success<T>>, value)
     {}
     template < class U = T, enable_if_t<
-                    check_result_success_ctor<U, U &&>::template enable_implicit<U>()
+                    check_result_success_ctor<U &&>::template enable_implicit<U>()
                 , int> = 0>
     constexpr result(success<U> && value) :
         base_type(in_place_type<success<T>>, std::move(value))
     {}
     template < class U = T, enable_if_t<
-                    check_result_success_ctor<U, U &&>::template enable_explicit<U>()
+                    check_result_success_ctor<U &&>::template enable_explicit<U>()
                 , int> = 0>
     explicit constexpr result(success<U> && value) :
         base_type(in_place_type<success<T>>, std::move(value))
     {}
+
+
+
+
+    template < class U = T, class G = E, enable_if_t<
+                    check_result_result_ctor<U, G, U const&, G const&>::template enable_implicit<U, G>()
+                , int> = 0>
+    constexpr result(result<U, G> const& other)
+    : base_type(uninitialized_t{})
+        {
+            this->construct_from(other);
+        }
+    template < class U = T, class G = E, enable_if_t<
+                    check_result_result_ctor<U, G, U const&, G const&>::template enable_explicit<U, G>()
+                , int> = 0>
+    explicit constexpr result(result<U, G> const& other)
+    : base_type(uninitialized_t{})
+        {
+            this->construct_from(other);
+        }
+    template < class U = T, class G = E, enable_if_t<
+                    check_result_result_ctor<U, G, U &&, G&&>::template enable_implicit<U, G>()
+                , int> = 0>
+    constexpr result(result<U, G> && other)
+    : base_type(uninitialized_t{})
+        {
+            this->construct_from(std::move(other));
+        }
+    template < class U = T, class G = E, enable_if_t<
+                    check_result_result_ctor<U, G, U &&, G&&>::template enable_explicit<U, G>()
+                , int> = 0>
+    explicit constexpr result(result<U, G> && other)
+    : base_type(uninitialized_t{})
+        {
+            this->construct_from(std::move(other));
+        }
+
 };
 
 template <class E>
@@ -434,6 +474,9 @@ class result<void, E> : public result_detail::result_base<void, E>
 {
     using T = void;
     using base_type = result_detail::result_base<T, E>;
+
+    template <class QualU>
+    using check_result_result_ctor = helpers_detail::check_constructible<E, QualU>;
 
 public:
     using base_type::base_type;
@@ -444,11 +487,45 @@ public:
     constexpr result(success<void> && value) :
         base_type(in_place_type<success<T>>, std::move(value))
     {}
+
+    template < class U = E, enable_if_t<
+                    check_result_result_ctor<U const&>::template enable_implicit<U>()
+                , int> = 0>
+    constexpr result(result<void, U> const& other)
+    : base_type(uninitialized_t{})
+        {
+            this->construct_from(other);
+        }
+    template < class U = E, enable_if_t<
+                    check_result_result_ctor<U const&>::template enable_explicit<U>()
+                , int> = 0>
+    explicit constexpr result(result<void, U> const& other)
+    : base_type(uninitialized_t{})
+        {
+            this->construct_from(other);
+        }
+    template < class U = E, enable_if_t<
+                    check_result_result_ctor<U &&>::template enable_implicit<U>()
+                , int> = 0>
+    constexpr result(result<void, U> && other)
+    : base_type(uninitialized_t{})
+        {
+            this->construct_from(std::move(other));
+        }
+    template < class U = E, enable_if_t<
+                    check_result_result_ctor<U &&>::template enable_explicit<U>()
+                , int> = 0>
+    explicit constexpr result(result<void, U> && other)
+    : base_type(uninitialized_t{})
+        {
+            this->construct_from(std::move(other));
+        }
+
 };
 
 
-template <class T, class E>
-constexpr bool operator==(const result<T,E>& x, const result<T,E>& y)
+template <class T1, class E1, class T2, class E2>
+constexpr bool operator==(const result<T1, E1>& x, const result<T2, E2>& y)
 {
   return (x.has_value() && y.has_value())
     ? x.get_success() == y.get_success()
@@ -457,8 +534,8 @@ constexpr bool operator==(const result<T,E>& x, const result<T,E>& y)
       : false;
 }
 
-template <class T, class E>
-constexpr bool operator!=(const result<T,E>& x, const result<T,E>& y)
+template <class T1, class E1, class T2, class E2>
+constexpr bool operator!=(const result<T1, E1>& x, const result<T2, E2>& y)
 {
   return !(x == y);
 }
