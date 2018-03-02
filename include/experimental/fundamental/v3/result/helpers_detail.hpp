@@ -17,8 +17,6 @@
 #ifndef JASEL_EXPERIMENTAL_V3_HELPERS_DETAIL_HPP
 #define JASEL_EXPERIMENTAL_V3_HELPERS_DETAIL_HPP
 
-#if __cplusplus >= 201402L && defined __clang__
-
 #include <experimental/fundamental/v2/config.hpp>
 
 #include <type_traits>
@@ -126,22 +124,21 @@ struct check_constructible {
 };
 
 template <class T, class U, class QualU>
-using check_void_or_constructible = conditional_t<
+using check_void_or_constructible = typename conditional<
     !is_void<T>::value,
     helpers_detail::check_constructible<T, QualU>,
     helpers_detail::check_implicit
->;
+>::type;
 
 template <class T, class U, class QualU>
-using check_diff_or_constructible = conditional_t<
+using check_diff_or_constructible = typename conditional<
     !is_same<T, U>::value,
     helpers_detail::check_constructible<T, QualU>,
     helpers_detail::check_fail
->;
+>::type;
 
 }
 }
 }
 }
-#endif
 #endif // header

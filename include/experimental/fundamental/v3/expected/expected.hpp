@@ -26,6 +26,7 @@
 #include <experimental/type_constructible.hpp>
 #include <experimental/meta/v1/rebind.hpp>
 #include <experimental/meta/v1/id.hpp>
+#include <experimental/fundamental/v3/result/success_failure.hpp>
 
 
 #include <stdexcept>
@@ -1657,89 +1658,6 @@ namespace meta
 
 inline namespace fundamental_v3
 {
-template <typename ValueType>
-class success
-{
-public:
-  typedef ValueType value_type;
-
-  JASEL_0_REQUIRES(
-      is_copy_constructible<value_type>::value
-  )
-  constexpr success(const value_type& v) // NOLINT google-explicit-constructor
-      BOOST_NOEXCEPT_IF(
-          is_nothrow_copy_constructible<value_type>::value
-      )
-  : value_(v)
-  {}
-
-  JASEL_0_REQUIRES(
-    is_move_constructible<value_type>::value
-  )
-  constexpr success(value_type&& v  ) // NOLINT google-explicit-constructor
-      BOOST_NOEXCEPT_IF(
-            is_nothrow_move_constructible<value_type>::value
-      )
-  : value_(constexpr_move(v))
-  {}
-
-  success(const success& rhs) = default;
-  success(success&& rhs)  = default;
-  success& operator=(const success& rhs) = default;
-  success& operator=(success&& rhs)  = default;
-
-#if ! defined JASEL_NO_CXX11_RVALUE_REFERENCE_FOR_THIS
-
-    BOOST_CXX14_CONSTEXPR
-    BOOST_FORCEINLINE value_type const& value() const&
-    {
-      return value_;
-    }
-    BOOST_CXX14_CONSTEXPR
-    BOOST_FORCEINLINE value_type& value() &
-    {
-      return value_;
-    }
-    JASEL_CONSTEXPR_IF_MOVE_ACCESSORS
-    BOOST_FORCEINLINE value_type&& value() &&
-    {
-      return constexpr_move(value_);
-    }
-#else
-    constexpr
-    BOOST_FORCEINLINE value_type const& value() const
-    {
-      return value_;
-    }
-    BOOST_FORCEINLINE value_type& value()
-    {
-      return value_;
-    }
-#endif
-
-private:
-  ValueType value_;
-
-};
-
-template <>
-class success<void>
-{
-public:
-  typedef void value_type;
-
-  constexpr success()
-  {}
-
-  constexpr success(in_place_t)
-  {}
-
-  success(const success& rhs) = default;
-  success(success&& rhs)  = default;
-  success& operator=(const success& rhs) = default;
-  success& operator=(success&& rhs)  = default;
-
-};
 namespace expected_detail
 {
 
@@ -1924,7 +1842,7 @@ public:
       BOOST_NOEXCEPT_IF(
           is_nothrow_copy_constructible<value_type>::value
       )
-  : base_type(v.value())
+  : base_type(v.value)
   {}
 
   JASEL_0_REQUIRES(
@@ -1934,7 +1852,7 @@ public:
       BOOST_NOEXCEPT_IF(
             is_nothrow_move_constructible<value_type>::value
       )
-  : base_type(constexpr_move(v.value()))
+  : base_type(constexpr_move(v.value))
   {}
 
   expected(const expected& rhs) = default;
@@ -3621,7 +3539,7 @@ constexpr success<T> make_expected(U&& v)
 
 BOOST_FORCEINLINE success<void> make_expected()
 {
-  return success<void>(in_place);
+  return success<void>();
 }
 
 template <typename T>

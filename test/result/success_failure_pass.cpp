@@ -7,17 +7,14 @@
 // Copyright Vicente J. Botet Escriba 2018.
 
 #include <boost/detail/lightweight_test.hpp>
-#if __cplusplus >= 201402L && defined __clang__
 
-#include <experimental/result.hpp>
-#include <memory>
-#include <vector>
+#include <experimental/fundamental/v3/result/success_failure.hpp>
 #include <string>
 
 namespace stdex = std::experimental;
 
 template <class A>
-auto g(A&& x)
+auto g(A&& x) -> stdex::success<std::unique_ptr<int>>
 {
     return stdex::success<std::unique_ptr<int>> (std::forward<A>(x));
 }
@@ -49,19 +46,24 @@ int main()
     {
         stdex::success<std::string> x =  stdex::make_success(std::string(""));
         auto y = x;
+        BOOST_TEST(x == y);
         BOOST_TEST(y.value == "");
     }
     {
         stdex::success<std::string> x =  stdex::make_success("");
         auto y = x;
+        BOOST_TEST(x == y);
         BOOST_TEST(y.value == "");
     }
     {
         auto x = stdex::make_success(std::string("aaa"));
         auto y = std::move(x);
+        BOOST_TEST(x != y);
         BOOST_TEST(x.value == "");
         BOOST_TEST(y.value == "aaa");
     }
+
+#if __cplusplus >= 201402L
     {
         auto x =  stdex::make_success(std::make_unique<int>(1));
         static_assert(! std::is_same<decltype(x),std::unique_ptr<int>>::value, "ERROR");
@@ -88,13 +90,6 @@ int main()
         auto y = g(std::move(x));
         BOOST_TEST(*y.value == 1);
     }
-
-    return ::boost::report_errors();
-}
-
-#else
-int main()
-{
-    return ::boost::report_errors();
-}
 #endif
+    return ::boost::report_errors();
+}

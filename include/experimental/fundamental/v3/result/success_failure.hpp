@@ -6,8 +6,6 @@
 #ifndef JASEL_EXPERIMENTAL_V3_RESULT_SUCCESS_FAILURE_HPP
 #define JASEL_EXPERIMENTAL_V3_RESULT_SUCCESS_FAILURE_HPP
 
-#if __cplusplus >= 201402L && defined __clang__
-
 #include <experimental/fundamental/v2/config.hpp>
 #include <experimental/fundamental/v3/result/immutable_wrapper.hpp>
 #include <type_traits>
@@ -29,9 +27,9 @@ struct success : degenerated_immutable_wrapper<success_tag, T>
 };
 
 template <class T>
-success<std::decay_t<T>> make_success(T&& value)
+success<typename std::decay<T>::type> make_success(T&& value)
 {
-    return success<std::decay_t<T>>(std::forward<T>(value));
+    return success<typename std::decay<T>::type>(std::forward<T>(value));
 }
 
 success<void> make_success()
@@ -48,13 +46,12 @@ struct failure : immutable_wrapper<failure_tag, T>
 };
 
 template <class E>
-failure<std::decay_t<E>> make_failure(E&& error)
+failure<typename std::decay<E>::type> make_failure(E&& error)
 {
-    return failure<std::decay_t<E>>(std::forward<E>(error));
+    return failure<typename std::decay<E>::type>(std::forward<E>(error));
 }
 
 }
 }
 }
-#endif
 #endif // header
