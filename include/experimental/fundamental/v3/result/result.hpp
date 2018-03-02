@@ -25,6 +25,7 @@
 #include <type_traits>
 #include <utility>
 #include <memory>
+#include <cassert>
 
 #if __cplusplus <= 201402L
 #include <experimental/fundamental/v3/in_place.hpp>
@@ -93,26 +94,30 @@ using check_diff_or_constructible = conditional_t<
 
 }
 
-template <class T>
-struct success {
+template <class Tag, class T>
+struct immutable_wrapper {
 private:
     template <class U, class QualU>
     using check_success_ctor = result_detail::check_diff_or_constructible<T, U, QualU>;
-
 public:
+    static_assert(is_object<T>::value,
+        "instantiation of immutable_wrapper with a non-object type is ill defined");
+    static_assert(! std::is_array<T>::value,
+        "instantiation of immutable_wrapper with a array type is ill defined");
+
     T value;
 
-    success() = delete;
-    constexpr success(success const& e) = default;
-    constexpr success(success&& e) = default;
-    constexpr success& operator=(success const& e) = delete;
-    constexpr success& operator=(success&& e) = delete;
+    immutable_wrapper() = delete;
+    constexpr immutable_wrapper(immutable_wrapper const& e) = default;
+    constexpr immutable_wrapper(immutable_wrapper&& e) = default;
+    constexpr immutable_wrapper& operator=(immutable_wrapper const& e) = delete;
+    constexpr immutable_wrapper& operator=(immutable_wrapper&& e) = delete;
 
-    constexpr explicit success(T const& v) :
+    constexpr explicit immutable_wrapper(T const& v) :
         value(v)
     {
     }
-    constexpr explicit success(T&& v) :
+    constexpr explicit immutable_wrapper(T&& v) :
         value(std::move(v))
     {
     }
@@ -121,33 +126,60 @@ public:
         is_constructible<T, _Args...>::value>
     >
     _LIBCPP_INLINE_VISIBILITY
-    constexpr explicit success(in_place_t, _Args&&... __args)
+    constexpr explicit immutable_wrapper(in_place_t, _Args&&... __args)
         : value(std::forward<_Args>(__args)...) {}
 
     template < class U = T, enable_if_t<
                     check_success_ctor<U, U const&>::template enable_implicit<U>()
                 , int> = 0>
-    constexpr success(success<U> const& other) :
+    constexpr immutable_wrapper(immutable_wrapper<Tag, U> const& other) :
         value(other.value)
     {}
     template < class U = T, enable_if_t<
                     check_success_ctor<U, U const&>::template enable_explicit<U>()
                 , int> = 0>
-    explicit constexpr success(success<U> const& other) :
+    explicit constexpr immutable_wrapper(immutable_wrapper<Tag, U> const& other) :
         value(other.value)
     {}
     template < class U = T, enable_if_t<
                     check_success_ctor<U, U &&>::template enable_implicit<U>()
                 , int> = 0>
-    constexpr success(success<U> && other) :
+    constexpr immutable_wrapper(immutable_wrapper<Tag, U> && other) :
         value(std::move(other.value))
     {}
     template < class U = T, enable_if_t<
                     check_success_ctor<U, U &&>::template enable_explicit<U>()
                 , int> = 0>
-    explicit constexpr success(success<U> && other) :
+    explicit constexpr immutable_wrapper(immutable_wrapper<Tag, U> && other) :
         value(std::move(other.value))
     {}
+};
+
+template <class Tag, class T>
+struct degenerated_immutable_wrapper : immutable_wrapper<Tag, T>
+{
+        using immutable_wrapper<Tag, T>::immutable_wrapper;
+};
+
+template <class Tag>
+struct degenerated_immutable_wrapper<Tag, void> {
+
+    constexpr degenerated_immutable_wrapper(degenerated_immutable_wrapper const& e) = default;
+    constexpr degenerated_immutable_wrapper(degenerated_immutable_wrapper&& e) = default;
+    constexpr degenerated_immutable_wrapper& operator=(degenerated_immutable_wrapper const& e) = delete;
+    constexpr degenerated_immutable_wrapper& operator=(degenerated_immutable_wrapper&& e) = delete;
+
+    constexpr explicit degenerated_immutable_wrapper()
+    {
+    }
+};
+
+struct success_tag {};
+
+template <class T>
+struct success : degenerated_immutable_wrapper<success_tag, T>
+{
+    using degenerated_immutable_wrapper<success_tag, T>::degenerated_immutable_wrapper;
 };
 
 template <class T>
@@ -156,84 +188,17 @@ success<std::decay_t<T>> make_success(T&& value)
     return success<std::decay_t<T>>(std::forward<T>(value));
 }
 
-template <>
-struct success<void> {
-
-    constexpr success(success const& e) = default;
-    constexpr success(success&& e) = default;
-    constexpr success& operator=(success const& e) = delete;
-    constexpr success& operator=(success&& e) = delete;
-
-    constexpr explicit success()
-    {
-    }
-
-};
-
 success<void> make_success()
 {
     return success<void>();
 }
 
+struct failure_tag {};
 
-template <class E>
-struct failure {
-private:
-    template <class U, class QualU>
-    using check_success_ctor = result_detail::check_diff_or_constructible<E, U, QualU>;
-
-public:
-    E value;
-
-    static_assert(! is_same<E,void>::value, "The E of failure<E> can not be void.");
-
-    failure() = delete;
-    constexpr failure(failure const& e) = default;
-    constexpr failure(failure&& e) = default;
-    constexpr failure& operator=(failure const& e) = delete;
-    constexpr failure& operator=(failure&& e) = delete;
-
-    constexpr explicit failure(E const& e) :
-                value(e)
-    {
-    }
-    constexpr explicit failure(E&& e) :
-                value(std::move(e))
-    {
-    }
-
-    template <class... _Args, class = enable_if_t<
-        is_constructible<E, _Args...>::value>
-    >
-    _LIBCPP_INLINE_VISIBILITY
-    constexpr explicit failure(in_place_t, _Args&&... __args)
-        : value(std::forward<_Args>(__args)...) {}
-
-
-    template < class U = E, enable_if_t<
-                    check_success_ctor<U, U const&>::template enable_implicit<U>()
-                , int> = 0>
-    constexpr failure(failure<U> const& other) :
-        value(other.value)
-    {}
-    template < class U = E, enable_if_t<
-                    check_success_ctor<U, U const&>::template enable_explicit<U>()
-                , int> = 0>
-    explicit constexpr failure(failure<U> const& other) :
-        value(other.value)
-    {}
-    template < class U = E, enable_if_t<
-                    check_success_ctor<U, U &&>::template enable_implicit<U>()
-                , int> = 0>
-    constexpr failure(failure<U> && other) :
-        value(std::move(other.value))
-    {}
-    template < class U = E, enable_if_t<
-                    check_success_ctor<U, U &&>::template enable_explicit<U>()
-                , int> = 0>
-    explicit constexpr failure(failure<U> && other) :
-        value(std::move(other.value))
-    {}
+template <class T>
+struct failure : immutable_wrapper<failure_tag, T>
+{
+    using immutable_wrapper<failure_tag, T>::immutable_wrapper;
 };
 
 template <class E>
@@ -256,10 +221,7 @@ struct result_destruct_base<T, E, false>
     typedef success<T> success_type;
     typedef E error_type;
     typedef failure<E> failure_type;
-    static_assert(is_object<value_type>::value,
-        "instantiation of result with a non-object type is undefined behavior");
-    static_assert(is_object<error_type>::value,
-        "instantiation of result with a non-object E type is undefined behavior");
+
     union
     {
         success_type _success;
@@ -294,10 +256,7 @@ struct result_destruct_base<T, E, true>
     typedef success<T> success_type;
     typedef E error_type;
     typedef failure<E> failure_type;
-    static_assert(is_object<value_type>::value || is_void<value_type>::value,
-        "instantiation of result with a non-object type or void is undefined behavior");
-    static_assert(is_object<error_type>::value,
-        "instantiation of result with a non-object E type is undefined behavior");
+
     union
     {
         success_type _success;
@@ -317,11 +276,9 @@ struct result_destruct_base<T, E, true>
            _has_value(false) {}
 };
 
-template <class T, class E, bool = is_reference<T>::value>
-struct result_storage_base;
 
 template <class T, class E>
-struct result_storage_base<T, E, false>: result_destruct_base<T, E>
+struct result_storage_common_base: result_destruct_base<T, E>
 {
     using base_type = result_destruct_base<T, E>;
     typedef T value_type;
@@ -336,69 +293,65 @@ struct result_storage_base<T, E, false>: result_destruct_base<T, E>
         return this->_has_value;
     }
 
-    constexpr const value_type& value() const& noexcept
+    constexpr const success_type& get_success() const&
     {
-        return this->_success.value;
-    }
-    constexpr const value_type&& value() const&& noexcept
-    {
-        return std::move(this->_success.value);
-    }
-    constexpr value_type& value() & noexcept
-    {
-        return this->_success.value;
-    }
-    constexpr value_type&& value() && noexcept
-    {
-        return std::move(this->_success.value);
-    }
-    constexpr const success_type& get_success() const& noexcept
-    {
+        assert(this->has_value() && "result must have a value");
         return this->_success;
     }
-    constexpr const success_type&& get_success() const&& noexcept
+    constexpr const success_type&& get_success() const&&
     {
+        assert(this->has_value() && "result must have a value");
         return std::move(this->_success);
     }
-    constexpr success_type& get_success() & noexcept
+    constexpr success_type& get_success() &
     {
+        assert(this->has_value() && "result must have a value");
         return this->_success;
     }
-    constexpr success_type&& get_success() && noexcept
+    constexpr success_type&& get_success() &&
     {
+        assert(this->has_value() && "result must have a value");
         return std::move(this->_success);
     }
 
-    constexpr const error_type& error() const& noexcept
+    constexpr const error_type& error() const&
     {
+        assert(!this->has_value() && "result must have an error");
         return this->_failure.value;
     }
-    constexpr const error_type&& error() const&& noexcept
+    constexpr const error_type&& error() const&&
     {
+        assert(!this->has_value() && "result must have an error");
         return std::move(this->_failure.value);
     }
-    constexpr error_type& error() & noexcept
+    constexpr error_type& error() &
     {
+        assert(!this->has_value() && "result must have an error");
         return this->_failure.value;
     }
-    constexpr error_type&& error() && noexcept
+    constexpr error_type&& error() &&
     {
+        assert(!this->has_value() && "result must have an error");
         return std::move(this->_failure.value);
     }
-    constexpr const failure_type& get_failure() const& noexcept
+    constexpr const failure_type& get_failure() const&
     {
+        assert(!this->has_value() && "result must have an error");
         return this->_failure;
     }
-    constexpr const failure_type&& get_failure() const&& noexcept
+    constexpr const failure_type&& get_failure() const&&
     {
+        assert(!this->has_value() && "result must have an error");
         return std::move(this->_failure);
     }
-    constexpr failure_type& get_failure() & noexcept
+    constexpr failure_type& get_failure() &
     {
+        assert(!this->has_value() && "result must have an error");
         return this->_failure;
     }
-    constexpr failure_type&& get_failure() && noexcept
+    constexpr failure_type&& get_failure() &&
     {
+        assert(!this->has_value() && "result must have an error");
         return std::move(this->_failure);
     }
 
@@ -423,25 +376,61 @@ struct result_storage_base<T, E, false>: result_destruct_base<T, E>
         else
             construct(in_place_type<failure<E>>, std::forward<That>(other).get_failure());
     }
-
 };
 
-template <class E>
-struct result_storage_base<void, E, false>: result_destruct_base<void, E>
+template <class T, class E, bool = is_reference<T>::value || is_reference<E>::value>
+struct result_storage_base;
+
+template <class T, class E>
+struct result_storage_base<T, E, false>: result_storage_common_base<T, E>
 {
-    using T = void;
-    using base_type = result_destruct_base<T, E>;
+    using base_type = result_storage_common_base<T, E>;
+    using base_type::base_type;
     typedef T value_type;
     typedef success<T> success_type;
     typedef E error_type;
     typedef failure<E> failure_type;
 
-    using base_type::base_type;
-
-    constexpr bool has_value() const noexcept
+    constexpr const value_type& value() const&
     {
-        return this->_has_value;
+        assert(this->has_value() && "result must have a value");
+        return this->_success.value;
+        //return value_impl(*this);
     }
+    constexpr const value_type&& value() const&&
+    {
+        assert(this->has_value() && "result must have a value");
+        return std::move(this->_success.value);
+        //return value_impl(std::move(*this));
+    }
+    constexpr value_type& value() &
+    {
+        assert(this->has_value() && "result must have a value");
+        return this->_success.value;
+        //return value_impl(*this);
+        // error: non-const lvalue reference to type 'xxx' (aka 'int') cannot bind to a temporary of type 'int'
+        // fixme: why this doesn't work. See p0847r0
+    }
+    constexpr value_type&& value() &&
+    {
+        assert(this->has_value() && "result must have a value");
+        return std::move(this->_success.value);
+        //return value_impl(std::move(*this));
+    }
+private:
+    template <typename Self>
+    static decltype(auto) value_impl(Self&& self)
+    {
+        assert(self.has_value() && "result must have a value");
+        return std::forward<Self>(self)._success.value;
+    }
+};
+
+template <class E>
+struct result_storage_base<void, E, false>: result_storage_common_base<void, E>
+{
+    using base_type = result_storage_common_base<void, E>;
+    using base_type::base_type;
 
     constexpr void value() const& noexcept
     {
@@ -455,85 +444,13 @@ struct result_storage_base<void, E, false>: result_destruct_base<void, E>
     constexpr void value() && noexcept
     {
     }
-    constexpr const success_type& get_success() const& noexcept
-    {
-        return this->_success;
-    }
-    constexpr const success_type&& get_success() const&& noexcept
-    {
-        return std::move(this->_success);
-    }
-    constexpr success_type& get_success() & noexcept
-    {
-        return this->_success;
-    }
-    constexpr success_type&& get_success() && noexcept
-    {
-        return std::move(this->_success);
-    }
-
-    constexpr const error_type& error() const& noexcept
-    {
-        return this->_failure.value;
-    }
-    constexpr const error_type&& error() const&& noexcept
-    {
-        return std::move(this->_failure.value);
-    }
-    constexpr error_type& error() & noexcept
-    {
-        return this->_failure.value;
-    }
-    constexpr error_type&& error() && noexcept
-    {
-        return std::move(this->_failure.value);
-    }
-    constexpr const failure_type& get_failure() const& noexcept
-    {
-        return this->_failure;
-    }
-    constexpr const failure_type&& get_failure() const&& noexcept
-    {
-        return std::move(this->_failure);
-    }
-    constexpr failure_type& get_failure() & noexcept
-    {
-        return this->_failure;
-    }
-    constexpr failure_type&& get_failure() && noexcept
-    {
-        return std::move(this->_failure);
-    }
-
-    template <class... Args>
-    constexpr void construct(in_place_type_t<success<T>>, Args&&... args)
-    {
-        ::new((void*)std::addressof(this->_success)) success_type(std::forward<Args>(args)...);
-        this->_has_value = true;
-    }
-    template <class... Args>
-    constexpr void  construct(in_place_type_t<failure<E>>, Args&&... args)
-    {
-        ::new((void*)std::addressof(this->_failure)) failure_type(std::forward<Args>(args)...);
-        this->_has_value = false;
-    }
-
-    template <class That>
-    void construct_from(That&& other)
-    {
-        if (other.has_value())
-            construct(in_place_type<success<T>>, std::forward<That>(other).get_success());
-        else
-            construct(in_place_type<failure<E>>, std::forward<That>(other).get_failure());
-    }
 };
 
 template <class T, class E>
 struct result_storage_base<T, E, true>
 {
-    //static_assert(false, "T can not be a reference");
+    //static_assert(false, "Neither T nor E cannot be reference types");
 };
-
 
 template <class T>
 struct is_trivially_copy_constructible_or_void : is_trivially_copy_constructible<T> {};
@@ -588,7 +505,6 @@ struct result_move_base<T, E, false> : result_copy_base<T, E>
     {
         this->construct_from(std::move(other));
     }
-
 };
 
 
@@ -633,14 +549,11 @@ struct is_move_constructible_or_void : is_move_constructible<T> {};
 template <>
 struct is_move_constructible_or_void<void> : true_type {};
 
-
 template <class T, class E>
 using result_sfinae_ctor_base = sfinae_ctor_base<
                 is_copy_constructible_or_void<T>::value && is_copy_constructible<E>::value,
                 is_move_constructible_or_void<T>::value && is_move_constructible<E>::value
 >;
-
-
 
 template <class T, class E>
 class result_base : private result_move_base<T,E>
@@ -665,14 +578,7 @@ public:
     result_base& operator=(result_base const& e) = delete;
     result_base& operator=(result_base && e) = delete;
     ~result_base() = default;
-#if 0
-    constexpr result_base(failure<E> const& error) :
-        base_type(in_place_type<failure<E>>, error)
-    {}
-    constexpr result_base(failure<E> && error) :
-        base_type(in_place_type<failure<E>>, std::move(error))
-    {}
-#else
+
     template < class U = E, enable_if_t<
                     check_result_failure_ctor<U, U const&>::template enable_implicit<U>()
                 , int> = 0>
@@ -697,7 +603,7 @@ public:
     explicit constexpr result_base(failure<U> && other) :
     base_type(in_place_type<failure<E>>, std::move(other))
     {}
-#endif
+
     using base_type::has_value;
     using base_type::value;
     using base_type::get_success;
@@ -705,18 +611,12 @@ public:
     using base_type::get_failure;
 };
 
-
-
 }
 
 template <class T, class E>
 class result : public result_detail::result_base<T, E>
 {
-    static_assert(is_destructible<T>::value,
-        "instantiation of result with a non-destructible non-void T type is ill-formed");
-
     using base_type = result_detail::result_base<T, E>;
-
 
     template <class U, class QualU>
     using check_result_success_ctor = result_detail::check_void_or_constructible<T, U, QualU>;
