@@ -463,6 +463,47 @@ constexpr bool operator!=(const result<T,E>& x, const result<T,E>& y)
   return !(x == y);
 }
 
+template <class T, class E, class G>
+  constexpr bool operator==(const result<T, E>& x, const success<G>& y)
+  {
+    return ! x.has_value() ? false : x.get_success() == y;
+  }
+template <class G, class T, class E>
+  constexpr bool operator==(const success<G>& x, const result<T, E>& y)
+  {
+    return y == x;
+  }
+template <class T, class E, class G>
+  constexpr bool operator!=(const result<T, E>& x, const success<G>& y)
+  {
+    return ! x.has_value() ? true : x.get_success() != y;
+  }
+template <class G, class T, class E>
+  constexpr bool operator!=(const success<G>& x, const result<T, E>& y)
+  {
+    return y != x;
+  }
+
+template <class T, class E, class G>
+  constexpr bool operator==(const result<T, E>& x, const failure<G>& y)
+  {
+    return x.has_value() ? false : x.get_failure() == y;
+  }
+template <class G, class T, class E>
+  constexpr bool operator==(const failure<G>& x, const result<T, E>& y)
+  {
+    return y == x;
+  }
+template <class T, class E, class G>
+  constexpr bool operator!=(const result<T, E>& x, const failure<G>& y)
+  {
+    return x.has_value() ? true : x.get_failure() != y;
+  }
+template <class G, class T, class E>
+  constexpr bool operator!=(const failure<G>& x, const result<T, E>& y)
+  {
+    return y != x;
+  }
 
 }
 }

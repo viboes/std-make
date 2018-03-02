@@ -149,6 +149,54 @@ int main()
         stdex::result<int, short> y = stdex::make_failure(2);
         BOOST_TEST(y != x);
     }
+    {
+        stdex::result<int, short> x = stdex::make_success(1);
+        BOOST_TEST(x == stdex::make_success(1));
+    }
+    {
+        stdex::result<int, short> x = stdex::make_success(1);
+        BOOST_TEST(stdex::make_success(1) == x);
+    }
+    {
+        stdex::result<int, short> x = stdex::make_success(1);
+        BOOST_TEST(x != stdex::make_success(2));
+    }
+    {
+        stdex::result<int, short> x = stdex::make_success(1);
+        BOOST_TEST(stdex::make_success(2) != x);
+    }
+    {
+        stdex::result<int, short> x = stdex::make_success(1);
+        BOOST_TEST(x != stdex::make_failure(2));
+    }
+    {
+        stdex::result<int, short> x = stdex::make_success(1);
+        BOOST_TEST(stdex::make_failure(2) != x);
+    }
+    {
+        stdex::result<int, short> x = stdex::make_failure(1);
+        BOOST_TEST(x == stdex::make_failure(1));
+    }
+    {
+        stdex::result<int, short> x = stdex::make_failure(1);
+        BOOST_TEST(stdex::make_failure(1) == x);
+    }
+    {
+        stdex::result<int, short> x = stdex::make_failure(1);
+        BOOST_TEST(x != stdex::make_failure(2));
+    }
+    {
+        stdex::result<int, short> x = stdex::make_failure(1);
+        BOOST_TEST(stdex::make_failure(2) != x);
+    }
+    {
+        stdex::result<int, short> x = stdex::make_failure(1);
+        BOOST_TEST(x != stdex::make_success(2));
+    }
+    {
+        stdex::result<int, short> x = stdex::make_failure(1);
+        BOOST_TEST(stdex::make_success(2) != x);
+    }
     return ::boost::report_errors();
 }
 
