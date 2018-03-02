@@ -446,6 +446,24 @@ public:
     {}
 };
 
+
+template <class T, class E>
+constexpr bool operator==(const result<T,E>& x, const result<T,E>& y)
+{
+  return (x.has_value() && y.has_value())
+    ? x.get_success() == y.get_success()
+    : (!x.has_value() && !y.has_value())
+      ?  x.get_failure() == y.get_failure()
+      : false;
+}
+
+template <class T, class E>
+constexpr bool operator!=(const result<T,E>& x, const result<T,E>& y)
+{
+  return !(x == y);
+}
+
+
 }
 }
 }

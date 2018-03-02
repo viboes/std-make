@@ -119,7 +119,36 @@ int main()
         }
         //vec[1] = stdex::make_failure(2); // this is a limitation of result as it is not assignable.
     }
-
+    {
+        stdex::result<int, short> x = stdex::make_success(1);
+        stdex::result<int, short> y = x;
+        BOOST_TEST(x == y);
+    }
+    {
+        stdex::result<int, short> x = stdex::make_success(1);
+        stdex::result<int, short> y = stdex::make_success(2);
+        BOOST_TEST(x != y);
+    }
+    {
+        stdex::result<int, short> x = stdex::make_failure(1);
+        stdex::result<int, short> y = stdex::make_failure(1);
+        BOOST_TEST(x == y);
+    }
+    {
+        stdex::result<int, short> x = stdex::make_failure(1);
+        stdex::result<int, short> y = stdex::make_failure(2);
+        BOOST_TEST(x != y);
+    }
+    {
+        stdex::result<int, short> x = stdex::make_success(1);
+        stdex::result<int, short> y = stdex::make_failure(2);
+        BOOST_TEST(x != y);
+    }
+    {
+        stdex::result<int, short> x = stdex::make_success(1);
+        stdex::result<int, short> y = stdex::make_failure(2);
+        BOOST_TEST(y != x);
+    }
     return ::boost::report_errors();
 }
 
