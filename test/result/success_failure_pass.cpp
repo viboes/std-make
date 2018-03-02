@@ -124,5 +124,14 @@ int main()
         BOOST_TEST(*y.value == 1);
     }
 #endif
+    {
+        auto x = stdex::make_success(1);
+        auto y = stdex::make_success(2);
+        using std::swap;
+        swap(x, y);
+        BOOST_TEST(x == stdex::make_success(2));
+        BOOST_TEST(y == stdex::make_success(1));
+
+    }
     return ::boost::report_errors();
 }

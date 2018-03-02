@@ -99,6 +99,16 @@ BOOST_CONSTEXPR bool operator!=(const immutable_wrapper<Tag, E1>& x, const immut
 }
 
 template <class Tag, class T>
+void swap(immutable_wrapper<Tag, T>& x, immutable_wrapper<Tag, T>& y)
+#if __cplusplus > 201402L && defined __clang__
+    noexcept(std::is_nothrow_move_constructible_v<T> && std::is_nothrow_swappable_v<T>)
+#endif
+{
+    using std::swap;
+    swap(x.value, y.value);
+}
+
+template <class Tag, class T>
 struct degenerated_immutable_wrapper : immutable_wrapper<Tag, T>
 {
         using immutable_wrapper<Tag, T>::immutable_wrapper;
@@ -139,6 +149,12 @@ template <class Tag>
 BOOST_CONSTEXPR bool operator!=(const degenerated_immutable_wrapper<Tag, void>& x, const degenerated_immutable_wrapper<Tag, void>& y)
 {
   return false;
+}
+
+template <class Tag>
+void swap(degenerated_immutable_wrapper<Tag, void>& x, degenerated_immutable_wrapper<Tag, void>& y)
+    noexcept
+{
 }
 
 }
