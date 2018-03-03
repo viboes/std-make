@@ -29,8 +29,24 @@ inline namespace fundamental_v3
 template <class Tag, class T>
 struct immutable_wrapper {
 private:
+
+    template <class U>
+    struct T_is_not_immutable_wrapper_like {
+        static constexpr bool value =
+            ! is_constructible<T, immutable_wrapper<Tag, U>&>::value &&
+            ! is_constructible<T, immutable_wrapper<Tag, U>&&>::value &&
+            ! is_constructible<T, const immutable_wrapper<Tag, U>&>::value &&
+            ! is_constructible<T, const immutable_wrapper<Tag, U>&&>::value &&
+            ! is_convertible<immutable_wrapper<Tag, U>&, T>::value &&
+            ! is_convertible<immutable_wrapper<Tag, U>&&, T>::value &&
+            ! is_convertible<const immutable_wrapper<Tag, U>&, T>::value &&
+            ! is_convertible<const immutable_wrapper<Tag, U>&&, T>::value;
+    };
+
     template <class U, class QualU>
-    using check_success_ctor = helpers_detail::check_diff_or_constructible<T, U, QualU>;
+    using check_success_ctor = helpers_detail::check_if_constructible_else_fail<
+                    T_is_not_immutable_wrapper_like<U>::value,
+                    T, QualU>;
 public:
     static_assert(is_object<T>::value,
         "instantiation of immutable_wrapper with a non-object type is ill defined");

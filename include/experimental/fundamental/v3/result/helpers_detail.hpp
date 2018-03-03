@@ -137,6 +137,14 @@ using check_diff_or_constructible = typename conditional<
     helpers_detail::check_fail
 >::type;
 
+template <bool Cnd, class T, class QualU>
+using check_if_constructible_else_fail = typename conditional<Cnd,
+    helpers_detail::check_constructible<T, QualU>,
+    helpers_detail::check_fail
+>::type;
+
+
+
 
 template <class T, class E, class QualU, class QualG>
 struct check_constructibles {
@@ -153,13 +161,7 @@ struct check_constructibles {
   }
 };
 
-//template <class T, class E, class QualU, class QualG>
-//using check_void_or_constructibles = typename conditional<
-//    !is_void<T>::value,
-//    helpers_detail::check_constructible<T, E, QualU, QualG>,
-//    helpers_detail::check_implicit
-//>::type;
-//
+
 template <class T, class E, class U, class G, class QualU, class QualG>
 using check_diffs_or_constructibles = typename conditional<
     !is_same<T, U>::value || !is_same<E, G>::value,
