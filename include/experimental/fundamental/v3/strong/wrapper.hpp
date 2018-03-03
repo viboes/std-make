@@ -9,6 +9,7 @@
 
 #include <experimental/ordinal.hpp>
 #include <experimental/fundamental/v2/config.hpp>
+#include <experimental/fundamental/v3/config/requires.hpp>
 #include <experimental/type_traits.hpp>
 #include <experimental/wrapped.hpp>
 
@@ -30,15 +31,27 @@ inline  namespace fundamental_v3
 
       constexpr wrapper() noexcept = default;
 
-      //! explicit conversion from the underlying type
+      //! explicit construction from an LVALUE underlying type
       //! @par Effects Constructs a wrapper from its underlying type
-      explicit constexpr wrapper(underlying_type v): _value(v) {}
+      JASEL_0_REQUIRES(
+            is_copy_constructible<underlying_type>::value
+      )
+      explicit constexpr wrapper(underlying_type const& v): _value(v) {}
+
+      //! explicit construction from an RVALUE underlying type
+      //! @par Effects Constructs a wrapper from its underlying type
+      JASEL_0_REQUIRES(
+            is_move_constructible<underlying_type>::value
+      )
+      explicit constexpr wrapper(underlying_type &&v): _value(std::move(v)) {}
 
       //! underlying value access
       //! @par Returns the underlying value
-      constexpr const underlying_type& underlying() const noexcept
+      constexpr const underlying_type& underlying() const& noexcept
       { return _value; }
 
+      constexpr const underlying_type&& underlying() const&& noexcept
+      { return std::move(_value); }
 
     protected:
       //! the wrapped value

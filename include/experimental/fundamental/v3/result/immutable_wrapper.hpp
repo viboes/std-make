@@ -8,6 +8,7 @@
 
 #include <experimental/fundamental/v2/config.hpp>
 #include <experimental/fundamental/v3/result/helpers_detail.hpp>
+#include <experimental/fundamental/v3/config/requires.hpp>
 
 #include <type_traits>
 #include <utility>
@@ -44,10 +45,16 @@ public:
     constexpr immutable_wrapper& operator=(immutable_wrapper const& e) = delete;
     constexpr immutable_wrapper& operator=(immutable_wrapper&& e) = delete;
 
+    JASEL_0_REQUIRES(
+          is_copy_constructible<T>::value
+    )
     constexpr explicit immutable_wrapper(T const& v) :
         value(v)
     {
     }
+    JASEL_0_REQUIRES(
+          is_move_constructible<T>::value
+    )
     constexpr explicit immutable_wrapper(T&& v) :
         value(std::move(v))
     {

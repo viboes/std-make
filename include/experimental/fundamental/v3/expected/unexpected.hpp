@@ -44,7 +44,7 @@ inline namespace fundamental_v3
 
     template < class Err >
     BOOST_FORCEINLINE BOOST_CONSTEXPR explicit unexpected(Err&& e
-        , JASEL_REQUIRES( is_constructible<ErrorType, Err&&>::value )
+        , JASEL_REQUIRES( ! is_same<unexpected<ErrorType>, typename decay<Err>::type>::value && is_constructible<ErrorType, Err&&>::value )
         ) :
       error_(move(e))
     {
@@ -52,28 +52,60 @@ inline namespace fundamental_v3
 
     template < class Err >
     BOOST_FORCEINLINE BOOST_CONSTEXPR explicit unexpected(unexpected<Err> const& e
-        , JASEL_REQUIRES( is_constructible<ErrorType, const Err&>::value && ! is_convertible<const Err&, ErrorType>::value)
+        , JASEL_REQUIRES( ! is_constructible<ErrorType, unexpected<Err>&>::value &&
+                          ! is_constructible<ErrorType, unexpected<Err>&&>::value &&
+                          ! is_constructible<ErrorType, const unexpected<Err>&>::value &&
+                          ! is_constructible<ErrorType, const unexpected<Err>&&>::value &&
+                          ! is_convertible<unexpected<Err>&, ErrorType>::value &&
+                          ! is_convertible<unexpected<Err>&&, ErrorType>::value &&
+                          ! is_convertible<const unexpected<Err>&, ErrorType>::value &&
+                          ! is_convertible<const unexpected<Err>&&, ErrorType>::value &&
+                          is_constructible<ErrorType, const Err&>::value && ! is_convertible<const Err&, ErrorType>::value)
         ) :
       error_(e.error_)
     {
     }
     template < class Err >
     BOOST_FORCEINLINE BOOST_CONSTEXPR unexpected(unexpected<Err> const& e
-        , JASEL_REQUIRES( is_constructible<ErrorType, const Err&>::value && is_convertible<const Err&, ErrorType>::value)
+        , JASEL_REQUIRES( ! is_constructible<ErrorType, unexpected<Err>&>::value &&
+                          ! is_constructible<ErrorType, unexpected<Err>&&>::value &&
+                          ! is_constructible<ErrorType, const unexpected<Err>&>::value &&
+                          ! is_constructible<ErrorType, const unexpected<Err>&&>::value &&
+                          ! is_convertible<unexpected<Err>&, ErrorType>::value &&
+                          ! is_convertible<unexpected<Err>&&, ErrorType>::value &&
+                          ! is_convertible<const unexpected<Err>&, ErrorType>::value &&
+                          ! is_convertible<const unexpected<Err>&&, ErrorType>::value &&
+                          is_constructible<ErrorType, const Err&>::value && is_convertible<const Err&, ErrorType>::value)
         ) :
       error_(e.error_)
     {
     }
     template < class Err >
     BOOST_FORCEINLINE BOOST_CONSTEXPR explicit unexpected(unexpected<Err>&& e
-        , JASEL_REQUIRES( is_constructible<ErrorType, Err&&>::value && ! is_convertible<Err&&, ErrorType>::value)
+        , JASEL_REQUIRES( ! is_constructible<ErrorType, unexpected<Err>&>::value &&
+                          ! is_constructible<ErrorType, unexpected<Err>&&>::value &&
+                          ! is_constructible<ErrorType, const unexpected<Err>&>::value &&
+                          ! is_constructible<ErrorType, const unexpected<Err>&&>::value &&
+                          ! is_convertible<unexpected<Err>&, ErrorType>::value &&
+                          ! is_convertible<unexpected<Err>&&, ErrorType>::value &&
+                          ! is_convertible<const unexpected<Err>&, ErrorType>::value &&
+                          ! is_convertible<const unexpected<Err>&&, ErrorType>::value &&
+                          is_constructible<ErrorType, Err&&>::value && ! is_convertible<Err&&, ErrorType>::value)
         ) :
       error_(move(e.error_))
     {
     }
     template < class Err >
     BOOST_FORCEINLINE BOOST_CONSTEXPR unexpected(unexpected<Err>&& e
-        , JASEL_REQUIRES( is_constructible<ErrorType, Err&&>::value && is_convertible<Err&&, ErrorType>::value)
+        , JASEL_REQUIRES( ! is_constructible<ErrorType, unexpected<Err>&>::value &&
+                          ! is_constructible<ErrorType, unexpected<Err>&&>::value &&
+                          ! is_constructible<ErrorType, const unexpected<Err>&>::value &&
+                          ! is_constructible<ErrorType, const unexpected<Err>&&>::value &&
+                          ! is_convertible<unexpected<Err>&, ErrorType>::value &&
+                          ! is_convertible<unexpected<Err>&&, ErrorType>::value &&
+                          ! is_convertible<const unexpected<Err>&, ErrorType>::value &&
+                          ! is_convertible<const unexpected<Err>&&, ErrorType>::value &&
+                          is_constructible<ErrorType, Err&&>::value && is_convertible<Err&&, ErrorType>::value)
         ) :
       error_(move(e.error_))
     {
