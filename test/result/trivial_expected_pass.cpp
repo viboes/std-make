@@ -53,7 +53,17 @@ int main()
         stdex::expected<int, short> x;
         BOOST_TEST(x.has_value());
         BOOST_TEST(x.value() == 0);
-        (void)x;
+    }
+    {
+        stdex::expected<int, short> x = 1;
+        BOOST_TEST(x.has_value());
+        BOOST_TEST(x.value() == 1);
+    }
+    {
+        stdex::expected<int, short> x;
+        x = 1;
+        BOOST_TEST(x.has_value());
+        BOOST_TEST(x.value() == 1);
     }
     {
         stdex::expected<int, short> res = stdex::make_success(1);

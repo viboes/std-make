@@ -197,6 +197,11 @@ struct check_constructible {
       return is_constructible<T, QualU>::value &&
              !is_convertible<QualU, T>::value;
   }
+  template <class U>
+  static constexpr bool enable_assign() {
+      return is_constructible<T, QualU>::value &&
+             is_assignable<T&, QualU>::value;
+  }
 };
 
 template <class T, class QualU>
@@ -235,7 +240,15 @@ struct check_constructibles {
       return is_constructible<T, QualU>::value && is_constructible<E, QualG>::value &&
              ! ( is_convertible<QualU, T>::value && is_convertible<QualG, E>::value );
   }
+  template <class U, class G>
+  static constexpr bool enable_assign() {
+      return is_constructible<T, QualU>::value && is_constructible<E, QualG>::value &&
+             is_assignable<T&, QualU>::value && is_assignable<E&, QualG>::value;
+  }
+
 };
+
+
 
 
 template <class T, class E, class QualU, class QualG>

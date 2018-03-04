@@ -22,7 +22,7 @@
 #include <experimental/fundamental/v2/config.hpp>
 #include <experimental/fundamental/v3/result/helpers_detail.hpp>
 #include <experimental/fundamental/v3/result/success_failure.hpp>
-
+#include <experimental/meta/v1/uncvref.hpp>
 #include <type_traits>
 #include <utility>
 #include <memory>
@@ -74,6 +74,14 @@ struct expected_destruct_base<T, E, false>
     {}
 
     template <class... Args>
+    constexpr explicit expected_destruct_base(in_place_t, Args&&... args)
+        :  _success(in_place, std::forward<Args>(args)...),
+           _has_value(true) {}
+    template <class... Args>
+    constexpr explicit expected_destruct_base(in_place_type_t<T>, Args&&... args)
+        :  _success(in_place, std::forward<Args>(args)...),
+           _has_value(true) {}
+    template <class... Args>
     constexpr explicit expected_destruct_base(in_place_type_t<success<T>>, Args&&... args)
         :  _success(std::forward<Args>(args)...),
            _has_value(true) {}
@@ -108,6 +116,15 @@ struct expected_destruct_base<T, E, true>
     }
     constexpr expected_destruct_base(uninitialized_t)
     {}
+
+    template <class... Args>
+    constexpr explicit expected_destruct_base(in_place_t, Args&&... args)
+        :  _success(in_place, std::forward<Args>(args)...),
+           _has_value(true) {}
+    template <class... Args>
+    constexpr explicit expected_destruct_base(in_place_type_t<T>, Args&&... args)
+        :  _success(in_place, std::forward<Args>(args)...),
+           _has_value(true) {}
     template <class... Args>
     constexpr explicit expected_destruct_base(in_place_type_t<success<T>>, Args&&... args)
         :  _success(std::forward<Args>(args)...),
@@ -589,6 +606,14 @@ class expected : public expected_detail::expected_base<T, E>
 {
     using base_type = expected_detail::expected_base<T, E>;
 
+//    template <class U, class G>
+//    using check_equals = conjunction<
+//      is_same<T, U>,
+//      is_same<E, G>
+//    >;
+//    template <class U, class G>
+//    using check_diffs = negation<check_equals<U,G>>;
+
     template <class U, class G, class Exp = expected<U, G>>
     using check_constructible_from_exp = disjunction<
         is_constructible<T, Exp&>,
@@ -617,10 +642,10 @@ class expected : public expected_detail::expected_base<T, E>
         is_convertible<Exp const&, failure<E>>,
         is_convertible<Exp&&, failure<E>>,
         is_convertible<Exp const&&, failure<E>>
-
     >;
+
     template <class U, class G, class Exp = expected<U, G>>
-    using check_assignable_from_expt = disjunction<
+    using check_assignable_from_exp = disjunction<
         is_assignable<T&, Exp&>,
         is_assignable<T&, Exp const&>,
         is_assignable<T&, Exp&&>,
@@ -638,13 +663,33 @@ class expected : public expected_detail::expected_base<T, E>
     >;
 
     template <class QualU>
-    using check_expected_success_ctor = helpers_detail::check_void_or_constructible<T, QualU>;
+    using check_expected_success_ctor = helpers_detail::check_constructible<T, QualU>;
+
+    template <class U>
+    using check_expected_u_ctor = typename conditional<
+                    !is_same_v<meta::uncvref_t<U>, in_place_t> &&
+                    !is_same_v<meta::uncvref_t<U>, in_place_type_t<T>> &&
+                    !is_same_v<meta::uncvref_t<U>, in_place_type_t<success<T>>> &&
+                    !is_same_v<meta::uncvref_t<U>, in_place_type_t<failure<E>>> &&
+                    !is_same_v<meta::uncvref_t<U>, expected<T, E>>,
+                    helpers_detail::check_constructible<T, U>,
+                    helpers_detail::check_fail
+                >::type;
+
 
     template <class U, class G, class QualU, class QualG>
-    using check_expected_expected_ctor = helpers_detail::check_diffs_or_constructibles<T, E, U, G, QualU, QualG>;
+    using check_expected_expected_ctor = typename conditional<
+        (!is_same<T, U>::value || !is_same<E, G>::value) && ! check_constructible_from_exp<U,G>::value,
+        helpers_detail::check_constructibles<T, E, QualU, QualG>,
+        helpers_detail::check_fail
+    >::type;
 
-//    template <class U, class G, class QualU, class QualG>
-//    using check_expected_expected_assign = helpers_detail::check_diffs_or_constructibles<T, E, U, G, QualU, QualG>;
+    template <class U, class G, class QualU, class QualG>
+    using check_expected_expected_assign = typename conditional<
+        (!is_same<T, U>::value || !is_same<E, G>::value) && ! check_constructible_from_exp<U,G>::value && ! check_assignable_from_exp<U,G>::value,
+        helpers_detail::check_constructibles<T, E, QualU, QualG>,
+        helpers_detail::check_fail
+    >::type;
 
 public:
     //static_assert(! is_success<T>::value, "Error: T can not be success<U>.");
@@ -663,6 +708,20 @@ public:
     expected& operator=(expected const& e) = default;
     expected& operator=(expected && e) = default;
     ~expected() = default;
+
+    template < class U = T, enable_if_t<
+                    check_expected_u_ctor<U &&>::template enable_implicit<U>()
+                , int> = 0>
+    constexpr expected(U&& value) :
+        base_type(in_place_type<T>, std::forward<U>(value))
+    {}
+    template < class U = T, enable_if_t<
+                    check_expected_u_ctor<U &&>::template enable_explicit<U>()
+                , int> = 0>
+    explicit constexpr expected(U&& value) :
+        base_type(in_place_type<T>, std::forward<U>(value))
+    {}
+
 
     template < class U = T, enable_if_t<
                     check_expected_success_ctor<U const&>::template enable_implicit<U>()
@@ -688,6 +747,7 @@ public:
     explicit constexpr expected(success<U> && value) :
         base_type(in_place_type<success<T>>, std::move(value))
     {}
+
 
     template < class U = T, class G = E, enable_if_t<
                     check_expected_expected_ctor<U, G, U const&, G const&>::template enable_implicit<U, G>()
@@ -722,6 +782,25 @@ public:
             this->construct_from(std::move(other));
         }
 
+
+    template < class U = T, class G = E, enable_if_t<
+                    check_expected_expected_assign<U, G, U const&, G const&>::template enable_assign<U, G>()
+                , int> = 0>
+    constexpr expected& operator=(expected<U, G> const& other)
+        {
+            this->assign_from(other);
+            return *this;
+        }
+
+    template < class U = T, class G = E, enable_if_t<
+                    check_expected_expected_assign<U, G, U &&, G&&>::template enable_assign<U, G>()
+                , int> = 0>
+    constexpr expected& operator=(expected<U, G> && other)
+        {
+            this->assign_from(std::move(other));
+            return *this;
+        }
+
 };
 
 template <class E>
@@ -730,8 +809,53 @@ class expected<void, E> : public expected_detail::expected_base<void, E>
     using T = void;
     using base_type = expected_detail::expected_base<T, E>;
 
-    template <class QualU>
-    using check_expected_expected_ctor = helpers_detail::check_constructible<E, QualU>;
+    template <class G, class Exp = expected<void, G>>
+    using check_constructible_from_exp = disjunction<
+        is_constructible<success<T>, Exp&>,
+        is_constructible<success<T>, Exp const&>,
+        is_constructible<success<T>, Exp&&>,
+        is_constructible<success<T>, Exp const&&>,
+        is_convertible<Exp&, success<T>>,
+        is_convertible<Exp const&, success<T>>,
+        is_convertible<Exp&&, success<T>>,
+        is_convertible<Exp const&&, success<T>>,
+
+        is_constructible<failure<E>, Exp&>,
+        is_constructible<failure<E>, Exp const&>,
+        is_constructible<failure<E>, Exp&&>,
+        is_constructible<failure<E>, Exp const&&>,
+        is_convertible<Exp&, failure<E>>,
+        is_convertible<Exp const&, failure<E>>,
+        is_convertible<Exp&&, failure<E>>,
+        is_convertible<Exp const&&, failure<E>>
+    >;
+
+    template <class G, class Exp = expected<void, G>>
+    using check_assignable_from_exp = disjunction<
+        is_assignable<success<T>&, Exp&>,
+        is_assignable<success<T>&, Exp const&>,
+        is_assignable<success<T>&, Exp&&>,
+        is_assignable<success<T>&, Exp const&&>,
+
+        is_assignable<failure<E>&, Exp&>,
+        is_assignable<failure<E>&, Exp const&>,
+        is_assignable<failure<E>&, Exp&&>,
+        is_assignable<failure<E>&, Exp const&&>
+    >;
+
+    template <class G, class QualG>
+    using check_expected_expected_ctor = typename conditional<
+        (!is_same<E, G>::value) && ! check_constructible_from_exp<G>::value,
+        helpers_detail::check_constructible<E, QualG>,
+        helpers_detail::check_fail
+    >::type;
+
+    template <class G, class QualG>
+    using check_expected_expected_assign = typename conditional<
+        (!is_same<E, G>::value) && ! check_constructible_from_exp<G>::value && ! check_assignable_from_exp<G>::value,
+        helpers_detail::check_constructible<E, QualG>,
+        helpers_detail::check_fail
+    >::type;
 
 public:
     template <class U>
@@ -753,37 +877,55 @@ public:
         base_type(in_place_type<success<T>>, std::move(value))
     {}
 
-    template < class U = E, enable_if_t<
-                    check_expected_expected_ctor<U const&>::template enable_implicit<U>()
+    template < class G = E, enable_if_t<
+                    check_expected_expected_ctor<G, G const&>::template enable_implicit<G>()
                 , int> = 0>
-    constexpr expected(expected<void, U> const& other)
+    constexpr expected(expected<void, G> const& other)
     : base_type(uninitialized_t{})
         {
             this->construct_from(other);
         }
-    template < class U = E, enable_if_t<
-                    check_expected_expected_ctor<U const&>::template enable_explicit<U>()
+    template < class G = E, enable_if_t<
+                    check_expected_expected_ctor<G, G const&>::template enable_explicit<G>()
                 , int> = 0>
-    explicit constexpr expected(expected<void, U> const& other)
+    explicit constexpr expected(expected<void, G> const& other)
     : base_type(uninitialized_t{})
         {
             this->construct_from(other);
         }
-    template < class U = E, enable_if_t<
-                    check_expected_expected_ctor<U &&>::template enable_implicit<U>()
+    template < class G = E, enable_if_t<
+                    check_expected_expected_ctor<G, G &&>::template enable_implicit<G>()
                 , int> = 0>
-    constexpr expected(expected<void, U> && other)
+    constexpr expected(expected<void, G> && other)
     : base_type(uninitialized_t{})
         {
             this->construct_from(std::move(other));
         }
-    template < class U = E, enable_if_t<
-                    check_expected_expected_ctor<U &&>::template enable_explicit<U>()
+    template < class G = E, enable_if_t<
+                    check_expected_expected_ctor<G, G &&>::template enable_explicit<G>()
                 , int> = 0>
-    explicit constexpr expected(expected<void, U> && other)
+    explicit constexpr expected(expected<void, G> && other)
     : base_type(uninitialized_t{})
         {
             this->construct_from(std::move(other));
+        }
+
+    template < class G = E, enable_if_t<
+                    check_expected_expected_assign<G, G const&>::template enable_assign<G>()
+                , int> = 0>
+    constexpr expected& operator=(expected<void, G> const& other)
+        {
+            this->assign_from(other);
+            return *this;
+        }
+
+    template < class G = E, enable_if_t<
+                    check_expected_expected_assign<G, G&&>::template enable_assign<G>()
+                , int> = 0>
+    constexpr expected& operator=(expected<void, G> && other)
+        {
+            this->assign_from(std::move(other));
+            return *this;
         }
 
 };
