@@ -606,6 +606,11 @@ class expected : public expected_detail::expected_base<T, E>
 {
     using base_type = expected_detail::expected_base<T, E>;
 
+    typedef T value_type;
+    typedef success<T> success_type;
+    typedef E error_type;
+    typedef failure<E> failure_type;
+
 //    template <class U, class G>
 //    using check_equals = conjunction<
 //      is_same<T, U>,
@@ -801,6 +806,68 @@ public:
             return *this;
         }
 
+    void swap(expected& other)
+        noexcept(is_nothrow_move_constructible_v<T> && is_nothrow_swappable_v<T> &&
+                 is_nothrow_move_constructible_v<E> && is_nothrow_swappable_v<E>)
+     {
+        if (this->_has_value)
+        {
+            if (other.has_value())
+            {
+                using std::swap;
+                swap(this->get_success(), other.get_success());
+            }
+            else
+            {
+                if constexpr(is_nothrow_move_constructible_v<E>)
+                {
+                    failure_type tmp = std::move(other.get_failure());
+                    try {
+                        other.destroy(in_place_type<failure<E>>);
+                        other.construct(in_place_type<success<T>>, std::move(this->get_success()));
+                        this->destroy(in_place_type<success<T>>);
+                        this->construct(in_place_type<failure<E>>, std::move(tmp));
+                    }
+                    catch (...)
+                    {
+                        other.construct(in_place_type<failure<E>>, std::move(tmp));
+                        throw;
+                    }
+                }
+                else //if constexpr(is_nothrow_move_constructible_v<T>)
+                {
+                    success_type tmp = std::move(this->get_success());
+                    this->destroy(in_place_type<success<T>>);
+                    try {
+                        this->construct(in_place_type<failure<E>>, std::move(other.get_failure()));
+                        other.destroy(in_place_type<failure<E>>);
+                        other.construct(in_place_type<success<T>>, std::move(tmp));
+                    }
+                    catch (...)
+                    {
+                        this->construct(in_place_type<success<T>>, std::move(tmp));
+                        throw;
+                    }
+                }
+            }
+        }
+        else
+        {
+            if (other.has_value())
+            {
+                other.swap(*this);
+
+            }
+            else
+            {
+                using std::swap;
+                swap(this->get_failure(), other.get_failure());
+            }
+        }
+
+
+     }
+
 };
 
 template <class E>
@@ -808,6 +875,10 @@ class expected<void, E> : public expected_detail::expected_base<void, E>
 {
     using T = void;
     using base_type = expected_detail::expected_base<T, E>;
+
+    typedef success<T> success_type;
+    typedef E error_type;
+    typedef failure<E> failure_type;
 
     template <class G, class Exp = expected<void, G>>
     using check_constructible_from_exp = disjunction<
@@ -928,7 +999,46 @@ public:
             return *this;
         }
 
+    void swap(expected& other)
+        noexcept(is_nothrow_move_constructible_v<E> && is_nothrow_swappable_v<E>)
+     {
+        if (this->_has_value)
+        {
+            if (other.has_value())
+            {
+                // nothing
+            }
+            else
+            {
+                this->construct(in_place_type<failure<E>>, other.get_failure()); // this can throw
+                //rhs._failure.~failure_type(); //destroy()
+                //rhs._has_value = true;
+                other.destroy(in_place_type<failure<E>>);
+            }
+        }
+        else
+        {
+            if (other.has_value())
+            {
+                other.swap(*this);
+            }
+            else
+            {
+                using std::swap;
+                swap(this->get_failure(), other.get_failure());
+            }
+        }
+
+
+     }
+
 };
+
+template <class T, class E>
+void swap(expected<T, E>& lhs, expected<T, E>& rhs)
+{
+    return lhs.swap(rhs);
+}
 
 
 template <class T1, class E1, class T2, class E2>

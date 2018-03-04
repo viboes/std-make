@@ -422,6 +422,38 @@ int main()
         BOOST_TEST(x.error() == 2);
         BOOST_TEST(y.error() == 2);
     }
+    {
+        stdex::expected<int, int> x = stdex::make_success(1);
+        stdex::expected<int, int> y = stdex::make_success(2);
+        using std::swap;
+        swap(x, y);
+        BOOST_TEST(x.value() == 2);
+        BOOST_TEST(y.value() == 1);
+    }
+    {
+        stdex::expected<int, int> x = stdex::make_failure(1);
+        stdex::expected<int, int> y = stdex::make_failure(2);
+        using std::swap;
+        swap(x, y);
+        BOOST_TEST(x.error() == 2);
+        BOOST_TEST(y.error() == 1);
+    }
+    {
+        stdex::expected<int, int> x = stdex::make_success(1);
+        stdex::expected<int, int> y = stdex::make_failure(2);
+        using std::swap;
+        swap(x, y);
+        BOOST_TEST(x.error() == 2);
+        BOOST_TEST(y.value() == 1);
+    }
+    {
+        stdex::expected<int, int> x = stdex::make_failure(1);
+        stdex::expected<int, int> y = stdex::make_success(2);
+        using std::swap;
+        swap(x, y);
+        BOOST_TEST(x.value() == 2);
+        BOOST_TEST(y.error() == 1);
+    }
     return ::boost::report_errors();
 }
 
