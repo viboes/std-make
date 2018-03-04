@@ -61,6 +61,7 @@ test-suite std_result
     : 
       [ run result/success_failure_pass.cpp  ]
       [ run result/trivial_result_pass.cpp  ]
+      [ run result/trivial_expected_pass.cpp  ]
     ;
 
 test-suite std_expected

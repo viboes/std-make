@@ -14,7 +14,7 @@
 namespace stdex = std::experimental;
 
 
-static_assert(std::is_trivial<stdex::success<short>>::value, "Error");
+//static_assert(std::is_trivial<stdex::success<short>>::value, "Error");
 
 template <class A>
 auto g(A&& x) -> stdex::success<std::unique_ptr<int>>

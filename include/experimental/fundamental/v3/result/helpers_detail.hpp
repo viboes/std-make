@@ -28,6 +28,15 @@ namespace experimental
 {
 inline namespace fundamental_v3
 {
+template <class T>
+struct is_trivially_destructible_or_void : is_trivially_destructible<T> {};
+template <>
+struct is_trivially_destructible_or_void<void> : true_type {};
+
+template <class T>
+struct is_trivially_default_constructible_or_void : is_trivially_default_constructible<T> {};
+template <>
+struct is_trivially_default_constructible_or_void<void> : true_type {};
 
 template <class T>
 struct is_trivially_copy_constructible_or_void : is_trivially_copy_constructible<T> {};
@@ -40,6 +49,16 @@ template <>
 struct is_trivially_move_constructible_or_void<void> : true_type {};
 
 template <class T>
+struct is_trivially_copy_assignable_or_void : is_trivially_copy_assignable<T> {};
+template <>
+struct is_trivially_copy_assignable_or_void<void> : true_type {};
+
+template <class T>
+struct is_trivially_move_assignable_or_void : is_trivially_move_assignable<T> {};
+template <>
+struct is_trivially_move_assignable_or_void<void> : true_type {};
+
+template <class T>
 struct is_copy_constructible_or_void : is_copy_constructible<T> {};
 template <>
 struct is_copy_constructible_or_void<void> : true_type {};
@@ -49,12 +68,42 @@ struct is_move_constructible_or_void : is_move_constructible<T> {};
 template <>
 struct is_move_constructible_or_void<void> : true_type {};
 
+template <class T>
+struct is_copy_assignable_or_void : is_copy_assignable<T> {};
+template <>
+struct is_copy_assignable_or_void<void> : true_type {};
+
+template <class T>
+struct is_move_assignable_or_void : is_move_assignable<T> {};
+template <>
+struct is_move_assignable_or_void<void> : true_type {};
+
+template <class T>
+struct is_default_constructible_or_void : is_default_constructible<T> {};
+template <>
+struct is_default_constructible_or_void<void> : true_type {};
+
+
+
 struct uninitialized_t {};
 
 namespace helpers_detail
 {
 
-// move to sfinae_delete_base
+template <bool Can>
+struct sfinae_default_ctor_base {};
+template <>
+struct sfinae_default_ctor_base<false>
+{
+    sfinae_default_ctor_base() = delete;
+    sfinae_default_ctor_base(sfinae_default_ctor_base const&) = default;
+    sfinae_default_ctor_base(sfinae_default_ctor_base &&) = default;
+    sfinae_default_ctor_base& operator=(sfinae_default_ctor_base const&) = default;
+    sfinae_default_ctor_base& operator=(sfinae_default_ctor_base&&) = default;
+};
+
+
+
 template <bool CanCopy, bool CanMove>
 struct sfinae_ctor_base {};
 template <>
@@ -83,6 +132,33 @@ struct sfinae_ctor_base<false, true>
   sfinae_ctor_base(sfinae_ctor_base &&) = default;
   sfinae_ctor_base& operator=(sfinae_ctor_base const&) = default;
   sfinae_ctor_base& operator=(sfinae_ctor_base&&) = default;
+};
+
+template <bool CanCopy, bool CanMove>
+struct sfinae_assign_base {};
+template <>
+struct sfinae_assign_base<false, false> {
+  sfinae_assign_base() = default;
+  sfinae_assign_base(sfinae_assign_base const&) = default;
+  sfinae_assign_base(sfinae_assign_base &&) = default;
+  sfinae_assign_base& operator=(sfinae_assign_base const&) = delete;
+  sfinae_assign_base& operator=(sfinae_assign_base&&) = delete;
+};
+template <>
+struct sfinae_assign_base<true, false> {
+  sfinae_assign_base() = default;
+  sfinae_assign_base(sfinae_assign_base const&) = default;
+  sfinae_assign_base(sfinae_assign_base &&) = default;
+  sfinae_assign_base& operator=(sfinae_assign_base const&) = default;
+  sfinae_assign_base& operator=(sfinae_assign_base&&) = delete;
+};
+template <>
+struct sfinae_assign_base<false, true> {
+  sfinae_assign_base() = default;
+  sfinae_assign_base(sfinae_assign_base const&) = default;
+  sfinae_assign_base(sfinae_assign_base &&) = default;
+  sfinae_assign_base& operator=(sfinae_assign_base const&) = delete;
+  sfinae_assign_base& operator=(sfinae_assign_base&&) = default;
 };
 
 struct check_implicit {
@@ -160,6 +236,14 @@ struct check_constructibles {
              ! ( is_convertible<QualU, T>::value && is_convertible<QualG, E>::value );
   }
 };
+
+
+template <class T, class E, class QualU, class QualG>
+using check_void_or_constructibles = typename conditional<
+    !is_void<T>::value,
+    helpers_detail::check_constructibles<T, E, QualU, QualG>,
+    helpers_detail::check_implicit
+>::type;
 
 
 template <class T, class E, class U, class G, class QualU, class QualG>

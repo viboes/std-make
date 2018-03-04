@@ -94,11 +94,11 @@ public:
 
     T value;
 
-    success() = delete;
+    constexpr success() : value() {};
     constexpr success(success const& e) = default;
     constexpr success(success&& e) = default;
-    constexpr success& operator=(success const& e) = delete;
-    constexpr success& operator=(success&& e) = delete;
+    JASEL_CXX14_CONSTEXPR success& operator=(success const& e) = default;
+    JASEL_CXX14_CONSTEXPR success& operator=(success&& e) = default;
 
     JASEL_0_REQUIRES(
           is_copy_constructible<T>::value
@@ -164,14 +164,11 @@ constexpr bool operator!=(const success<E1>& x, const success<E2>& y)
 template <>
 struct success<void> {
 
+    constexpr success() = default;
     constexpr success(success const& e) = default;
     constexpr success(success&& e) = default;
-    constexpr success& operator=(success const& e) = delete;
-    constexpr success& operator=(success&& e) = delete;
-
-    constexpr explicit success()
-    {
-    }
+    JASEL_CXX14_CONSTEXPR success& operator=(success const& e) = default;
+    JASEL_CXX14_CONSTEXPR success& operator=(success&& e) = default;
 
     template <class U>
     using rebind = success<U>;
@@ -228,11 +225,11 @@ public:
     template <class U>
     using rebind = failure<U>;
 
-    failure() = delete;
+    constexpr failure() = default;
     constexpr failure(failure const& e) = default;
     constexpr failure(failure&& e) = default;
-    constexpr failure& operator=(failure const& e) = delete;
-    constexpr failure& operator=(failure&& e) = delete;
+    JASEL_CXX14_CONSTEXPR failure& operator=(failure const& e) = default;
+    JASEL_CXX14_CONSTEXPR failure& operator=(failure&& e) = default;
 
     JASEL_0_REQUIRES(
           is_copy_constructible<T>::value
