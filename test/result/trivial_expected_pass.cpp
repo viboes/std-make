@@ -14,6 +14,33 @@
 #include <vector>
 #include <string>
 
+struct NoDefaultConstructible {
+    int value;
+    NoDefaultConstructible() = delete;
+    NoDefaultConstructible(int i) : value(i) {}
+    NoDefaultConstructible(NoDefaultConstructible const&)  = default;
+    NoDefaultConstructible(NoDefaultConstructible&&)  = default;
+    NoDefaultConstructible& operator=(NoDefaultConstructible const&) = default;
+    NoDefaultConstructible& operator=(NoDefaultConstructible&&) = default;
+};
+
+struct ThrowConstructibleAndMovable {
+    int value;
+    ThrowConstructibleAndMovable() : value(0) {}
+    ThrowConstructibleAndMovable(int i) : value(i) {}
+    ThrowConstructibleAndMovable(ThrowConstructibleAndMovable const& other) : value(other.value) { if (value%2) throw 1; }
+    ThrowConstructibleAndMovable(ThrowConstructibleAndMovable&& other) : value(other.value) { if (value%2) throw 1; }
+    ThrowConstructibleAndMovable& operator=(ThrowConstructibleAndMovable const&) = default;
+    ThrowConstructibleAndMovable& operator=(ThrowConstructibleAndMovable&&) = default;
+
+};
+bool operator==(ThrowConstructibleAndMovable const& x, ThrowConstructibleAndMovable const& y) {
+    return x.value == y.value;
+}
+bool operator!=(ThrowConstructibleAndMovable const& x, ThrowConstructibleAndMovable const& y) {
+    return x.value != y.value;
+}
+
 namespace stdex = std::experimental;
 #if 0
 static_assert(std::is_trivially_copy_assignable<stdex::expected_detail::expected_destruct_base<int, short>>::value, "stdex::expected_detail::expected_destruct_base<int, short> is not is_trivially_default_constructible.");
@@ -31,7 +58,7 @@ static_assert(std::is_trivially_copy_assignable<stdex::expected_detail::expected
 
 #endif
 
-//static_assert(std::is_trivially_default_constructible<stdex::expected<int, short>>::value, "stdex::expected<int, short> is not is_trivially_default_constructible.");
+static_assert( ! std::is_trivially_default_constructible<stdex::expected<int, short>>::value, "stdex::expected<int, short> is is_trivially_default_constructible.");
 static_assert(std::is_trivially_copy_constructible<stdex::expected<int, short>>::value, "stdex::expected<int, short> is not is_trivially_copy_constructible.");
 static_assert(std::is_trivially_move_constructible<stdex::expected<int, short>>::value, "stdex::expected<int, short> is not is_trivially_move_constructible.");
 static_assert(std::is_trivially_copyable<stdex::expected<int, short>>::value, "stdex::expected<int, short> is not is_trivially_copyable.");
@@ -453,6 +480,109 @@ int main()
         swap(x, y);
         BOOST_TEST(x.value() == 2);
         BOOST_TEST(y.error() == 1);
+    }
+    {
+        stdex::expected<int, int> x = stdex::make_failure(1);
+        stdex::expected<int, int> y = stdex::make_success(2);
+        using std::swap;
+        swap(x, y);
+        BOOST_TEST(x.value() == 2);
+        BOOST_TEST(y.error() == 1);
+    }
+
+    {
+        // fixme: This should fail
+        stdex::success<NoDefaultConstructible> x = stdex::make_success(NoDefaultConstructible(2));
+        (void)x;
+    }
+#if 0
+    {
+        stdex::expected<NoDefaultConstructible, int> x = stdex::make_success(NoDefaultConstructible(2)); // compile fails as expected
+    }
+
+#endif
+    {
+        try {
+            stdex::success<ThrowConstructibleAndMovable> x = stdex::make_success(ThrowConstructibleAndMovable(1));
+            (void)x;
+            BOOST_TEST(false);
+        } catch(...) {
+        }
+    }
+#if 0
+    {
+        stdex::expected<ThrowConstructibleAndMovable, ThrowConstructibleAndMovable> x = stdex::make_success(ThrowConstructibleAndMovable(2));
+        stdex::expected<ThrowConstructibleAndMovable, ThrowConstructibleAndMovable> y = stdex::make_failure(ThrowConstructibleAndMovable(2));
+        x = y; // compile fails as expected
+    }
+#endif
+    {
+        stdex::expected<ThrowConstructibleAndMovable, int> x { stdex::make_failure(1) };
+        stdex::expected<ThrowConstructibleAndMovable, int> y = stdex::make_success(ThrowConstructibleAndMovable(2));
+        x = y;
+        BOOST_TEST( x == y );
+    }
+    {
+        stdex::expected<ThrowConstructibleAndMovable, int> x = stdex::make_failure(1) ;
+        stdex::expected<ThrowConstructibleAndMovable, int> y = stdex::make_success(ThrowConstructibleAndMovable(2)) ;
+        y.value().value = 3;
+        try {
+            x = y;
+            BOOST_TEST(false);
+        } catch (...) {
+
+        }
+        BOOST_TEST( x != y );
+        BOOST_TEST( ! x.has_value() );
+        BOOST_TEST( y.has_value() );
+        BOOST_TEST(x.error() == 1);
+        BOOST_TEST(y.value().value == 3);
+    }
+    {
+        stdex::expected<ThrowConstructibleAndMovable, int> x = stdex::make_success(ThrowConstructibleAndMovable(2)) ;
+        stdex::expected<ThrowConstructibleAndMovable, int> y = stdex::make_failure(1) ;
+        x.value().value = 3;
+        x = y;
+        BOOST_TEST( x == y );
+    }
+    {
+        stdex::expected<int, ThrowConstructibleAndMovable> x = stdex::make_success(1) ;
+        stdex::expected<int, ThrowConstructibleAndMovable> y = stdex::make_failure(ThrowConstructibleAndMovable(2)) ;
+        y.error().value = 3;
+        try {
+            x = y;
+            BOOST_TEST(false);
+        } catch (...) {
+
+        }
+        BOOST_TEST( x != y );
+        BOOST_TEST( x.has_value() );
+        BOOST_TEST( ! y.has_value() );
+        BOOST_TEST(x.value() == 1);
+        BOOST_TEST(y.error().value == 3);
+    }
+    {
+        stdex::expected<ThrowConstructibleAndMovable, int> x { stdex::make_failure(1) };
+        stdex::expected<ThrowConstructibleAndMovable, int> y = stdex::make_success(ThrowConstructibleAndMovable(2));
+        using std::swap;
+        swap(x, y);
+        BOOST_TEST( x.has_value() );
+        BOOST_TEST(x.value().value == 2);
+        BOOST_TEST( ! y.has_value() );
+        BOOST_TEST(y.error() == 1);
+    }
+    {
+        stdex::expected<ThrowConstructibleAndMovable, int> x { stdex::make_failure(1) };
+        stdex::expected<ThrowConstructibleAndMovable, int> y {stdex::make_success(ThrowConstructibleAndMovable(2)) };
+        y.value().value = 3;
+        try {
+            using std::swap;
+            swap(x, y);
+        } catch(...) {}
+        BOOST_TEST( ! x.has_value() );
+        BOOST_TEST( y.has_value() );
+        BOOST_TEST(x.error() == 1);
+        BOOST_TEST(y.value().value == 3);
     }
     return ::boost::report_errors();
 }
