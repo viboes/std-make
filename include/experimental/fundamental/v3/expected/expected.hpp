@@ -2312,7 +2312,7 @@ public:
 #if defined JASEL_CATCH_EXCEPTIONS
     try {
 #endif
-      f(**this);
+      forward<F>(f)(**this);
       return result_type(in_place);
 #if defined JASEL_CATCH_EXCEPTIONS
     } catch (...) {
@@ -2328,7 +2328,7 @@ public:
 #if defined JASEL_CATCH_EXCEPTIONS
     try {
 #endif
-      return f(**this);
+      return forward<F>(f)(**this);
 #if defined JASEL_CATCH_EXCEPTIONS
     } catch (...) {
       return make_unexpected(error_traits<error_type>::make_error_from_current_exception());
@@ -2343,7 +2343,7 @@ public:
     //typedef typename rebind<typename result_of<F(value_type)>::type>::type result_type;
     try {
 #endif
-      return f(**this);
+      return forward<F>(f)(**this);
 #if defined JASEL_CATCH_EXCEPTIONS
     } catch (...) {
       return make_unexpected(error_traits<error_type>::make_error_from_current_exception());
@@ -2358,7 +2358,7 @@ public:
 #if defined JASEL_CATCH_EXCEPTIONS
     try {
 #endif
-      f(move(*this));
+      forward<F>(f)(move(*this));
       return result_type(in_place);
 #if defined JASEL_CATCH_EXCEPTIONS
     } catch (...) {
@@ -2375,7 +2375,7 @@ public:
     //typedef typename result_of<F(expected)>::type result_type;
     try {
 #endif
-      return f(move(*this));
+      return forward<F>(f)(move(*this));
 #if defined JASEL_CATCH_EXCEPTIONS
     } catch (...) {
       return make_unexpected(error_traits<error_type>::make_error_from_current_exception());
@@ -2390,7 +2390,7 @@ public:
     //typedef typename rebind<typename result_of<F(expected)>::type>::type result_type;
     try {
 #endif
-      return f(move(*this));
+      return forward<F>(f)(move(*this));
 #if defined JASEL_CATCH_EXCEPTIONS
     } catch (...) {
       return make_unexpected(error_traits<error_type>::make_error_from_current_exception());
@@ -2522,7 +2522,7 @@ public:
   {
     return catch_all_etype_etype(forward<F>(f));
     //typedef typename rebind<typename result_of<F(value_type)>::type>::type result_type;
-    //return result_type(f(move(*this)));
+    //return result_type(forward<F>(f)(move(*this)));
   }
 
   template <typename F>
@@ -2532,7 +2532,7 @@ public:
     )
   {
     return catch_all_etype_type(forward<F>(f));
-    //return f(move(*this));
+    //return forward<F>(f)(move(*this));
   }
 
   template <typename F>
@@ -2543,12 +2543,12 @@ public:
 #if ! defined BOOST_NO_CXX14_CONSTEXPR
     if(!valid())
     {
-        return this_type(f(contained_err()));
+        return this_type(forward<F>(f)(contained_err()));
     }
     return *this;
 #else
     return ( ! valid()
-         ? this_type(f(contained_err()))
+         ? this_type(forward<F>(f)(contained_err()))
          : *this
            );
 #endif
@@ -2561,12 +2561,12 @@ public:
 #if ! defined BOOST_NO_CXX14_CONSTEXPR
     if(!valid())
     {
-        return f(contained_err());
+        return forward<F>(f)(contained_err());
     }
     return *this;
 #else
     return ( ! valid()
-         ? f(contained_err())
+         ? forward<F>(f)(contained_err())
          : *this
          );
 #endif
@@ -2579,12 +2579,12 @@ public:
 #if ! defined BOOST_NO_CXX14_CONSTEXPR
     if(!valid())
     {
-        return f(contained_err());
+        return forward<F>(f)(contained_err());
     }
     return *this;
 #else
     return (! valid()
-        ? this_type( f(contained_err()) )
+        ? this_type( forward<F>(f)(contained_err()) )
         : *this
         );
 #endif
@@ -2601,12 +2601,12 @@ public:
 #if ! defined BOOST_NO_CXX14_CONSTEXPR
     if(! valid())
     {
-        return result_type(unexpect, f(contained_err()));
+        return result_type(unexpect, forward<F>(f)(contained_err()));
     }
     return result_type(contained_val());
 #else
     return (! valid()
-        ? result_type(unexpect, f(contained_err()))
+        ? result_type(unexpect, forward<F>(f)(contained_err()))
         : result_type(contained_val())
         );
 #endif
@@ -2622,7 +2622,7 @@ public:
     }
     catch(Ex& e)
     {
-      return f(e);
+      return forward<F>(f)(e);
     }
     catch (...)
     {
@@ -2642,7 +2642,7 @@ public:
     }
     catch(Ex& e)
     {
-      return this_type(f(e));
+      return this_type(forward<F>(f)(e));
     }
     catch (...)
     {
@@ -2990,7 +2990,7 @@ public:
 #if defined JASEL_CATCH_EXCEPTIONS
     try {
 #endif
-      f();
+      forward<F>(f)();
       return result_type(in_place);
 #if defined JASEL_CATCH_EXCEPTIONS
     } catch (...) {
@@ -3006,7 +3006,7 @@ public:
     //typedef typename result_of<F()>::type result_type;
     try {
 #endif
-      return f();
+      return forward<F>(f)();
 #if defined JASEL_CATCH_EXCEPTIONS
     } catch (...) {
       return make_unexpected(error_traits<error_type>::make_error_from_current_exception());
@@ -3021,7 +3021,7 @@ public:
     //typedef typename rebind<typename result_of<F()>::type>::type result_type;
     try {
 #endif
-      return f();
+      return forward<F>(f)();
 #if defined JASEL_CATCH_EXCEPTIONS
     } catch (...) {
       return make_unexpected(error_traits<error_type>::make_error_from_current_exception());
@@ -3034,7 +3034,7 @@ public:
 //  {
 //    typedef typename rebind<void>::type result_type;
 //    try {
-//      f(move(*this));
+//      forward<F>(f)(move(*this));
 //    } catch (...) {
 //      return make_unexpected(error_traits<error_type>::make_error_from_current_exception());
 //    }
@@ -3046,7 +3046,7 @@ public:
 //  {
 //    //typedef typename result_of<F(expected)>::type result_type;
 //    try {
-//      return f(move(*this));
+//      return forward<F>(f)(move(*this));
 //    } catch (...) {
 //      return make_unexpected(error_traits<error_type>::make_error_from_current_exception());
 //    }
@@ -3057,7 +3057,7 @@ public:
 //  {
 //    //typedef typename rebind<typename result_of<F(expected)>::type>::type result_type;
 //    try {
-//      return f(move(*this));
+//      return forward<F>(f)(move(*this));
 //    } catch (...) {
 //      return make_unexpected(error_traits<error_type>::make_error_from_current_exception());
 //    }
@@ -3114,13 +3114,13 @@ public:
 //#if ! defined BOOST_NO_CXX14_CONSTEXPR
 //    if(valid())
 //    {
-//        f();
+//        forward<F>(f)();
 //        return result_type(in_place);
 //    }
 //    return get_unexpected();
 //#else
 //    return ( valid()
-//        ? ( f(), result_type(in_place) )
+//        ? ( forward<F>(f)(), result_type(in_place) )
 //        :  result_type(get_unexpected())
 //        );
 //#endif
@@ -3137,12 +3137,12 @@ public:
 //#if ! defined BOOST_NO_CXX14_CONSTEXPR
 //    if(valid())
 //    {
-//        return result_type(f());
+//        return result_type(forward<F>(f)());
 //    }
 //    return get_unexpected();
 //#else
 //    return ( valid()
-//        ? result_type(f())
+//        ? result_type(forward<F>(f)())
 //        :  result_type(get_unexpected())
 //        );
 //#endif
@@ -3157,13 +3157,13 @@ public:
 #if ! defined BOOST_NO_CXX14_CONSTEXPR
     if(valid())
     {
-        return f();
+        return forward<F>(f)();
     }
     return get_unexpected();
 #else
     typedef typename result_of<F()>::type result_type;
     return ( valid()
-        ? f()
+        ? forward<F>(f)()
         :  result_type(get_unexpected())
         );
 #endif
@@ -3176,10 +3176,10 @@ public:
   {
     typedef typename rebind<void>::type result_type;
 #if ! defined BOOST_NO_CXX14_CONSTEXPR
-    f(move(*this));
+    forward<F>(f)(move(*this));
     return result_type(in_place);
 #else
-    return ( f(move(*this)), result_type(in_place) );
+    return ( forward<F>(f)(move(*this)), result_type(in_place) );
 #endif
   }
 
@@ -3191,7 +3191,7 @@ public:
         ))
   {
     typedef typename rebind<typename result_of<F(expected)>::type>::type result_type;
-    return result_type(f(move(*this)));
+    return result_type(forward<F>(f)(move(*this)));
   }
 
   template <typename F>
@@ -3202,7 +3202,7 @@ public:
         )
     )
   {
-    return f(move(*this));
+    return forward<F>(f)(move(*this));
   }
 
   // catch_error factory
@@ -3214,12 +3214,12 @@ public:
 #if ! defined BOOST_NO_CXX14_CONSTEXPR
     if(! valid())
     {
-        return this_type(f(contained_err()));
+        return this_type(forward<F>(f)(contained_err()));
     }
     return *this;
 #else
     return (! valid()
-        ? this_type(f(contained_err()))
+        ? this_type(forward<F>(f)(contained_err()))
         : *this
         );
 #endif
@@ -3232,12 +3232,12 @@ public:
 #if ! defined BOOST_NO_CXX14_CONSTEXPR
     if(!valid())
     {
-      return f(contained_err());
+      return forward<F>(f)(contained_err());
     }
     return *this;
 #else
     return (! valid()
-        ? f(contained_err())
+        ? forward<F>(f)(contained_err())
         : *this
         );
 #endif
@@ -3254,12 +3254,12 @@ public:
 #if ! defined BOOST_NO_CXX14_CONSTEXPR
     if(! valid())
     {
-        return result_type(unexpect, f(contained_err()));
+        return result_type(unexpect, forward<F>(f)(contained_err()));
     }
     return result_type();
 #else
     return (! valid()
-        ? result_type(unexpect, f(contained_err()))
+        ? result_type(unexpect, forward<F>(f)(contained_err()))
         : result_type()
         );
 #endif
@@ -3277,7 +3277,7 @@ public:
     }
     catch(Ex& e)
     {
-      return f(e);
+      return forward<F>(f)(e);
     }
     catch (...)
     {
@@ -3297,7 +3297,7 @@ public:
     }
     catch(Ex& e)
     {
-      return this_type(f(e));
+      return this_type(forward<F>(f)(e));
     }
     catch (...)
     {
