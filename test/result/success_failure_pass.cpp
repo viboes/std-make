@@ -23,6 +23,12 @@ auto g(A&& x) -> stdex::success<std::unique_ptr<int>>
 }
 int main()
 {
+#if 0
+    {
+        int arr[3] = {};
+        stdex::success<int[3]> x =  stdex::make_success(arr); // compile fails as expected
+    }
+#endif
     {
         stdex::success<std::pair<int, short>> x =  stdex::make_success(std::make_pair(1,2));
         BOOST_TEST(x.value.first == 1);
