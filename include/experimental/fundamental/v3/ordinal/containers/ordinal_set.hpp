@@ -78,11 +78,11 @@ inline namespace fundamental_v3
         friend class ordinal_set<T>;
         ordinal_set<T>* ref_;
         T pos_;
-        reference() noexcept;
         reference(ordinal_set<T>& ref, T pos)
         : ref_(&ref), pos_(pos)
         { }
       public:
+        reference() noexcept = delete;
         ~reference() noexcept = default;
         reference(reference const& x) noexcept  = default;
         reference& operator=(const reference& x) noexcept = default;
