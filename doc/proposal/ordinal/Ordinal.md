@@ -196,6 +196,9 @@ The proposed changes are expressed as edits to [N4564] the Working Draft - C++ E
 
 ## Ordinal Types
 
+Ordinal types are types that are isomorphic to the range `0`..`n`.
+They can be used as index of ordinal arrays, as element of an ordinal set or as element of an ordinal range. 
+
 ### *Ordinal* requirements
 
 A *Ordinal* is a type that supports the `size/val/pos` functions. A type `O` meets the requirements of *Ordinal* if:
@@ -213,17 +216,17 @@ In Table X below, `o` denotes an rvalue of type `O`, `p` denotes a rvalue of typ
         <td align="left" valign="top"> <b>Operational Semantics</b> </td>
     </tr>
     <tr>
-        <td align="left" valign="top"> ordinal::size&lt;O>() </td>
-        <td align="left" valign="top"> index_t </td>
+        <td align="left" valign="top"> std::experiental::ordinal::size&lt;O>() </td>
+        <td align="left" valign="top"> std::experiental::ordinal::index_t </td>
         <td align="left" valign="top"> number of elements in O</td>
     </tr>
     <tr>
-        <td align="left" valign="top"> ordinal::val&lt;O>(p) </td>
+        <td align="left" valign="top"> std::experiental::ordinal::val&lt;O>(p) </td>
         <td align="left" valign="top"> O </td>
         <td align="left" valign="top"> value at position p, for p in 0..(size<O>-1)</td>
     </tr>
     <tr>
-        <td align="left" valign="top"> ordinal::pos(o) </td>
+        <td align="left" valign="top"> std::experiental::ordinal::pos(o) </td>
         <td align="left" valign="top"> index_t </td>
         <td align="left" valign="top"> position of o</td>
     </tr>
@@ -261,9 +264,9 @@ namespace ordinal {
     struct arithmetic_traits;  
   template <class T>
     struct logarithmic_traits;
-    
   template <typename T>
-    struct integral_traits: 
+    struct integral_traits; 
+    
   template <> struct traits<int>;
   template <> struct traits<short>;
   template <> struct traits<signed char>;
@@ -332,9 +335,10 @@ namespace ordinal {
     constexpr auto size() noexcept;
 }
 ```
+
 *Requires*: `Ordinal` is an *Ordinal* type.
 
-*Equivalent to*: `traits<Ordinal>::size::value` 
+*Returns*: `traits<Ordinal>::size::value` 
 
 ####  Function Template `val` [ordinal. val]
 
@@ -349,9 +353,9 @@ namespace ordinal {
 
 *Pre-condition*: `0 <= pos and pos < ordinal::size<O>()`.
 
-*Equivalent to*: `traits<Ordinal>::val(pos)` 
+*Returns*: `traits<Ordinal>::val(pos)` 
 
-####  Function Template `pos ` [ordinal. pos]
+####  Function Template `pos` [ordinal. pos]
 
 ```c++
 namespace ordinal {
@@ -362,7 +366,7 @@ namespace ordinal {
 
 *Requires*: `Ordinal` is an *Ordinal* type.
 
-*Equivalent to*: `traits<decay_t<Ordinal>>::pos(forward<Ordinal>(val))` 
+*Returns*: `traits<decay_t<Ordinal>>::pos(forward<Ordinal>(val))` 
 
 ####  Function Template `first` [ordinal.first]
 
@@ -388,7 +392,7 @@ namespace ordinal {
 
 *Requires*: `Ordinal` is an *Ordinal* type.
 
-*Equivalent to*: `ordinal::val<Ordinal>(ordinal::size<Ordinal>()-1)` 
+*Returns*: `ordinal::val<Ordinal>(ordinal::size<Ordinal>()-1)` 
 
 ####  Function Template `succ ` [ordinal.succ]
 
@@ -403,7 +407,7 @@ namespace ordinal {
 
 *Pre-condition*: `ordinal::pos(val)+1 < ordinal::size<decay_t<Ordinal>>()`.
 
-*Equivalent to*: `ordinal::val<decay_t<Ordinal>>(ordinal::pos(val)+1)` 
+*Returns*: `ordinal::val<decay_t<Ordinal>>(ordinal::pos(val)+1)` 
 
 ####  Function Template `pred ` [ordinal.pred]
 
@@ -418,8 +422,7 @@ namespace ordinal {
 
 *Pre-condition*: `ordinal::pos(val) > 0`.
 
-*Equivalent to*: `ordinal::val<Ordinal>(ordinal::pos(val)-1)` 
-
+*Returns*: `ordinal::val<Ordinal>(ordinal::pos(val)-1)` 
 
 ####  Template class `is_ordinal` [ordinal.is_ordinal]
 
@@ -483,7 +486,7 @@ namespace ordinal {
     };
 ```
 
-`logarithmic_traits ` defines a mapping from a logarithmic progression to `0`..`N` where `val(p) = 2^p`.
+`logarithmic_traits` defines a mapping from a logarithmic progression to `0`..`N` where `val(p) = 2^p`.
 
 ####  Template class `integral_traits` [ordinal.num]
 
@@ -518,20 +521,106 @@ Each one of the preceding traits is specialized using the `integral_traits` with
 
 As `std::array` but replacing the size `N` by the ordinal type `O`. 
 
+
 ```c++
+#include <initializer_list>
 namespace std::experimental {
 inline namespace fundamentals_v3 {
 
-
-    template<class T, typename O>
+  template<class T, typename O>
     // requires Ordinal<O>
     class ordinal_array;
+    
+  template <class T, class O>
+    bool operator==(const ordinal_array<T, O>& x, const ordinal_array<T, O>& y);
+  template <class T, class O>
+    bool operator!=(const ordinal_array<T, O>& x, const ordinal_array<T, O>& y);
+  template <class T, class O>
+    bool operator<(const ordinal_array<T, O>& x, const ordinal_array<T, O>& y);
+  template <class T, class O>
+    bool operator>(const ordinal_array<T, O>& x, const ordinal_array<T, O>& y);
+  template <class T, class O>
+    bool operator<=(const ordinal_array<T, O>& x, const ordinal_array<T, O>& y);
+  template <class T, class O>
+    bool operator>=(const ordinal_array<T, O>& x, const ordinal_array<T, O>& y);
+
+  template <class T, class O >
+    void swap(ordinal_array<T, O>& x, ordinal_array<T, O>& y) noexcept(noexcept(x.swap(y)));
+
+  template <class T> class tuple_size;
+  template <size_t I, class T> class tuple_element;
+  template <class T, class O> struct tuple_size<ordinal_array<T, O>>;
+  template <size_t I, class T, class O> struct tuple_element<I, ordinal_array<T, O>>;
+  template <size_t I, class T, class O> constexpr T& get(ordinal_array<T, O>&) noexcept;
+  template <size_t I, class T, class O> constexpr const T& get(const ordinal_array<T, O>&) noexcept;
+  template <size_t I, class T, class O> constexpr T&& get(ordinal_array<T, O>&&) noexcept;
+  template <size_t I, class T, class O> constexpr const T&& get(const ordinal_array<T, O>&&) noexcept;    
 
 }
 }
 ```
 
-### Header <experimental/ordinal_set> synopsis [ordinal_set.synop]
+
+#### Class template `ordinal_array` [ordinal_array]
+
+
+The header `<ordinal_array>` defines a class template for storing fixed-size sequences of objects identified by an *Ordinal* type. An `ordinal_array` is a contiguous container (26.2.1). An instance of `ordinal_array<T, O>` stores `ordinal::size<O>::value` elements of type `T`, so that `size() == ordinal::size<O>::value` is an invariant.An `ordinal_array` is an aggregate (11.6.1) that can be list-initialized with up to `ordinal::size<O>::value` elements whose types are convertible to `T`.An `ordinal_array` satisfies all of the requirements of a container and of a reversible container (26.2), except that a default constructed ordinal array object is not empty and that `swap` does not have constant complexity. An `ordinal_array` satisfies some of the requirements of a sequence container (26.2.3). Descriptions are provided here only for operations on `ordinal_array` that are not described in one of these tables and for operations where there is additional semantic information.
+
+
+```c++
+template <class T, class O >
+struct ordinal_array
+{
+    // types:
+    using value_type = T;    using pointer = T*;    using const_pointer = const T*;    using reference = T&;    using const_reference = const T&;    using key_type = 0;    using size_type = typename ordinal<O>::index_t;    using difference_type = ptrdiff_t;    using iterator = implementation defined; // see 26.2    using const_iterator = implementation defined; // see 26.2    using reverse_iterator = std::reverse_iterator<iterator>;    using const_reverse_iterator = std::reverse_iterator<const_iterator>;
+    
+
+    // No explicit construct/copy/destroy for aggregate type
+    
+    void fill(const T& u);
+    void swap(ordinal_array& a) noexcept(is_nothrow_swappable_v<T>);
+
+    // iterators:
+    iterator begin() noexcept;
+    const_iterator begin() const noexcept;
+    iterator end() noexcept;
+    const_iterator end() const noexcept;
+
+    reverse_iterator rbegin() noexcept;
+    const_reverse_iterator rbegin() const noexcept;
+    reverse_iterator rend() noexcept;
+    const_reverse_iterator rend() const noexcept;
+
+    const_iterator cbegin() const noexcept;
+    const_iterator cend() const noexcept;
+    const_reverse_iterator crbegin() const noexcept;
+    const_reverse_iterator crend() const noexcept;
+
+    // capacity:
+    [[nodiscard]] constexpr bool empty() const noexcept;
+    constexpr size_type size() const noexcept;
+    constexpr size_type max_size() const noexcept;
+
+    // element access:
+    constexpr reference operator[](key_type n);
+    constexpr const_reference operator[](key_type n) const;
+    constexpr const_reference at(key_type n) const;
+    constexpr reference at(key_type n);
+
+    constexpr reference front();
+    constexpr const_reference front() const;
+    constexpr reference back();
+    constexpr const_reference back() const;
+
+    constexpr T* data() noexcept;
+    constexpr const T* data() const noexcept;
+};
+
+  template<class O, class T, class... U>    ordinal_array(T, U...) -> ordinal_array<T, O>;
+    
+```
+
+### x.y.z.1 Header <experimental/ordinal_set> synopsis [ordinal_set.synop]
 
 As `std::bitset` but replacing the size `N` by the ordinal type `O`. 
 
@@ -541,23 +630,119 @@ inline namespace fundamentals_v3 {
 
 
     template<typename O>
-    // requires Ordinal<O>
+    // x.y.z.2 class
     class ordinal_set;
+
+    // x.y.z.3 ordinal_set operators:
+    template <class O>
+        ordinal_set<O> operator&(const ordinal_set<O>&, const ordinal_set<O>&) noexcept;
+
+    template <class O>
+        ordinal_set<O> operator|(const ordinal_set<O>&, const ordinal_set<O>&) noexcept;
+
+    template <class O>
+        ordinal_set<O> operator^(const ordinal_set<O>&, const ordinal_set<O>&) noexcept;
+
+    template <class charT, class traits, class O>
+        basic_istream<charT, traits>& operator>>(basic_istream<charT, traits>& is, ordinal_set<O>& x);
+
+    template <class charT, class traits, class O>
+        basic_ostream<charT, traits>& operator<<(basic_ostream<charT, traits>& os, const ordinal_set<O>& x);
+
+    template <class O> struct hash<std::ordinal_set<NO>;
 
 }
 }
 ```
 
+#### Class template `ordinal_set` [ordinal_set.ordinal_set]
+
+```c++
+template <class O>
+class ordinal_set
+{
+public:
+    // bit reference:
+    class reference
+    {
+        friend class ordinal_set;
+        reference() noexcept;
+    public:
+        ~reference() noexcept;
+        reference& operator=(bool x) noexcept;           // for b[i] = x;
+        reference& operator=(const reference&) noexcept; // for b[i] = b[j];
+        bool operator~() const noexcept;                 // flips the bit
+        operator bool() const noexcept;                  // for x = b[i];
+        reference& flip() noexcept;                      // for b[i].flip();
+    };
+
+    using key_type = 0;
+
+    // 23.3.5.1 constructors:
+    constexpr ordinal_set() noexcept;
+    constexpr ordinal_set(unsigned long long val) noexcept;
+    template <class charT>
+        explicit ordinal_set(const charT* str,
+                        typename basic_string<charT>::size_type n = basic_string<charT>::npos,
+                        charT zero = charT('0'), charT one = charT('1'));
+    template<class charT, class traits, class Allocator>
+        explicit ordinal_set(const basic_string<charT,traits,Allocator>& str,
+                        typename basic_string<charT,traits,Allocator>::size_type pos = 0,
+                        typename basic_string<charT,traits,Allocator>::size_type n =
+                                 basic_string<charT,traits,Allocator>::npos,
+                        charT zero = charT('0'), charT one = charT('1'));
+
+    // 23.3.5.2 ordinal_set operations:
+    ordinal_set& operator&=(const ordinal_set& rhs) noexcept;
+    ordinal_set& operator|=(const ordinal_set& rhs) noexcept;
+    ordinal_set& operator^=(const ordinal_set& rhs) noexcept;
+    ordinal_set& operator<<=(size_t pos) noexcept;
+    ordinal_set& operator>>=(size_t pos) noexcept;
+    ordinal_set& set() noexcept;
+    ordinal_set& set(key_type pos, bool val = true);
+    ordinal_set& reset() noexcept;
+    ordinal_set& reset(key_type pos);
+    ordinal_set operator~() const noexcept;
+    ordinal_set& flip() noexcept;
+    ordinal_set& flip(key_type pos);
+
+    // element access:
+    constexpr bool operator[](size_t pos) const; // for b[i];
+    reference operator[](size_t pos);            // for b[i];
+    unsigned long to_ulong() const;
+    unsigned long long to_ullong() const;
+    template <class charT, class traits, class Allocator>
+        basic_string<charT, traits, Allocator> to_string(charT zero = charT('0'), charT one = charT('1')) const;
+    template <class charT, class traits>
+        basic_string<charT, traits, allocator<charT> > to_string(charT zero = charT('0'), charT one = charT('1')) const;
+    template <class charT>
+        basic_string<charT, char_traits<charT>, allocator<charT> > to_string(charT zero = charT('0'), charT one = charT('1')) const;
+    basic_string<char, char_traits<char>, allocator<char> > to_string(char zero = '0', char one = '1') const;
+    size_t count() const noexcept;
+    constexpr size_t size() const noexcept;
+    bool operator==(const ordinal_set& rhs) const noexcept;
+    bool operator!=(const ordinal_set& rhs) const noexcept;
+    bool test(size_t pos) const;
+    bool all() const noexcept;
+    bool any() const noexcept;
+    bool none() const noexcept;
+    ordinal_set operator<<(size_t pos) const noexcept;
+    ordinal_set operator>>(size_t pos) const noexcept;
+};
+
+// x.y.z.3, hash supporttemplate<class T> struct hash; 
+template<class O> struct hash<ordinal_set<O>>;
+
+```
 
 ### Header <experimental/ordinal_range> synopsis [ordinal_range.synop]
 
-Similar to `std::experimental::iota` but replacing the size `n` by the ordinal type `O`. 
+Similar to `std::experimental::ranges::iota` but replacing the size `n` by the ordinal type `O`. 
 
 
 ```c++
 namespace std::experimental {
 inline namespace fundamentals_v3 {
-
 
     template<typename O>
     // requires Ordinal<O>
@@ -566,6 +751,44 @@ inline namespace fundamentals_v3 {
 }
 }
 ```
+
+
+#### Class template `ordinal_range` [ordinal_range.ordinal_range]
+
+```c++
+template<typename O>
+// requires Ordinal<O>
+class ordinal_range {
+public:
+    // types:
+    using value_type = O;    using size_type = typename ordinal<O>::index_t;    using difference_type = ptrdiff_t;    using iterator = implementation defined; // see 26.2    using const_iterator = implementation defined; // see 26.2    using reverse_iterator = std::reverse_iterator<iterator>;    using const_reverse_iterator = std::reverse_iterator<const_iterator>;
+
+    // constructors
+    constexpr ordinal_range();
+    constexpr ordinal_range(O first, O last)   
+    
+    // iterators:
+    constexpr iterator begin() noexcept;
+    constexpr const_iterator begin() const noexcept;
+    constexpr iterator end() noexcept;
+    constexpr const_iterator end() const noexcept;
+
+    constexpr reverse_iterator rbegin() noexcept;
+    constexpr const_reverse_iterator rbegin() const noexcept;
+    constexpr reverse_iterator rend() noexcept;
+    constexpr const_reverse_iterator rend() const noexcept;
+
+    constexpr const_iterator cbegin() const noexcept;
+    constexpr const_iterator cend() const noexcept;
+    constexpr const_reverse_iterator crbegin() const noexcept;
+    constexpr const_reverse_iterator crend() const noexcept;
+
+    constexpr size_t size() noexcept;
+    constexpr bool empty() noexcept;
+
+
+```
+
 
 # Implementability
 
@@ -609,7 +832,7 @@ The proposed `succ` and `pred` functions have undefined behavior when used on th
 
 ## Should small integral types be considered as *Ordinal*s?
 
-There is not additional cost to allow them. However, integral types work already well with arrays, `bitset` and ranges. Nevertheless mapping them as ordinal types could take advantage of future features that could require an ordinal type. 
+There is not additional cost to allow them. However, integral types work already well with arrays, `bitset` and ranges. Nevertheless mapping them as ordinal types could take advantage of future features that could require an ordinal type.
 
 # Future work
 
