@@ -13,6 +13,10 @@
 #include <string>
 #include <vector>
 
+#if __cplusplus > 201402L && defined __clang__
+#include <string_view>
+#endif
+
 #include <boost/detail/lightweight_test.hpp>
 
 struct X {
@@ -769,6 +773,17 @@ int main()
   {
     BOOST_TEST(0 ==overload(function_with_cv_q{})(1));
   }
+#if 1
+  // This couldn't work as it is ambiguous:(
+  {
+    const auto ol = std::experimental::overload(
+                    pitti98::Foo()
+          , pitti98::Bar()
+        );
+
+    ol(pitti98::X());
+  }
+#endif
 #if 0
   // This couldn't work as it is ambiguous:(
   {
@@ -867,6 +882,41 @@ int main()
     f(1.0f);
 
   }
+#if __cplusplus > 201402L && defined __clang__
+  {
+      struct A {
+          int operator()(std::string const&) {
+              return 1;
+          }
+      };
+      struct B {
+          int operator()(std::string_view) {
+              return 2;
+          }
+      };
+      A a; B b;
+      std::string s;
+
+      auto f = overload(a, b);
+      BOOST_TEST(f(s) == 1);
+
+#if 0
+      auto g = overload(a, std::ref(b));
+      // compile fail as ambiguous
+      BOOST_TEST(g(s) == 1);
+#endif
+#if 0
+      auto h = overload(std::ref(a), b);
+      // compile fail as ambiguous
+      BOOST_TEST(h(s) == 1);
+#endif
+#if 1
+      auto q = overload(std::ref(a), std::ref(b));
+      // compile fail as ambiguous
+      BOOST_TEST(q(s) == 1);
+#endif
+  }
+#endif
   return boost::report_errors();
 }
 #else
