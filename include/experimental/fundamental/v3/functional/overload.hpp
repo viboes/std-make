@@ -63,55 +63,37 @@ namespace detail
       /* Function version */
       /* Ignoring ellipsis, there is no way to wrap it */
 
-      template<typename R, typename... Args>
-      struct wrap_call<R(*)(Args...)>
+      template<typename FunctionType, typename R, typename... Args>
+      struct non_member_function_wrapper
       {
-          using type = R(*)(Args...);
+          using type = FunctionType;
           type f;
 
-          constexpr wrap_call(type fct) : f(fct) {}
+          constexpr non_member_function_wrapper(type fct) : f(fct) {}
 
           JASEL_CONSTEXPR_CWG_1581 auto operator()(Args... args) const
           JASEL_NOEXCEPT_DECLTYPE_RETURN( f(forward<Args>(args)...) )
 
       };
-      template<typename R, typename... Args>
-      struct wrap_call<R(&)(Args...)>
-      {
-          using type = R(&)(Args...);
-          type f;
 
-          constexpr wrap_call(type fct) : f(fct) {}
+    #define WRAP_CALL_FOR_NON_MEMBER_FUNCTION(ptr_or_ref, noexcept_qual) \
+     template<typename R, typename... Args> \
+     struct wrap_call<R (ptr_or_ref)(Args...) noexcept_qual>  \
+        : non_member_function_wrapper<R (ptr_or_ref)(Args...) noexcept_qual, R, Args...> \
+     {  \
+         using base = non_member_function_wrapper<R (ptr_or_ref)(Args...) noexcept_qual, R, Args...>; \
+         using base::base; \
+     }
 
-          JASEL_CONSTEXPR_CWG_1581 auto operator()(Args... args) const
-          JASEL_NOEXCEPT_DECLTYPE_RETURN( f(forward<Args>(args)...) )
-      };
 
+      WRAP_CALL_FOR_NON_MEMBER_FUNCTION(*,);
+      WRAP_CALL_FOR_NON_MEMBER_FUNCTION(&,);
 #if __cplusplus > 201402L && defined __clang__
-      template<typename R, typename... Args>
-      struct wrap_call<R(*)(Args...) noexcept>
-      {
-          using type = R(*)(Args...);
-          type f;
-
-          constexpr wrap_call(type fct) : f(fct) {}
-
-          JASEL_CONSTEXPR_CWG_1581 auto operator()(Args... args) const
-          JASEL_NOEXCEPT_DECLTYPE_RETURN( f(forward<Args>(args)...) )
-
-      };
-      template<typename R, typename... Args>
-      struct wrap_call<R(&)(Args...) noexcept>
-      {
-          using type = R(&)(Args...);
-          type f;
-
-          constexpr wrap_call(type fct) : f(fct) {}
-
-          JASEL_CONSTEXPR_CWG_1581 auto operator()(Args... args) const
-          JASEL_NOEXCEPT_DECLTYPE_RETURN( f(forward<Args>(args)...) )
-      };
+      WRAP_CALL_FOR_NON_MEMBER_FUNCTION(*, noexcept);
+      WRAP_CALL_FOR_NON_MEMBER_FUNCTION(&, noexcept);
 #endif
+
+#undef WRAP_CALL_FOR_NON_MEMBER_FUNCTION
 
       template<typename PointerType, typename Clazz, typename R, typename... Args>
       struct function_member_wrapper
@@ -189,7 +171,44 @@ namespace detail
 
       #undef WRAP_CALL_FOR_MEMBER_FUNCTION
 
-      // todo: Add for data memeber
+      template<typename PointerType, typename Clazz, typename R>
+      struct data_member_wrapper
+      {
+          using type = PointerType;
+          type f;
+
+          constexpr data_member_wrapper(type fct) : f(fct) {}
+
+          template<typename U,
+                   enable_if_t<is_same<Clazz, decay_t<U>>::value
+                                 , bool> = true>
+          JASEL_CONSTEXPR_CWG_1581 auto operator()(U&& obj) const
+          JASEL_NOEXCEPT_DECLTYPE_RETURN( forward<U>(obj).*f )
+
+          template<typename U>
+          JASEL_CONSTEXPR_CWG_1581 auto operator()(reference_wrapper<U> ref) const
+          JASEL_NOEXCEPT_DECLTYPE_RETURN( ref.get().*f )
+
+          template<typename U,
+                   enable_if_t<!is_same<Clazz, decay_t<U>>::value
+                                 , bool> = true>
+          JASEL_CONSTEXPR_CWG_1581 auto operator()(U&& ptr) const
+          JASEL_NOEXCEPT_DECLTYPE_RETURN( (*forward<U>(ptr)).*f )
+
+      };
+
+      #define WRAP_CALL_FOR_DATA_MEMBER() \
+      template<typename C, typename R> \
+      struct wrap_call<R C::*>  \
+         : data_member_wrapper<R C::*, C, R> \
+      {  \
+          using base = data_member_wrapper<R C::*, C, R>; \
+          using base::base; \
+      }
+
+      WRAP_CALL_FOR_DATA_MEMBER();
+
+#undef WRAP_CALL_FOR_DATA_MEMBER
 
       // If F is not final class make it direct base of the overload, otherwise wrap in into a call.
       // Notice that both F and wrap_call<F> will be constructible from same object (perfect forwarding constructor)
