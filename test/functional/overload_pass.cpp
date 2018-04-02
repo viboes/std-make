@@ -12,12 +12,113 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <functional>
 
 #if __cplusplus > 201402L && defined __clang__
 #include <string_view>
 #endif
 
+#if __cplusplus > 201402L && defined __clang__
+
+// perfect forwarding call wrapper for reference_wrapper
+
+namespace stdex {
+
+
+    template <class Tp>
+    class reference_wrapper
+    {
+    public:
+        // types
+        typedef Tp type;
+    private:
+        type* f_;
+
+    public:
+        // construct/copy/destroy
+         reference_wrapper(type& f) noexcept
+            : f_(std::addressof(f)) {}
+        private:
+         reference_wrapper(type&&);
+        public: // = delete; // do not bind to temps
+
+        // access
+         operator type&    () const noexcept {return *f_;}
+                  type& get() const noexcept {return *f_;}
+
+        // invoke
+        template <class... ArgTypes>
+        auto
+        operator() (ArgTypes&&... args) const & {
+          return std::invoke(get(), std::forward<ArgTypes>(args)...);
+        }
+        template <class... ArgTypes>
+        auto
+        operator() (ArgTypes&&... args) & {
+          return std::invoke(get(), std::forward<ArgTypes>(args)...);
+        }
+        template <class... ArgTypes>
+        auto
+        operator() (ArgTypes&&... args) const && {
+          return std::invoke(std::move(get()), std::forward<ArgTypes>(args)...);
+        }
+        template <class... ArgTypes>
+        auto
+        operator() (ArgTypes&&... args) && {
+            return std::invoke(std::move(get()), std::forward<ArgTypes>(args)...);
+        }
+
+    };
+
+
+    template <class Tp>
+    inline
+    reference_wrapper<Tp>
+    ref(Tp& t) noexcept
+    {
+        return reference_wrapper<Tp>(t);
+    }
+
+    template <class Tp>
+    inline
+    reference_wrapper<Tp>
+    ref(reference_wrapper<Tp> t) noexcept
+    {
+        return ref(t.get());
+    }
+
+    template <class Tp>
+    inline
+    reference_wrapper<const Tp>
+    cref(const Tp& t) noexcept
+    {
+        return reference_wrapper<const Tp>(t);
+    }
+
+    template <class Tp>
+    inline
+    reference_wrapper<const Tp>
+    cref(reference_wrapper<Tp> t) noexcept
+    {
+        return cref(t.get());
+    }
+
+    template <class Tp> void ref(const Tp&&) = delete;
+    template <class Tp> void cref(const Tp&&) = delete;
+
+    }
+
+#endif
+
+
 #include <boost/detail/lightweight_test.hpp>
+
+#if __cplusplus >= 201402L
+template <class ... Args, class F>
+auto lambda(F &f) {
+    return [&f](Args ... args) { return f(args...); };
+}
+#endif
 
 struct X {
   X& f(char) {
@@ -890,7 +991,7 @@ int main()
           }
       };
       struct B {
-          int operator()(std::string_view) {
+          int operator()(std::string_view)  {
               return 2;
           }
       };
@@ -910,11 +1011,187 @@ int main()
       // compile fail as ambiguous
       BOOST_TEST(h(s) == 1);
 #endif
-#if 1
+#if 0
       auto q = overload(std::ref(a), std::ref(b));
       // compile fail as ambiguous
       BOOST_TEST(q(s) == 1);
 #endif
+  }
+  {
+      struct A {
+          int operator()(std::string const&) {
+              return 1;
+          }
+      };
+      struct B {
+          int operator()(std::string_view)  {
+              return 2;
+          }
+      };
+      A a; B b;
+      std::string s;
+
+      auto f = overload(a, b);
+      BOOST_TEST(f(s) == 1);
+
+      auto g = overload(a, stdex::ref(b));
+      BOOST_TEST(g(s) == 2); // ups, why the overloaded function changed?
+
+      auto h = overload(stdex::ref(a), b);
+      BOOST_TEST(h(s) == 1);
+#if 0
+      auto q = overload(stdex::ref(a), stdex::ref(b));
+      // compile fail as ambiguous
+      BOOST_TEST(q(s) == 1);
+#endif
+  }
+  {
+      struct A {
+          int operator()(std::string const&) const  {
+              return 1;
+          }
+      };
+      struct B {
+          int operator()(std::string_view) const   {
+              return 2;
+          }
+      };
+      A a; B b;
+      std::string s;
+
+      auto f = overload(a, b);
+      BOOST_TEST(f(s) == 1);
+
+      auto g = overload(a, std::ref(b));
+      BOOST_TEST(g(s) == 2);  // ups, why the overloaded function changed?
+
+      auto h = overload(std::ref(a), b);
+      BOOST_TEST(h(s) == 1);
+
+#if 0
+      auto q = overload(std::ref(a), std::ref(b));
+      // compile fail as ambiguous
+      BOOST_TEST(q(s) == 1);
+#endif
+  }
+  {
+      struct A {
+          int operator()(std::string const&) const  {
+              return 1;
+          }
+      };
+      struct B {
+          int operator()(std::string_view) const   {
+              return 2;
+          }
+      };
+      A a; B b;
+      std::string s;
+
+      auto f = overload(a, b);
+      BOOST_TEST(f(s) == 1);
+
+      auto g = overload(a, stdex::ref(b));
+      BOOST_TEST(g(s) == 2);  // ups, why the overloaded function changed?
+
+      auto h = overload(stdex::ref(a), b);
+      BOOST_TEST(h(s) == 1);
+
+#if 0
+      auto q = overload(stdex::ref(a), stdex::ref(b));
+      // compile fail as ambiguous
+      BOOST_TEST(q(s) == 1);
+#endif
+  }
+  {
+      struct A {
+          int operator()(std::string const&) const  {
+              return 1;
+          }
+      };
+      struct B {
+          int operator()(std::string_view) const   {
+              return 2;
+          }
+      };
+      A a; B b;
+      std::string s;
+
+      auto f = overload(a, b);
+      BOOST_TEST(f(s) == 1);
+
+      auto g = overload(a, lambda<std::string_view>(b));
+      BOOST_TEST(g(s) == 1);
+
+      auto h = overload(lambda<std::string const&>(a), b);
+      BOOST_TEST(h(s) == 1);
+
+      auto q = overload(lambda<std::string const&>(a), lambda<std::string_view>(b));
+      BOOST_TEST(q(s) == 1);
+  }
+  {
+      auto a = [](std::string const&) mutable  {
+          return 1;
+      };
+      auto b = [](std::string_view) mutable {
+          return 2;
+      };
+      std::string s;
+
+      auto f = overload(a, b);
+      BOOST_TEST(f(s) == 1);
+
+#if 0
+      auto g = overload(a, std::ref(b));
+      BOOST_TEST(g(s) == 2);  // ups, why the overloaded function changed?
+#endif
+#if 0
+      auto h = overload(std::ref(a), b);
+      BOOST_TEST(h(s) == 1);
+#endif
+#if 0
+      auto q = overload(std::ref(a), std::ref(b));
+      // compile fail as ambiguous
+      BOOST_TEST(q(s) == 1);
+#endif
+  }
+  {
+      auto a = [](std::string const&)   {
+          return 1;
+      };
+      auto b = [](std::string_view) {
+          return 2;
+      };
+      std::string s;
+
+      auto f = overload(a, b);
+      BOOST_TEST(f(s) == 1);
+
+      auto g = overload(a, std::ref(b));
+      BOOST_TEST(g(s) == 2);  // ups, why the overloaded function changed?
+
+      auto h = overload(std::ref(a), b);
+      BOOST_TEST(h(s) == 1);
+
+#if 0
+      auto q = overload(std::ref(a), std::ref(b));
+      // compile fail as ambiguous
+      BOOST_TEST(q(s) == 1);
+#endif
+  }
+  {
+      std::string s;
+
+      auto f = overload(
+          [](std::string const&) {
+              return 1;
+          },
+          [](std::string_view) {
+              return 2;
+          }
+      );
+      BOOST_TEST(f(s) == 1);
+
   }
 #endif
   return boost::report_errors();
