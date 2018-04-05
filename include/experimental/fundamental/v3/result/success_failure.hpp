@@ -7,11 +7,16 @@
 #define JASEL_EXPERIMENTAL_V3_RESULT_SUCCESS_FAILURE_HPP
 
 #include <experimental/fundamental/v2/config.hpp>
+#if 0
 #include <experimental/fundamental/v3/result/immutable_wrapper.hpp>
+#endif
 #include <experimental/fundamental/v3/result/helpers_detail.hpp>
 #include <experimental/fundamental/v3/config/requires.hpp>
 #include <type_traits>
 #include <utility>
+#if __cplusplus <= 201402L || ! defined __clang__
+#include <experimental/fundamental/v3/in_place.hpp>
+#endif
 
 namespace std
 {
@@ -162,8 +167,8 @@ constexpr bool operator!=(const success<E1>& x, const success<E2>& y)
 }
 
 template <>
-struct success<void> {
-
+struct success<void>
+{
     constexpr success() = default;
     constexpr success(success const& e) = default;
     constexpr success(success&& e) = default;
@@ -293,19 +298,50 @@ constexpr bool operator!=(const failure<E1>& x, const failure<E2>& y)
     return x.value != y.value;
 }
 
-
-template <class E>
-failure<typename std::decay<E>::type> make_failure(E&& error)
+template <>
+struct failure<void>
 {
-    return failure<typename std::decay<E>::type>(std::forward<E>(error));
+
+    constexpr failure() = default;
+    constexpr failure(failure const& e) = default;
+    constexpr failure(failure&& e) = default;
+    JASEL_CXX14_CONSTEXPR failure& operator=(failure const& e) = default;
+    JASEL_CXX14_CONSTEXPR failure& operator=(failure&& e) = default;
+
+    template <class U>
+    using rebind = failure<U>;
+};
+
+inline constexpr bool operator==(const failure<void>& x, const failure<void>& y)
+{
+  return true;
+}
+inline constexpr bool operator!=(const failure<void>& x, const failure<void>& y)
+{
+  return false;
+}
+
+template <class T>
+failure<typename std::decay<T>::type> make_failure(T&& value)
+{
+    return failure<typename std::decay<T>::type>(std::forward<T>(value));
+}
+
+
+inline failure<void> make_failure()
+{
+    return failure<void>();
 }
 #endif
 
+// CTAD
 #if __cplusplus > 201402L && defined __clang__
 template <class T>
 explicit success(T a) -> success<T>;
+explicit success() -> success<void>;
 template <class T>
 explicit failure(T a) -> failure<T>;
+explicit failure() -> failure<void>;
 #endif
 
 }

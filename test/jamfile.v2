@@ -57,11 +57,16 @@ test-suite std_optional
       [ run make/make_std_optional_pass.cpp  ]
     ;
 
+test-suite stdex_expected
+    : 
+      [ run expected2/trivial_unexpected_pass.cpp  ]
+      [ run expected2/trivial_expected_pass.cpp  ]
+    ;
+
 test-suite std_result
     : 
       [ run result/success_failure_pass.cpp  ]
       [ run result/trivial_result_pass.cpp  ]
-      [ run result/trivial_expected_pass.cpp  ]
     ;
 
 test-suite std_expected

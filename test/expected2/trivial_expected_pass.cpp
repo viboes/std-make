@@ -71,7 +71,7 @@ stdex::expected<int, short> f(int v, int w) {
     if (w != 0)
         return stdex::make_success(v/w);
     else
-        return stdex::make_failure(-1);
+        return stdex::make_unexpected(-1);
 }
 
 int main()
@@ -96,7 +96,7 @@ int main()
         stdex::expected<int, short> res = stdex::make_success(1);
         BOOST_TEST(res.has_value());
         BOOST_TEST(res.value() == 1);
-        //res = stdex::make_failure(-1);
+        //res = stdex::make_unexpected(-1);
     }
     {
         stdex::expected<short, int> res = stdex::make_success(1);
@@ -107,12 +107,14 @@ int main()
         //stdex::expected<void, short> res; // compile fails as expected
     }
     {
-        stdex::expected<void, short> res = stdex::success<void>();
+        stdex::expected<void, short> res;
         BOOST_TEST(res.has_value());
     }
     {
-        stdex::expected<void, short> res = stdex::make_success();
+        stdex::expected<std::pair<int, short>, short> res {std::in_place_type<std::pair<int, short>>, 1, 2};
         BOOST_TEST(res.has_value());
+        BOOST_TEST(res.value().first == 1);
+        BOOST_TEST(res.value().second == 2);
     }
     {
         stdex::expected<std::pair<int, short>, short> res {std::in_place_type<stdex::success<std::pair<int, short>>>, std::in_place, 1, 2};
@@ -121,13 +123,13 @@ int main()
         BOOST_TEST(res.value().second == 2);
     }
     {
-        stdex::expected<std::pair<int, short>, short> res {std::in_place_type<stdex::failure<short>>, std::in_place, 1};
+        stdex::expected<std::pair<int, short>, short> res {std::in_place_type<stdex::unexpected<short>>, std::in_place, 1};
         BOOST_TEST(! res.has_value());
         BOOST_TEST(res.error() == 1);
     }
 
     {
-        stdex::expected<void, short> res = stdex::make_failure(-1);
+        stdex::expected<void, short> res = stdex::make_unexpected(-1);
         BOOST_TEST(! res.has_value());
         BOOST_TEST( res.error() == -1);
     }
@@ -159,23 +161,23 @@ int main()
         BOOST_TEST( *res2.value() == 1 );
     }
     {
-        stdex::expected<std::unique_ptr<int>, int> res = stdex::make_failure(1);
+        stdex::expected<std::unique_ptr<int>, int> res = stdex::make_unexpected(1);
         stdex::expected<std::unique_ptr<int>, int> res2 { std::move(res) };
         BOOST_TEST( ! res2.has_value() );
     }
     {
         std::vector<stdex::expected<std::string, int>> vec;
-        vec.push_back(stdex::make_failure(1));
+        vec.push_back(stdex::make_unexpected(1));
         vec.push_back(stdex::make_success(std::string("a")));
-        vec.push_back(stdex::make_failure(3));
+        vec.push_back(stdex::make_unexpected(3));
         for (auto r : vec)
         {
             if( r.has_value())
                 std::cout << "success: " << r.value() << std::endl;
             else
-                std::cout << "failure: " << r.error() << std::endl;
+                std::cout << "unexpected: " << r.error() << std::endl;
         }
-        //vec[1] = stdex::make_failure(2); // this is a limitation of expected as it is not assignable.
+        //vec[1] = stdex::make_unexpected(2); // this is a limitation of expected as it is not assignable.
     }
     {
         stdex::expected<int, short> x = stdex::make_success(1);
@@ -188,23 +190,23 @@ int main()
         BOOST_TEST(x != y);
     }
     {
-        stdex::expected<int, short> x = stdex::make_failure(1);
-        stdex::expected<int, short> y = stdex::make_failure(1);
+        stdex::expected<int, short> x = stdex::make_unexpected(1);
+        stdex::expected<int, short> y = stdex::make_unexpected(1);
         BOOST_TEST(x == y);
     }
     {
-        stdex::expected<int, short> x = stdex::make_failure(1);
-        stdex::expected<int, short> y = stdex::make_failure(2);
+        stdex::expected<int, short> x = stdex::make_unexpected(1);
+        stdex::expected<int, short> y = stdex::make_unexpected(2);
         BOOST_TEST(x != y);
     }
     {
         stdex::expected<int, short> x = stdex::make_success(1);
-        stdex::expected<int, short> y = stdex::make_failure(2);
+        stdex::expected<int, short> y = stdex::make_unexpected(2);
         BOOST_TEST(x != y);
     }
     {
         stdex::expected<int, short> x = stdex::make_success(1);
-        stdex::expected<int, short> y = stdex::make_failure(2);
+        stdex::expected<int, short> y = stdex::make_unexpected(2);
         BOOST_TEST(y != x);
     }
     {
@@ -225,34 +227,34 @@ int main()
     }
     {
         stdex::expected<int, short> x = stdex::make_success(1);
-        BOOST_TEST(x != stdex::make_failure(2));
+        BOOST_TEST(x != stdex::make_unexpected(2));
     }
     {
         stdex::expected<int, short> x = stdex::make_success(1);
-        BOOST_TEST(stdex::make_failure(2) != x);
+        BOOST_TEST(stdex::make_unexpected(2) != x);
     }
     {
-        stdex::expected<int, short> x = stdex::make_failure(1);
-        BOOST_TEST(x == stdex::make_failure(1));
+        stdex::expected<int, short> x = stdex::make_unexpected(1);
+        BOOST_TEST(x == stdex::make_unexpected(1));
     }
     {
-        stdex::expected<int, short> x = stdex::make_failure(1);
-        BOOST_TEST(stdex::make_failure(1) == x);
+        stdex::expected<int, short> x = stdex::make_unexpected(1);
+        BOOST_TEST(stdex::make_unexpected(1) == x);
     }
     {
-        stdex::expected<int, short> x = stdex::make_failure(1);
-        BOOST_TEST(x != stdex::make_failure(2));
+        stdex::expected<int, short> x = stdex::make_unexpected(1);
+        BOOST_TEST(x != stdex::make_unexpected(2));
     }
     {
-        stdex::expected<int, short> x = stdex::make_failure(1);
-        BOOST_TEST(stdex::make_failure(2) != x);
+        stdex::expected<int, short> x = stdex::make_unexpected(1);
+        BOOST_TEST(stdex::make_unexpected(2) != x);
     }
     {
-        stdex::expected<int, short> x = stdex::make_failure(1);
+        stdex::expected<int, short> x = stdex::make_unexpected(1);
         BOOST_TEST(x != stdex::make_success(2));
     }
     {
-        stdex::expected<int, short> x = stdex::make_failure(1);
+        stdex::expected<int, short> x = stdex::make_unexpected(1);
         BOOST_TEST(stdex::make_success(2) != x);
     }
     {
@@ -267,7 +269,7 @@ int main()
         BOOST_TEST(x == y);
     }
     {
-        stdex::expected<void, short> x = stdex::make_failure(1);
+        stdex::expected<void, short> x = stdex::make_unexpected(1);
         stdex::expected<void, int> y = x;
         BOOST_TEST(x == y);
     }
@@ -277,7 +279,7 @@ int main()
         BOOST_TEST(x == y);
     }
     {
-        stdex::expected<short, short> x = stdex::make_failure(1);
+        stdex::expected<short, short> x = stdex::make_unexpected(1);
         stdex::expected<int, int> y = x;
         BOOST_TEST(x == y);
     }
@@ -290,18 +292,18 @@ int main()
     }
     {
         stdex::expected<int, short> x = stdex::make_success(1);
-        stdex::expected<int, short> y = stdex::make_failure(2);
+        stdex::expected<int, short> y = stdex::make_unexpected(2);
         x = y;
         BOOST_TEST(x == y);
     }
     {
-        stdex::expected<int, short> x = stdex::make_failure(1);
-        stdex::expected<int, short> y = stdex::make_failure(2);
+        stdex::expected<int, short> x = stdex::make_unexpected(1);
+        stdex::expected<int, short> y = stdex::make_unexpected(2);
         x = y;
         BOOST_TEST(x == y);
     }
     {
-        stdex::expected<int, short> x = stdex::make_failure(1);
+        stdex::expected<int, short> x = stdex::make_unexpected(1);
         stdex::expected<int, short> y = stdex::make_success(2);
         x = y;
         BOOST_TEST(x == y);
@@ -314,18 +316,18 @@ int main()
     }
     {
         stdex::expected<void, short> x = stdex::make_success();
-        stdex::expected<void, short> y = stdex::make_failure(2);
+        stdex::expected<void, short> y = stdex::make_unexpected(2);
         x = y;
         BOOST_TEST(x == y);
     }
     {
-        stdex::expected<void, short> x = stdex::make_failure(1);
-        stdex::expected<void, short> y = stdex::make_failure(2);
+        stdex::expected<void, short> x = stdex::make_unexpected(1);
+        stdex::expected<void, short> y = stdex::make_unexpected(2);
         x = y;
         BOOST_TEST(x == y);
     }
     {
-        stdex::expected<void, short> x = stdex::make_failure(1);
+        stdex::expected<void, short> x = stdex::make_unexpected(1);
         stdex::expected<void, short> y = stdex::make_success();
         x = y;
         BOOST_TEST(x == y);
@@ -356,18 +358,18 @@ int main()
     }
     {
         stdex::expected<std::string, short> x = stdex::make_success("1");
-        stdex::expected<std::string, short> y = stdex::make_failure(2);
+        stdex::expected<std::string, short> y = stdex::make_unexpected(2);
         x = y;
         BOOST_TEST(x == y);
     }
     {
-        stdex::expected<std::string, short> x = stdex::make_failure(1);
-        stdex::expected<std::string, short> y = stdex::make_failure(2);
+        stdex::expected<std::string, short> x = stdex::make_unexpected(1);
+        stdex::expected<std::string, short> y = stdex::make_unexpected(2);
         x = y;
         BOOST_TEST(x == y);
     }
     {
-        stdex::expected<std::string, short> x = stdex::make_failure(1);
+        stdex::expected<std::string, short> x = stdex::make_unexpected(1);
         stdex::expected<std::string, short> y = stdex::make_success("2");
         x = y;
         BOOST_TEST(x == y);
@@ -381,7 +383,7 @@ int main()
         BOOST_TEST(x.value() == "2");
     }
     {
-        stdex::expected<std::string, short> x = stdex::make_failure(1);
+        stdex::expected<std::string, short> x = stdex::make_unexpected(1);
         stdex::expected<std::string, short> y = stdex::make_success("2");
         x = std::move(y);
         BOOST_TEST(x.has_value());
@@ -390,15 +392,15 @@ int main()
     }
     {
         stdex::expected<std::string, short> x = stdex::make_success("1");
-        stdex::expected<std::string, short> y = stdex::make_failure(2);
+        stdex::expected<std::string, short> y = stdex::make_unexpected(2);
         x = std::move(y);
         BOOST_TEST(!x.has_value());
         BOOST_TEST(!y.has_value());
         BOOST_TEST(x.error() == 2);
     }
     {
-        stdex::expected<std::string, short> x = stdex::make_failure(1);
-        stdex::expected<std::string, short> y = stdex::make_failure(2);
+        stdex::expected<std::string, short> x = stdex::make_unexpected(1);
+        stdex::expected<std::string, short> y = stdex::make_unexpected(2);
         x = std::move(y);
         BOOST_TEST(!x.has_value());
         BOOST_TEST(!y.has_value());
@@ -422,7 +424,7 @@ int main()
         BOOST_TEST(*x.value() == 2);
     }
     {
-        stdex::expected<std::unique_ptr<int>, short> x = stdex::make_failure(1);
+        stdex::expected<std::unique_ptr<int>, short> x = stdex::make_unexpected(1);
         stdex::expected<std::unique_ptr<int>, short> y = stdex::make_success(std::make_unique<int>(2));
         x = std::move(y);
         BOOST_TEST(x.has_value());
@@ -433,7 +435,7 @@ int main()
     }
     {
         stdex::expected<std::unique_ptr<int>, short> x = stdex::make_success(std::make_unique<int>(1));
-        stdex::expected<std::unique_ptr<int>, short> y = stdex::make_failure(2);
+        stdex::expected<std::unique_ptr<int>, short> y = stdex::make_unexpected(2);
         x = std::move(y);
         BOOST_TEST(!x.has_value());
         BOOST_TEST(!y.has_value());
@@ -441,8 +443,8 @@ int main()
         BOOST_TEST(y.error() == 2);
     }
     {
-        stdex::expected<std::unique_ptr<int>, short> x = stdex::make_failure(1);
-        stdex::expected<std::unique_ptr<int>, short> y = stdex::make_failure(2);
+        stdex::expected<std::unique_ptr<int>, short> x = stdex::make_unexpected(1);
+        stdex::expected<std::unique_ptr<int>, short> y = stdex::make_unexpected(2);
         x = std::move(y);
         BOOST_TEST(!x.has_value());
         BOOST_TEST(!y.has_value());
@@ -458,8 +460,8 @@ int main()
         BOOST_TEST(y.value() == 1);
     }
     {
-        stdex::expected<int, int> x = stdex::make_failure(1);
-        stdex::expected<int, int> y = stdex::make_failure(2);
+        stdex::expected<int, int> x = stdex::make_unexpected(1);
+        stdex::expected<int, int> y = stdex::make_unexpected(2);
         using std::swap;
         swap(x, y);
         BOOST_TEST(x.error() == 2);
@@ -467,14 +469,14 @@ int main()
     }
     {
         stdex::expected<int, int> x = stdex::make_success(1);
-        stdex::expected<int, int> y = stdex::make_failure(2);
+        stdex::expected<int, int> y = stdex::make_unexpected(2);
         using std::swap;
         swap(x, y);
         BOOST_TEST(x.error() == 2);
         BOOST_TEST(y.value() == 1);
     }
     {
-        stdex::expected<int, int> x = stdex::make_failure(1);
+        stdex::expected<int, int> x = stdex::make_unexpected(1);
         stdex::expected<int, int> y = stdex::make_success(2);
         using std::swap;
         swap(x, y);
@@ -482,7 +484,7 @@ int main()
         BOOST_TEST(y.error() == 1);
     }
     {
-        stdex::expected<int, int> x = stdex::make_failure(1);
+        stdex::expected<int, int> x = stdex::make_unexpected(1);
         stdex::expected<int, int> y = stdex::make_success(2);
         using std::swap;
         swap(x, y);
@@ -490,40 +492,22 @@ int main()
         BOOST_TEST(y.error() == 1);
     }
 
-    {
-        // fixme: This should fail
-        stdex::success<NoDefaultConstructible> x = stdex::make_success(NoDefaultConstructible(2));
-        (void)x;
-    }
-#if 0
-    {
-        stdex::expected<NoDefaultConstructible, int> x = stdex::make_success(NoDefaultConstructible(2)); // compile fails as expected
-    }
 
-#endif
-    {
-        try {
-            stdex::success<ThrowConstructibleAndMovable> x = stdex::make_success(ThrowConstructibleAndMovable(1));
-            (void)x;
-            BOOST_TEST(false);
-        } catch(...) {
-        }
-    }
 #if 0
     {
         stdex::expected<ThrowConstructibleAndMovable, ThrowConstructibleAndMovable> x = stdex::make_success(ThrowConstructibleAndMovable(2));
-        stdex::expected<ThrowConstructibleAndMovable, ThrowConstructibleAndMovable> y = stdex::make_failure(ThrowConstructibleAndMovable(2));
+        stdex::expected<ThrowConstructibleAndMovable, ThrowConstructibleAndMovable> y = stdex::make_unexpected(ThrowConstructibleAndMovable(2));
         x = y; // compile fails as expected
     }
 #endif
     {
-        stdex::expected<ThrowConstructibleAndMovable, int> x { stdex::make_failure(1) };
+        stdex::expected<ThrowConstructibleAndMovable, int> x { stdex::make_unexpected(1) };
         stdex::expected<ThrowConstructibleAndMovable, int> y = stdex::make_success(ThrowConstructibleAndMovable(2));
         x = y;
         BOOST_TEST( x == y );
     }
     {
-        stdex::expected<ThrowConstructibleAndMovable, int> x = stdex::make_failure(1) ;
+        stdex::expected<ThrowConstructibleAndMovable, int> x = stdex::make_unexpected(1) ;
         stdex::expected<ThrowConstructibleAndMovable, int> y = stdex::make_success(ThrowConstructibleAndMovable(2)) ;
         y.value().value = 3;
         try {
@@ -540,14 +524,14 @@ int main()
     }
     {
         stdex::expected<ThrowConstructibleAndMovable, int> x = stdex::make_success(ThrowConstructibleAndMovable(2)) ;
-        stdex::expected<ThrowConstructibleAndMovable, int> y = stdex::make_failure(1) ;
+        stdex::expected<ThrowConstructibleAndMovable, int> y = stdex::make_unexpected(1) ;
         x.value().value = 3;
         x = y;
         BOOST_TEST( x == y );
     }
     {
         stdex::expected<int, ThrowConstructibleAndMovable> x = stdex::make_success(1) ;
-        stdex::expected<int, ThrowConstructibleAndMovable> y = stdex::make_failure(ThrowConstructibleAndMovable(2)) ;
+        stdex::expected<int, ThrowConstructibleAndMovable> y = stdex::make_unexpected(ThrowConstructibleAndMovable(2)) ;
         y.error().value = 3;
         try {
             x = y;
@@ -562,7 +546,7 @@ int main()
         BOOST_TEST(y.error().value == 3);
     }
     {
-        stdex::expected<ThrowConstructibleAndMovable, int> x { stdex::make_failure(1) };
+        stdex::expected<ThrowConstructibleAndMovable, int> x { stdex::make_unexpected(1) };
         stdex::expected<ThrowConstructibleAndMovable, int> y = stdex::make_success(ThrowConstructibleAndMovable(2));
         using std::swap;
         swap(x, y);
@@ -572,7 +556,7 @@ int main()
         BOOST_TEST(y.error() == 1);
     }
     {
-        stdex::expected<ThrowConstructibleAndMovable, int> x { stdex::make_failure(1) };
+        stdex::expected<ThrowConstructibleAndMovable, int> x { stdex::make_unexpected(1) };
         stdex::expected<ThrowConstructibleAndMovable, int> y {stdex::make_success(ThrowConstructibleAndMovable(2)) };
         y.value().value = 3;
         try {

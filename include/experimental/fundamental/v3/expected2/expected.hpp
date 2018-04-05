@@ -25,6 +25,11 @@
 #include <experimental/meta/v1/uncvref.hpp>
 #include <type_traits>
 #include <utility>
+#if __cplusplus <= 201402L || ! defined __clang__
+#include <experimental/fundamental/v3/in_place.hpp>
+#endif
+#include <experimental/fundamental/v3/expected2/unexpected.hpp>
+
 #include <memory>
 #include <cassert>
 
@@ -46,7 +51,7 @@ struct expected_destruct_base<T, E, false>
     typedef T value_type;
     typedef success<T> success_type;
     typedef E error_type;
-    typedef failure<E> failure_type;
+    typedef unexpected<E> failure_type;
 
     struct dummy{};
     union
@@ -82,13 +87,14 @@ struct expected_destruct_base<T, E, false>
         :  _success(in_place, std::forward<Args>(args)...),
            _has_value(true) {}
     template <class... Args>
-    constexpr explicit expected_destruct_base(in_place_type_t<success<T>>, Args&&... args)
+    constexpr explicit expected_destruct_base(in_place_type_t<success_type>, Args&&... args)
         :  _success(std::forward<Args>(args)...),
            _has_value(true) {}
     template <class... Args>
-    constexpr explicit expected_destruct_base(in_place_type_t<failure<E>>, Args&&... args)
+    constexpr explicit expected_destruct_base(in_place_type_t<failure_type>, Args&&... args)
         :  _failure(std::forward<Args>(args)...),
            _has_value(false) {}
+
 };
 
 template <class T, class E>
@@ -97,7 +103,7 @@ struct expected_destruct_base<T, E, true>
     typedef T value_type;
     typedef success<T> success_type;
     typedef E error_type;
-    typedef failure<E> failure_type;
+    typedef unexpected<E> failure_type;
 
     struct dummy{};
 
@@ -126,13 +132,14 @@ struct expected_destruct_base<T, E, true>
         :  _success(in_place, std::forward<Args>(args)...),
            _has_value(true) {}
     template <class... Args>
-    constexpr explicit expected_destruct_base(in_place_type_t<success<T>>, Args&&... args)
+    constexpr explicit expected_destruct_base(in_place_type_t<success_type>, Args&&... args)
         :  _success(std::forward<Args>(args)...),
            _has_value(true) {}
     template <class... Args>
-    constexpr explicit expected_destruct_base(in_place_type_t<failure<E>>, Args&&... args)
+    constexpr explicit expected_destruct_base(in_place_type_t<failure_type>, Args&&... args)
         :  _failure(std::forward<Args>(args)...),
            _has_value(false) {}
+
 };
 
 
@@ -143,7 +150,7 @@ struct expected_storage_common_base: expected_destruct_base<T, E>
     typedef T value_type;
     typedef success<T> success_type;
     typedef E error_type;
-    typedef failure<E> failure_type;
+    typedef unexpected<E> failure_type;
 
     using base_type::base_type;
 
@@ -218,23 +225,23 @@ struct expected_storage_common_base: expected_destruct_base<T, E>
     }
 
     template <class... Args>
-    constexpr void construct(in_place_type_t<success<T>>, Args&&... args)
+    constexpr void construct(in_place_type_t<success_type>, Args&&... args)
     {
         ::new((void*)std::addressof(this->_success)) success_type(std::forward<Args>(args)...);
         this->_has_value = true;
     }
+
     template <class... Args>
-    constexpr void  construct(in_place_type_t<failure<E>>, Args&&... args)
+    constexpr void  construct(in_place_type_t<failure_type>, Args&&... args)
     {
         ::new((void*)std::addressof(this->_failure)) failure_type(std::forward<Args>(args)...);
         this->_has_value = false;
     }
-
-    constexpr void destroy(in_place_type_t<success<T>>)
+    constexpr void destroy(in_place_type_t<success_type>)
     {
         this->_success.~success_type();
     }
-    constexpr void  destroy(in_place_type_t<failure<E>>)
+    constexpr void  destroy(in_place_type_t<failure_type>)
     {
         this->_failure.~failure_type();
     }
@@ -243,9 +250,9 @@ struct expected_storage_common_base: expected_destruct_base<T, E>
     void construct_from(That&& other)
     {
         if (other.has_value())
-            construct(in_place_type<success<T>>, std::forward<That>(other).get_success());
+            construct(in_place_type<success_type>, std::forward<That>(other).get_success());
         else
-            construct(in_place_type<failure<E>>, std::forward<That>(other).get_failure());
+            construct(in_place_type<failure_type>, std::forward<That>(other).get_failure());
     }
 
     template <class That>
@@ -259,29 +266,29 @@ struct expected_storage_common_base: expected_destruct_base<T, E>
             } else {
                 if constexpr (is_void_v<T>)
                 {
-                    construct(in_place_type<failure<E>>, std::forward<That>(other).get_failure());
+                    construct(in_place_type<failure_type>, std::forward<That>(other).get_failure());
                 }
                 else if constexpr (is_nothrow_copy_constructible_v<E>)
                 {
-                    destroy(in_place_type<success<T>>);
-                    construct(in_place_type<failure<E>>, std::forward<That>(other).get_failure());
+                    destroy(in_place_type<success_type>);
+                    construct(in_place_type<failure_type>, std::forward<That>(other).get_failure());
                 }
                 else if constexpr (is_nothrow_move_constructible_v<E>)
                 {
                     failure_type tmp = std::forward<That>(other).get_failure();
-                    destroy(in_place_type<success<T>>);
-                    construct(in_place_type<failure<E>>, std::move(tmp));
+                    destroy(in_place_type<success_type>);
+                    construct(in_place_type<failure_type>, std::move(tmp));
                 }
                 else // is_nothrow_move_constructible_v<T>
                 {
                     success_type tmp = this->get_success();
-                    destroy(in_place_type<success<T>>);
+                    destroy(in_place_type<success_type>);
                     try {
-                        construct(in_place_type<failure<E>>, std::forward<That>(other).get_failure());
+                        construct(in_place_type<failure_type>, std::forward<That>(other).get_failure());
                     }
                     catch (...)
                     {
-                        construct(in_place_type<success<T>>, std::move(tmp));
+                        construct(in_place_type<success_type>, std::move(tmp));
                         throw;
                     }
                 }
@@ -293,30 +300,30 @@ struct expected_storage_common_base: expected_destruct_base<T, E>
             {
                 if constexpr (is_void_v<T>)
                 {
-                    destroy(in_place_type<failure<E>>);
+                    destroy(in_place_type<failure_type>);
                     this->_has_value = true;
                 }
                 else if constexpr (is_nothrow_copy_constructible_v<T>)
                 {
-                    destroy(in_place_type<failure<E>>);
-                    construct(in_place_type<success<T>>, std::forward<That>(other).get_success());
+                    destroy(in_place_type<failure_type>);
+                    construct(in_place_type<success_type>, std::forward<That>(other).get_success());
                 }
                 else if constexpr (is_nothrow_move_constructible_v<T>)
                 {
                     success_type tmp = std::forward<That>(other).get_success();
-                    destroy(in_place_type<failure<E>>);
-                    construct(in_place_type<success<T>>, std::move(tmp));
+                    destroy(in_place_type<failure_type>);
+                    construct(in_place_type<success_type>, std::move(tmp));
                 }
                 else // `is_nothrow_move_constructible_v<E>`
                 {
                     failure_type tmp = this->get_failure();
-                    destroy(in_place_type<failure<E>>);
+                    destroy(in_place_type<failure_type>);
                     try {
-                        construct(in_place_type<success<T>>, std::forward<That>(other).get_success());
+                        construct(in_place_type<success_type>, std::forward<That>(other).get_success());
                     }
                     catch (...)
                     {
-                        construct(in_place_type<failure<E>>, std::move(tmp));
+                        construct(in_place_type<failure_type>, std::move(tmp));
                         throw;
                     }
                 }
@@ -338,7 +345,7 @@ struct expected_storage_base<T, E, false>: expected_storage_common_base<T, E>
     typedef T value_type;
     typedef success<T> success_type;
     typedef E error_type;
-    typedef failure<E> failure_type;
+    typedef unexpected<E> failure_type;
 
     expected_storage_base() = default;
 
@@ -402,7 +409,7 @@ struct expected_storage_base<void, E, false>: expected_storage_common_base<void,
 template <class T, class E>
 struct expected_storage_base<T, E, true>
 {
-    //static_assert(false, "Neither T nor E cannot be reference types");
+    //static_assert(false, "Neither T nor E can be reference types");
 };
 
 template <class T, class E, bool = is_trivially_copy_constructible_or_void<T>::value && is_trivially_copy_constructible<E>::value>
@@ -558,6 +565,8 @@ class expected_base : protected expected_move_assign_base<T,E>
     using check_expected_failure_ctor = helpers_detail::check_constructible<U, QualU>;
 
 public:
+    typedef unexpected<E> failure_type;
+
     using base_type::base_type;
 
     expected_base() = default;
@@ -570,26 +579,26 @@ public:
     template < class U = E, enable_if_t<
                     check_expected_failure_ctor<U, U const&>::template enable_implicit<U>()
                 , int> = 0>
-    constexpr expected_base(failure<U> const& other) :
-    base_type(in_place_type<failure<E>>, other)
+    constexpr expected_base(unexpected<U> const& other) :
+    base_type(in_place_type<failure_type>, other)
     {}
     template < class U = E, enable_if_t<
                     check_expected_failure_ctor<U, U const&>::template enable_explicit<U>()
                 , int> = 0>
-    explicit constexpr expected_base(failure<U> const& other) :
-    base_type(in_place_type<failure<E>>, other)
+    explicit constexpr expected_base(unexpected<U> const& other) :
+    base_type(in_place_type<failure_type>, other)
     {}
     template < class U = E, enable_if_t<
                     check_expected_failure_ctor<U, U &&>::template enable_implicit<U>()
                 , int> = 0>
-    constexpr expected_base(failure<U> && other) :
-    base_type(in_place_type<failure<E>>, std::move(other))
+    constexpr expected_base(unexpected<U> && other) :
+    base_type(in_place_type<failure_type>, std::move(other))
     {}
     template < class U = E, enable_if_t<
                     check_expected_failure_ctor<U, U &&>::template enable_explicit<U>()
                 , int> = 0>
-    explicit constexpr expected_base(failure<U> && other) :
-    base_type(in_place_type<failure<E>>, std::move(other))
+    explicit constexpr expected_base(unexpected<U> && other) :
+    base_type(in_place_type<failure_type>, std::move(other))
     {}
 
     using base_type::has_value;
@@ -609,15 +618,7 @@ class expected : public expected_detail::expected_base<T, E>
     typedef T value_type;
     typedef success<T> success_type;
     typedef E error_type;
-    typedef failure<E> failure_type;
-
-//    template <class U, class G>
-//    using check_equals = conjunction<
-//      is_same<T, U>,
-//      is_same<E, G>
-//    >;
-//    template <class U, class G>
-//    using check_diffs = negation<check_equals<U,G>>;
+    typedef unexpected<E> failure_type;
 
     template <class U, class G, class Exp = expected<U, G>>
     using check_constructible_from_exp = disjunction<
@@ -630,23 +631,23 @@ class expected : public expected_detail::expected_base<T, E>
         is_convertible<Exp&&, T>,
         is_convertible<Exp const&&, T>,
 
-        is_constructible<success<T>, Exp&>,
-        is_constructible<success<T>, Exp const&>,
-        is_constructible<success<T>, Exp&&>,
-        is_constructible<success<T>, Exp const&&>,
-        is_convertible<Exp&, success<T>>,
-        is_convertible<Exp const&, success<T>>,
-        is_convertible<Exp&&, success<T>>,
-        is_convertible<Exp const&&, success<T>>,
+        is_constructible<success_type, Exp&>,
+        is_constructible<success_type, Exp const&>,
+        is_constructible<success_type, Exp&&>,
+        is_constructible<success_type, Exp const&&>,
+        is_convertible<Exp&, success_type>,
+        is_convertible<Exp const&, success_type>,
+        is_convertible<Exp&&, success_type>,
+        is_convertible<Exp const&&, success_type>,
 
-        is_constructible<failure<E>, Exp&>,
-        is_constructible<failure<E>, Exp const&>,
-        is_constructible<failure<E>, Exp&&>,
-        is_constructible<failure<E>, Exp const&&>,
-        is_convertible<Exp&, failure<E>>,
-        is_convertible<Exp const&, failure<E>>,
-        is_convertible<Exp&&, failure<E>>,
-        is_convertible<Exp const&&, failure<E>>
+        is_constructible<failure_type, Exp&>,
+        is_constructible<failure_type, Exp const&>,
+        is_constructible<failure_type, Exp&&>,
+        is_constructible<failure_type, Exp const&&>,
+        is_convertible<Exp&, failure_type>,
+        is_convertible<Exp const&, failure_type>,
+        is_convertible<Exp&&, failure_type>,
+        is_convertible<Exp const&&, failure_type>
     >;
 
     template <class U, class G, class Exp = expected<U, G>>
@@ -656,15 +657,15 @@ class expected : public expected_detail::expected_base<T, E>
         is_assignable<T&, Exp&&>,
         is_assignable<T&, Exp const&&>,
 
-        is_assignable<success<T>&, Exp&>,
-        is_assignable<success<T>&, Exp const&>,
-        is_assignable<success<T>&, Exp&&>,
-        is_assignable<success<T>&, Exp const&&>,
+        is_assignable<success_type&, Exp&>,
+        is_assignable<success_type&, Exp const&>,
+        is_assignable<success_type&, Exp&&>,
+        is_assignable<success_type&, Exp const&&>,
 
-        is_assignable<failure<E>&, Exp&>,
-        is_assignable<failure<E>&, Exp const&>,
-        is_assignable<failure<E>&, Exp&&>,
-        is_assignable<failure<E>&, Exp const&&>
+        is_assignable<failure_type&, Exp&>,
+        is_assignable<failure_type&, Exp const&>,
+        is_assignable<failure_type&, Exp&&>,
+        is_assignable<failure_type&, Exp const&&>
     >;
 
     template <class QualU>
@@ -674,8 +675,8 @@ class expected : public expected_detail::expected_base<T, E>
     using check_expected_u_ctor = typename conditional<
                     !is_same_v<meta::uncvref_t<U>, in_place_t> &&
                     !is_same_v<meta::uncvref_t<U>, in_place_type_t<T>> &&
-                    !is_same_v<meta::uncvref_t<U>, in_place_type_t<success<T>>> &&
-                    !is_same_v<meta::uncvref_t<U>, in_place_type_t<failure<E>>> &&
+                    !is_same_v<meta::uncvref_t<U>, in_place_type_t<success_type>> &&
+                    !is_same_v<meta::uncvref_t<U>, in_place_type_t<failure_type>> &&
                     !is_same_v<meta::uncvref_t<U>, expected<T, E>>,
                     helpers_detail::check_constructible<T, U>,
                     helpers_detail::check_fail
@@ -732,25 +733,25 @@ public:
                     check_expected_success_ctor<U const&>::template enable_implicit<U>()
                 , int> = 0>
     constexpr expected(success<U> const& value) :
-        base_type(in_place_type<success<T>>, value)
+        base_type(in_place_type<success_type>, value)
     {}
     template < class U = T, enable_if_t<
                     check_expected_success_ctor<U const&>::template enable_explicit<U>()
                 , int> = 0>
     explicit constexpr expected(success<U> const& value) :
-        base_type(in_place_type<success<T>>, value)
+        base_type(in_place_type<success_type>, value)
     {}
     template < class U = T, enable_if_t<
                     check_expected_success_ctor<U &&>::template enable_implicit<U>()
                 , int> = 0>
     constexpr expected(success<U> && value) :
-        base_type(in_place_type<success<T>>, std::move(value))
+        base_type(in_place_type<success_type>, std::move(value))
     {}
     template < class U = T, enable_if_t<
                     check_expected_success_ctor<U &&>::template enable_explicit<U>()
                 , int> = 0>
     explicit constexpr expected(success<U> && value) :
-        base_type(in_place_type<success<T>>, std::move(value))
+        base_type(in_place_type<success_type>, std::move(value))
     {}
 
 
@@ -823,29 +824,29 @@ public:
                 {
                     failure_type tmp = std::move(other.get_failure());
                     try {
-                        other.destroy(in_place_type<failure<E>>);
-                        other.construct(in_place_type<success<T>>, std::move(this->get_success()));
-                        this->destroy(in_place_type<success<T>>);
-                        this->construct(in_place_type<failure<E>>, std::move(tmp));
+                        other.destroy(in_place_type<failure_type>);
+                        other.construct(in_place_type<success_type>, std::move(this->get_success()));
+                        this->destroy(in_place_type<success_type>);
+                        this->construct(in_place_type<failure_type>, std::move(tmp));
                     }
                     catch (...)
                     {
-                        other.construct(in_place_type<failure<E>>, std::move(tmp));
+                        other.construct(in_place_type<failure_type>, std::move(tmp));
                         throw;
                     }
                 }
                 else //if constexpr(is_nothrow_move_constructible_v<T>)
                 {
                     success_type tmp = std::move(this->get_success());
-                    this->destroy(in_place_type<success<T>>);
+                    this->destroy(in_place_type<success_type>);
                     try {
-                        this->construct(in_place_type<failure<E>>, std::move(other.get_failure()));
-                        other.destroy(in_place_type<failure<E>>);
-                        other.construct(in_place_type<success<T>>, std::move(tmp));
+                        this->construct(in_place_type<failure_type>, std::move(other.get_failure()));
+                        other.destroy(in_place_type<failure_type>);
+                        other.construct(in_place_type<success_type>, std::move(tmp));
                     }
                     catch (...)
                     {
-                        this->construct(in_place_type<success<T>>, std::move(tmp));
+                        this->construct(in_place_type<success_type>, std::move(tmp));
                         throw;
                     }
                 }
@@ -876,42 +877,42 @@ class expected<void, E> : public expected_detail::expected_base<void, E>
     using T = void;
     using base_type = expected_detail::expected_base<T, E>;
 
-    typedef success<T> success_type;
+    typedef success<void> success_type;
     typedef E error_type;
-    typedef failure<E> failure_type;
+    typedef unexpected<E> failure_type;
 
     template <class G, class Exp = expected<void, G>>
     using check_constructible_from_exp = disjunction<
-        is_constructible<success<T>, Exp&>,
-        is_constructible<success<T>, Exp const&>,
-        is_constructible<success<T>, Exp&&>,
-        is_constructible<success<T>, Exp const&&>,
-        is_convertible<Exp&, success<T>>,
-        is_convertible<Exp const&, success<T>>,
-        is_convertible<Exp&&, success<T>>,
-        is_convertible<Exp const&&, success<T>>,
+        is_constructible<success_type, Exp&>,
+        is_constructible<success_type, Exp const&>,
+        is_constructible<success_type, Exp&&>,
+        is_constructible<success_type, Exp const&&>,
+        is_convertible<Exp&, success_type>,
+        is_convertible<Exp const&, success_type>,
+        is_convertible<Exp&&, success_type>,
+        is_convertible<Exp const&&, success_type>,
 
-        is_constructible<failure<E>, Exp&>,
-        is_constructible<failure<E>, Exp const&>,
-        is_constructible<failure<E>, Exp&&>,
-        is_constructible<failure<E>, Exp const&&>,
-        is_convertible<Exp&, failure<E>>,
-        is_convertible<Exp const&, failure<E>>,
-        is_convertible<Exp&&, failure<E>>,
-        is_convertible<Exp const&&, failure<E>>
+        is_constructible<failure_type, Exp&>,
+        is_constructible<failure_type, Exp const&>,
+        is_constructible<failure_type, Exp&&>,
+        is_constructible<failure_type, Exp const&&>,
+        is_convertible<Exp&, failure_type>,
+        is_convertible<Exp const&, failure_type>,
+        is_convertible<Exp&&, failure_type>,
+        is_convertible<Exp const&&, failure_type>
     >;
 
     template <class G, class Exp = expected<void, G>>
     using check_assignable_from_exp = disjunction<
-        is_assignable<success<T>&, Exp&>,
-        is_assignable<success<T>&, Exp const&>,
-        is_assignable<success<T>&, Exp&&>,
-        is_assignable<success<T>&, Exp const&&>,
+        is_assignable<success_type&, Exp&>,
+        is_assignable<success_type&, Exp const&>,
+        is_assignable<success_type&, Exp&&>,
+        is_assignable<success_type&, Exp const&&>,
 
-        is_assignable<failure<E>&, Exp&>,
-        is_assignable<failure<E>&, Exp const&>,
-        is_assignable<failure<E>&, Exp&&>,
-        is_assignable<failure<E>&, Exp const&&>
+        is_assignable<failure_type&, Exp&>,
+        is_assignable<failure_type&, Exp const&>,
+        is_assignable<failure_type&, Exp&&>,
+        is_assignable<failure_type&, Exp const&&>
     >;
 
     template <class G, class QualG>
@@ -942,10 +943,10 @@ public:
     ~expected() = default;
 
     constexpr expected(success<void> const& value) :
-        base_type(in_place_type<success<T>>, value)
+        base_type(in_place_type<success_type>, value)
     {}
     constexpr expected(success<void> && value) :
-        base_type(in_place_type<success<T>>, std::move(value))
+        base_type(in_place_type<success_type>, std::move(value))
     {}
 
     template < class G = E, enable_if_t<
@@ -1010,10 +1011,8 @@ public:
             }
             else
             {
-                this->construct(in_place_type<failure<E>>, other.get_failure()); // this can throw
-                //rhs._failure.~failure_type(); //destroy()
-                //rhs._has_value = true;
-                other.destroy(in_place_type<failure<E>>);
+                this->construct(in_place_type<failure_type>, other.get_failure()); // this can throw
+                other.destroy(in_place_type<failure_type>);
             }
         }
         else
@@ -1058,6 +1057,27 @@ constexpr bool operator!=(const expected<T1, E1>& x, const expected<T2, E2>& y)
 }
 
 template <class T, class E, class G>
+  constexpr bool operator==(const expected<T, E>& x, const G& y)
+  {
+    return ! x.has_value() ? false : x.get_success() == y;
+  }
+template <class G, class T, class E>
+  constexpr bool operator==(const G& x, const expected<T, E>& y)
+  {
+    return y == x;
+  }
+template <class T, class E, class G>
+  constexpr bool operator!=(const expected<T, E>& x, const G& y)
+  {
+    return ! x.has_value() ? true : x.get_success() != y;
+  }
+template <class G, class T, class E>
+  constexpr bool operator!=(const G& x, const expected<T, E>& y)
+  {
+    return y != x;
+  }
+
+template <class T, class E, class G>
   constexpr bool operator==(const expected<T, E>& x, const success<G>& y)
   {
     return ! x.has_value() ? false : x.get_success() == y;
@@ -1079,22 +1099,22 @@ template <class G, class T, class E>
   }
 
 template <class T, class E, class G>
-  constexpr bool operator==(const expected<T, E>& x, const failure<G>& y)
+  constexpr bool operator==(const expected<T, E>& x, const unexpected<G>& y)
   {
     return x.has_value() ? false : x.get_failure() == y;
   }
 template <class G, class T, class E>
-  constexpr bool operator==(const failure<G>& x, const expected<T, E>& y)
+  constexpr bool operator==(const unexpected<G>& x, const expected<T, E>& y)
   {
     return y == x;
   }
 template <class T, class E, class G>
-  constexpr bool operator!=(const expected<T, E>& x, const failure<G>& y)
+  constexpr bool operator!=(const expected<T, E>& x, const unexpected<G>& y)
   {
     return x.has_value() ? true : x.get_failure() != y;
   }
 template <class G, class T, class E>
-  constexpr bool operator!=(const failure<G>& x, const expected<T, E>& y)
+  constexpr bool operator!=(const unexpected<G>& x, const expected<T, E>& y)
   {
     return y != x;
   }
