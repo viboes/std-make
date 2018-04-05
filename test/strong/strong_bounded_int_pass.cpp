@@ -35,6 +35,7 @@ int main()
       //Frame fn4 {1.0};      // error narrowing conversion
 
       Slot sn1{1};
+      (void)sn1;
       Frame fn5 {fn2};
       BOOST_TEST(fn5 == Frame{1});
       //Slot sn2{fn2}; // error

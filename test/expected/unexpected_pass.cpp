@@ -62,6 +62,7 @@ int main()
 #endif
   {
     stde::unexpected<X> e{X{}};
+    (void)e;
   }
   {
     stde::unexpected<X> e{Y{}};

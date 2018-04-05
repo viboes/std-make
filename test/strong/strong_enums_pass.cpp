@@ -115,7 +115,10 @@ int main()
   {
     //EC e;
       BOOST_TEST( ! stdex::is_valid_enumerator<E>(5) );
-      try {        EC es(E(5));        } catch(...) {}
+      try {
+          EC es(E(5));
+          (void)es;
+      } catch(...) {}
   }
   {
       ES es;
@@ -205,6 +208,7 @@ int main()
   }
   {
       ES es(1);
+      (void)es;
   }
   // constructor from int fails
   {

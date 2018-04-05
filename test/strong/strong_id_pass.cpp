@@ -55,7 +55,10 @@ int main()
       //EngineId es5 {1.0};      // error narrow
 
       EngineId es {0};        // ok
+      (void)es;
       BoardId     cr {1};       // ok
+      (void)cr;
+
 
       //EngineId es6 {cr};       // error
 
@@ -76,6 +79,7 @@ int main()
       EngineId es1 {1};
       EngineId es2 {2};
       BoardId     cr {3};
+      (void)cr;
       BOOST_TEST(es1 < es2);
       BOOST_TEST(es2 != es1);
       //BOOST_TEST(cr < es1); // error

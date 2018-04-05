@@ -105,6 +105,7 @@ int main()
   }
   {
     stde::optional<int> o((stde::in_place));
+    (void)o;
     stde::optional<int> x = stde::make<stde::optional<int>>();
     BOOST_TEST(! x);
   }

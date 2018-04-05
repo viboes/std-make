@@ -100,6 +100,7 @@ int main()
       EngineStarted es1 {true};
       EngineStarted es2 {false};
       CrewReady     cr {false};
+      (void)cr;
       BOOST_TEST(es2<es1);
       BOOST_TEST(es2!=es1);
       //BOOST_TEST(cr<es1); // error

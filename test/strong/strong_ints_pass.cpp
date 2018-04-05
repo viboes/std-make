@@ -55,6 +55,7 @@ int main()
       //OrangeCount oc4 {1.0};      // error narrowing conversion
 
       AppelCount ac1{1};
+      (void)ac1;
       OrangeCount oc5 {oc2};
       BOOST_TEST(oc5 == OrangeCount{1});
 

@@ -72,6 +72,7 @@ int main()
       //OrangeCount oc4 {1.0};      // error narrowing conversion
 
       AppelCount ac1{1};
+      (void)ac1;
       OrangeCount oc5 {oc2};
       BOOST_TEST(oc5 == OrangeCount{1});
       //AppelCount ac2{oc2}; // error
@@ -220,6 +221,7 @@ int main()
       { // operator/(x,y)
         OrangeCount oc1{6};
         OrangeCount oc2{2};
+        (void)oc2;
         BOOST_TEST(oc1/2 == OrangeCount{3});
       }
       { // operator/=(x)

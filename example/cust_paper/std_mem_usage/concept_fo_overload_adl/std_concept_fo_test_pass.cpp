@@ -30,6 +30,7 @@ int main()
     boost::optional<std::vector<int>> ov;
     std::vector<boost::optional<int>> vo;
     std::tuple<int> t (10);
+    (void)t;
     boost::optional<std::tuple<int>> ot;
 
     static_assert(meta::is_valid<decltype(mem_usage_able::mem_usage(i))>, "");
