@@ -77,6 +77,10 @@ stdex::expected<int, short> f(int v, int w) {
 int main()
 {
     {
+        stdex::expected<int, void> x;
+        (void)x;
+    }
+    {
         stdex::expected<int, short> x;
         BOOST_TEST(x.has_value());
         BOOST_TEST(x.value() == 0);
