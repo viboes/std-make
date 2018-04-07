@@ -93,6 +93,7 @@ int main()
     stde::optional<int> x(n);
     BOOST_TEST(! x);
     BOOST_TEST(! has_value(x));
+    BOOST_TEST(stde::holds_alternative_value(x, stde::none()));
     BOOST_TEST(x == stde::none());
     BOOST_TEST(stde::none() == x);
     BOOST_TEST(x == stde::none<stde::optional<stde::_t>>());
@@ -103,6 +104,7 @@ int main()
     stde::optional<stde::optional<int>> x = stde::none() ;
     BOOST_TEST(! x);
     BOOST_TEST(! has_value(x));
+    BOOST_TEST(stde::holds_alternative_value(x, stde::none()));
     BOOST_TEST(x == stde::none());
     BOOST_TEST(stde::none() == x);
     BOOST_TEST(x == stde::none<stde::optional<stde::_t>>());
@@ -111,6 +113,7 @@ int main()
     stde::optional<stde::optional<int>> x { stde::none() };
     BOOST_TEST(! x);
     BOOST_TEST(! has_value(x));
+    BOOST_TEST(stde::holds_alternative_value(x, stde::none()));
     BOOST_TEST(x == stde::none());
     BOOST_TEST(stde::none() == x);
     BOOST_TEST(x == stde::none<stde::optional<stde::_t>>());
@@ -119,6 +122,7 @@ int main()
     stde::optional<stde::optional<int>> x = stde::optional<int>(stde::none()) ;
     BOOST_TEST(x);
     BOOST_TEST(has_value(x));
+    BOOST_TEST(stde::holds_alternative_value(x, stde::optional<int>(stde::none())));
     BOOST_TEST(x != stde::none());
     BOOST_TEST(stde::none() != x);
     BOOST_TEST(x != stde::none<stde::optional<stde::_t>>());
@@ -128,6 +132,7 @@ int main()
     stde::optional<stde::optional<int>> x { stde::optional<int>(stde::none()) };
     BOOST_TEST(x);
     BOOST_TEST(has_value(x));
+    BOOST_TEST(stde::holds_alternative_value(x, stde::optional<int>(stde::none())));
   }
 
 # if !defined __clang__ && defined __GNUC__ // NOTE: GNUC is also defined for Clang
@@ -272,6 +277,7 @@ int main()
     stde::optional<int> o((stde::in_place));
     BOOST_TEST(o);
     BOOST_TEST(has_value(o));
+    BOOST_TEST(stde::holds_alternative_value(o, 0));
   }
 #if 0
   {
@@ -299,6 +305,7 @@ int main()
   }
   {
     stde::optional<int> x=stde::make_optional(1);
+    BOOST_TEST(stde::holds_alternative_value(x, 1));
     BOOST_TEST(x != stde::none());
     BOOST_TEST(stde::none() != x);
     BOOST_TEST(x > stde::none());
@@ -307,6 +314,7 @@ int main()
   {
     stde::optional<int> x=stde::make_optional(1);
     BOOST_TEST(x != stde::none<stde::optional<int>>());
+    BOOST_TEST(stde::holds_alternative_value(x, 1));
     BOOST_TEST(stde::none() != x);
     BOOST_TEST(x > stde::none());
     BOOST_TEST(stde::none() < x);

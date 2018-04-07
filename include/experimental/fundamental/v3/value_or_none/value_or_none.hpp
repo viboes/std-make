@@ -34,6 +34,7 @@ namespace value_or_none
     using nullable::none;
     using nullable::none_type_t;
     using nullable::has_value;
+    using nullable::holds_alternative_value;
 
     namespace detail {
         struct not_a_value_or_none_tag{};

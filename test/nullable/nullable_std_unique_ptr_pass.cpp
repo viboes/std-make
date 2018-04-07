@@ -32,6 +32,7 @@ int main()
     std::unique_ptr<int> x = stde::none<std::unique_ptr>();
     BOOST_TEST( ! x);
     BOOST_TEST(! stde::has_value(x));
+    BOOST_TEST(stde::holds_alternative_value(x, stde::none()));
     BOOST_TEST(x == stde::none());
     BOOST_TEST(stde::none() == x);
     BOOST_TEST(x == stde::none<std::unique_ptr<stde::_t>>());
@@ -42,6 +43,7 @@ int main()
     BOOST_TEST(*x == 0);
 
     BOOST_TEST(stde::has_value(x));
+    BOOST_TEST(stde::holds_alternative_value(x, 0));
     BOOST_TEST(x != stde::none());
     BOOST_TEST(stde::none() != x);
     BOOST_TEST(x != stde::none<std::unique_ptr<stde::_t>>());

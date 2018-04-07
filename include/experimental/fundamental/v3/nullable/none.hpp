@@ -49,6 +49,9 @@ inline namespace fundamental_v3
       static
       bool has_value(U && ptr)  = delete;
 
+      template <class N, class VT>
+      static
+      auto holds_alternative_value(N&& n, VT && x) = delete;
 #endif
     };
 
@@ -57,10 +60,16 @@ inline namespace fundamental_v3
       static constexpr
       nullptr_t none() noexcept { return nullptr; }
 
-      template <class U>
+      template <class Ptr>
       static constexpr
-      bool has_value(U && ptr) noexcept { return bool(forward<U>(ptr)); }
+      bool has_value(Ptr && ptr) noexcept { return bool(forward<Ptr>(ptr)); }
 
+      template <class Ptr, class T>
+      static constexpr
+      auto holds_alternative_value(Ptr&& ptr, T && x)
+      {
+          return has_value(ptr) && *ptr == x;
+      }
     };
 
     template <>
@@ -109,12 +118,28 @@ inline namespace fundamental_v3
   template <class TC>
   using none_type_t = typename none_type<TC>::type;
 
-  template <class T>
+  template <class N>
   constexpr
-  auto has_value(T && x)
+  auto has_value(N && n)
     JASEL_DECLTYPE_RETURN_NOEXCEPT (
-      traits<meta::uncvref_t<T>>::has_value(std::forward<T>(x))
+      traits<meta::uncvref_t<N>>::has_value(std::forward<N>(n))
     )
+
+  template <class N, class T,
+      enable_if_t<! is_same<T, none_t>::value, int> = 0
+  >
+  constexpr
+  auto holds_alternative_value(N&& n, T && x)
+      JASEL_DECLTYPE_RETURN_NOEXCEPT (
+        traits<meta::uncvref_t<N>>::holds_alternative_value(std::forward<N>(n), std::forward<T>(x))
+      )
+
+   template <class N>
+   constexpr
+   auto holds_alternative_value(N&& n, none_t)
+          JASEL_DECLTYPE_RETURN_NOEXCEPT (
+            ! has_value(std::forward<N>(n))
+          )
 
 //  template <class T>
 //  constexpr
@@ -144,6 +169,7 @@ inline namespace fundamental_v3
   using nullable::none_type_t;
   using nullable::none;
   using nullable::has_value;
+  using nullable::holds_alternative_value;
   using nullable::have_value;
 
   // todo: define in function of whether
