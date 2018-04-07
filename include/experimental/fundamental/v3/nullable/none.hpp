@@ -51,7 +51,7 @@ inline namespace fundamental_v3
 
       template <class N, class VT>
       static
-      auto holds_alternative_value(N&& n, VT && x) = delete;
+      bool holds_alternative_value(N&& n, VT && x) = delete;
 #endif
     };
 
@@ -66,7 +66,7 @@ inline namespace fundamental_v3
 
       template <class Ptr, class T>
       static constexpr
-      auto holds_alternative_value(Ptr&& ptr, T && x)
+      bool holds_alternative_value(Ptr&& ptr, T && x)
       {
           return has_value(ptr) && *ptr == x;
       }
