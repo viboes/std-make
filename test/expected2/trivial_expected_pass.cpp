@@ -91,6 +91,18 @@ int main()
         BOOST_TEST(x.value() == 1);
     }
     {
+        stdex::expected<int, short> x = 1;
+        x = 2;
+        BOOST_TEST(x.has_value());
+        BOOST_TEST(x.value() == 2);
+    }
+    {
+        stdex::expected<int, short> x = 1;
+        x.emplace(2);
+        BOOST_TEST(x.has_value());
+        BOOST_TEST(x.value() == 2);
+    }
+    {
         stdex::expected<int, short> x;
         x = 1;
         BOOST_TEST(x.has_value());
@@ -151,6 +163,18 @@ int main()
         stdex::expected<std::string, short> res = stdex::make_success("");
         BOOST_TEST(res.has_value());
         BOOST_TEST(res.value() == "");
+    }
+    {
+        stdex::expected<std::string, short> res = stdex::make_success("");
+        res.emplace("ah");
+        BOOST_TEST(res.has_value());
+        BOOST_TEST(res.value() == "ah");
+    }
+    {
+        stdex::expected<std::string, short> res = stdex::make_success("");
+        res = "ah";
+        BOOST_TEST(res.has_value());
+        BOOST_TEST(res.value() == "ah");
     }
     {
         stdex::expected<std::unique_ptr<int>, short> res = stdex::make_success(std::make_unique<int>(1));

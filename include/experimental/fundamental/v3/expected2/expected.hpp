@@ -908,50 +908,7 @@ public:
             this->construct_from(std::move(other));
         }
 
-#if 0
-    // todo
-    template < class U = T
-                    //, enable_if_t<
-                    //check_expected_emplace_success<U&&>::template enable_emplace<U>()
-                    //, int> = 0
-                >
-    constexpr expected& operator=(U&& v)
-    {
-        this->emplace(std::forward<U>(v));
-//        if (this->has_value())
-//        {
-//            this->deref() = std::forward<U>(v);
-//        } else {
-//            this->destroy(in_place_type<failure_type>);
-//            this->construct(in_place_type<success_type>, std::forward<U>(v));
-//
-//
-//            if constexpr(is_nothrow_constructible_v<T, U&&>)
-//            {
-//                this->destroy(in_place_type<failure_type>);
-//                this->construct(in_place_type<success_type>, std::forward<U>(v));
-//            }
-//            else if constexpr(is_nothrow_move_constructible_v<T>)
-//            {
-//                auto tmp =  T{std::forward<U>(v)};
-//                this->destroy(in_place_type<failure_type>);
-//                this->construct(in_place_type<success_type>, std::move(tmp));
-//            }
-//            else
-//            {
-//                auto tmp =  std::move(this->get_failure());
-//                this->destroy(in_place_type<failure_type>);
-//                try {
-//                    this->construct(in_place_type<success_type>, std::forward<U>(v));
-//                } catch (...) {
-//                    this->construct(in_place_type<failure_type>, std::move(tmp));
-//                    throw;
-//                }
-//            }
-//        }
-        return *this;
-    }
-#endif
+
 
     template < class U = T, class G = E, enable_if_t<
                     check_expected_expected_assign<U, G, U const&, G const&>::template enable_assign<U, G>()
@@ -971,11 +928,10 @@ public:
         return *this;
     }
 
-#if 0
-    template <class... Args
-    //, enable_if_t<
-    //check_expected_emplace_success<Args&&...>::template enable_emplace<Args...>()
-    //, int> = 0
+    template <class... Args,
+        enable_if_t<
+            is_constructible_v<value_type, Args...>
+        , int> = 0
     >
         T& emplace(Args&&... args)
     {
@@ -1009,10 +965,10 @@ public:
         return this->deref();
     }
 
-    template <class U, class... Args
-    //, enable_if_t<
-    //check_expected_emplace_success<initializer_list<U>&, Args&&...>::template enable_emplace<U, Args...>()
-    //, int> = 0
+    template <class U, class... Args,
+        enable_if_t<
+            is_constructible_v<value_type, initializer_list<U>&, Args...>
+        , int> = 0
     >
         T& emplace(initializer_list<U> il, Args&&... args)
     {
@@ -1023,7 +979,7 @@ public:
             if constexpr(is_nothrow_constructible_v<T, initializer_list<U>&, Args&&...>)
             {
                 this->destroy(in_place_type<failure_type>);
-                this->construct(in_place_type<success_type>, std::forward<Args>(args)...);
+                this->construct(in_place_type<success_type>, il, std::forward<Args>(args)...);
             }
             else if constexpr(is_nothrow_move_constructible_v<T>)
             {
@@ -1045,7 +1001,17 @@ public:
         }
         return this->deref();
     }
-#endif
+
+    template < class U = T,
+                    enable_if_t<
+                        is_constructible_v<value_type, U&&>
+                    , int> = 0
+                >
+    constexpr expected& operator=(U&& v)
+    {
+        this->emplace(std::forward<U>(v));
+        return *this;
+    }
 
     void swap(expected& other)
         noexcept(is_nothrow_move_constructible_v<T> && is_nothrow_swappable_v<T> &&
