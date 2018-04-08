@@ -41,6 +41,15 @@ namespace experimental
 inline namespace fundamental_v3
 {
 
+inline constexpr int success_index = 0;
+inline constexpr int failure_index = 1;
+
+using in_place_success_t = in_place_index_t<success_index>;
+using in_place_failure_t = in_place_index_t<failure_index>;
+
+inline constexpr in_place_success_t in_place_success;
+inline constexpr in_place_failure_t in_place_failure;
+
 struct unexpect_t
 {
     explicit unexpect_t() = default;
@@ -108,6 +117,15 @@ struct expected_destruct_base<T, E, false>
         :  _failure(std::forward<Args>(args)...),
            _has_value(false) {}
 
+    template <class... Args>
+    constexpr explicit expected_destruct_base(in_place_index_t<success_index>, Args&&... args)
+        :  _success(std::forward<Args>(args)...),
+           _has_value(true) {}
+    template <class... Args>
+    constexpr explicit expected_destruct_base(in_place_index_t<failure_index>, Args&&... args)
+        :  _failure(std::forward<Args>(args)...),
+           _has_value(false) {}
+
 };
 
 template <class T, class E>
@@ -157,6 +175,16 @@ struct expected_destruct_base<T, E, true>
     constexpr explicit expected_destruct_base(in_place_type_t<failure_type>, Args&&... args)
         :  _failure(std::forward<Args>(args)...),
            _has_value(false) {}
+
+    template <class... Args>
+    constexpr explicit expected_destruct_base(in_place_index_t<success_index>, Args&&... args)
+        :  _success(std::forward<Args>(args)...),
+           _has_value(true) {}
+    template <class... Args>
+    constexpr explicit expected_destruct_base(in_place_index_t<failure_index>, Args&&... args)
+        :  _failure(std::forward<Args>(args)...),
+           _has_value(false) {}
+
 
 };
 
@@ -239,6 +267,20 @@ struct expected_storage_common_base: expected_destruct_base<T, E>
         ::new((void*)std::addressof(this->_failure)) failure_type(std::forward<Args>(args)...);
         this->_has_value = false;
     }
+    template <class... Args>
+    constexpr void construct(in_place_index_t<success_index>, Args&&... args)
+    {
+        ::new((void*)std::addressof(this->_success)) success_type(std::forward<Args>(args)...);
+        this->_has_value = true;
+    }
+
+    template <class... Args>
+    constexpr void  construct(in_place_index_t<failure_index>, Args&&... args)
+    {
+        ::new((void*)std::addressof(this->_failure)) failure_type(std::forward<Args>(args)...);
+        this->_has_value = false;
+    }
+
     constexpr void destroy(in_place_type_t<success_type>)
     {
         this->_success.~success_type();
@@ -792,9 +834,12 @@ class expected : public expected_detail::expected_base<T, E>
     template <class U>
     using check_expected_u_ctor = typename conditional<
                     !is_same_v<meta::uncvref_t<U>, in_place_t> &&
+                    !is_same_v<meta::uncvref_t<U>, unexpect_t> &&
                     !is_same_v<meta::uncvref_t<U>, in_place_type_t<T>> &&
                     !is_same_v<meta::uncvref_t<U>, in_place_type_t<success_type>> &&
                     !is_same_v<meta::uncvref_t<U>, in_place_type_t<failure_type>> &&
+                    !is_same_v<meta::uncvref_t<U>, in_place_index_t<success_index>> &&
+                    !is_same_v<meta::uncvref_t<U>, in_place_index_t<failure_index>> &&
                     !is_same_v<meta::uncvref_t<U>, expected<T, E>>,
                     helpers_detail::check_constructible<T, U>,
                     helpers_detail::check_fail
