@@ -103,6 +103,18 @@ int main()
         BOOST_TEST(x.value() == 2);
     }
     {
+        stdex::expected<int, short> x = 1;
+        x.emplace2<int>(2);
+        BOOST_TEST(x.has_value());
+        BOOST_TEST(x.value() == 2);
+    }
+    {
+        stdex::expected<int, short> x = 1;
+        x.emplace2<stdex::success_index>(2);
+        BOOST_TEST(x.has_value());
+        BOOST_TEST(x.value() == 2);
+    }
+    {
         stdex::expected<int, short> x;
         x = 1;
         BOOST_TEST(x.has_value());
@@ -159,6 +171,18 @@ int main()
         stdex::expected<std::pair<int, short>, short> res {stdex::unexpect, 1};
         BOOST_TEST(! res.has_value());
         BOOST_TEST(res.error() == 1);
+    }
+    {
+        stdex::expected<std::pair<int, short>, short> res {stdex::unexpect, 1};
+        res.emplace2<stdex::unexpected<short>>(short(2));
+        BOOST_TEST(! res.has_value());
+        BOOST_TEST(res.error() == 2);
+    }
+    {
+        stdex::expected<std::pair<int, short>, short> res {stdex::unexpect, 1};
+        res.emplace2<stdex::failure_index>(short(2));
+        BOOST_TEST(! res.has_value());
+        BOOST_TEST(res.error() == 2);
     }
     {
         stdex::expected<std::pair<int, short>, short> res {stdex::in_place_failure, std::in_place, 1};
