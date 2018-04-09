@@ -13,6 +13,7 @@ int main()
 #else
 
 #include <experimental/expected.hpp>
+#include <experimental/optional.hpp>
 #include <experimental/functional.hpp>
 #include <experimental/sum_type.hpp>
 
@@ -41,6 +42,7 @@ int main()
     BOOST_TEST( true == v(error));
     BOOST_TEST( true == stde::sum_type::traits<expected_sc<int>>::visit(v, o));
     BOOST_TEST( true == stde::sum_type::match<bool>(o, [](error_t){ return true;}, [](int){ return false;}));
+    BOOST_TEST( true == stde::sum_type::inspect(o)(stde::overload<bool>([](error_t){ return true;}, [](int){ return false;})));
   }
   {
     expected_sc<int> o1= stde::make_unexpected(ec);
@@ -66,8 +68,47 @@ int main()
         [](int, error_t){ return false;}
       )
       );
+    BOOST_TEST( true == stde::sum_type::inspect(o1, o2)(stde::overload<bool>(
+        [](error_t, error_t){ return true;},
+        [](error_t, int){ return false;},
+        [](int, int){ return false;},
+        [](int, error_t){ return false;}
+      ))
+      );
   }
+  {
+    stde::optional<int> o1;
+    expected_sc<int> o2= stde::make_unexpected(ec);
 
+    auto v = stde::overload(
+        [](stde::nullopt_t, error_t){ return true;},
+        [](stde::nullopt_t, int const &){ return false;},
+        [](int const &, int const &){ return false;},
+        [](int const &, error_t){ return false;}
+        );
+    BOOST_TEST( true == v(stde::nullopt, error));
+    BOOST_TEST( true == stde::product_type::apply(v, std::make_tuple(stde::nullopt, error)));
+    BOOST_TEST( false == stde::product_type::apply(v, std::make_tuple(stde::nullopt, 1)));
+    BOOST_TEST( false == stde::product_type::apply(v, std::make_tuple(1, error)));
+    BOOST_TEST( false == stde::product_type::apply(v, std::make_tuple(1, 1)));
+
+    auto t = std::make_tuple(o1, o2);
+    BOOST_TEST( true == stde::sum_type::match<bool>(t,
+        [](stde::nullopt_t, error_t){ return true;},
+        [](stde::nullopt_t, int){ return false;},
+        [](int, int){ return false;},
+        [](int, error_t){ return false;}
+      )
+      );
+
+    BOOST_TEST( true == stde::sum_type::inspect(o1, o2)(stde::overload<bool>(
+        [](stde::nullopt_t, error_t){ return true;},
+        [](stde::nullopt_t, int){ return false;},
+        [](int, int){ return false;},
+        [](int, error_t){ return false;}
+      ))
+      );
+  }
 
   return ::boost::report_errors();
 }

@@ -130,7 +130,7 @@ namespace sum_type
         {
           // nested applier
           using applier_type = applier<R, F, tuple<ODTs const&...>, OST, tuple<OSTs const&...>,
-              make_integer_sequence<size_t,sum_type::size<OST>::value >>;
+              make_integer_sequence<size_t, sum_type::size<OST>::value >>;
 
           // customization point
 #if ! defined YAFPL_X1

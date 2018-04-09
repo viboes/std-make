@@ -40,6 +40,11 @@ int main()
     BOOST_TEST( true == v(stde::nullopt));
     BOOST_TEST( true == stde::sum_type::traits<stde::optional<int>>::visit(v, o));
     BOOST_TEST( true == stde::sum_type::match<bool>(o, [](stde::nullopt_t){ return true;}, [](int){ return false;}));
+    BOOST_TEST( true == stde::sum_type::inspect(o)(stde::overload<bool>(
+                    [](stde::nullopt_t){ return true;},
+                    [](int){ return false;}
+                    ))
+                    );
   }
   {
     stde::optional<int> o1, o2;
@@ -63,6 +68,13 @@ int main()
         [](int, int){ return false;},
         [](int, stde::nullopt_t){ return false;}
       )
+      );
+    BOOST_TEST( true == stde::sum_type::inspect(o1, o2)(stde::overload<bool>(
+        [](stde::nullopt_t, stde::nullopt_t){ return true;},
+        [](stde::nullopt_t, int){ return false;},
+        [](int, int){ return false;},
+        [](int, stde::nullopt_t){ return false;}
+      ))
       );
   }
 
