@@ -132,11 +132,14 @@ int main()
         BOOST_TEST(res.value() == 1);
     }
     {
-        //stdex::expected<void, short> res; // compile fails as expected
-    }
-    {
         stdex::expected<void, short> res;
         BOOST_TEST(res.has_value());
+    }
+    {
+        stdex::expected<std::pair<int, short>, short> res {std::in_place, 1, 2};
+        BOOST_TEST(res.has_value());
+        BOOST_TEST(res.value().first == 1);
+        BOOST_TEST(res.value().second == 2);
     }
     {
         stdex::expected<std::pair<int, short>, short> res {std::in_place_type<std::pair<int, short>>, 1, 2};
@@ -209,6 +212,31 @@ int main()
         stdex::expected<std::string, short> res = stdex::make_success("");
         BOOST_TEST(res.has_value());
         BOOST_TEST(res.value() == "");
+    }
+    {
+        stdex::expected<void, short> res;
+        res.emplace();
+        BOOST_TEST(res.has_value());
+    }
+    {
+        stdex::expected<void, short> res {std::in_place};
+        res.emplace();
+        BOOST_TEST(res.has_value());
+    }
+    {
+        stdex::expected<void, short> res {stdex::in_place_failure, short{1}};
+        res.emplace();
+        BOOST_TEST(res.has_value());
+    }
+    {
+        stdex::expected<void, short> res = stdex::unexpected(short{1});
+        res.emplace2<void>();
+        BOOST_TEST(res.has_value());
+    }
+    {
+        stdex::expected<void, short> res = stdex::unexpected(short{1});
+        res.emplace2<stdex::success_index>();
+        BOOST_TEST(res.has_value());
     }
     {
         stdex::expected<std::string, short> res = stdex::make_success("");

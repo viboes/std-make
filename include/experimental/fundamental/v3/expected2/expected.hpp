@@ -1224,7 +1224,7 @@ public:
         return emplace(in_place_index<I>, std::forward<Args>(args)...);
     }
     template <class I, class U, class... Args>
-        auto emplace(initializer_list<U> il, Args&&... args) -> decltype(emplace(in_place_index<I>, il, std::forward<Args>(args)...))
+        auto emplace2(initializer_list<U> il, Args&&... args) -> decltype(emplace(in_place_index<I>, il, std::forward<Args>(args)...))
     {
         return emplace(in_place_index<I>, il, std::forward<Args>(args)...);
     }
@@ -1394,17 +1394,141 @@ public:
             return *this;
         }
 
-#if 0
-    void emplace()
+    void emplace(in_place_success_t)
     {
         if (this->has_value())
         {
-        } else {
+        }
+        else
+        {
             this->destroy(in_place_type<failure_type>);
             this->construct(in_place_type<success_type>);
         }
     }
-#endif
+
+    template <class... Args,
+        enable_if_t<
+            is_constructible_v<failure_type, Args...>
+        , int> = 0
+    >
+        unexpected<E>& emplace(in_place_failure_t, Args&&... args)
+    {
+        if (! this->has_value())
+        {
+            this->get_failure() = failure_type{std::forward<Args>(args)...};
+        }
+        else
+        {
+            if constexpr(is_nothrow_constructible_v<failure_type, Args&&...>)
+            {
+                this->destroy(in_place_type<success_type>);
+                this->construct(in_place_type<failure_type>, std::forward<Args>(args)...);
+            }
+            else if constexpr(is_nothrow_move_constructible_v<E>)
+            {
+                auto tmp =  E{std::forward<Args>(args)...};
+                this->destroy(in_place_type<success_type>);
+                this->construct(in_place_type<failure_type>, std::move(tmp));
+            }
+            else
+            {
+                this->destroy(in_place_type<success_type>);
+                try {
+                    this->construct(in_place_type<failure_type>, std::forward<Args>(args)...);
+                } catch (...) {
+                    this->construct(in_place_type<success_type>);
+                    throw;
+                }
+            }
+        }
+        return this->get_failure();
+    }
+    template <class U, class... Args,
+        enable_if_t<
+            is_constructible_v<failure_type, initializer_list<U>&, Args...>
+        , int> = 0
+    >
+        unexpected<E>& emplace(in_place_failure_t, initializer_list<U> il, Args&&... args)
+    {
+        if (! this->has_value())
+        {
+            this->get_failure() = failure_type{il, std::forward<Args>(args)...};
+        }
+        else
+        {
+            if constexpr(is_nothrow_constructible_v<failure_type, Args&&...>)
+            {
+                this->destroy(in_place_type<success_type>);
+                this->construct(in_place_type<failure_type>, il, std::forward<Args>(args)...);
+            }
+            else if constexpr(is_nothrow_move_constructible_v<E>)
+            {
+                auto tmp =  E{il, std::forward<Args>(args)...};
+                this->destroy(in_place_type<success_type>);
+                this->construct(in_place_type<failure_type>, std::move(tmp));
+            }
+            else
+            {
+                this->destroy(in_place_type<success_type>);
+                try {
+                    this->construct(in_place_type<failure_type>, il, std::forward<Args>(args)...);
+                } catch (...) {
+                    this->construct(in_place_type<success_type>);
+                    throw;
+                }
+            }
+        }
+        return this->get_failure();
+    }
+
+    void emplace()
+    {
+        emplace(in_place_success);
+    }
+
+    template <size_t I, class... Args>
+        auto emplace2(Args&&... args) -> decltype(emplace(in_place_index<I>, std::forward<Args>(args)...))
+    {
+        return emplace(in_place_index<I>, std::forward<Args>(args)...);
+    }
+    template <class I, class U, class... Args>
+        auto emplace2(initializer_list<U> il, Args&&... args) -> decltype(emplace(in_place_index<I>, il, std::forward<Args>(args)...))
+    {
+        return emplace(in_place_index<I>, il, std::forward<Args>(args)...);
+    }
+
+    template <class S, class... Args,
+        enable_if_t<
+            is_void_v<S> || is_constructible_v<S, Args...>
+        , int> = 0
+    >
+        auto emplace2(Args&&... args)
+    {
+        if constexpr (is_same_v<S, void>)
+        {
+            return emplace(in_place_success, std::forward<Args>(args)...);
+        }
+        else
+        {
+            return emplace(in_place_failure, std::forward<Args>(args)...);
+        }
+    }
+    template <class S, class U, class... Args,
+        enable_if_t<
+            is_void_v<S> || is_constructible_v<S, initializer_list<U>&, Args...>
+        , int> = 0
+    >
+        auto emplace2(initializer_list<U> il, Args&&... args)
+    {
+        if constexpr (is_same_v<S, void>)
+        {
+            return emplace(in_place_success, il, std::forward<Args>(args)...);
+        }
+        else
+        {
+            return emplace(in_place_failure, il, std::forward<Args>(args)...);
+        }
+    }
 
     void swap(expected& other)
         noexcept(is_nothrow_move_constructible_v<E> && is_nothrow_swappable_v<E>)

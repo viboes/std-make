@@ -175,6 +175,8 @@ struct success<void>
     JASEL_CXX14_CONSTEXPR success& operator=(success const& e) = default;
     JASEL_CXX14_CONSTEXPR success& operator=(success&& e) = default;
 
+    constexpr explicit success(in_place_t) {}
+
     template <class U>
     using rebind = success<U>;
 };
@@ -307,6 +309,8 @@ struct failure<void>
     constexpr failure(failure&& e) = default;
     JASEL_CXX14_CONSTEXPR failure& operator=(failure const& e) = default;
     JASEL_CXX14_CONSTEXPR failure& operator=(failure&& e) = default;
+
+    constexpr explicit failure(in_place_t) {}
 
     template <class U>
     using rebind = failure<U>;
