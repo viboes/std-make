@@ -67,14 +67,22 @@ int main()
         [](int, int){ return false;},
         [](int, error_t){ return false;}
       )
-      );
+    );
     BOOST_TEST( true == stde::sum_type::inspect(o1, o2)(stde::overload<bool>(
         [](error_t, error_t){ return true;},
         [](error_t, int){ return false;},
         [](int, int){ return false;},
         [](int, error_t){ return false;}
       ))
-      );
+    );
+    BOOST_TEST_EQ(true,
+      stde::sum_type::inspect(o1, o2) | stde::overload<bool>(
+        [](error_t, error_t){ return true;},
+        [](error_t, int){ return false;},
+        [](int, int){ return false;},
+        [](int, error_t){ return false;}
+      )
+    );
   }
   {
     stde::optional<int> o1;
@@ -99,7 +107,7 @@ int main()
         [](int, int){ return false;},
         [](int, error_t){ return false;}
       )
-      );
+    );
 
     BOOST_TEST( true == stde::sum_type::inspect(o1, o2)(stde::overload<bool>(
         [](stde::nullopt_t, error_t){ return true;},
@@ -107,7 +115,15 @@ int main()
         [](int, int){ return false;},
         [](int, error_t){ return false;}
       ))
-      );
+    );
+    BOOST_TEST_EQ(true,
+      stde::sum_type::inspect(o1, o2) | stde::overload<bool>(
+        [](stde::nullopt_t, error_t){ return true;},
+        [](stde::nullopt_t, int){ return false;},
+        [](int, int){ return false;},
+        [](int, error_t){ return false;}
+      )
+    );
   }
 
   return ::boost::report_errors();

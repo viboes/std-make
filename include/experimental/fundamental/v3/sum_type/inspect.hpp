@@ -84,6 +84,13 @@ namespace sum_type
         {
             return sum_type::match2(storage, std::forward<F>(f));
         }
+
+        template <class F>
+        auto operator|(F&& f)
+        {
+            return sum_type::match2(storage, std::forward<F>(f));
+        }
+
         template <class F>
         auto operator()(F&& f)
         {
