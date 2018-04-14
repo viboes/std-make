@@ -73,40 +73,37 @@ namespace sum_type
     template <class ...STs>
     class inspector
     {
-        std::tuple<STs...> storage;
-
     public:
-        template <class ...Ts>
-        inspector(Ts&& ...ts) : storage(std::forward<Ts>(ts)...) {};
+        std::tuple<STs&&...> storage;
 
         template <class F>
         auto match(F&& f)
         {
-            return sum_type::match2(storage, std::forward<F>(f));
+            return sum_type::match2(std::move(storage), std::forward<F>(f));
         }
 
         template <class F>
         auto operator|(F&& f)
         {
-            return sum_type::match2(storage, std::forward<F>(f));
+            return sum_type::match2(std::move(storage), std::forward<F>(f));
         }
 
         template <class F>
         auto operator()(F&& f)
         {
-            return sum_type::match2(storage, std::forward<F>(f));
+            return sum_type::match2(std::move(storage), std::forward<F>(f));
         }
         template <class R, class F>
         R match(F&& f)
         {
-            return sum_type::match2<R>(storage, std::forward<F>(f));
+            return sum_type::match2<R>(std::move(storage), std::forward<F>(f));
         }
     };
 
     template <class ...Ts>
-    inspector<decay_t<Ts>...> inspect(Ts&&...ts)
+    auto inspect(Ts&&...ts)
     {
-        return inspector<decay_t<Ts>...>(std::forward<Ts>(ts)...);
+        return inspector<Ts...>{std::forward_as_tuple(std::forward<Ts>(ts)...)};
     }
 
 
