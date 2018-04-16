@@ -111,11 +111,6 @@ inline  namespace fundamental_v3
     {
       using base_type = strong_type<byte, unsigned char>;
       using base_type::base_type;
-
-      byte() noexcept = default;
-
-      template< class IntegralType, typename = enable_if_t<is_same<IntegralType, unsigned char>::value> >
-      explicit constexpr byte( IntegralType v ) noexcept : base_type(v) { }
     };
 
     //! helper function to cast from IntegralType to byte

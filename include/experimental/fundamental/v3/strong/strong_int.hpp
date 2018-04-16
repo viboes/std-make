@@ -74,46 +74,6 @@ inline namespace fundamental_v3
       using base_type = strong_type<strong_integral<Tag, UT>, UT>;
       using base_type::base_type;
 
-      /// @par Effects
-      ///   Constructs an uninitialized strong_integral
-      strong_integral() = default;
-      strong_integral(strong_integral const&) = default;
-      strong_integral& operator=(strong_integral const&) = default;
-
-      /// @par Effects Implicitly constructs a strong_integral from another strong_integral with implicit convertible underlying types
-      /// @par Throws: Whatever the underlying copy can throw.
-      /// @par Remarks: This overload participate in overload resolution only if
-      ///   is_constructible_v<UT, UT2 const&> && is_convertible_v<UT2 const&, UT>
-      template <class UT2
-#if ! defined JASEL_DOXYGEN_INVOKED
-      //fixme  error: constructor cannot be redeclared when using , typename = typename enable_if<>::type
-        , enable_if_t<
-        ! is_same<UT, UT2>::value &&
-        is_constructible<UT, UT2 const&>::value &&
-            is_convertible<UT2 const&, UT>::value
-            , bool> = false
-#endif
-      >
-      strong_integral(strong_integral<Tag, UT2> const& other)
-        : base_type(other.underlying())
-      {}
-
-      /// @par Effects Explicitly constructs a strong_integral from another strong_integral with explicit convertible underlying types
-      /// @par Throws: Whatever the underlying copy can throw.
-      /// @par Remarks: This overload participate in overload resolution only if
-      ///   is_constructible_v<UT, UT2 const&> && ! is_convertible_v<UT2 const&, UT>
-      template <class UT2
-#if ! defined JASEL_DOXYGEN_INVOKED
-        ,  typename = enable_if_t<
-            is_constructible<UT, UT2 const&>::value &&
-            ! is_convertible<UT2 const&, UT>::value
-          >
-#endif
-      >
-      explicit strong_integral(strong_integral<Tag, UT2> const& other)
-        : base_type(other.underlying())
-      {}
-
   };
 
   /// @par Returns A strong int with the tag `Tag` wrapping the value `x`

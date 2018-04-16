@@ -10,6 +10,7 @@
 #include <experimental/ordinal.hpp>
 #include <experimental/fundamental/v2/config.hpp>
 #include <experimental/fundamental/v3/config/requires.hpp>
+#include <experimental/fundamental/v3/in_place.hpp>
 #include <experimental/type_traits.hpp>
 #include <experimental/wrapped.hpp>
 
@@ -30,20 +31,96 @@ inline  namespace fundamental_v3
       using underlying_type = UT;
 
       constexpr wrapper() noexcept = default;
+      constexpr wrapper(wrapper const& e) = default;
+      constexpr wrapper(wrapper&& e) = default;
+      constexpr wrapper& operator=(wrapper const& e) = default;
+      constexpr wrapper& operator=(wrapper&& e) = default;
 
-      //! explicit construction from an LVALUE underlying type
-      //! @par Effects Constructs a wrapper from its underlying type
-      JASEL_0_REQUIRES(
-            is_copy_constructible<underlying_type>::value
-      )
-      explicit constexpr wrapper(underlying_type const& v): _value(v) {}
+      template <class... Args, typename = enable_if_t<
+          is_constructible<UT, Args&&...>::value == true>
+      >
+          constexpr explicit wrapper(in_place_t, Args&&...args)
+          : _value(std::forward<Args>(args)...) {}
 
-      //! explicit construction from an RVALUE underlying type
+      template <class U, class... Args, typename = enable_if_t<
+          is_constructible<UT, std::initializer_list<U>&, Args&&...>::value == true>
+      >
+          constexpr explicit wrapper(in_place_t, std::initializer_list<U> il, Args&&... args)
+          : _value(il, std::forward<Args>(args)...) {}
+
+      //! explicit construction from an convertible to underlying type
       //! @par Effects Constructs a wrapper from its underlying type
-      JASEL_0_REQUIRES(
-            is_move_constructible<underlying_type>::value
-      )
-      explicit constexpr wrapper(underlying_type &&v): _value(std::move(v)) {}
+      template <class U = UT, typename = enable_if_t<
+          is_constructible<UT, U&&>::value == true
+          && is_same<remove_cvref_t<U>, in_place_t>::value == false
+          && is_same<remove_cvref_t<U>, wrapper<UT>>::value == false
+          >>
+          constexpr explicit wrapper(U&& u)
+          : _value(std::forward<U>(u)) {}
+
+      template <class U, enable_if_t<
+          is_constructible<UT, const U&>::value == true &&
+          is_convertible<const U&, UT>::value == true &&
+          is_constructible<UT, wrapper<U>&>::value == false &&
+          is_constructible<UT, wrapper<U>&&>::value == false &&
+          is_constructible<UT, const wrapper<U>&>::value == false &&
+          is_constructible<UT, const wrapper<U>&&>::value == false &&
+          is_convertible<wrapper<U>&, UT>::value == false &&
+          is_convertible<wrapper<U>&&, UT>::value == false &&
+          is_convertible<const wrapper<U>&, UT>::value == false &&
+          is_convertible<const wrapper<U>&&, UT>::value == false
+          , int> = 0
+      >
+          constexpr explicit wrapper(const wrapper<U>& other)
+          : _value(other._value) {}
+
+      template <class U, enable_if_t<
+          is_constructible<UT, const U&>::value == true &&
+          is_convertible<const U&, UT>::value == false &&
+          is_constructible<UT, wrapper<U>&>::value == false &&
+          is_constructible<UT, wrapper<U>&&>::value == false &&
+          is_constructible<UT, const wrapper<U>&>::value == false &&
+          is_constructible<UT, const wrapper<U>&&>::value == false &&
+          is_convertible<wrapper<U>&, UT>::value == false &&
+          is_convertible<wrapper<U>&&, UT>::value == false &&
+          is_convertible<const wrapper<U>&, UT>::value == false &&
+          is_convertible<const wrapper<U>&&, UT>::value == false
+          , int> = 0
+      >
+          constexpr wrapper(const wrapper<U>& other)
+          : _value(other._value) {}
+
+      template <class U, enable_if_t<
+          is_constructible<UT, U&&>::value == true &&
+          is_convertible<U&&, UT>::value == true &&
+          is_constructible<UT, wrapper<U>&>::value == false &&
+          is_constructible<UT, wrapper<U>&&>::value == false &&
+          is_constructible<UT, const wrapper<U>&>::value == false &&
+          is_constructible<UT, const wrapper<U>&&>::value == false &&
+          is_convertible<wrapper<U>&, UT>::value == false &&
+          is_convertible<wrapper<U>&&, UT>::value == false &&
+          is_convertible<const wrapper<U>&, UT>::value == false &&
+          is_convertible<const wrapper<U>&&, UT>::value == false
+          , int> = 0
+      >
+          constexpr explicit wrapper(wrapper<U>&& other)
+          : _value(std::move(other)._value) {}
+
+      template <class U, enable_if_t<
+          is_constructible<UT, U&&>::value == true &&
+          is_convertible<U&&, UT>::value == false &&
+          is_constructible<UT, wrapper<U>&>::value == false &&
+          is_constructible<UT, wrapper<U>&&>::value == false &&
+          is_constructible<UT, const wrapper<U>&>::value == false &&
+          is_constructible<UT, const wrapper<U>&&>::value == false &&
+          is_convertible<wrapper<U>&, UT>::value == false &&
+          is_convertible<wrapper<U>&&, UT>::value == false &&
+          is_convertible<const wrapper<U>&, UT>::value == false &&
+          is_convertible<const wrapper<U>&&, UT>::value == false
+          , int> = 0
+      >
+          constexpr wrapper(wrapper<U>&& other)
+          : _value(std::move(other)._value) {}
 
       //! underlying value access
       //! @par Returns the underlying value

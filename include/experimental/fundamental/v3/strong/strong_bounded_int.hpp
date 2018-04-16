@@ -105,9 +105,15 @@ inline namespace fundamental_v3
           return x;
       }
   public:
-
-      // This constructor is needed by the mixins that use the constructor from from underlying.
-      constexpr explicit strong_bounded_int(UT v) : base_type(check_it(v)) {}
+      //! explicit construction from an convertible to underlying type
+      //! @par Effects Constructs a strong_bounded_int from its underlying type after checking the value is in the range
+      template <class U = UT, typename = enable_if_t<
+          is_constructible<UT, U&&>::value == true
+          && is_same<remove_cvref_t<U>, in_place_t>::value == false
+          && is_same<remove_cvref_t<U>, wrapper<UT>>::value == false
+          >>
+          constexpr explicit strong_bounded_int(U&& u)
+          : base_type(check_it(std::forward<U>(u))) {}
 
 #if __cplusplus > 201402L && defined __clang__
       // safe construction
