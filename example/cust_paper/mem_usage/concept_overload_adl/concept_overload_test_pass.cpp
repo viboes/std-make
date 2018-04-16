@@ -32,50 +32,50 @@ int main()
   (void)t;
   boost::optional<std::tuple<int>> ot;
 
-  static_assert(framework::is_valid<decltype(framework::concept::mem_usage(i))>, "");
-  std::cout << framework::concept::mem_usage(i) << "\n";
-  std::cout << framework::concept::mem_usage(a) << "\n";
-  std::cout << framework::concept::mem_usage(v) << "\n";
-  std::cout << framework::concept::mem_usage(o) << "\n";
+  static_assert(framework::is_valid<decltype(framework::concept2::mem_usage(i))>, "");
+  std::cout << framework::concept2::mem_usage(i) << "\n";
+  std::cout << framework::concept2::mem_usage(a) << "\n";
+  std::cout << framework::concept2::mem_usage(v) << "\n";
+  std::cout << framework::concept2::mem_usage(o) << "\n";
 
 #if 0
     // compile fails as expected
-    decltype(framework::concept::mem_usage(t)) xx;
+    decltype(framework::concept2::mem_usage(t)) xx;
 #endif
-  std::cout << framework::concept::mem_usage(vp) << "\n";
-  std::cout << framework::concept::mem_usage(pv) << "\n";
-  std::cout << framework::concept::mem_usage(ov) << "\n";
-  std::cout << framework::concept::mem_usage(vo) << "\n";
+  std::cout << framework::concept2::mem_usage(vp) << "\n";
+  std::cout << framework::concept2::mem_usage(pv) << "\n";
+  std::cout << framework::concept2::mem_usage(ov) << "\n";
+  std::cout << framework::concept2::mem_usage(vo) << "\n";
 
 
   {
       int i2;
-      assert(framework::concept::mem_usage(i2)==4);
+      assert(framework::concept2::mem_usage(i2)==4);
   }
   {
       boost::optional<int> o2;
-      std::cout << framework::concept::mem_usage(o2) << "\n";
-      //assert(framework::concept::mem_usage(o)==8);
+      std::cout << framework::concept2::mem_usage(o2) << "\n";
+      //assert(framework::concept2::mem_usage(o)==8);
   }
   {
       boost::optional<boost::optional<int>> o2;
-      std::cout << framework::concept::mem_usage(o2) << "\n";
-      //assert(framework::concept::mem_usage(o)==8);
+      std::cout << framework::concept2::mem_usage(o2) << "\n";
+      //assert(framework::concept2::mem_usage(o)==8);
   }
   {
       std::experimental::optional<int> o2;
-      std::cout << framework::concept::mem_usage(o2) << "\n";
-      //assert(framework::concept::mem_usage(o)==8);
+      std::cout << framework::concept2::mem_usage(o2) << "\n";
+      //assert(framework::concept2::mem_usage(o)==8);
   }
   {
       std::vector<std::experimental::optional<int>> o2;
-      std::cout << framework::concept::mem_usage(o2) << "\n";
-      //assert(framework::concept::mem_usage(o)==8);
+      std::cout << framework::concept2::mem_usage(o2) << "\n";
+      //assert(framework::concept2::mem_usage(o)==8);
   }
   {
       std::experimental::optional<std::vector<int>> o2;
-      std::cout << framework::concept::mem_usage(o2) << "\n";
-      //assert(framework::concept::mem_usage(o)==8);
+      std::cout << framework::concept2::mem_usage(o2) << "\n";
+      //assert(framework::concept2::mem_usage(o)==8);
   }
   return ::boost::report_errors();
 }

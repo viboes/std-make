@@ -16,7 +16,7 @@ namespace boost {
     size_t mem_usage(const optional<T>& v)
     {
       size_t ans = sizeof(v);
-      if (v) ans += framework::concept::mem_usage(*v) - sizeof(*v);
+      if (v) ans += framework::concept2::mem_usage(*v) - sizeof(*v);
       return ans;
     }
 }

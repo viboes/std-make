@@ -25,10 +25,10 @@ namespace framework
   };
 
   template <typename T>
-    auto mem_usage(const Array<T>& v) -> decltype(concept::mem_usage(std::declval<T>()))
+    auto mem_usage(const Array<T>& v) -> decltype(concept2::mem_usage(std::declval<T>()))
     {
       size_t ans = sizeof(v);
-      for (const T& e : v) ans += concept::mem_usage(e);
+      for (const T& e : v) ans += concept2::mem_usage(e);
       return ans;
     }
 

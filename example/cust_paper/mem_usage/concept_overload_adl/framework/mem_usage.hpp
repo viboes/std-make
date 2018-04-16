@@ -82,11 +82,11 @@ namespace adl_mem_usage {
   template< class C >
     constexpr auto apply( C& c ) -> decltype(mem_usage(c)) { return mem_usage(c); }
 }
-namespace concept {
+namespace concept2 {
   template <typename T>
   auto mem_usage(const T& v) -> decltype(adl_mem_usage::apply(v))
     { return adl_mem_usage::apply(v); }
-} // concept
+} // concept2
 } // framework
 #endif
 
