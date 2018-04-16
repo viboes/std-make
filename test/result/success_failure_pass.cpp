@@ -10,6 +10,7 @@
 
 #include <experimental/fundamental/v3/result/success_failure.hpp>
 #include <string>
+#include <memory>
 
 namespace stdex = std::experimental;
 
