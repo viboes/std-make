@@ -6,7 +6,7 @@
     </tr>
     <tr>
         <td width="172" align="left" valign="top">Date:</td>
-        <td width="435">2018-04-12</td>
+        <td width="435">2018-04-13</td>
     </tr>
     <tr>
         <td width="172" align="left" valign="top">Project:</td>
@@ -34,7 +34,7 @@ Vicente J. Botet Escrib&aacute;
 
 LWG raised 3 design issues concerning the proposed `std::experimental::expected` [P0323R5]. 
 
-* Why unexpected<void> is not valid?
+* Why `unexpected<void>` is not valid?
 * Why there is no `expected<T,E>:emplace` for `unexpected<E>`? 
 * The in-place construction of success (`in_place_t`) and failure (`unexpect_t`) naming is not symmetric. In addition `unexpect_t` doesn't convey any idea of emplacement.
 
@@ -432,7 +432,7 @@ An almost full reference implementation of the different approaches of this prop
 
 # Acknowledgements
 
-We are very grateful to the LWG for raising this design issues and be the "raison d`être" of this paper.
+We are very grateful to the LWG, and in particular to Geoff Romer, for raising this design issues that are the "raison d`être" of this paper.
 
 Special thanks and recognition goes to Technical Center of Nokia - Lannion for
 supporting in part the production of this proposal.
