@@ -12,7 +12,7 @@
 
 #include <experimental/fundamental/v2/config.hpp>
 #include <experimental/fundamental/v3/value_or_none/value_or_none.hpp>
-#include <experimental/meta.hpp>
+#include <experimental/type_traits.hpp>
 #include <utility>
 
 namespace std
@@ -30,9 +30,9 @@ namespace value_or_none
    */
   template <class N, class E
     , class = enable_if_t<
-        is_value_or_none< meta::uncvref_t<N> >::value
+        is_value_or_none< remove_cvref_t<N> >::value
         // add constraint on E
-        //&& is_comparable_v< meta::uncvref_t<E>, none_type_t<meta::uncvref_t<N>> >
+        //&& is_comparable_v< remove_cvref_t<E>, none_type_t<remove_cvref_t<N>> >
     >
   >
   BOOST_CXX14_CONSTEXPR
@@ -43,7 +43,7 @@ namespace value_or_none
     {
       return false;
     }
-    return value_or_none::none<meta::uncvref_t<N>>() == forward<E>(e);
+    return value_or_none::none<remove_cvref_t<N>>() == forward<E>(e);
   }
 
 } // value_or_none

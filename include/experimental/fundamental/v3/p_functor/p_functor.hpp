@@ -57,7 +57,7 @@ namespace p_functor
   auto
     transform(T&& x, F&& f)
        JASEL_DECLTYPE_RETURN_NOEXCEPT(
-          traits<type_constructor_t<meta::uncvref_t<T>>>::transform(forward<T>(x),forward<F>(f))
+          traits<type_constructor_t<remove_cvref_t<T>>>::transform(forward<T>(x),forward<F>(f))
        )
 
   template <class F, class T>

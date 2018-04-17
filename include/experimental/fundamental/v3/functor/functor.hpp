@@ -20,6 +20,7 @@
 #include <experimental/fundamental/v2/config.hpp>
 #include <functional> // std::invoke
 #include <experimental/functional.hpp>
+#include <experimental/type_traits.hpp>
 
 namespace std
 {
@@ -77,7 +78,7 @@ namespace detail
   auto
     transform(T&& x, F&& f)
         JASEL_DECLTYPE_RETURN_NOEXCEPT(
-            traits<type_constructor_t<meta::uncvref_t<T>>>::transform(forward<T>(x),forward<F>(f))
+            traits<type_constructor_t<remove_cvref_t<T>>>::transform(forward<T>(x),forward<F>(f))
         )
 
   //! Applies the `Callable` `F` over the `Functor` `T`. This the equivalent to transform but the argument are flip.
@@ -107,7 +108,7 @@ namespace detail
   template <class Functor_T, class Pred_T, class Callable_T_U>
     auto adjust_if(Functor_T && xs, Pred_T&&  p, Callable_T_U&&  f)
         JASEL_DECLTYPE_RETURN_NOEXCEPT(
-            traits<type_constructor_t<meta::uncvref_t<Functor_T>>>::adjust_if(forward<Functor_T>(xs), forward<Pred_T>(p), forward<Callable_T_U>(f))
+            traits<type_constructor_t<remove_cvref_t<Functor_T>>>::adjust_if(forward<Functor_T>(xs), forward<Pred_T>(p), forward<Callable_T_U>(f))
         )
 
 #if ! defined JASEL_DOXYGEN_INVOKED

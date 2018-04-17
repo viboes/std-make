@@ -16,6 +16,7 @@
 #include <utility>
 #include <type_traits>
 #include <experimental/meta.hpp>
+#include <experimental/type_traits.hpp>
 #include <experimental/type_constructible.hpp>
 #include <experimental/fundamental/v2/config.hpp>
 #include <experimental/monad.hpp>
@@ -127,14 +128,14 @@ namespace detail
   auto
   catch_error(M&& x, F&& f)
        JASEL_DECLTYPE_RETURN_NOEXCEPT(
-          traits<type_constructor_t<meta::uncvref_t<M>>>::catch_error(forward<M>(x), forward<F>(f))
+          traits<type_constructor_t<remove_cvref_t<M>>>::catch_error(forward<M>(x), forward<F>(f))
        )
 
    template <class M, class F>
    auto
    adapt_error(M&& x, F&& f)
         JASEL_DECLTYPE_RETURN_NOEXCEPT(
-           traits<type_constructor_t<meta::uncvref_t<M>>>::adapt_error(forward<M>(x), forward<F>(f))
+           traits<type_constructor_t<remove_cvref_t<M>>>::adapt_error(forward<M>(x), forward<F>(f))
         )
 
   // make_error overload: requires a type constructor, , deduce the error type associated to the type constructor

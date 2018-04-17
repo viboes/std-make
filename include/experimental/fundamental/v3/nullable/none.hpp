@@ -122,7 +122,7 @@ inline namespace fundamental_v3
   constexpr
   auto has_value(N && n)
     JASEL_DECLTYPE_RETURN_NOEXCEPT (
-      traits<meta::uncvref_t<N>>::has_value(std::forward<N>(n))
+      traits<remove_cvref_t<N>>::has_value(std::forward<N>(n))
     )
 
   template <class N, class T,
@@ -131,7 +131,7 @@ inline namespace fundamental_v3
   constexpr
   auto holds_alternative_value(N&& n, T && x)
       JASEL_DECLTYPE_RETURN_NOEXCEPT (
-        traits<meta::uncvref_t<N>>::holds_alternative_value(std::forward<N>(n), std::forward<T>(x))
+        traits<remove_cvref_t<N>>::holds_alternative_value(std::forward<N>(n), std::forward<T>(x))
       )
 
    template <class N>

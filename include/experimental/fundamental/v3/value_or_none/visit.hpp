@@ -37,7 +37,7 @@ namespace detail
     template <class ST>
     static constexpr decltype(auto) get(ST&&) noexcept
     {
-      return value_or_none::none<meta::uncvref_t<ST>>();
+      return value_or_none::none<remove_cvref_t<ST>>();
     }
   };
   template <>
@@ -74,7 +74,7 @@ namespace detail
       {
         if (value_or_none::has_value(forward<ST>(st)))
           return JASEL_INVOKE(forward<V>(v),value_or_none::deref(forward<ST>(st)));
-        return JASEL_INVOKE(forward<V>(v), value_or_none::none<meta::uncvref_t<ST>>() );
+        return JASEL_INVOKE(forward<V>(v), value_or_none::none<remove_cvref_t<ST>>() );
       }
   };
 }

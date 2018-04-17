@@ -14,6 +14,7 @@
 #include <experimental/functor.hpp>
 #include <experimental/n_functor.hpp>
 #include <experimental/p_functor.hpp>
+#include <experimental/type_traits.hpp>
 #include <utility>
 #include <functional>
 
@@ -61,19 +62,19 @@ namespace product_type
   template <class F, class ProductType
 #if ! defined JASEL_DOXYGEN_INVOKED
   // todo add constraint on F
-  , class = enable_if_t< is_product_type_v<meta::uncvref_t<ProductType>> >
+  , class = enable_if_t< is_product_type_v<remove_cvref_t<ProductType>> >
 #endif
   >
   constexpr decltype(auto) transform(ProductType&& pt, F&& f)
   {
-      return product_type_detail::p_transform_impl<type_constructor_t<meta::uncvref_t<ProductType>>>(
+      return product_type_detail::p_transform_impl<type_constructor_t<remove_cvref_t<ProductType>>>(
           forward<ProductType>(pt), forward<F>(f),
           product_type::element_sequence_for<ProductType>{});
   }
   template <class TC, class F, class ProductType
 #if ! defined JASEL_DOXYGEN_INVOKED
   // todo add constraint on F
-  , class = enable_if_t< is_product_type_v<meta::uncvref_t<ProductType>> >
+  , class = enable_if_t< is_product_type_v<remove_cvref_t<ProductType>> >
 #endif
   >
   constexpr decltype(auto) transform(ProductType&& pt, F&& f)
@@ -99,19 +100,19 @@ namespace product_type
   template <class F, class ProductType
 #if ! defined JASEL_DOXYGEN_INVOKED
   // todo add constraint on F
-  , class = enable_if_t< is_product_type_v<meta::uncvref_t<ProductType>> >
+  , class = enable_if_t< is_product_type_v<remove_cvref_t<ProductType>> >
 #endif
   >
   constexpr decltype(auto) n_transform(ProductType&& pt, F&& f)
   {
-      return product_type_detail::n_transform_impl<type_constructor_t<meta::uncvref_t<ProductType>>>(
+      return product_type_detail::n_transform_impl<type_constructor_t<remove_cvref_t<ProductType>>>(
           forward<ProductType>(pt), forward<F>(f),
           product_type::element_sequence_for<ProductType>{});
   }
   template <class TC, class F, class ProductType
 #if ! defined JASEL_DOXYGEN_INVOKED
   // todo add constraint on F
-  , class = enable_if_t< is_product_type_v<meta::uncvref_t<ProductType>> >
+  , class = enable_if_t< is_product_type_v<remove_cvref_t<ProductType>> >
 #endif
   >
   constexpr decltype(auto) n_transform(ProductType&& pt, F&& f)
@@ -137,19 +138,19 @@ namespace product_type
   template <class F, class ProductType
 #if ! defined JASEL_DOXYGEN_INVOKED
   // todo add constraint on F
-  , class = enable_if_t< is_product_type_v<meta::uncvref_t<ProductType>> >
+  , class = enable_if_t< is_product_type_v<remove_cvref_t<ProductType>> >
 #endif
   >
   constexpr decltype(auto) p_transform(ProductType&& pt, F&& f)
   {
-      return product_type_detail::p_transform_impl<type_constructor_t<meta::uncvref_t<ProductType>>>(
+      return product_type_detail::p_transform_impl<type_constructor_t<remove_cvref_t<ProductType>>>(
           forward<ProductType>(pt), forward<F>(f),
           product_type::element_sequence_for<ProductType>{});
   }
   template <class TC, class F, class ProductType
 #if ! defined JASEL_DOXYGEN_INVOKED
   // todo add constraint on F
-  , class = enable_if_t< is_product_type_v<meta::uncvref_t<ProductType>> >
+  , class = enable_if_t< is_product_type_v<remove_cvref_t<ProductType>> >
 #endif
   >
   constexpr decltype(auto) p_transform(ProductType&& pt, F&& f)

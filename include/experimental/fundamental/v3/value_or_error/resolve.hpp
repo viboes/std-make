@@ -11,7 +11,7 @@
 
 #include <experimental/fundamental/v2/config.hpp>
 #include <experimental/fundamental/v3/value_or_error/value_or_error.hpp>
-#include <experimental/meta.hpp>
+#include <experimental/type_traits.hpp>
 #include <utility>
 
 namespace std
@@ -30,12 +30,12 @@ namespace value_or_error
   template <class N, class F
   // todo add constraint on F
   //, class = enable_if_t<
-  //    is_value_or_error_v<meta::uncvref_t<N>>
-  // && is_convertible_v< F(error_type_t<meta::uncvref_t<N>>), value_type_t<meta::uncvref_t<N>> >
+  //    is_value_or_error_v<remove_cvref_t<N>>
+  // && is_convertible_v< F(error_type_t<remove_cvref_t<N>>), value_type_t<remove_cvref_t<N>> >
   //>
   >
   BOOST_CXX14_CONSTEXPR
-  value_type_t<meta::uncvref_t<N>>
+  value_type_t<remove_cvref_t<N>>
   resolve(N&& n, F&& f)
   {
     if (value_or_error::has_value(forward<N>(n)))

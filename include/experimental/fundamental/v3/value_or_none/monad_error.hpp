@@ -14,6 +14,7 @@
 #include <experimental/fundamental/v3/value_or_none/value_or_none.hpp>
 #include <experimental/make.hpp>
 #include <experimental/meta.hpp>
+#include <experimental/type_traits.hpp>
 #include <experimental/type_constructible.hpp>
 #include <experimental/fundamental/v3/monad_error/monad_error.hpp>
 #include <utility>
@@ -30,7 +31,7 @@ inline  namespace fundamental_v3
     // fixme: Should we provide another overload taking a Callable<F(none_type_t<N>) as parameter?
     template <class N, class F>
     // requires Nullable<N> and Callable<F,none_type_t<N>(void)>
-    static constexpr meta::uncvref_t<N> catch_error(N&& x, F&& f)
+    static constexpr remove_cvref_t<N> catch_error(N&& x, F&& f)
     {
       return (has_value(forward<N>(x))) ? move(x) : f();
     }

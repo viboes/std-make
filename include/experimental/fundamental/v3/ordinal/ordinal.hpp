@@ -9,6 +9,7 @@
 
 #include <experimental/meta.hpp>
 #include <experimental/fundamental/v2/config.hpp>
+#include <experimental/type_traits.hpp>
 #include <utility>
 #include <limits>
 #include <climits>
@@ -169,10 +170,10 @@ namespace meta {
   }
 
   template <class Ord>
-  constexpr auto pos(Ord&& val) noexcept -> decltype(traits<experimental::meta::uncvref_t<Ord>>::pos(std::forward<Ord>(val)))
+  constexpr auto pos(Ord&& val) noexcept -> decltype(traits<remove_cvref_t<Ord>>::pos(std::forward<Ord>(val)))
   {
       //JASEL_EXPECTS(unique<Ord>());
-      return traits<experimental::meta::uncvref_t<Ord>>::pos(std::forward<Ord>(val));
+      return traits<remove_cvref_t<Ord>>::pos(std::forward<Ord>(val));
   }
 
   template <class Ord>

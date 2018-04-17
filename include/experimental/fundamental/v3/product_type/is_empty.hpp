@@ -10,6 +10,7 @@
 #define JASEL_FUNDAMENTAL_V3_PRODUCT_TYPE_IS_EMPTY_HPP
 
 #include <experimental/fundamental/v3/product_type/product_type.hpp>
+#include <experimental/type_traits.hpp>
 #include <tuple>
 #include <utility>
 
@@ -24,12 +25,12 @@ namespace product_type
 {
   template <class ProductType
 #if ! defined JASEL_DOXYGEN_INVOKED
-  , class = enable_if_t< is_product_type_v<meta::uncvref_t<ProductType>>  >
+  , class = enable_if_t< is_product_type_v<remove_cvref_t<ProductType>>  >
 #endif
   >
   constexpr auto is_empty(ProductType&& )
     JASEL_DECLTYPE_RETURN_NOEXCEPT(
-        product_type::size<meta::uncvref_t<ProductType>>::value==0
+        product_type::size<remove_cvref_t<ProductType>>::value==0
     )
 
 }

@@ -10,6 +10,7 @@
 #define JASEL_FUNDAMENTAL_V3_PRODUCT_TYPE_TO_TUPLE_HPP
 
 #include <experimental/fundamental/v3/product_type/product_type.hpp>
+#include <experimental/type_traits.hpp>
 #include <tuple>
 #include <utility>
 
@@ -45,7 +46,7 @@ namespace product_type
 
   template <class ProductType
 #if ! defined JASEL_DOXYGEN_INVOKED
-  , class = enable_if_t< is_product_type_v<meta::uncvref_t<ProductType>>  >
+  , class = enable_if_t< is_product_type_v<remove_cvref_t<ProductType>>  >
 #endif
   >
   constexpr decltype(auto) to_tuple(ProductType&& pt)
@@ -66,7 +67,7 @@ namespace product_type
    */
 
   template <class IndexSequence, class ProductType
-  , class = enable_if_t< is_product_type_v<meta::uncvref_t<ProductType>>  >
+  , class = enable_if_t< is_product_type_v<remove_cvref_t<ProductType>>  >
   >
   constexpr decltype(auto) select_to_tuple(ProductType&& pt)
   {
@@ -115,7 +116,7 @@ namespace product_type
 
   template <std::size_t I, std::size_t J, class ProductType
   , class = enable_if_t<
-      is_product_type_v<meta::uncvref_t<ProductType>>
+      is_product_type_v<remove_cvref_t<ProductType>>
       && I < product_type::size_v<ProductType>
       && J < product_type::size_v<ProductType>
       >
@@ -152,11 +153,11 @@ namespace product_type
    */
 
   template <class IndexPred, class ProductType
-  , class = enable_if_t< is_product_type_v<meta::uncvref_t<ProductType>>  >
+  , class = enable_if_t< is_product_type_v<remove_cvref_t<ProductType>>  >
   >
   constexpr decltype(auto) project_to_tuple(ProductType&& pt)
   {
-      using PT = meta::uncvref_t<PT2>;
+      using PT = remove_cvref_t<PT2>;
       return product_type_detail::to_tuple_impl(forward<ProductType>(pt),
           make_projected_integer_sequence<IndexPred, product_type::element_sequence_for<PT>>{}{});
   }
@@ -183,12 +184,12 @@ namespace product_type_detail {
 
   template <class TypePred, class PT2
 #if ! defined JASEL_DOXYGEN_INVOKED
-  , class = enable_if_t< is_product_type_v<meta::uncvref_t<PT2>>  >
+  , class = enable_if_t< is_product_type_v<remove_cvref_t<PT2>>  >
 #endif
   >
   constexpr decltype(auto) filter_to_tuple(PT2&& pt)
   {
-      using PT = meta::uncvref_t<PT2>;
+      using PT = remove_cvref_t<PT2>;
       return product_type_detail::to_tuple_impl(forward<ProductType>(pt),
           make_project_index_sequence<product_type_detail::TypeToIndexPred<TypePred, PT>, product_type::element_sequence_for<PT>>{});
   }

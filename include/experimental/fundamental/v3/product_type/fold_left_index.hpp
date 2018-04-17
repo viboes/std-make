@@ -11,6 +11,7 @@
 
 #include <experimental/fundamental/v3/product_type/product_type.hpp>
 #include <experimental/fundamental/v3/product_type/fold_left.hpp>
+#include <experimental/type_traits.hpp>
 #include <utility>
 
 // fixme: fold_let is implementable, as Hana does it, using foldable::apply (hana::unpack).
@@ -63,7 +64,7 @@ namespace product_type
   template <class F, class State, class ProductType
 #if ! defined JASEL_DOXYGEN_INVOKED
   // todo add constraint on F
-  , class = enable_if_t< is_product_type_v<meta::uncvref_t<ProductType>> >
+  , class = enable_if_t< is_product_type_v<remove_cvref_t<ProductType>> >
 #endif
   >
   constexpr decltype(auto) fold_left_index(ProductType&& pt, State&& state, F&& f)
@@ -77,7 +78,7 @@ namespace product_type
   // todo add constraint on F
   , class = enable_if_t<
               product_type::friendly_type_trait<
-                meta::uncvref_t<ProductType>,
+                remove_cvref_t<ProductType>,
                 product_type::not_empty
               >::value
       >

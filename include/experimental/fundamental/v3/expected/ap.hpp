@@ -15,6 +15,7 @@
 #include <experimental/meta.hpp>
 #include <experimental/type_constructible.hpp>
 #include <experimental/fundamental/v3/applicative/applicative.hpp>
+#include <experimental/type_traits.hpp>
 #include <utility>
 #include <functional>
 
@@ -35,13 +36,13 @@ namespace expected_helpers
   template <class N, class F
   // todo add constraint on F
   //, class = enable_if_t<
-  //    is_nullable_v<meta::uncvref_t<N>>
-  // && is_type_constructible_v<meta::uncvref_t<N>>
+  //    is_nullable_v<remove_cvref_t<N>>
+  // && is_type_constructible_v<remove_cvref_t<N>>
   //>
   >
   auto
   ap(F&& f, N&& n)
-  -> decltype(meta::rebind_t<meta::uncvref_t<N>, decltype(
+  -> decltype(meta::rebind_t<remove_cvref_t<N>, decltype(
           JASEL_INVOKE((*forward<F>(f)), *forward<N>(n))
         )>(JASEL_INVOKE((*forward<F>(f)), *forward<N>(n))))
   {
@@ -51,7 +52,7 @@ namespace expected_helpers
       return make_unexpected(n.error());
 
     return
-        meta::rebind_t<meta::uncvref_t<N>, decltype(
+        meta::rebind_t<remove_cvref_t<N>, decltype(
                       JASEL_INVOKE((*forward<F>(f)), *forward<N>(n))
                     )>(JASEL_INVOKE((*forward<F>(f)), *forward<N>(n)));
   }

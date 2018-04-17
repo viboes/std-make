@@ -11,7 +11,7 @@
 
 #include <experimental/fundamental/v2/config.hpp>
 #include <experimental/fundamental/v3/value_or_error/value_or_error.hpp>
-#include <experimental/meta.hpp>
+#include <experimental/type_traits.hpp>
 #include <utility>
 
 namespace std
@@ -29,9 +29,9 @@ namespace value_or_error
    */
   template <class N, class E
     , class = enable_if_t<
-        is_value_or_error< meta::uncvref_t<N> >::value
+        is_value_or_error< remove_cvref_t<N> >::value
         // add constraint on E
-        //&& is_comparable_v< meta::uncvref_t<E>, none_type_t<meta::uncvref_t<N>> >
+        //&& is_comparable_v< remove_cvref_t<E>, none_type_t<remove_cvref_t<N>> >
     >
   >
   BOOST_CXX14_CONSTEXPR

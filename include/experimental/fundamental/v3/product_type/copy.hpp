@@ -71,12 +71,12 @@ namespace product_type
 #if ! defined JASEL_DOXYGEN_INVOKED
   , class = enable_if_t<
         product_type_detail::have_same_size<
-          PT2, meta::uncvref_t<PT1>,
-          (is_product_type_v<PT2> && is_product_type_v<meta::uncvref_t<PT1>>)
+          PT2, remove_cvref_t<PT1>,
+          (is_product_type_v<PT2> && is_product_type_v<remove_cvref_t<PT1>>)
         >::value
       && product_type_detail::have_assignable_elements<
-          PT2&, meta::uncvref_t<PT1>&&,
-          (is_product_type_v<PT2> && is_product_type_v<meta::uncvref_t<PT1>>),
+          PT2&, remove_cvref_t<PT1>&&,
+          (is_product_type_v<PT2> && is_product_type_v<remove_cvref_t<PT1>>),
           product_type::element_sequence_for<PT2>
         >::value
     >

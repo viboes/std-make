@@ -82,7 +82,7 @@ namespace value_or_none
     constexpr
     auto deref(T && x)
     JASEL_DECLTYPE_RETURN (
-            traits<meta::uncvref_t<T>>::deref(x)
+            traits<remove_cvref_t<T>>::deref(x)
     )
 
     template <class T>
@@ -100,7 +100,7 @@ namespace value_or_none
     constexpr
     auto deref_none(T&& )
     JASEL_DECLTYPE_RETURN (
-            none<meta::uncvref_t<T>>()
+            none<remove_cvref_t<T>>()
     )
 
 }

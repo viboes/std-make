@@ -10,6 +10,7 @@
 #define JASEL_FUNDAMENTAL_V3_PRODUCT_TYPE_STREAM_INSERT_HPP
 
 #include <experimental/fundamental/v3/product_type/product_type.hpp>
+#include <experimental/type_traits.hpp>
 #include <utility>
 #include <iostream>
 #include <experimental/fundamental/v2/config.hpp>
@@ -46,7 +47,7 @@ namespace product_type_detail {
   template <class Char, class Traits, class PT
 #if ! defined JASEL_DOXYGEN_INVOKED
   , class = enable_if_t<
-      is_product_type_v<meta::uncvref_t<PT>>
+      is_product_type_v<remove_cvref_t<PT>>
     >
 #endif
   >

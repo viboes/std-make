@@ -9,6 +9,7 @@
 
 // todo move this to concurrency/v1
 #include <future>
+#include <experimental/fundamental/v3/utility/unwrap_ref_decay.hpp>
 
 namespace std
 {
@@ -26,9 +27,9 @@ inline namespace concurrency_v1
 
   // deduced type
   template <int = 0, int..., class T>
-  future<experimental::meta::decay_unwrap_t<T>> make_ready_future(T&& x)
+  future<unwrap_ref_decay_t<T>> make_ready_future(T&& x)
   {
-    promise<experimental::meta::decay_unwrap_t<T>> p;
+    promise<unwrap_ref_decay_t<T>> p;
     p.set_value(forward<T>(x));
     return p.get_future();
   }
@@ -49,9 +50,9 @@ inline namespace concurrency_v1
   }
 
   template <int = 0, int..., class T>
-  future<experimental::meta::decay_unwrap_t<T>> emplace_ready_future(T&& x)
+  future<unwrap_ref_decay_t<T>> emplace_ready_future(T&& x)
   {
-    promise<experimental::meta::decay_unwrap_t<T>> p;
+    promise<unwrap_ref_decay_t<T>> p;
     p.set_value(forward<T>(x));
     return p.get_future();
   }

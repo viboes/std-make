@@ -27,6 +27,7 @@
 
 # include <experimental/fundamental/v2/config.hpp>
 # include <experimental/fundamental/v3/config/requires.hpp>
+# include <experimental/type_traits.hpp>
 # include <experimental/utility.hpp>
 # include <experimental/type_traits.hpp>
 
@@ -142,8 +143,8 @@ public:
     template < class U = value_type
             , JASEL_REQUIRES(
                     is_constructible<T, U&&>::value
-                    && ! is_same<meta::uncvref_t<U>, in_place_t>::value
-                    && ! is_same<meta::uncvref_t<U>, optional<T>>::value
+                    && ! is_same<remove_cvref_t<U>, in_place_t>::value
+                    && ! is_same<remove_cvref_t<U>, optional<T>>::value
                     && is_convertible<U&&, T>::value
             )
     >
@@ -155,8 +156,8 @@ public:
     template < class U = value_type
             , JASEL_REQUIRES(
                     is_constructible<T, U&&>::value
-                    && ! is_same<meta::uncvref_t<U>, in_place_t>::value
-                    && ! is_same<meta::uncvref_t<U>, optional<T>>::value
+                    && ! is_same<remove_cvref_t<U>, in_place_t>::value
+                    && ! is_same<remove_cvref_t<U>, optional<T>>::value
                     && ! is_convertible<U&&, T>::value
             )
     >
@@ -168,8 +169,8 @@ public:
     template <class U = value_type
                     , JASEL_REQUIRES(
                             is_constructible<T, U&&>::value
-                            && ! is_same<meta::uncvref_t<U>, in_place_t>::value
-                            && ! is_same<meta::uncvref_t<U>, optional<T>>::value
+                            && ! is_same<remove_cvref_t<U>, in_place_t>::value
+                            && ! is_same<remove_cvref_t<U>, optional<T>>::value
                             && ! is_convertible<U&&, T>::value
                     )
     >
@@ -248,10 +249,10 @@ public:
     template <class U=T
                     , JASEL_REQUIRES(
                             is_constructible<T, U>::value
-                            && ! is_same<meta::uncvref_t<U>, optional<T>>::value
+                            && ! is_same<remove_cvref_t<U>, optional<T>>::value
                             && is_assignable<T&, U>::value
                             && (
-                                  ! is_same<meta::uncvref_t<U>, T>::value
+                                  ! is_same<remove_cvref_t<U>, T>::value
                                ||
                                    ! is_scalar<T>::value
                                             )
@@ -633,9 +634,9 @@ void swap(optional<T>& x, optional<T>& y) noexcept
 }
 
 template <class T>
-constexpr optional<meta::uncvref_t<T>> make_optional(T&& v)
+constexpr optional<remove_cvref_t<T>> make_optional(T&& v)
 {
-    return optional<meta::uncvref_t<T>>(constexpr_forward<T>(v));
+    return optional<remove_cvref_t<T>>(constexpr_forward<T>(v));
 }
 
 #if 0

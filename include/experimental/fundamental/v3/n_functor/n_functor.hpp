@@ -20,6 +20,7 @@
 #include <experimental/meta.hpp>
 #include <experimental/type_constructible.hpp>
 #include <experimental/fundamental/v2/config.hpp>
+#include <experimental/type_traits.hpp>
 
 namespace std
 {
@@ -57,7 +58,7 @@ namespace n_functor
   auto
     transform(T&& x, F&& f)
       JASEL_DECLTYPE_RETURN_NOEXCEPT(
-          traits<type_constructor_t<meta::uncvref_t<T>>>::transform(forward<T>(x),forward<F>(f))
+          traits<type_constructor_t<remove_cvref_t<T>>>::transform(forward<T>(x),forward<F>(f))
        )
 
   template <class F, class T>

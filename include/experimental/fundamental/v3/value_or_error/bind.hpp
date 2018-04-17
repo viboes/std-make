@@ -14,6 +14,7 @@
 #include <experimental/fundamental/v3/value_or_error/value_or_error.hpp>
 #include <experimental/make.hpp>
 #include <experimental/meta.hpp>
+#include <experimental/type_traits.hpp>
 #include <experimental/type_constructible.hpp>
 #include <experimental/fundamental/v3/monad/monad.hpp>
 #include <utility>
@@ -36,8 +37,8 @@ namespace value_or_error
   template <class M, class F
   // todo add constraint on F
   //, class = enable_if_t<
-  //    is_value_or_error_v<meta::uncvref_t<N>>
-  // && is_type_constructible_v<meta::uncvref_t<N>>
+  //    is_value_or_error_v<remove_cvref_t<N>>
+  // && is_type_constructible_v<remove_cvref_t<N>>
   //>
   >
   JASEL_CXX14_CONSTEXPR auto

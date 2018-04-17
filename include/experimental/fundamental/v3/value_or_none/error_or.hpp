@@ -32,17 +32,17 @@ namespace value_or_none
   template <class N, class E
   // constraint on E
     , class = enable_if_t<
-          is_value_or_none< meta::uncvref_t<N> >::value
-          && is_convertible< E, none_type_t< meta::uncvref_t<N> > >::value
+          is_value_or_none< remove_cvref_t<N> >::value
+          && is_convertible< E, none_type_t< remove_cvref_t<N> > >::value
     >
   >
   BOOST_CXX14_CONSTEXPR
-  none_type_t<meta::uncvref_t<N>>
+  none_type_t<remove_cvref_t<N>>
   error_or(N&& n, E&& e)
   {
     if (value_or_none::has_value(forward<N>(n)))
     {
-      return value_or_none::none<meta::uncvref_t<N>>();
+      return value_or_none::none<remove_cvref_t<N>>();
     }
     return forward<E>(e);
   }

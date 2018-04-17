@@ -13,6 +13,7 @@
 #include <experimental/fundamental/v3/value_or_error/value_or_error.hpp>
 #include <experimental/make.hpp>
 #include <experimental/meta.hpp>
+#include <experimental/type_traits.hpp>
 #include <experimental/make.hpp>
 #include <experimental/type_constructible.hpp>
 #include <experimental/fundamental/v3/monad_error/monad_error.hpp>
@@ -30,7 +31,7 @@ inline  namespace fundamental_v3
     // fixme: Should we provide another overload taking a Callable<F(error_type_t<N>) as parameter?
     template <class N, class F>
     // requires Nullable<N> and Callable<F,error_type_t<N>(void)>
-    constexpr meta::uncvref_t<N> catch_error(N&& x, F&& f)
+    constexpr remove_cvref_t<N> catch_error(N&& x, F&& f)
     {
       return (value_or_error::has_value(forward<N>(x))) ? move(x) : f();
     }

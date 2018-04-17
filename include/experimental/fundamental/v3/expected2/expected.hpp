@@ -22,8 +22,7 @@
 #include <experimental/fundamental/v2/config.hpp>
 #include <experimental/fundamental/v3/result/helpers_detail.hpp>
 #include <experimental/fundamental/v3/result/success_failure.hpp>
-#include <experimental/meta/v1/uncvref.hpp>
-#include <type_traits>
+#include <experimental/type_traits.hpp>
 #include <utility>
 #if __cplusplus <= 201402L || ! defined __clang__
 #include <experimental/fundamental/v3/in_place.hpp>
@@ -833,14 +832,14 @@ class expected : public expected_detail::expected_base<T, E>
 
     template <class U>
     using check_expected_u_ctor = typename conditional<
-                    !is_same_v<meta::uncvref_t<U>, in_place_t> &&
-                    !is_same_v<meta::uncvref_t<U>, unexpect_t> &&
-                    !is_same_v<meta::uncvref_t<U>, in_place_type_t<T>> &&
-                    !is_same_v<meta::uncvref_t<U>, in_place_type_t<success_type>> &&
-                    !is_same_v<meta::uncvref_t<U>, in_place_type_t<failure_type>> &&
-                    !is_same_v<meta::uncvref_t<U>, in_place_index_t<success_index>> &&
-                    !is_same_v<meta::uncvref_t<U>, in_place_index_t<failure_index>> &&
-                    !is_same_v<meta::uncvref_t<U>, expected<T, E>>,
+                    !is_same_v<remove_cvref_t<U>, in_place_t> &&
+                    !is_same_v<remove_cvref_t<U>, unexpect_t> &&
+                    !is_same_v<remove_cvref_t<U>, in_place_type_t<T>> &&
+                    !is_same_v<remove_cvref_t<U>, in_place_type_t<success_type>> &&
+                    !is_same_v<remove_cvref_t<U>, in_place_type_t<failure_type>> &&
+                    !is_same_v<remove_cvref_t<U>, in_place_index_t<success_index>> &&
+                    !is_same_v<remove_cvref_t<U>, in_place_index_t<failure_index>> &&
+                    !is_same_v<remove_cvref_t<U>, expected<T, E>>,
                     helpers_detail::check_constructible<T, U>,
                     helpers_detail::check_fail
                 >::type;

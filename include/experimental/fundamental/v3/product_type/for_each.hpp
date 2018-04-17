@@ -51,7 +51,7 @@ namespace product_type
   template <class F, class ProductType
 #if ! defined JASEL_DOXYGEN_INVOKED
   // todo add constraint on F
-  , class = enable_if_t< is_product_type_v<meta::uncvref_t<ProductType>> >
+  , class = enable_if_t< is_product_type_v<remove_cvref_t<ProductType>> >
 #endif
   >
   constexpr void for_each(ProductType&& pt, F&& f)

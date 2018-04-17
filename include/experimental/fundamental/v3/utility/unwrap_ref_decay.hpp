@@ -1,17 +1,14 @@
 //////////////////////////////////////////////////////////////////////////////
 //
-// (C) Copyright Vicente J. Botet Escriba 2014.
+// (C) Copyright Vicente J. Botet Escriba 2014,2018.
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file // LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef JASEL_META_V1_DECAY_UNWRAP_HPP
-#define JASEL_META_V1_DECAY_UNWRAP_HPP
+#ifndef JASEL_STD_UNWRAP_REF_DECAY_HPP
+#define JASEL_STD_UNWRAP_REF_DECAY_HPP
 
-#error
-#include <experimental/meta/v1/id.hpp>
-#include <experimental/meta/v1/eval.hpp>
 #include <functional> // reference_wrapper
 #include <type_traits> //decay
 
@@ -19,27 +16,29 @@ namespace std
 {
 namespace experimental
 {
-namespace meta
-{
-inline namespace v1
+inline namespace fundamental_v3
 {
   namespace detail {
     template <class T>
-    struct decay_unwrap_impl : id<T> {};
+    struct unwrap_ref_decay_impl {
+        using type = T;
+    };
 
     template <class T>
-    struct decay_unwrap_impl<reference_wrapper<T>> : id<T&> {};
+    struct unwrap_ref_decay_impl<reference_wrapper<T>> {
+        using type = T&;
+    };
   }
 
   template <class T>
-  struct decay_unwrap : detail::decay_unwrap_impl<eval<decay<T>>> {};
+  struct unwrap_ref_decay : detail::unwrap_ref_decay_impl<typename decay<T>::type> {};
 
   template <class T>
-  using decay_unwrap_t = eval<decay_unwrap<T>>;
+  using unwrap_ref_decay_t = typename unwrap_ref_decay<T>::type;
 
 }
 }
 }
-}
+
 
 #endif // header

@@ -12,6 +12,7 @@
 #include <experimental/fundamental/v2/config.hpp>
 #include <experimental/fundamental/v3/monad_error/monad_error.hpp>
 #include <experimental/meta.hpp>
+#include <experimental/type_traits.hpp>
 #include <utility>
 
 namespace std
@@ -34,15 +35,15 @@ namespace monad_error
   template <class M, class E
   // constraints on M and E
     , class = enable_if_t<
-        is_monad_error_v<meta::uncvref_t<N>>
-      && is_convertible_v< E, error_type_t<meta::uncvref_t<N>> >
+        is_monad_error_v<remove_cvref_t<N>>
+      && is_convertible_v< E, error_type_t<remove_cvref_t<N>> >
     >
   >
   BOOST_CXX14_CONSTEXPR
   M
   error_or(M&& n, E&& e)
   {
-    using ME = meta::uncvref_t<M>;
+    using ME = remove_cvref_t<M>;
     return (bind)(forward<M>(m), [e](auto) -> ME { return make_error<ME>(e)});
   }
 

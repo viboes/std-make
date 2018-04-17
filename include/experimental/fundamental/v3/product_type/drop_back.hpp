@@ -10,6 +10,7 @@
 #define JASEL_FUNDAMENTAL_V3_PRODUCT_TYPE_DROP_BACK_HPP
 
 #include <experimental/fundamental/v3/product_type/product_type.hpp>
+#include <experimental/type_traits.hpp>
 #include <tuple>
 #include <utility>
 
@@ -28,7 +29,7 @@ namespace product_type
     template <size_t N, class ProductType, std::size_t... I>
     constexpr decltype(auto) select_impl( ProductType&& pt, index_sequence<I...> )
     {
-      return make<type_constructor_t<meta::uncvref_t<ProductType>>>(
+      return make<type_constructor_t<remove_cvref_t<ProductType>>>(
           product_type::get<I>(forward<ProductType>(pt))...
           );
     }
@@ -37,25 +38,25 @@ namespace product_type
 
   template <size_t N, class ProductType
 #if ! defined JASEL_DOXYGEN_INVOKED
-  , class = enable_if_t< is_product_type_v<meta::uncvref_t<ProductType>>  >
+  , class = enable_if_t< is_product_type_v<remove_cvref_t<ProductType>>  >
 #endif
   >
   constexpr auto drop_back(ProductType&& pt)
   JASEL_DECLTYPE_RETURN_NOEXCEPT(
       product_type_detail::select_impl<N>(forward<ProductType>(pt),
-          make_index_sequence<product_type::size<meta::uncvref_t<ProductType>>::value-N>{}
+          make_index_sequence<product_type::size<remove_cvref_t<ProductType>>::value-N>{}
           )
   )
 
   template <size_t N, class ProductType
 #if ! defined JASEL_DOXYGEN_INVOKED
-  , class = enable_if_t< is_product_type_v<meta::uncvref_t<ProductType>>  >
+  , class = enable_if_t< is_product_type_v<remove_cvref_t<ProductType>>  >
 #endif
   >
   constexpr auto drop_front(ProductType&& pt)
   JASEL_DECLTYPE_RETURN_NOEXCEPT(
       product_type_detail::select_impl<N>(forward<ProductType>(pt),
-          make_index_sequence_for_range<N, product_type::size<meta::uncvref_t<ProductType>>::value-1>{}
+          make_index_sequence_for_range<N, product_type::size<remove_cvref_t<ProductType>>::value-1>{}
           )
   )
 

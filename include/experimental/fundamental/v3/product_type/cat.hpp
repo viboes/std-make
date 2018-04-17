@@ -11,6 +11,7 @@
 
 #include <experimental/fundamental/v3/product_type/to_tuple.hpp>
 #include <experimental/fundamental/v3/product_type/product_type.hpp>
+#include <experimental/type_traits.hpp>
 #include <utility>
 #include <experimental/fundamental/v2/config.hpp>
 
@@ -34,7 +35,7 @@ namespace product_type
   template <class ...ProductTypes
 #if ! defined JASEL_DOXYGEN_INVOKED
 #if defined JASEL_HAS_FOLD_EXPRESSIONS
-  , class = enable_if_t< (is_product_type_v<meta::uncvref_t<ProductTypes>> && ...) >
+  , class = enable_if_t< (is_product_type_v<remove_cvref_t<ProductTypes>> && ...) >
 #else
   // todo Add for C++14
 #endif

@@ -136,11 +136,11 @@ namespace std
 #endif
 
         template <class T>
-        constexpr auto begin(T&& x) noexcept -> decltype( traits<meta::uncvref_t<T>>::begin(forward<T>(x)) )
-        { return traits<meta::uncvref_t<T>>::begin(forward<T>(x));}
+        constexpr auto begin(T&& x) noexcept -> decltype( traits<remove_cvref_t<T>>::begin(forward<T>(x)) )
+        { return traits<remove_cvref_t<T>>::begin(forward<T>(x));}
         template <class T>
-        constexpr auto end(T&& x) noexcept -> decltype( traits<meta::uncvref_t<T>>::end(forward<T>(x)) )
-        { return traits<meta::uncvref_t<T>>::end(forward<T>(x));}
+        constexpr auto end(T&& x) noexcept -> decltype( traits<remove_cvref_t<T>>::end(forward<T>(x)) )
+        { return traits<remove_cvref_t<T>>::end(forward<T>(x));}
 
         // overload for c-arrays
 #if 0

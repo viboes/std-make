@@ -14,6 +14,7 @@
 #include <experimental/fundamental/v3/value_or_none/value_or_none.hpp>
 #include <experimental/make.hpp>
 #include <experimental/meta.hpp>
+#include <experimental/type_traits.hpp>
 #include <experimental/type_constructible.hpp>
 #include <experimental/fundamental/v3/monad/monad.hpp>
 #include <utility>
@@ -36,8 +37,8 @@ namespace value_or_none
   template <class M, class F
   // todo add constraint on F
   //, class = enable_if_t<
-  //    is_value_or_none_v<meta::uncvref_t<N>>
-  // && is_type_constructible_v<meta::uncvref_t<N>>
+  //    is_value_or_none_v<remove_cvref_t<N>>
+  // && is_type_constructible_v<remove_cvref_t<N>>
   //>
   >
   JASEL_CXX14_CONSTEXPR auto
@@ -50,7 +51,7 @@ namespace value_or_none
     {
       return JASEL_INVOKE(std::forward<F>(f), value_or_none::deref(forward<M>(m)));
     }
-    return value_or_none::none<meta::uncvref_t<M>>();
+    return value_or_none::none<remove_cvref_t<M>>();
 
   }
   struct as_monad: monad::mcd_bind

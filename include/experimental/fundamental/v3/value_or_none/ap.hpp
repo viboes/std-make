@@ -14,6 +14,7 @@
 #include <experimental/fundamental/v3/value_or_none/value_or_none.hpp>
 #include <experimental/make.hpp>
 #include <experimental/meta.hpp>
+#include <experimental/type_traits.hpp>
 #include <experimental/type_constructible.hpp>
 #include <experimental/fundamental/v3/applicative/applicative.hpp>
 #include <utility>
@@ -36,20 +37,20 @@ namespace value_or_none
   template <class N, class F
   // todo add constraint on F
   //, class = enable_if_t<
-  //    is_value_or_none_v<meta::uncvref_t<N>>
-  // && is_type_constructible_v<meta::uncvref_t<N>>
+  //    is_value_or_none_v<remove_cvref_t<N>>
+  // && is_type_constructible_v<remove_cvref_t<N>>
   //>
   >
   JASEL_CXX14_CONSTEXPR auto
   ap(F&& f, N&& n) -> decltype(
-      make<TypeConstructor<meta::uncvref_t<N>>>(value_or_none::deref(std::forward<F>(f))(value_or_none::deref(forward<N>(n))))
+      make<TypeConstructor<remove_cvref_t<N>>>(value_or_none::deref(std::forward<F>(f))(value_or_none::deref(forward<N>(n))))
       )
   {
     if (! value_or_none::has_value(forward<F>(f)) || ! value_or_none::has_value(forward<N>(n)))
-      return value_or_none::none<meta::uncvref_t<N>>();
+      return value_or_none::none<remove_cvref_t<N>>();
 
 
-    return make<TypeConstructor<meta::uncvref_t<N>>>(
+    return make<TypeConstructor<remove_cvref_t<N>>>(
         JASEL_INVOKE(value_or_none::deref(std::forward<F>(f)), value_or_none::deref(forward<N>(n)))
       );
   }

@@ -9,6 +9,7 @@
 
 #include <experimental/make.hpp>
 #include <experimental/meta.hpp>
+#include <experimental/type_traits.hpp>
 #include <experimental/product_type.hpp>
 #include <experimental/n_functor.hpp>
 #include <experimental/n_applicative.hpp>
@@ -55,7 +56,7 @@ inline namespace fundamental_v3
         return detail::apply_impl(std::forward<Function>(fn),
                           std::forward<Tuple>(tuple),
                           std::make_index_sequence<
-                          std::tuple_size<meta::uncvref_t<Tuple>>::value>());
+                          std::tuple_size<remove_cvref_t<Tuple>>::value>());
       }
 #endif
 #if __cplusplus >= 201402L || defined JASEL_DOXYGEN_INVOKED

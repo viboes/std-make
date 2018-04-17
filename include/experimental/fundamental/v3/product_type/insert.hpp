@@ -29,7 +29,7 @@ namespace product_type
     template <size_t N, class ProductType, std::size_t... IF, class T, std::size_t... IL>
     constexpr decltype(auto) insert_impl( ProductType&& pt, index_sequence<IF...>, T&& x, index_sequence<IL...> )
     {
-      return make<type_constructor_t<meta::uncvref_t<ProductType>>>(
+      return make<type_constructor_t<remove_cvref_t<ProductType>>>(
           product_type::get<IF>(forward<ProductType>(pt))...,
           forward<T>(x),
           product_type::get<IL>(forward<ProductType>(pt))...
@@ -39,7 +39,7 @@ namespace product_type
 #endif
   template <size_t N, class ProductType, class T
 #if ! defined JASEL_DOXYGEN_INVOKED
-  , class = enable_if_t< is_product_type_v<meta::uncvref_t<ProductType>>  >
+  , class = enable_if_t< is_product_type_v<remove_cvref_t<ProductType>>  >
 #endif
   >
   constexpr auto insert(ProductType&& pt, T&& x)
@@ -47,7 +47,7 @@ namespace product_type
       product_type_detail::insert_impl<N>(forward<ProductType>(pt),
           make_index_sequence_for_range<0, N-1>{},
           forward<T>(x),
-          make_index_sequence_for_range<N, product_type::size<meta::uncvref_t<ProductType>>::value-1>{}
+          make_index_sequence_for_range<N, product_type::size<remove_cvref_t<ProductType>>::value-1>{}
           )
   )
 

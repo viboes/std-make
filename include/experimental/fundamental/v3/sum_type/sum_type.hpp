@@ -288,17 +288,17 @@ namespace detail {
 
     // note: this cannot be noexcept as either it can throw as for variant or has a narrow contract
     template <size_t I, class ST
-      , class= std::enable_if_t< I < size_v<meta::uncvref_t<ST>> >
+      , class= std::enable_if_t< I < size_v<remove_cvref_t<ST>> >
     >
     constexpr decltype(auto) get(ST && st)
     {
-        return traits<meta::uncvref_t<ST>>::template get<I>(forward<ST>(st));
+        return traits<remove_cvref_t<ST>>::template get<I>(forward<ST>(st));
     }
 
     template <class V, class ST>
     constexpr decltype(auto) visit(V&& v, ST && st)
     {
-        return traits<meta::uncvref_t<ST>>::visit(forward<V>(v), forward<ST>(st));
+        return traits<remove_cvref_t<ST>>::visit(forward<V>(v), forward<ST>(st));
     }
 
     template <class ST>
@@ -308,7 +308,7 @@ namespace detail {
     constexpr size_t is_empty(ST &&) noexcept { return sum_type::empty_v<remove_reference_t<ST>>; }
 
     template <class ST>
-    using alternative_sequence_for = make_index_sequence<sum_type::size_v<meta::uncvref_t<ST>>>;
+    using alternative_sequence_for = make_index_sequence<sum_type::size_v<remove_cvref_t<ST>>>;
 
 #if ! defined JASEL_DOXYGEN_INVOKED
     namespace detail {
@@ -324,7 +324,7 @@ namespace detail {
     template <class ST>
     struct alternatives
 #if ! defined JASEL_DOXYGEN_INVOKED
-        : detail::alternatives<meta::uncvref_t<ST>, sum_type::alternative_sequence_for<ST>> {}
+        : detail::alternatives<remove_cvref_t<ST>, sum_type::alternative_sequence_for<ST>> {}
 #endif
         ;
 

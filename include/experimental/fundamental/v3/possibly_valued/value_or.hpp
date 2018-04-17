@@ -33,12 +33,12 @@ namespace possibly_valued
   template <class N, class T
   // todo add constraint on T
   //, class = enable_if_t<
-  //    is_possibly_valued_v<meta::uncvref_t<N>>
-  // && is_convertible_v< T, value_type_t<meta::uncvref_t<N>> >
+  //    is_possibly_valued_v<remove_cvref_t<N>>
+  // && is_convertible_v< T, value_type_t<remove_cvref_t<N>> >
   //>
   >
   BOOST_CXX14_CONSTEXPR
-  value_type_t<meta::uncvref_t<N>>
+  value_type_t<remove_cvref_t<N>>
   value_or(N&& n, T&& v)
   {
     if (possibly_valued::has_value(forward<N>(n)))

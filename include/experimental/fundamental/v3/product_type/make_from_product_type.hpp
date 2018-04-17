@@ -10,6 +10,7 @@
 #define JASEL_FUNDAMENTAL_V3_PRODUCT_TYPE_MAKE_FROM_PRODUCT_TYPE_HPP
 
 #include <experimental/fundamental/v3/product_type/product_type.hpp>
+#include <experimental/type_traits.hpp>
 #include <tuple>
 #include <utility>
 
@@ -42,7 +43,7 @@ namespace product_type
    */
   template <class T, class ProductType
 #if ! defined JASEL_DOXYGEN_INVOKED
-  , class = enable_if_t< is_product_type_v<meta::uncvref_t<ProductType>>  >
+  , class = enable_if_t< is_product_type_v<remove_cvref_t<ProductType>>  >
 #endif
   >
   constexpr decltype(auto) make_from(ProductType&& pt)

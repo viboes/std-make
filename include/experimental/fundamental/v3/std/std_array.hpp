@@ -12,6 +12,7 @@
 #include <experimental/functor.hpp>
 #include <experimental/applicative.hpp>
 #include <experimental/product_type.hpp>
+#include <experimental/type_traits.hpp>
 #include <array>
 #include <type_traits>
 
@@ -25,7 +26,7 @@ namespace std
     template<class T> struct is_ref_wrapper<reference_wrapper<T>> : true_type {};
 
     //template<class T>
-    //using not_ref_wrapper = experimental::negation<is_ref_wrapper<meta::uncvref_t<T>>>;
+    //using not_ref_wrapper = experimental::negation<is_ref_wrapper<remove_cvref_t<T>>>;
 
     template <class D, class...> struct return_type_helper { using type = D; };
     template <class... Types>

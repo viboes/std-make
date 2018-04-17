@@ -164,7 +164,7 @@ namespace swappable {
     >
     swap(T&& x, U&& y)
       JASEL_NOEXCEPT_RETURN(
-          traits<meta::uncvref_t<T>, meta::uncvref_t<U>>::swap(forward<T>(x),forward<U>(y))
+          traits<remove_cvref_t<T>, remove_cvref_t<U>>::swap(forward<T>(x),forward<U>(y))
        )
 
   // overload for move swappable: std
@@ -212,7 +212,7 @@ namespace swappable {
   >
   swap(T&& x, U&& y)
       JASEL_NOEXCEPT_RETURN(
-          traits<meta::uncvref_t<T>, meta::uncvref_t<U>>::swap(forward<T>(x),forward<U>(y))
+          traits<remove_cvref_t<T>, remove_cvref_t<U>>::swap(forward<T>(x),forward<U>(y))
        )
 #endif
 

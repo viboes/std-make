@@ -10,7 +10,6 @@
 #define JASEL_FUNDAMENTAL_V3_VALUE_OR_ERROR_HPP
 
 #include <experimental/type_traits.hpp>
-#include <experimental/meta.hpp>
 #include <experimental/fundamental/v2/config.hpp>
 #include <experimental/meta/v1/when.hpp>
 #include <experimental/wrapped.hpp>
@@ -81,20 +80,20 @@ inline namespace fundamental_v3
     constexpr
     auto succeeded(T && x)
       JASEL_DECLTYPE_RETURN_NOEXCEPT (
-        traits<meta::uncvref_t<T>>::succeeded(forward<T>(x))
+        traits<remove_cvref_t<T>>::succeeded(forward<T>(x))
       )
     template <class T>
     constexpr
     auto failed(T && x)
     JASEL_DECLTYPE_RETURN_NOEXCEPT (
-      traits<meta::uncvref_t<T>>::failed(forward<T>(x))
+      traits<remove_cvref_t<T>>::failed(forward<T>(x))
     )
 
     template <class T>
     constexpr
     auto success_value(T && x)
       JASEL_DECLTYPE_RETURN (
-        traits<meta::uncvref_t<T>>::success_value(x)
+        traits<remove_cvref_t<T>>::success_value(x)
       )
 
     template <class T>
@@ -109,7 +108,7 @@ inline namespace fundamental_v3
     constexpr
     auto failure_value(T && x)
       JASEL_DECLTYPE_RETURN_NOEXCEPT (
-          traits<meta::uncvref_t<T>>::failure_value(forward<T>(x))
+          traits<remove_cvref_t<T>>::failure_value(forward<T>(x))
       )
 
     template <class T>
@@ -122,21 +121,21 @@ inline namespace fundamental_v3
     constexpr
     auto has_value(T && x)
       JASEL_DECLTYPE_RETURN_NOEXCEPT (
-        traits<meta::uncvref_t<T>>::has_value(forward<T>(x))
+        traits<remove_cvref_t<T>>::has_value(forward<T>(x))
       )
 
     template <class T>
     constexpr
     auto has_error(T && x)
     JASEL_DECLTYPE_RETURN_NOEXCEPT (
-      ! traits<meta::uncvref_t<T>>::has_value(forward<T>(x))
+      ! traits<remove_cvref_t<T>>::has_value(forward<T>(x))
     )
 
     template <class T>
     constexpr
     auto deref(T && x)
       JASEL_DECLTYPE_RETURN (
-        traits<meta::uncvref_t<T>>::deref(x)
+        traits<remove_cvref_t<T>>::deref(x)
       )
 
     template <class T>
@@ -167,7 +166,7 @@ inline namespace fundamental_v3
     constexpr
     auto error(T && x)
       JASEL_DECLTYPE_RETURN_NOEXCEPT (
-          traits<meta::uncvref_t<T>>::error(forward<T>(x))
+          traits<remove_cvref_t<T>>::error(forward<T>(x))
       )
 
     template <class T>
