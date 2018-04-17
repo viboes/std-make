@@ -34,46 +34,6 @@ inline  namespace fundamental_v3
       using base_type::base_type;
     };
 
-#if 0
-    //! public_tagged is a tagged wrapper that provides implicit conversion to the underlying type
-    //!
-    //! @tparam Tag the tag type
-    //! @tparam UT the underlying type
-    template <class Tag, class UT>
-    struct public_tagged
-    : public_wrapper<UT>
-    {
-      using tag_type = Tag;
-      using base_type = public_wrapper<UT>;
-      using base_type::base_type;
-    };
-
-    //! protected_tagged is a tagged wrapper that provides explicit conversion to the underlying type
-    //!
-    //! @tparam Tag the tag type
-    //! @tparam UT the underlying type
-    template <class Tag, class UT>
-    struct protected_tagged
-    : protected_wrapper<UT>
-    {
-      using tag_type = Tag;
-      using base_type = protected_wrapper<UT>;
-      using base_type::base_type;
-    };
-
-    //! private_tagged is a tagged wrapper that provides no conversion to the underlying type
-    //!
-    //! @tparam Tag the tag type
-    //! @tparam UT the underlying type
-    template <class Tag, class UT>
-    struct private_tagged
-    : private_wrapper<UT>
-    {
-      using tag_type = Tag;
-      using base_type = private_wrapper<UT>;
-      using base_type::base_type;
-    };
-#endif
 }
 }
 }

@@ -33,8 +33,8 @@ inline  namespace fundamental_v3
       constexpr wrapper() noexcept = default;
       constexpr wrapper(wrapper const& e) = default;
       constexpr wrapper(wrapper&& e) = default;
-      constexpr wrapper& operator=(wrapper const& e) = default;
-      constexpr wrapper& operator=(wrapper&& e) = default;
+      JASEL_MUTABLE_CONSTEXPR wrapper& operator=(wrapper const& e) = default;
+      JASEL_MUTABLE_CONSTEXPR wrapper& operator=(wrapper&& e) = default;
 
       template <class... Args, typename = enable_if_t<
           is_constructible<UT, Args&&...>::value == true>
@@ -135,8 +135,6 @@ inline  namespace fundamental_v3
       underlying_type _value;
     };
 
-    // fixme: do we need an heterogeneous_wrapper that is constructible from convertibles?
-
     namespace wrapping {
     template <typename T>
     struct traits<T, meta::when<is_base_of<wrapper_base, T>::value>>
@@ -150,57 +148,6 @@ inline  namespace fundamental_v3
     };
     };
 
-#if 0
-
-    //! public_wrapper is a wrapper that provides implicit conversion to the underlying type
-    //!
-    //! @tparam UT the underlying type
-    template <class UT>
-    struct public_wrapper
-    : wrapper<UT>
-    {
-      using base_type = wrapper<UT>;
-      using typename base_type::underlying_type;
-      using base_type::base_type;
-      using base_type::underlying;
-
-      //! @par Returns the underlying value
-      constexpr operator UT () const noexcept
-      { return this->_value;}
-    };
-
-    //! protected_wrapper is a wrapper that provides explicit conversion to the underlying type
-    //!
-    //! @tparam UT the underlying type
-    template <class UT>
-    struct protected_wrapper
-    : wrapper<UT>
-    {
-      using base_type = wrapper<UT>;
-      using typename base_type::underlying_type;
-      using base_type::base_type;
-      using base_type::underlying;
-
-      //! @par Returns the underlying value
-      explicit constexpr operator UT () const noexcept
-      { return this->_value;}
-    };
-
-    //! private_wrapper is a wrapper that provides no conversion to the underlying type
-    //!
-    //! @tparam UT the underlying type
-    template <class UT>
-    struct private_wrapper
-    : wrapper<UT>
-    {
-      using base_type = wrapper<UT>;
-      using base_type::wrapper;
-      using base_type::underlying;
-
-      operator UT () const = delete;
-    };
-
-#endif
 }
 }
 }
