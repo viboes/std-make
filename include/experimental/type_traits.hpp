@@ -9,11 +9,14 @@
 
 #include <type_traits>
 
+#include <experimental/fundamental/v3/type_traits/bool_constant.hpp>
 #include <experimental/fundamental/v3/type_traits/conjunction.hpp>
+#include <experimental/fundamental/v3/type_traits/detection.hpp>
 #include <experimental/fundamental/v3/type_traits/disjunction.hpp>
 #include <experimental/fundamental/v3/type_traits/integer_sequence.hpp>
 #include <experimental/fundamental/v3/type_traits/negation.hpp>
 #include <experimental/fundamental/v3/type_traits/remove_cvref.hpp>
+#include <experimental/fundamental/v3/type_traits/type_identity.hpp>
 #include <experimental/fundamental/v3/type_traits/type_traits_t.hpp>
 #include <experimental/fundamental/v3/type_traits/type_traits_v.hpp>
 #include <experimental/fundamental/v3/type_traits/void_t.hpp>
