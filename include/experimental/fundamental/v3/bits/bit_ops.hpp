@@ -13,7 +13,7 @@
  \file
  \brief
  The header \c <experimental/.../bits/algorithms.hpp> defines some common bits algorithms.
- Most of them are based on http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2017/p0553r1.html
+ Most of them are based on http://open-std.org/JTC1/SC22/WG21/docs/papers/2017/p0553r2.html
  */
 
 #ifndef JASEL_FUNDAMENTAL_V3_BITS_BITOPS_HPP
