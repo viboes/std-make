@@ -7,36 +7,38 @@ Experimental library for C++11/14/17.
 
 This code forms the basis of several formal proposal to the C++ standard library
 
-* P0051R2 - C++ generic overload function (http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0051r2.pdf)
-* P0196R1 - Generic none() factories for Nullable types (http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0196r1.pdf)
-
-* P0318R0 - decay_unwrap and unwrap_reference (http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0318r0.pdf
-* P0319R0 - Adding Emplace functions for promise<T>/future<T>  (http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0319r0.pdf
+* P0050R0 - C++ generic match function  (http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/p0050r0.pdf)
+* P0051R3 - C++ generic overload function (http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2018/p0051r3.pdf)
+* P0196R4 - Generic none() factories for Nullable types (http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2017/p0196r4.pdf)
+* P0318R1 - `decay_unwrap` and `unwrap_reference` (http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2018/p0318r1.pdf
+* P0319R1 - Adding Emplace functions for `promise<T>`/`future<T>`  (http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2017/p0319r1.pdf
 * P0320R1 - Thread Constructor Attributes (http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0320r1.pdf
-* P0323R1 - A proposal to add a utility class to represent expected monad (Revision 3) http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0323r1.pdf
-* P0327R1 - Product types access (http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0327r1.pdf)
-* P0338R1 - C++ generic factories (http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0338r1.pdf)
-* P0343R0 - Meta-programming High-Order Functions (http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0343r0.pdf)
+* P0323R6 - `std::expected` http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2018/p0323r6.pdf
+* P0327R3 - Product types access (http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2017/p0327r3.pdf)
+* P0338R3 - C++ generic factories (http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2018/p0338r3.pdf)
+* P0343R1 - Meta-programming High-Order Functions (http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2017/p0343r1.pdf)
+* P0648R0 - Extending Tuple-like algorithms to Product-Types - http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2017/p0648r0.pdf
+* P0649R0 - Other Product-Type algorithms - http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2017/p0649r0.pdf
+* P0650R2 - C++ Monadic interface (http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2018/p0650r2.pdf)
+* P0786R1 - ValuedOrError and ValueOrNone types (http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2018/p0786r1.pdf)
+
 
 # Ongoing new revisions proposals
 
-* D0196R2 - Generic none() factories for Nullable types - https://github.com/viboes/std-make/blob/master/doc/proposal/nullable/D0196R3.md
-* D0319R1 - Adding Emplace functions for `promise<T>`/`future<T>  - https://github.com/viboes/std-make/blob/master/doc/proposal/future/d0319r1.md
-* D0323R2 - A proposal to add a utility class to represent expected monad (Revision 4) - https://github.com/viboes/std-make/blob/master/doc/proposal/expected/d0323r2.md
-* D0327R2 - Product types access - https://github.com/viboes/std-make/blob/master/doc/proposal/reflection/d0327r2.md
-* D0338R2 - C++ generic factories - https://github.com/viboes/std-make/blob/master/doc/proposal/factories/d0338r2.md
-
+* D0051R4 - C++ generic overload function (https://github.com/viboes/tags/blob/master/doc/proposal/overload/d0051R4.md)
+* D0196R5 - Generic `none()` factories for Nullable types - https://github.com/viboes/std-make/blob/master/doc/proposal/nullable/D0196R5.md
+* D0319R2 - Adding Emplace functions for `promise<T>`/`future<T>  - https://github.com/viboes/std-make/blob/master/doc/proposal/future/d0319r2.md
+* D0323R7 - `std::expected` - https://github.com/viboes/std-make/blob/master/doc/proposal/expected/d0323r7.md
+* D0338R4 - C++ generic factories - https://github.com/viboes/std-make/blob/master/doc/proposal/factories/d0338r4.md
+ 
 # Ongoing New proposals
 
-* DXXXX - Adapting the standard tuple-like function to Product types - https://github.com/viboes/std-make/blob/master/doc/proposal/reflection/TupleLikeToProductType.md
-* DXXXX - Product types algorithms - https://github.com/viboes/std-make/blob/master/doc/proposal/reflection/ProductTypeAlgorithms.md
-* DXXXX - C++ Monadic inteface - https://github.com/viboes/std-make/blob/master/doc/proposal/monads/Monads.md
-* DXXXX - Sum types
-* DXXXX - C++ Ordinal types
+* DXXXX - Sum types - https://github.com/viboes/std-make/blob/master/doc/proposal/sum_type/SumType.md
+* DXXXX - C++ Ordinal types - https://github.com/viboes/std-make/blob/master/doc/proposal/ordinal/Ordinal.md
 * DXXXX - C++ Strong types and mixins
-* DXXXX - `chrono::modulo types
+* DXXXX - `chrono::modulo` types
 
-# Overrriden proposals
+# Withdrawal proposals
 
 The following proposals have been abandoned and should be replaced by an alternative customization approach on *ProductTypes*
 
@@ -49,27 +51,29 @@ This code is undocumented (other than via the proposals), not fully tested, cons
 
 # License
 
-Most of the source code in this project are mine, and those are under the Boost Software License. I have borrowed a lot from Hana original editions, before itbecomes Boost.Hana. A lot of code is inspired from the library Meta.
+Most of the source code in this project are mine, and those are under the Boost Software License. I have borrowed a lot from Hana original editions, before it becomes Boost.Hana. A lot of code is inspired from the library Meta.
 
 # Supported Compilers
 
 The code is known to work with the following compilers:
 
-* Clang 3.9.0 `-std=c++11 -std=c++14 -std=c++1y`
-* Clang 4.4.0 `-std=c++11 -std=c++14 -std=c++1y`
+* Clang 5.0.0 `-std=c++11 -std=c++14 -std=c++1y`
+* Clang 6.0.0 `-std=c++11 -std=c++14 -std=c++1y -std=c++2a`
 * GCC 6.1.1   `-std=c++11 -std=c++14 -std=c++1z`
-
 
 Other compiler and older versions could works as well, but are not tested regularly
 
-*Development Status:* The aim of the library is to be portable on comforming C++11/14/17 compilers.
-However some modules require C++14:
+*Development Status:* The aim of the library is to be portable on conforming C++11/14/17 compilers. However some modules require 
 
-* product_type
-* sum_type, 
-* functional/overload
-* swappable
+* C++14:
+    * product_type
+    * sum_type, 
+    * functional/overload
+    * swappable
 
+* C++17
+    * expected
+ 
 Hopefully this will change in the future.
 
 # Header only library
