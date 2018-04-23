@@ -1,6 +1,6 @@
 //////////////////////////////////////////////////////////////////////////////
 //
-// (C) Copyright Vicente J. Botet Escriba 2016.
+// (C) Copyright Vicente J. Botet Escriba 2016-2018.
 // Distributed under the Boost
 // Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or
@@ -82,6 +82,14 @@
 #define JASEL_INVOKE(F, ...) F(__VA_ARGS__)
 #endif
 
+
+#if __cplusplus > 201402L && defined __clang__
+#define JASEL_INLINE_VAR inline
+#else
+#define JASEL_INLINE_VAR
+#endif
+
+
 #define JASEL_NOEXCEPT_DECLTYPE_RETURN(...)                 \
     noexcept(noexcept(decltype(__VA_ARGS__)(__VA_ARGS__)))  \
     -> decltype(__VA_ARGS__)                                \
@@ -103,6 +111,9 @@
 
 #define JASEL_STRINGIFY(  x )  JASEL_STRINGIFY_( x )
 #define JASEL_STRINGIFY_( x )  #x
+
+
+
 
 /**/
 

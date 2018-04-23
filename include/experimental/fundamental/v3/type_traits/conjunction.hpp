@@ -1,6 +1,6 @@
 //////////////////////////////////////////////////////////////////////////////
 //
-// (C) Copyright Vicente J. Botet Escriba 2016.
+// (C) Copyright Vicente J. Botet Escriba 2016-2018.
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file // LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
@@ -10,6 +10,7 @@
 #define JASEL_V3_FUNDAMENTAL_TYPE_TRAITS_CONJUNCTION_HPP
 
 #include <experimental/fundamental/v3/type_traits/type_traits_t.hpp>
+#include <experimental/fundamental/v2/config.hpp>
 
 #if __cplusplus <= 201402L
 namespace std
@@ -33,8 +34,7 @@ inline namespace fundamental_v3
 
 #if __cplusplus >= 201402L
   template <class ...Bs>
-  //inline C++17
-  constexpr bool conjunction_v = conjunction<Bs...>::value;
+  JASEL_INLINE_VAR constexpr bool conjunction_v = conjunction<Bs...>::value;
 #endif
 
 }

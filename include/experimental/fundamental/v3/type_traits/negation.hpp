@@ -1,6 +1,6 @@
 //////////////////////////////////////////////////////////////////////////////
 //
-// (C) Copyright Vicente J. Botet Escriba 2017.
+// (C) Copyright Vicente J. Botet Escriba 2017-2018.
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file // LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
@@ -10,6 +10,7 @@
 #define JASEL_V3_FUNDAMENTAL_TYPE_TRAITS_NEGATION_HPP
 
 #include <type_traits>
+#include <experimental/fundamental/v2/config.hpp>
 
 #if __cplusplus <= 201402L
 namespace std
@@ -24,8 +25,7 @@ inline namespace fundamental_v3
 
 #if __cplusplus >= 201402L
   template<class B>
-  //inline C++17
-  constexpr bool negation_v = negation<B>::value;
+  JASEL_INLINE_VAR constexpr bool negation_v = negation<B>::value;
 #endif
 
 }
