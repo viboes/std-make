@@ -29,7 +29,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
 
-#if __cplusplus > 201402L || defined JASEL_DOXYGEN_INVOKED
+#if (__cplusplus > 201402L && defined __clang__) || defined JASEL_DOXYGEN_INVOKED
 
 #include <experimental/fundamental/v3/scoped/detail/box.hpp>
 #include <experimental/fundamental/v3/scoped/scope.hpp>

@@ -6,11 +6,12 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef JASEL_STD_UTILITY_AS_CONST_HPP
-#define JASEL_STD_UTILITY_AS_CONST_HPP
+#ifndef JASEL_FUNDAMENTAL_V3_UTILITY_DEPENDENT_FALSE_HPP
+#define JASEL_FUNDAMENTAL_V3_UTILITY_DEPENDENT_FALSE_HPP
 
 #include <utility> //
 #include <type_traits>
+#include <experimental/fundamental/v2/config.hpp>
 
 // See https://quuxplusone.github.io/blog/2018/04/02/false-v/
 
@@ -31,9 +32,12 @@ struct dependent_false : std::false_type{};
 template<>
 struct dependent_false<dependent_false_detail::class_with_a_really_long_name_that_you_should_not_use> : std::true_type{};
 
-template<typename...> inline constexpr bool false_v = false;
+#if __cplusplus >= 201402L
 
+template <typename...>
+JASEL_INLINE_VAR constexpr bool false_v = false;
 
+#endif
 }
 }
 }

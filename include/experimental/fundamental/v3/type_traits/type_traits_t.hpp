@@ -1,6 +1,6 @@
 //////////////////////////////////////////////////////////////////////////////
 //
-// (C) Copyright Vicente J. Botet Escriba 2016.
+// (C) Copyright Vicente J. Botet Escriba 2016-2018.
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file // LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
@@ -14,6 +14,9 @@
 #if __cplusplus == 201103L
 namespace std
 {
+  template< class T >
+  using add_const_t = typename add_const<T>::type;
+
   template< class T >
   using add_pointer_t = typename add_pointer<T>::type;
 
