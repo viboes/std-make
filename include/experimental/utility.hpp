@@ -9,10 +9,11 @@
 
 #include <experimental/fundamental/v3/std/std_pair.hpp>
 #include <experimental/fundamental/v3/utility/as_const.hpp>
+#include <experimental/fundamental/v3/utility/as_ptr_const.hpp>
 //#include <experimental/fundamental/v3/utility/compressed_pair.hpp>
 #include <experimental/fundamental/v3/utility/constexpr_utility.hpp>
 #include <experimental/fundamental/v3/utility/decay_copy.hpp>
-//#include <experimental/fundamental/v3/utility/dependent_false.hpp>
+#include <experimental/fundamental/v3/utility/dependent_false.hpp>
 #include <experimental/fundamental/v3/utility/exchange.hpp>
 #include <experimental/fundamental/v3/utility/lvalue_ref.hpp>
 #include <experimental/fundamental/v3/utility/narrow.hpp>
@@ -20,7 +21,7 @@
 #include <experimental/fundamental/v3/utility/only_when.hpp>
 #include <experimental/fundamental/v3/utility/out_param.hpp>
 #include <experimental/fundamental/v3/utility/owner.hpp>
-//#include <experimental/fundamental/v3/utility/prioity_tag.hpp>
+#include <experimental/fundamental/v3/utility/priority_tag.hpp>
 #include <experimental/fundamental/v3/utility/static_addressof.hpp>
 #include <experimental/fundamental/v3/utility/swallow.hpp>
 #include <experimental/fundamental/v3/utility/unwrap_ref_decay.hpp>
