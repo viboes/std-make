@@ -22,6 +22,7 @@
 #include <experimental/fundamental/v2/config.hpp>
 #include <experimental/fundamental/v3/result/helpers_detail.hpp>
 #include <experimental/fundamental/v3/result/success_failure.hpp>
+#include <experimental/fundamental/v3/utility/delete_helpers.hpp>
 
 #include <type_traits>
 #include <utility>
@@ -329,14 +330,18 @@ struct result_move_base<T, E, false> : result_copy_base<T, E>
 };
 
 template <class T, class E>
-using result_sfinae_ctor_base = helpers_detail::sfinae_ctor_base<
-                is_copy_constructible_or_void<T>::value && is_copy_constructible<E>::value,
+using result_copy_constructible_if = helpers_detail::copy_constructible_if<
+                is_copy_constructible_or_void<T>::value && is_copy_constructible<E>::value
+>;
+template <class T, class E>
+using result_move_constructible_if = helpers_detail::move_constructible_if<
                 is_move_constructible_or_void<T>::value && is_move_constructible<E>::value
 >;
 
 template <class T, class E>
 class result_base : protected result_move_base<T,E>
-             , private result_sfinae_ctor_base<T,E>
+, private result_copy_constructible_if<T,E>
+, private result_move_constructible_if<T,E>
 {
     static_assert(is_destructible<T>::value || is_void<T>::value,
         "instantiation of result with a non-destructible non-void T type is ill-formed");

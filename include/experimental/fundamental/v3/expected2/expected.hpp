@@ -22,6 +22,8 @@
 #include <experimental/fundamental/v2/config.hpp>
 #include <experimental/fundamental/v3/result/helpers_detail.hpp>
 #include <experimental/fundamental/v3/result/success_failure.hpp>
+#include <experimental/fundamental/v3/utility/delete_helpers.hpp>
+
 #include <experimental/type_traits.hpp>
 #include <utility>
 #if __cplusplus <= 201402L || ! defined __clang__
@@ -685,21 +687,28 @@ struct expected_move_assign_base<T, E, false> : expected_copy_assign_base<T, E>
 };
 
 template <class T, class E>
-using expected_sfinae_default_ctor_base = helpers_detail::sfinae_default_ctor_base<
+using expected_default_constructible_if = helpers_detail::default_constructible_if<
                 is_default_constructible_or_void<T>::value
 >;
 
 template <class T, class E>
-using expected_sfinae_ctor_base = helpers_detail::sfinae_ctor_base<
-                is_copy_constructible_or_void<T>::value && is_copy_constructible<E>::value,
+using expected_copy_constructible_if = helpers_detail::copy_constructible_if<
+                is_copy_constructible_or_void<T>::value && is_copy_constructible<E>::value
+>;
+template <class T, class E>
+using expected_move_constructible_if = helpers_detail::move_constructible_if<
                 is_move_constructible_or_void<T>::value && is_move_constructible<E>::value
 >;
 
+
 template <class T, class E>
-using expected_sfinae_assign_base = helpers_detail::sfinae_assign_base<
+using expected_copy_assignable_if = helpers_detail::copy_assignable_if<
                 is_copy_constructible_or_void<T>::value && is_copy_constructible<E>::value &&
                 is_copy_assignable_or_void<T>::value && is_copy_assignable<E>::value &&
-                (is_nothrow_move_constructible_v<E> || is_nothrow_move_constructible_v<T>),
+                (is_nothrow_move_constructible_v<E> || is_nothrow_move_constructible_v<T>)
+>;
+template <class T, class E>
+using expected_move_assignable_if = helpers_detail::move_assignable_if<
                 is_move_constructible_or_void<T>::value && is_move_constructible<E>::value &&
                 is_move_assignable_or_void<T>::value && is_move_assignable<E>::value &&
                 (is_nothrow_move_constructible_v<E> || is_nothrow_move_constructible_v<T>)
@@ -707,9 +716,11 @@ using expected_sfinae_assign_base = helpers_detail::sfinae_assign_base<
 
 template <class T, class E>
 class expected_base : protected expected_move_assign_base<T,E>
-, private expected_sfinae_default_ctor_base<T,E>
-, private expected_sfinae_ctor_base<T,E>
-, private expected_sfinae_assign_base<T,E>
+, private expected_default_constructible_if<T,E>
+, private expected_copy_constructible_if<T,E>
+, private expected_move_constructible_if<T,E>
+, private expected_copy_assignable_if<T,E>
+, private expected_move_assignable_if<T,E>
 {
     static_assert(is_destructible<T>::value || is_void<T>::value,
         "instantiation of expected with a non-destructible non-void T type is ill-formed");
