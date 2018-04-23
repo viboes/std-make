@@ -352,6 +352,11 @@ test-suite scoped
       [ run scoped/scope_pass.cpp  ]
     ;
 
+test-suite compare
+    : 
+      [ run compare/compare_pass.cpp  ]
+    ;
+
 test-suite strong
     : 
       [ run strong/byte_pass.cpp  ]
