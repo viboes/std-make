@@ -2,11 +2,29 @@
 // accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 //
-// (C) Copyright 2017 Vicente J. Botet Escriba
+// (C) Copyright 2017-2018 Vicente J. Botet Escriba
 // Based on https://github.com/PeterSommerlad/SC22WG21_Papers/blob/master/workspace/P0052_scope_exit/src/_scope_guard_common.h#L23
-
-#ifndef JASEL_EXPERIMENTAL_UTILITY_FINALY_HPP
-#define JASEL_EXPERIMENTAL_UTILITY_FINALY_HPP
+/*
+ * MIT License
+Copyright (c) 2016/2017 Eric Niebler, adapted by Peter Sommerlad
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+ */
+#ifndef JASEL_EXPERIMENTAL_SCOPED_BOX_HPP
+#define JASEL_EXPERIMENTAL_SCOPED_BOX_HPP
 
 #include <utility>
 #include <functional>
@@ -19,8 +37,7 @@ namespace experimental
 inline namespace fundamental_v3
 {
 
-// contribution by (c) Eric Niebler 2016, slightly adapted by Peter Sommerlad
-namespace detail
+namespace scope_detail
 {
 namespace hidden
 {
