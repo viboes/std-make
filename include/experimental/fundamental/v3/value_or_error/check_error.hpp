@@ -1,6 +1,6 @@
 //////////////////////////////////////////////////////////////////////////////
 //
-// (C) Copyright Vicente J. Botet Escriba 2017.
+// (C) Copyright Vicente J. Botet Escriba 2017-2018.
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file // LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
@@ -30,7 +30,7 @@ namespace value_or_error
   template <class N, class E
     , class = enable_if_t<
         is_value_or_error< remove_cvref_t<N> >::value
-        // add constraint on E
+        // todo add constraint on E
         //&& is_comparable_v< remove_cvref_t<E>, none_type_t<remove_cvref_t<N>> >
     >
   >

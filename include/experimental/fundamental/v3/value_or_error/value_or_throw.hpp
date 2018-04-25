@@ -1,6 +1,6 @@
 //////////////////////////////////////////////////////////////////////////////
 //
-// (C) Copyright Vicente J. Botet Escriba 2017.
+// (C) Copyright Vicente J. Botet Escriba 2017-2018.
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file // LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
@@ -33,11 +33,10 @@ namespace value_or_error
    *  value_or(n, v) == resolve(n, always(v))
    */
   template <class E, class N
-  // todo add constraint on T
-  //, class = enable_if_t<
-  //    is_value_or_error_v<remove_cvref_t<N>>
-  // && is_convertible_v< T, value_type_t<remove_cvref_t<N>> >
-  //>
+  , class = enable_if_t<
+      is_value_or_error<remove_cvref_t<N>>::value
+   && is_convertible< E, error_type_t<remove_cvref_t<N>> >::value
+  >
   >
   BOOST_CXX14_CONSTEXPR
   value_type_t<remove_cvref_t<N>>

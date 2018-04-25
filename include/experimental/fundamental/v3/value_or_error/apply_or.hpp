@@ -29,10 +29,10 @@ namespace value_or_error
    */
   template <class N, class F, class T
   // todo add constraint on T and F
-  //, class = enable_if_t<
-  //    is_value_or_error_v<remove_cvref_t<N>>
-  // && is_convertible_v< T, value_type_t<remove_cvref_t<N>> >
-  //>
+  , class = enable_if_t<
+      is_value_or_error<remove_cvref_t<N>>::value
+   && is_convertible< T, value_type_t<remove_cvref_t<N>> >::value
+  >
   >
   BOOST_CXX14_CONSTEXPR
   value_type_t<remove_cvref_t<N>>
