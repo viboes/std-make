@@ -6,8 +6,8 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef JASEL_STD_UTILITY_AS_CONST_HPP
-#define JASEL_STD_UTILITY_AS_CONST_HPP
+#ifndef JASEL_STD_UTILITY_PRIORITY_TAG_HPP
+#define JASEL_STD_UTILITY_PRIORITY_TAG_HPP
 
 #include <cstdlib>
 
