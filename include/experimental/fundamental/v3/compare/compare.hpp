@@ -15,6 +15,7 @@
 #if __cplusplus >= 201402L
 
 #include <experimental/fundamental/v2/config.hpp>
+#include <experimental/utility.hpp>
 
 namespace std
 {
@@ -61,8 +62,8 @@ using _CmpUnspecifiedParam = void (_CmpUnspecifiedType::*)();
         friend constexpr bool operator!=(_CmpUnspecifiedParam, weak_equality v) noexcept;
     };
 
-    inline constexpr weak_equality weak_equality::equivalent{eq::equivalent};
-    inline constexpr weak_equality weak_equality::nonequivalent{eq::nonequivalent};
+    JASEL_INLINE_VAR constexpr weak_equality weak_equality::equivalent{eq::equivalent};
+    JASEL_INLINE_VAR constexpr weak_equality weak_equality::nonequivalent{eq::nonequivalent};
 
     inline constexpr bool operator==(weak_equality v, _CmpUnspecifiedParam) noexcept
     {   return v.value == eq::_zero;}
@@ -86,8 +87,7 @@ using _CmpUnspecifiedParam = void (_CmpUnspecifiedType::*)();
 
         static const strong_equality equal, equivalent, nonequal, nonequivalent;
 
-        constexpr operator weak_equality() const noexcept
-        {   return this->value == equal.value ? weak_equality::equivalent : weak_equality::nonequivalent;}
+        constexpr operator weak_equality() const noexcept;
 
         friend constexpr bool operator==(strong_equality v, _CmpUnspecifiedParam) noexcept;
         friend constexpr bool operator!=(strong_equality v, _CmpUnspecifiedParam) noexcept;
@@ -95,14 +95,18 @@ using _CmpUnspecifiedParam = void (_CmpUnspecifiedType::*)();
         friend constexpr bool operator!=(_CmpUnspecifiedParam, strong_equality v) noexcept;
     };
 
-    inline constexpr strong_equality strong_equality::equal
+    JASEL_INLINE_VAR constexpr strong_equality strong_equality::equal
     {   eq::equal};
-    inline constexpr strong_equality strong_equality::equivalent
+    JASEL_INLINE_VAR constexpr strong_equality strong_equality::equivalent
     {   eq::equivalent}; // for convenient substitutability in generic code
-    inline constexpr strong_equality strong_equality::nonequal
+    JASEL_INLINE_VAR constexpr strong_equality strong_equality::nonequal
     {   eq::nonequal};
-    inline constexpr strong_equality strong_equality::nonequivalent
+    JASEL_INLINE_VAR constexpr strong_equality strong_equality::nonequivalent
     {   eq::nonequivalent}; // for convenient substitutability in generic code
+
+    inline constexpr strong_equality::operator weak_equality() const noexcept
+    {   return this->value == equal.value ? weak_equality::equivalent : weak_equality::nonequivalent;}
+
 
     inline constexpr bool operator==(strong_equality v, _CmpUnspecifiedParam) noexcept
     {   return v.value == eq::_zero;}
@@ -142,8 +146,7 @@ using _CmpUnspecifiedParam = void (_CmpUnspecifiedType::*)();
     public:
         static const partial_ordering less, equivalent, greater, unordered;
 
-        constexpr operator weak_equality() const noexcept
-        { return this->value == equivalent.value ? weak_equality::equivalent : weak_equality::nonequivalent;}
+        constexpr operator weak_equality() const noexcept;
 
         friend constexpr bool operator==(partial_ordering v, _CmpUnspecifiedParam) noexcept;
         friend constexpr bool operator!=(partial_ordering v, _CmpUnspecifiedParam) noexcept;
@@ -159,14 +162,17 @@ using _CmpUnspecifiedParam = void (_CmpUnspecifiedType::*)();
         friend constexpr bool operator>=(_CmpUnspecifiedParam, partial_ordering v) noexcept;
 
     };
-    constexpr partial_ordering partial_ordering::less
+    JASEL_INLINE_VAR constexpr partial_ordering partial_ordering::less
     {   ord::less };
-    constexpr partial_ordering partial_ordering::equivalent
+    JASEL_INLINE_VAR constexpr partial_ordering partial_ordering::equivalent
     {   eq::equivalent };
-    constexpr partial_ordering partial_ordering::greater
+    JASEL_INLINE_VAR constexpr partial_ordering partial_ordering::greater
     {   ord::greater};
-    constexpr partial_ordering partial_ordering::unordered
+    JASEL_INLINE_VAR constexpr partial_ordering partial_ordering::unordered
     {   ncmp::unordered };
+
+    inline constexpr partial_ordering::operator weak_equality() const noexcept
+    { return this->value == equivalent.value ? weak_equality::equivalent : weak_equality::nonequivalent;}
 
     inline constexpr bool operator==(partial_ordering v, _CmpUnspecifiedParam) noexcept
     { return v.is_ordered() && v.value == 0;}
@@ -209,14 +215,9 @@ using _CmpUnspecifiedParam = void (_CmpUnspecifiedType::*)();
 
         static const weak_ordering less, equivalent, greater;
 
-        constexpr operator weak_equality() const noexcept
-        {   return this->value == equivalent.value ? weak_equality::equivalent : weak_equality::nonequivalent;}
-        constexpr operator partial_ordering() const noexcept
-        {
-            return this->value == equivalent.value ? partial_ordering::equivalent
-            : this->value == less.value ? partial_ordering::less
-            : partial_ordering::greater;
-        }
+        constexpr operator weak_equality() const noexcept;
+        constexpr operator partial_ordering() const noexcept;
+
         friend constexpr bool operator==(weak_ordering v, _CmpUnspecifiedParam) noexcept;
         friend constexpr bool operator!=(weak_ordering v, _CmpUnspecifiedParam) noexcept;
         friend constexpr bool operator< (weak_ordering v, _CmpUnspecifiedParam) noexcept;
@@ -231,10 +232,19 @@ using _CmpUnspecifiedParam = void (_CmpUnspecifiedType::*)();
         friend constexpr bool operator>=(_CmpUnspecifiedParam, weak_ordering v) noexcept;
 
     };
-    inline constexpr weak_ordering weak_ordering::less{ord::less};
-    inline constexpr weak_ordering weak_ordering::equivalent{eq::equivalent};
-    inline constexpr weak_ordering weak_ordering::greater{ord::greater};
+    JASEL_INLINE_VAR constexpr weak_ordering weak_ordering::less{ord::less};
+    JASEL_INLINE_VAR constexpr weak_ordering weak_ordering::equivalent{eq::equivalent};
+    JASEL_INLINE_VAR constexpr weak_ordering weak_ordering::greater{ord::greater};
 
+
+    inline constexpr weak_ordering::operator weak_equality() const noexcept
+    {   return this->value == equivalent.value ? weak_equality::equivalent : weak_equality::nonequivalent;}
+    inline constexpr weak_ordering::operator partial_ordering() const noexcept
+    {
+        return this->value == equivalent.value ? partial_ordering::equivalent
+        : this->value == less.value ? partial_ordering::less
+        : partial_ordering::greater;
+    }
     inline constexpr bool operator==(weak_ordering v, _CmpUnspecifiedParam) noexcept
     {   return v.value == 0;}
     inline constexpr bool operator!=(weak_ordering v, _CmpUnspecifiedParam) noexcept
@@ -277,17 +287,10 @@ using _CmpUnspecifiedParam = void (_CmpUnspecifiedType::*)();
 
         static const strong_ordering less, equal, equivalent, greater;
 
-        constexpr operator weak_equality() const noexcept
-        {   return this->value == equal.value ? weak_equality::equivalent : weak_equality::nonequivalent;}
-        constexpr operator strong_equality() const noexcept
-        {   return this->value == equal.value ? strong_equality::equal : strong_equality::nonequivalent;}
-        constexpr operator partial_ordering() const noexcept
-        {   return this->value == equal.value ? partial_ordering::equivalent
-            : this->value == less.value ? partial_ordering::less : partial_ordering::greater;}
-        constexpr operator weak_ordering() const noexcept
-        {   return this->value == equal.value ? weak_ordering::equivalent
-            : this->value == less.value ? weak_ordering::less : weak_ordering::greater;
-        }
+        constexpr operator weak_equality() const noexcept;
+        constexpr operator strong_equality() const noexcept;
+        constexpr operator partial_ordering() const noexcept;
+        constexpr operator weak_ordering() const noexcept;
 
         friend constexpr bool operator==(strong_ordering v, _CmpUnspecifiedParam) noexcept
         {   return v.value == 0;}
@@ -315,10 +318,23 @@ using _CmpUnspecifiedParam = void (_CmpUnspecifiedType::*)();
         {   return 0 >= v.value;}
 
     };
-    constexpr strong_ordering strong_ordering::less{ord::less};
-    constexpr strong_ordering strong_ordering::equal{eq::equal};
-    constexpr strong_ordering strong_ordering::equivalent{eq::equivalent}; // for convenient substitutability in generic code
-    constexpr strong_ordering strong_ordering::greater{ord::greater};
+    JASEL_INLINE_VAR constexpr strong_ordering strong_ordering::less{ord::less};
+    JASEL_INLINE_VAR constexpr strong_ordering strong_ordering::equal{eq::equal};
+    JASEL_INLINE_VAR constexpr strong_ordering strong_ordering::equivalent{eq::equivalent}; // for convenient substitutability in generic code
+    JASEL_INLINE_VAR constexpr strong_ordering strong_ordering::greater{ord::greater};
+
+
+    inline constexpr strong_ordering::operator weak_equality() const noexcept
+    {   return this->value == equal.value ? weak_equality::equivalent : weak_equality::nonequivalent;}
+    inline constexpr strong_ordering::operator strong_equality() const noexcept
+    {   return this->value == equal.value ? strong_equality::equal : strong_equality::nonequivalent;}
+    inline constexpr strong_ordering::operator partial_ordering() const noexcept
+    {   return this->value == equal.value ? partial_ordering::equivalent
+        : this->value == less.value ? partial_ordering::less : partial_ordering::greater;}
+    inline constexpr strong_ordering::operator weak_ordering() const noexcept
+    {   return this->value == equal.value ? weak_ordering::equivalent
+        : this->value == less.value ? weak_ordering::less : weak_ordering::greater;
+    }
 
     //----------------------------------------------------------------------------
 

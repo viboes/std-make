@@ -14,6 +14,8 @@
 #include <experimental/fundamental/v2/config.hpp>
 #include <experimental/fundamental/v3/compare/compare.hpp>
 #include <experimental/fundamental/v3/compare/spaceship.hpp>
+#include <experimental/utility.hpp>
+#include <limits>
 
 namespace std
 {
@@ -24,6 +26,7 @@ inline namespace fundamental_v3
 
     // [cmp.alg], comparison algorithms
 #if 0
+    // todo: implement
     template<class T, class U> auto compare_3way(const T& a, const U& b);
 
     template<InputIterator I1, InputIterator I2, class Cmp>
@@ -63,13 +66,109 @@ inline namespace fundamental_v3
     {
         return compare(a,b);
     }
-    template <typename T>
-    // requires compare(a,b) -> {strong_ordering}
-    strong_ordering strong_order(T const& a, T const&b)
+
+    template <typename T
+        , enable_if_t<
+            numeric_limits<T>::is_iec559 == false
+            &&
+            ! is_convertible<
+                decltype(compare(declval<T>(),declval<T>())),
+                strong_ordering
+            >::value
+        , int> = 0
+    >
+    strong_ordering strong_order(T const& a, T const&b) = delete;
+
+#if (__cplusplus <= 201402L || ! defined __clang__)
+    template <typename T
+        , enable_if_t<
+            is_convertible_v<
+                decltype(declval<T>() == declval<T>()),
+                bool
+            >
+            &&
+            is_convertible_v<
+                decltype(declval<T>() < declval<T>()),
+                bool
+            >
+        , int> =0
+    >
+    strong_ordering strong_order(T const& a, T const&b, priority_tag<0>)
+    {
+        if (a == b) return strong_ordering::equal;
+        if (a < b) return strong_ordering::less;
+        return strong_ordering::greater;
+    }
+    template <typename T
+        , enable_if_t<
+            is_convertible_v<
+                decltype(compare(declval<T>(),declval<T>())),
+                strong_ordering
+            >
+        , int> =0
+    >
+    strong_ordering strong_order(T const& a, T const&b, priority_tag<1>)
     {
         return compare(a,b);
     }
 
+    template <typename T
+        , enable_if_t<
+            numeric_limits<T>::is_iec559 == true
+        , int> =0
+    >
+    strong_ordering strong_order(T const& a, T const&b, priority_tag<2>)
+    {
+        // todo: strong_ordering value onsistent with the totalOrder operation as specified in ISO/IEC/IEEE 60559
+        return strong_ordering::equal;
+    }
+    template <typename T>
+    auto strong_order(T const& a, T const&b)
+    JASEL_DECLTYPE_RETURN_NOEXCEPT(
+                    strong_order(a, b, priority_tag<2>{})
+         )
+
+#else
+
+    template <typename T
+        , enable_if_t<
+            numeric_limits<T>::is_iec559 == true
+        ||
+            is_convertible_v<
+                decltype(compare(declval<T>(),declval<T>())),
+                strong_ordering
+            >
+        ||
+        (
+            is_convertible_v<
+                decltype(declval<T>() == declval<T>()),
+                bool
+            >
+            &&
+            is_convertible_v<
+                decltype(declval<T>() < declval<T>()),
+                bool
+            >
+        )
+        , int> =0
+    >
+    strong_ordering strong_order(T const& a, T const&b)
+    {
+        if constexpr (numeric_limits<T>::is_iec559)
+            // todo: strong_ordering value onsistent with the totalOrder operation as specified in ISO/IEC/IEEE 60559
+            return strong_ordering::equal;
+        if constexpr (is_convertible_v<
+                      decltype(compare(declval<T>(),declval<T>())),
+                      strong_ordering
+                  >)
+            return compare(a,b);
+        else {
+            if (a == b) return strong_ordering::equal;
+            if (a < b) return strong_ordering::less;
+            return strong_ordering::greater;
+        }
+    }
+#endif
 
    // binary comparisons
 
