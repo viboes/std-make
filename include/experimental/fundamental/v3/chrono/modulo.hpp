@@ -81,7 +81,6 @@ namespace chrono
       template <class UT2>
       using rebind = modulo<Duration, SuperDuration, UT2>;
 
-
       explicit constexpr modulo() = default;
       modulo(modulo const&) = default;
       modulo(modulo &&) = default;
@@ -137,7 +136,7 @@ namespace chrono
 
       //! @par Returns:
       //!   0 <= count() && count() < cardinal
-      constexpr bool valid() const
+      constexpr bool valid() const noexcept
       {
           return count() >= 0 && count() < cardinal;
       }
@@ -305,7 +304,7 @@ namespace chrono
     , ModuloTo
   >
 #endif
-  to_modulo(modulo<D,SD,R> m)
+  to_modulo(modulo<D,SD,R> m) noexcept
   {
       using duration_to = typename ModuloTo::duration_t;
       return ModuloTo(
@@ -325,7 +324,7 @@ namespace chrono
   , ModuloTo
   >
 #endif
-  modulo_cast(modulo<SubDuration, Duration, Rep> m)
+  modulo_cast(modulo<SubDuration, Duration, Rep> m) noexcept
   {
     using SubDurationSuperDuration = modulo<SubDuration,   SuperDuration,    std::uint64_t>;
     using SubModSuperDuration = modulo<typename ModuloTo::duration_t,   SuperDuration,    std::uint64_t>;

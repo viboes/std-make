@@ -23,41 +23,41 @@ using months   = std::chrono::duration<int32_t,  std::ratio_divide<years::period
 // relative numbers
 // The interface provided here differs to the one provided in p0355r4
 // Missing interfaces
-//constexpr weekday(const sys_days& dp) noexcept;
-//constexpr explicit weekday(const local_days& dp) noexcept;
+//constexpr weekday_number(const sys_days& dp) noexcept;
+//constexpr explicit weekday_number(const local_days& dp) noexcept;
 //constexpr explicit operator unsigned() const noexcept;
 //constexpr bool ok() const noexcept;
 //constexpr weekday_indexed operator[](unsigned index) const noexcept;
 //constexpr weekday_last    operator[](last_spec) const noexcept;
 // operator<<(OSTREAM) differes
 
-using month = stdex::chrono::modulo<months,   years,    std::uint8_t>; //12
-using weekday = stdex::chrono::modulo<days,   weeks,    std::uint8_t>; //7
-using am_pm   = stdex::chrono::modulo<half_days,   days,    std::uint8_t>; //24
-using hour   = stdex::chrono::modulo<std::chrono::hours,   days,    std::uint8_t>; //24
+using month_number = stdex::chrono::modulo<months,   years,    std::uint8_t>; //12
+using weekday_number = stdex::chrono::modulo<days,   weeks,    std::uint8_t>; //7
+using am_pm_number   = stdex::chrono::modulo<half_days,   days,    std::uint8_t>; //2
+using hour_number   = stdex::chrono::modulo<std::chrono::hours,   days,    std::uint8_t>; //24
 using am_pm_hour   = stdex::chrono::modulo<std::chrono::hours,   half_days,    std::uint8_t>; //12
-using minute = stdex::chrono::modulo<std::chrono::minutes, std::chrono::hours,   std::uint8_t>; //60
-using second = stdex::chrono::modulo<std::chrono::seconds, std::chrono::minutes, std::uint8_t>; //60
+using minute_number = stdex::chrono::modulo<std::chrono::minutes, std::chrono::hours,   std::uint8_t>; //60
+using second_number = stdex::chrono::modulo<std::chrono::seconds, std::chrono::minutes, std::uint8_t>; //60
 
-// todo: time_of_day must be specialized to provide access to hour/minute/second/subseconds depending on Duration
+// todo: time_of_day must be specialized to provide access to hour_number/minute_number/second_number/subseconds depending on Duration
 // So the following can be only a representation, not the interface
 template <class Duration>
 using time_of_day = stdex::chrono::modulo<Duration, days, std::uint32_t >;
 
 // fixme: Should the following conversions work only for time_of_day?
 template <class ModuloFrom>
-hour to_hour(ModuloFrom m)
+constexpr hour_number to_hour(ModuloFrom m) noexcept
 {
-    return stdex::chrono::modulo_cast<hour, days>(m);
+    return stdex::chrono::modulo_cast<hour_number, days>(m);
 }
 
 template <class ModuloFrom>
-am_pm to_am_pm(ModuloFrom m)
+constexpr am_pm_number to_am_pm(ModuloFrom m) noexcept
 {
-  return stdex::chrono::modulo_cast<am_pm, days>(m);
+  return stdex::chrono::modulo_cast<am_pm_number, days>(m);
 }
 template <class ModuloFrom>
-am_pm_hour to_am_pm_hour(ModuloFrom m)
+constexpr am_pm_hour to_am_pm_hour(ModuloFrom m) noexcept
 {
   return stdex::chrono::modulo_cast<am_pm_hour, days>(m);
 }
@@ -65,26 +65,26 @@ am_pm_hour to_am_pm_hour(ModuloFrom m)
 // This doesn't works if the time_of_day is in hours
 // todo: use SFINAE to remove the overload when the precision of ModuloFrom is less fine grained than minutes
 template <class ModuloFrom>
-minute to_minute(ModuloFrom m)
+constexpr minute_number to_minute(ModuloFrom m) noexcept
 {
-  return stdex::chrono::modulo_cast<minute, days>(m);
+  return stdex::chrono::modulo_cast<minute_number, days>(m);
 }
 
 template <class ModuloFrom>
-second to_second(ModuloFrom m)
+constexpr second_number to_second(ModuloFrom m) noexcept
 {
-  return stdex::chrono::modulo_cast<second, days>(m);
+  return stdex::chrono::modulo_cast<second_number, days>(m);
 }
 
 // todo: add to_subsecond
 
 static_assert(am_pm_hour::cardinal  == 12, "12 hours are not a half-day");
-static_assert(am_pm::cardinal  == 2, "2 half-days are not a day");
-static_assert(hour::cardinal  == 24, "24 hours are not a day");
-static_assert(minute::cardinal  == 60, "60 minutes are not an hour");
-static_assert(second::cardinal  == 60, "60 seconds are not a minute");
-static_assert(hour::min()  == hour{0}, "0 is not the min of hour");
-static_assert(hour::max()  == hour{23}, "23 is not the min of hour");
+static_assert(am_pm_number::cardinal  == 2, "2 half-days are not a day");
+static_assert(hour_number::cardinal  == 24, "24 hours are not a day");
+static_assert(minute_number::cardinal  == 60, "60 minutes are not an hour_number");
+static_assert(second_number::cardinal  == 60, "60 seconds are not a minute_number");
+static_assert(hour_number::min()  == hour_number{0}, "0 is not the min of hour_number");
+static_assert(hour_number::max()  == hour_number{23}, "23 is not the min of hour_number");
 
 #include <boost/detail/lightweight_test.hpp>
 #include <iostream>
@@ -93,16 +93,16 @@ int main()
 {
   {
                                             //   ms        sec       min  h
-      time_of_day<std::chrono::milliseconds> t2{ 234+ 1000*(2 + 60 * ( 4 + 8 * 60 ) )};
+      constexpr time_of_day<std::chrono::milliseconds> t2{ 234+ 1000*(2 + 60 * ( 4 + 8 * 60 ) )};
       std::cout << "t2 = " << t2.count() << "\n";
       time_of_day<std::chrono::milliseconds> t{ std::chrono::milliseconds(234)+ std::chrono::seconds(2) + std::chrono::minutes(4) + std::chrono::hours(20)};
       std::cout << "t = " << t.count() << "\n";
 
-      std::cout << "am_pm = " << int(to_am_pm(t).count()) << "\n";
+      std::cout << "am_pm_number = " << int(to_am_pm(t).count()) << "\n";
       std::cout << "am_pm_hour = " << int(to_am_pm_hour(t).count()) << "\n";
-      std::cout << "hour = " << int(to_hour(t).count()) << "\n";
-      std::cout << "minute = " << int(to_minute(t).count()) << "\n";
-      std::cout << "second = " << int(to_second(t).count()) << "\n";
+      std::cout << "hour_number = " << int(to_hour(t).count()) << "\n";
+      std::cout << "minute_number = " << int(to_minute(t).count()) << "\n";
+      std::cout << "second_number = " << int(to_second(t).count()) << "\n";
 
       BOOST_TEST(to_am_pm(t).count() == 1);
       BOOST_TEST(to_am_pm_hour(t).count() == 8);
@@ -111,22 +111,25 @@ int main()
       BOOST_TEST_EQ(to_second(t).count(), 2);
   }
   {
-      weekday wd{2};
+      constexpr weekday_number wd{2};
       BOOST_TEST(wd.count() == 2);
   }
   {
-    stdex::ordinal_array<int, weekday> arr;
+    stdex::ordinal_array<int, weekday_number> arr;
     BOOST_TEST(arr.size() == 7);
   }
   {
-    stdex::ordinal_array<int, weekday> c {{0, 1, 2, 3, 4, 5, 6}};
+    constexpr stdex::ordinal_array<int, weekday_number> c {{0, 1, 2, 3, 4, 5, 6}};
     BOOST_TEST(c.size() == 7);
-    BOOST_TEST(c[weekday{1}] == 1);
-    BOOST_TEST(c[weekday{2}] == 2);
-    BOOST_TEST(c[weekday{3}] == 3);
+    BOOST_TEST(c[weekday_number{1}] == 1);
+    BOOST_TEST(c[weekday_number{2}] == 2);
+    BOOST_TEST(c[weekday_number{3}] == 3);
   }
   {
-    stdex::ordinal_range<weekday> rng;
+    // fixme:  the type ‘const std::experimental::fundamental_v3::ordinal_range<std::experimental::fundamental_v3::chrono::modulo<std::chrono::duration<int, std::ratio<86400l, 1l> >, std::chrono::duration<int, std::ratio<604800l, 1l> >, unsigned char> >’ of constexpr variable ‘rng’ is not literal
+    // Surely it comes from boost::iterator
+    //constexpr
+    stdex::ordinal_range<weekday_number> rng;
     auto b = rng.begin();
     BOOST_TEST(b->count()==0);
     for (auto w : rng)
@@ -135,11 +138,11 @@ int main()
     }
   }
   {
-      stdex::ordinal_set<weekday> os;
-      os[weekday{1}]=true;
+      stdex::ordinal_set<weekday_number> os;
+      os[weekday_number{1}]=true;
       BOOST_TEST( 1 == os.count() );
       BOOST_TEST( os.any() );
-      BOOST_TEST(os[weekday{1}]);
+      BOOST_TEST(os[weekday_number{1}]);
   }
   return ::boost::report_errors();
 }
