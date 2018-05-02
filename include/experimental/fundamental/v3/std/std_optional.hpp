@@ -7,10 +7,15 @@
 #ifndef JASEL_FUNDAMENTAL_V3_OPTIONAL_HPP
 #define JASEL_FUNDAMENTAL_V3_OPTIONAL_HPP
 
-#include <optional.hpp>
+#if __cplusplus > 201402L && defined __clang__
+#include <optional>
+#define JASEL_HAS_OPTIONAL 1
+#else
+#define JASEL_HAS_OPTIONAL 0
+#endif
 
+#include <experimental/fundamental/v3/optional/optional.hpp>
 #include <experimental/make.hpp>
-//#include <experimental/possibly_valued.hpp>
 #include <experimental/nullable.hpp>
 #include <experimental/value_or_none.hpp>
 #include <experimental/sum_type.hpp>
@@ -25,6 +30,7 @@
 #include <experimental/fundamental/v2/functor/mcd/possible_valued_mcd.hpp>
 #include <experimental/fundamental/v2/monad/mcd/possible_valued_mcd.hpp>
 #endif
+
 namespace std
 {
 namespace experimental
@@ -108,5 +114,4 @@ namespace sum_type
 }
 }
 }
-
 #endif // header

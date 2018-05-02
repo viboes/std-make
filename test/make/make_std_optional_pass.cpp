@@ -12,19 +12,10 @@
 //  template <class M, class ...Args>
 //  auto make(Args&& ...args);
 
-#if defined JASEL_STD_EXPERIMENTAL_FUNDAMENTALS_V2_STD_OPTIONAL_NOT_INSTALLED
-#warning JASEL_STD_EXPERIMENTAL_FUNDAMENTALS_V2_STD_OPTIONAL_NOT_INSTALLED
-int main()
-{
-}
-#else
-
-//#define JASEL_STD_EXPERIMENTAL_FACTORIES_USE_OPTIONAL
 #define JASEL_FUNDAMENTAL_EXTENDED
 
-#include <experimental/optional.hpp>
-
 #include <boost/detail/lightweight_test.hpp>
+#include <experimental/optional.hpp>
 
 std::experimental::nullopt_t null() { return std::experimental::nullopt;}
 
@@ -131,4 +122,3 @@ int main()
 
   return ::boost::report_errors();
 }
-#endif

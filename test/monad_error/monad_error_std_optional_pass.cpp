@@ -6,9 +6,9 @@
 // <experimental/monad_error.hpp>
 // <experimental/optional.hpp>
 
-#include <experimental/optional.hpp>
-
 #include <boost/detail/lightweight_test.hpp>
+#include <experimental/monad_error.hpp>
+#include <experimental/optional.hpp>
 
 std::experimental::optional<int> twice(int i) {
   if (i==0)
@@ -57,3 +57,4 @@ int main()
 
   return ::boost::report_errors();
 }
+

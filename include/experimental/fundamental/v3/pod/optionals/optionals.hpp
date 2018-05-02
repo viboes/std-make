@@ -141,13 +141,13 @@ public:
     {
         if (has_value())
             return *get();
-        throw bad_optional_access("");
+        throw bad_optional_access();
     }
     JASEL_CXX14_CONSTEXPR T const& value() const
     {
         if (has_value())
             return *get();
-        throw bad_optional_access("");
+        throw bad_optional_access();
     }
 
     template <class U>
@@ -291,7 +291,7 @@ public:
     {
         if (has_value())
             return *get();
-        throw bad_optional_access("");
+        throw bad_optional_access();
     }
     template <class U>
     JASEL_CXX14_CONSTEXPR T value_or(U const& v) const
@@ -613,5 +613,4 @@ void swap(optionals<Ts...>& x, optionals<Ts...>& y)
 } // pod
 }} // experimental/fundamentals_v3/
 } // std
-
 #endif // header

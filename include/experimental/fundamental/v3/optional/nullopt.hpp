@@ -9,6 +9,10 @@
 #ifndef JASEL_V3_FUNDAMENTAL_OPTIONAL_NULLOPT_HPP
 #define JASEL_V3_FUNDAMENTAL_OPTIONAL_NULLOPT_HPP
 
+#if __cplusplus > 201402L && defined __clang__
+#include <optional>
+#endif
+
 namespace std
 {
   namespace experimental
@@ -31,8 +35,5 @@ namespace std
 
   }
   }
-  using std::experimental::nullopt_t;
-  using std::experimental::nullopt;
-
 }
 #endif // header

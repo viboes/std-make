@@ -9,9 +9,8 @@
 // * add constexpr tests
 // * add noexcept tests
 
-#include <experimental/optionals.hpp>
-
 #include <boost/detail/lightweight_test.hpp>
+#include <experimental/optionals.hpp>
 
 namespace stdex = std::experimental;
 
@@ -143,3 +142,4 @@ int main()
   }
   return ::boost::report_errors();
 }
+

@@ -6,19 +6,11 @@
 // <experimental/sum_type.hpp>
 // <experimental/optional.hpp>
 
-#if defined JASEL_STD_EXPERIMENTAL_FUNDAMENTALS_V2_STD_OPTIONAL_NOT_INSTALLED
-#warning JASEL_STD_EXPERIMENTAL_FUNDAMENTALS_V2_STD_OPTIONAL_NOT_INSTALLED
-int main()
-{
-}
-#elif __cplusplus < 201402L
+#if __cplusplus < 201402L
 int main()
 {
 }
 #else
-
-//#define JASEL_STD_EXPERIMENTAL_FACTORIES_USE_OPTIONAL
-//#define JASEL_FUNDAMENTAL_EXTENDED
 #include <experimental/optional.hpp>
 #include <experimental/functional.hpp>
 #include <experimental/sum_type.hpp>

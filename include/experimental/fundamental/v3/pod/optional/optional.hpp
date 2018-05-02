@@ -18,26 +18,13 @@
 #ifndef JASEL_FUNDAMENTAL_V3_POD_OPTIONAL_HPP
 #define JASEL_FUNDAMENTAL_V3_POD_OPTIONAL_HPP
 
-#if defined __clang__
-#if (__clang_major__ >= 4) && (__cplusplus > 201402L)
-#define JASEL_STD_HAVE_OPTIONAL
-#endif
-#else
-#endif
-
 # include <experimental/fundamental/v2/config.hpp>
 # include <experimental/fundamental/v3/config/requires.hpp>
 # include <experimental/type_traits.hpp>
 # include <experimental/utility.hpp>
 # include <experimental/type_traits.hpp>
 
-#if defined JASEL_STD_HAVE_OPTIONAL
-#include <optional>
-#else
-# include <experimental/fundamental/v3/in_place.hpp>
-# include <experimental/fundamental/v3/optional/nullopt.hpp>
-# include <experimental/fundamental/v3/optional/bad_optional_access.hpp>
-#endif
+#include <experimental/optional.hpp>
 #include <functional>
 
 namespace std
@@ -48,11 +35,11 @@ inline namespace fundamental_v3
 {
 namespace pod
 {
-using std::nullopt_t;
-using std::nullopt;
-using std::in_place_t;
-using std::in_place;
-using std::bad_optional_access;
+using std::experimental::nullopt_t;
+using std::experimental::nullopt;
+using std::experimental::in_place_t;
+using std::experimental::in_place;
+using std::experimental::bad_optional_access;
 
 template <class T>
 struct optional_data
@@ -212,7 +199,7 @@ public:
     template< class... Args
             , JASEL_T_REQUIRES( is_constructible<T, Args&&...>::value )
     >
-    JASEL_CXX14_CONSTEXPR explicit optional( std::in_place_t, Args&&... args ) noexcept
+    JASEL_CXX14_CONSTEXPR explicit optional( in_place_t, Args&&... args ) noexcept
             : m_present(bool_type(true))
             , m_value(forward<Args>(args)...)
     {
@@ -220,7 +207,7 @@ public:
     template< class U, class... Args
             , JASEL_T_REQUIRES( is_constructible<T, std::initializer_list<U>, Args&&...>::value )
     >
-    JASEL_CXX14_CONSTEXPR explicit optional( std::in_place_t,
+    JASEL_CXX14_CONSTEXPR explicit optional( in_place_t,
             std::initializer_list<U> ilist,
             Args&&... args ) noexcept
         : m_present(bool_type(true))
@@ -285,9 +272,8 @@ public:
     }
 #endif
 
-#if defined JASEL_STD_HAVE_OPTIONAL
     template <class U>
-    optional& operator=(std::optional<U>&& x) noexcept {
+    optional& operator=(std::experimental::optional<U>&& x) noexcept {
         m_present = bool(x);
         if (x)
             m_value = move(*x);
@@ -295,14 +281,13 @@ public:
 
     }
     template <class U>
-    optional& operator=(std::optional<U> const& x) noexcept {
+    optional& operator=(std::experimental::optional<U> const& x) noexcept {
         m_present = bool(x);
         if (x)
             m_value = *x;
         return *this;
 
     }
-#endif
 
     template <class... Args
             , JASEL_T_REQUIRES( is_constructible<T, Args&&...>::value )
@@ -379,6 +364,7 @@ public:
     {
         if (! has_value())
         {
+            //experimental::bad_optional_access x;
             throw bad_optional_access();
         }
         return m_value;
@@ -387,7 +373,7 @@ public:
     {
         if (! has_value())
         {
-            throw bad_optional_access();
+            throw experimental::bad_optional_access();
         }
         return m_value;
     }
@@ -396,7 +382,7 @@ public:
     {
         if (! has_value())
         {
-            throw bad_optional_access();
+            throw experimental::bad_optional_access();
         }
         return m_value;
     }
@@ -404,7 +390,7 @@ public:
     {
         if (! has_value())
         {
-            throw bad_optional_access();
+            throw experimental::bad_optional_access();
         }
         return m_value;
     }

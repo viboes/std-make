@@ -6,18 +6,9 @@
 // <experimental/functor.hpp>
 // <experimental/optional.hpp>
 
-#if defined JASEL_STD_EXPERIMENTAL_FUNDAMENTALS_V2_STD_OPTIONAL_NOT_INSTALLED
-#warning JASEL_STD_EXPERIMENTAL_FUNDAMENTALS_V2_STD_OPTIONAL_NOT_INSTALLED
-int main()
-{
-}
-#else
-
-//#define JASEL_STD_EXPERIMENTAL_FACTORIES_USE_OPTIONAL
-
-#include <experimental/optional.hpp>
 #include <boost/detail/lightweight_test.hpp>
-
+#include <experimental/functor.hpp>
+#include <experimental/optional.hpp>
 
 int twice(int i) {
   return 2*i;
@@ -95,4 +86,3 @@ int main()
   }
   return ::boost::report_errors();
 }
-#endif

@@ -41,7 +41,7 @@ test-suite boost_optional
       [ run make/make_boost_optional_pass.cpp  ]
     ;
 
-#explicit boost_expected ;
+explicit boost_expected ;
 test-suite boost_expected
     : 
       [ run make/make_boost_expected_pass.cpp  ]

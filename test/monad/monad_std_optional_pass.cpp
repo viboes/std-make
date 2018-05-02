@@ -6,18 +6,10 @@
 // <experimental/monad.hpp>
 // <experimental/optional.hpp>
 
-#if defined JASEL_STD_EXPERIMENTAL_FUNDAMENTALS_V2_STD_OPTIONAL_NOT_INSTALLED
-#warning JASEL_STD_EXPERIMENTAL_FUNDAMENTALS_V2_STD_OPTIONAL_NOT_INSTALLED
-int main()
-{
-}
-#else
-
-//#define JASEL_STD_EXPERIMENTAL_FACTORIES_USE_OPTIONAL
-
-#include <experimental/optional.hpp>
 
 #include <boost/detail/lightweight_test.hpp>
+#include <experimental/monad.hpp>
+#include <experimental/optional.hpp>
 
 std::experimental::optional<int> twice(int i) {
   if (i==0) return std::experimental::nullopt;
@@ -60,4 +52,3 @@ int main()
 
   return ::boost::report_errors();
 }
-#endif

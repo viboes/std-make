@@ -9,6 +9,10 @@
 #ifndef JASEL_V3_FUNDAMENTAL_OPTIONAL_BAD_OPTIONAL_ACCESS_HPP
 #define JASEL_V3_FUNDAMENTAL_OPTIONAL_BAD_OPTIONAL_ACCESS_HPP
 
+#if __cplusplus > 201402L && defined __clang__
+#include <optional>
+#endif
+
 #include <stdexcept>
 
 namespace std
@@ -23,14 +27,10 @@ namespace std
     public:
       explicit bad_optional_access() : logic_error{"bad_optional_access"}
       {}
-      explicit bad_optional_access(const string& what_arg) : logic_error{ what_arg}
-      {}
-      explicit bad_optional_access(const char* what_arg) : logic_error{ what_arg}
-      {}
     };
 
   }
   }
-  using std::experimental::bad_optional_access;
 }
+
 #endif // header
