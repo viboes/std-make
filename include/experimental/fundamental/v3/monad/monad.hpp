@@ -79,7 +79,6 @@ struct not_a_monad_tag{};
    unwrap(M&& x)
       JASEL_DECLTYPE_RETURN_NOEXCEPT(
           traits<type_constructor_t<remove_cvref_t<M>>>::unwrap(forward<M>(x))
-         //bind(forward<M>(x), identity{})
       )
 
   //! minimal complete definition based on transform
