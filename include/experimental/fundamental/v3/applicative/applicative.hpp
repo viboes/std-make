@@ -19,6 +19,7 @@
 #include <experimental/type_constructible.hpp>
 #include <experimental/fundamental/v2/config.hpp>
 #include <experimental/type_traits.hpp>
+#include <experimental/functor.hpp>
 
 namespace std
 {
