@@ -2,7 +2,7 @@
 <table border="0" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="607">
     <tr>
         <td width="172" align="left" valign="top">Document number:</td>
-        <td width="435"><span style="background-color: #FFFF00">D0XXXR0</span></td>
+        <td width="435"><span style="background-color: #FFFF00">D1051R0</span></td>
     </tr>
     <tr>
         <td width="172" align="left" valign="top">Date:</td>
@@ -38,6 +38,8 @@ LWG raised 3 design issues concerning the proposed `std::experimental::expected`
 * Why there is no `expected<T,E>:emplace` for `unexpected<E>`? 
 * The in-place construction of success (`in_place_t`) and failure (`unexpect_t`) naming is not symmetric. In addition `unexpect_t` doesn't convey any idea of emplacement.
 
+
+This paper is a response to these issues.
 
 # Table of Contents
 
@@ -253,12 +255,12 @@ The authors would like to have an answer to the following points:
 The proposed changes are expressed as edits to [N4617] the Working Draft - C++
 Extensions for Library Fundamentals V3. 
 
-The impact of allowing `unexpected<void>` ad `expected<T, void>` is quite viral at the wording level, as it has an impact on almost all the functions that have to work with `E`.
+The impact of allowing `unexpected<void>` and `expected<T, void>` is quite viral at the wording level, as it has an impact on almost all the functions that have to work with `E`.
 
-The impact of emplace functions is restricted to those functions and so is minor compared with the privious one.
+The impact of emplace functions is restricted to those functions and so is minor compared with the previous one.
  
-Next follows a first draft of the needed changes to have an idea of the impact.
-To be completed after we decide the desired approach.
+Next follows the interface changes to have an idea of the impact.
+Wording to be completed after we decide the desired approach.
 
 
 �.�.2 Header `<experimental/expected>` synopsis [*expected.synop*] {#expected.synop}
@@ -432,9 +434,9 @@ An almost full reference implementation of the different approaches of this prop
 
 # Acknowledgements
 
-We are very grateful to the LWG, and in particular to Geoff Romer, for raising this design issues that are the "raison d`être" of this paper.
+We are very grateful to the LWG, and in particular to Geoff Romer, for raising these design issues that are the "raison d`être" of this paper.
 
-Special thanks and recognition goes to Technical Center of Nokia - Lannion for
+Special thanks and recognition goes to Technical Center of Nokia - Lannion for 
 supporting in part the production of this proposal.
 
 # References
