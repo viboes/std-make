@@ -32,6 +32,109 @@ inline  namespace fundamental_v3
       using tag_type = Tag;
       using base_type = wrapper<UT>;
       using base_type::base_type;
+
+      constexpr tagged() noexcept = default;
+      constexpr tagged(tagged const& e) = default;
+      constexpr tagged(tagged&& e) = default;
+      JASEL_MUTABLE_CONSTEXPR tagged& operator=(tagged const& e) = default;
+      JASEL_MUTABLE_CONSTEXPR tagged& operator=(tagged&& e) = default;
+
+
+      template <class U, enable_if_t<
+          is_constructible<UT, const U&>::value == true &&
+          is_convertible<const U&, UT>::value == true &&
+          is_constructible<UT, tagged<Tag, U>&>::value == false &&
+          is_constructible<UT, tagged<Tag, U>&&>::value == false &&
+          is_constructible<UT, const tagged<Tag, U>&>::value == false &&
+          is_constructible<UT, const tagged<Tag, U>&&>::value == false &&
+          is_convertible<tagged<Tag, U>&, UT>::value == false &&
+          is_convertible<tagged<Tag, U>&&, UT>::value == false &&
+          is_convertible<const tagged<Tag, U>&, UT>::value == false &&
+          is_convertible<const tagged<Tag, U>&&, UT>::value == false
+          , int> = 0
+      >
+          constexpr explicit tagged(const tagged<Tag, U>& other)
+          : base_type(other.underlying()) {}
+
+      template <class U, enable_if_t<
+          is_constructible<UT, const U&>::value == true &&
+          is_convertible<const U&, UT>::value == false &&
+          is_constructible<UT, tagged<Tag, U>&>::value == false &&
+          is_constructible<UT, tagged<Tag, U>&&>::value == false &&
+          is_constructible<UT, const tagged<Tag, U>&>::value == false &&
+          is_constructible<UT, const tagged<Tag, U>&&>::value == false &&
+          is_convertible<tagged<Tag, U>&, UT>::value == false &&
+          is_convertible<tagged<Tag, U>&&, UT>::value == false &&
+          is_convertible<const tagged<Tag, U>&, UT>::value == false &&
+          is_convertible<const tagged<Tag, U>&&, UT>::value == false
+          , int> = 0
+      >
+          constexpr tagged(const tagged<Tag, U>& other)
+          : base_type(other.underlying()) {}
+
+      template <class Tag2, class U, enable_if_t<
+          is_same<Tag, Tag2>::value == false &&
+          is_constructible<UT, const U&>::value == true &&
+          is_constructible<UT, tagged<Tag2, U>&>::value == false &&
+          is_constructible<UT, tagged<Tag2, U>&&>::value == false &&
+          is_constructible<UT, const tagged<Tag2, U>&>::value == false &&
+          is_constructible<UT, const tagged<Tag2, U>&&>::value == false &&
+          is_convertible<tagged<Tag2, U>&, UT>::value == false &&
+          is_convertible<tagged<Tag2, U>&&, UT>::value == false &&
+          is_convertible<const tagged<Tag2, U>&, UT>::value == false &&
+          is_convertible<const tagged<Tag2, U>&&, UT>::value == false
+          , int> = 0
+      >
+          constexpr explicit tagged(const tagged<Tag2, U>& other) = delete;
+
+      template <class U, enable_if_t<
+          is_constructible<UT, U&&>::value == true &&
+          is_convertible<U&&, UT>::value == true &&
+          is_constructible<UT, tagged<Tag, U>&>::value == false &&
+          is_constructible<UT, tagged<Tag, U>&&>::value == false &&
+          is_constructible<UT, const tagged<Tag, U>&>::value == false &&
+          is_constructible<UT, const tagged<Tag, U>&&>::value == false &&
+          is_convertible<tagged<Tag, U>&, UT>::value == false &&
+          is_convertible<tagged<Tag, U>&&, UT>::value == false &&
+          is_convertible<const tagged<Tag, U>&, UT>::value == false &&
+          is_convertible<const tagged<Tag, U>&&, UT>::value == false
+          , int> = 0
+      >
+          constexpr explicit tagged(tagged<Tag, U>&& other)
+          : base_type(std::move(other).underlying()) {}
+
+      template <class U, enable_if_t<
+          is_constructible<UT, U&&>::value == true &&
+          is_convertible<U&&, UT>::value == false &&
+          is_constructible<UT, tagged<Tag, U>&>::value == false &&
+          is_constructible<UT, tagged<Tag, U>&&>::value == false &&
+          is_constructible<UT, const tagged<Tag, U>&>::value == false &&
+          is_constructible<UT, const tagged<Tag, U>&&>::value == false &&
+          is_convertible<tagged<Tag, U>&, UT>::value == false &&
+          is_convertible<tagged<Tag, U>&&, UT>::value == false &&
+          is_convertible<const tagged<Tag, U>&, UT>::value == false &&
+          is_convertible<const tagged<Tag, U>&&, UT>::value == false
+          , int> = 0
+      >
+          constexpr tagged(tagged<Tag, U>&& other)
+          : base_type(std::move(other).underlying()) {}
+
+      template <class Tag2, class U, enable_if_t<
+          is_same<Tag, Tag2>::value == false &&
+          is_constructible<UT, U&&>::value == true &&
+          is_constructible<UT, tagged<Tag2, U>&>::value == false &&
+          is_constructible<UT, tagged<Tag2, U>&&>::value == false &&
+          is_constructible<UT, const tagged<Tag2, U>&>::value == false &&
+          is_constructible<UT, const tagged<Tag2, U>&&>::value == false &&
+          is_convertible<tagged<Tag2, U>&, UT>::value == false &&
+          is_convertible<tagged<Tag2, U>&&, UT>::value == false &&
+          is_convertible<const tagged<Tag2, U>&, UT>::value == false &&
+          is_convertible<const tagged<Tag2, U>&&, UT>::value == false
+          , int> = 0
+      >
+          constexpr tagged(tagged<Tag2, U>&& other) = delete;
+
+
     };
 
 }

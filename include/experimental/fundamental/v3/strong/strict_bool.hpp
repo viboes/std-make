@@ -86,12 +86,14 @@ inline namespace fundamental_v3
   template <class Tag>
   struct strict_bool<Tag, bool> final
     : strong_type<strict_bool<Tag, bool>, bool>
-    , mixin::comparable<strict_bool<Tag, bool>>
-    , mixin::explicit_convertible_to<strong_bool<Tag, bool>, bool>
-    , mixin::logical<strict_bool<Tag, bool>>
-    , mixin::hashable<strict_bool<Tag, bool>>
-    , mixin::streamable<strict_bool<Tag, bool>>
-    , mixin::ordinal<strict_bool<Tag, bool>>
+    , mixins<strict_bool<Tag, bool>,
+          meta_mixin::comparable<>
+        , meta_mixin::explicit_convertible_to<bool>
+        , meta_mixin::logical<>
+        , meta_mixin::hashable<>
+        , meta_mixin::streamable<>
+        , meta_mixin::ordinal<>
+    >
   {
       using base_type = strong_type<strict_bool<Tag, bool>, bool>;
       using base_type::base_type;
@@ -110,11 +112,13 @@ inline namespace fundamental_v3
 
   };
 
+#if __cplusplus <= 201402L || (! defined __clang__ && defined __GNUC__ && __GNUC__ <= 6)
   static_assert(std::is_pod<strict_bool<bool>>::value, "");
   static_assert(std::is_trivially_default_constructible<strict_bool<bool>>::value, "");
   static_assert(std::is_trivially_copyable<strict_bool<bool>>::value, "");
   static_assert(std::is_standard_layout<strict_bool<bool>>::value, "");
   static_assert(std::is_trivial<strict_bool<bool>>::value, "");
+#endif
 
 }
 }

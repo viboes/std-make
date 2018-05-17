@@ -35,7 +35,7 @@ inline namespace fundamental_v3
   template <class ...Ts>
   struct type_constructor<tuple<Ts...>> : meta::id<tuple_tc> {};
 
-#if ! defined JASEL_DOXYGEN_INVOKED && (__cplusplus == 201402L || (__cplusplus > 201402L && defined __GNUC__ && ! defined __clang__))
+#if ! defined JASEL_DOXYGEN_INVOKED && (__cplusplus == 201402L || (__cplusplus > 201402L && defined __GNUC__ && __GNUC__ == 6 && ! defined __clang__))
 
 
       namespace detail {

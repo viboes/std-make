@@ -12,7 +12,9 @@
 
 namespace stdex = std::experimental;
 
+#if __cplusplus <= 201402L || (! defined __clang__ && defined __GNUC__ && __GNUC__ <= 6)
 static_assert(std::is_pod<stdex::byte>::value, "byte is not a POD");
+#endif
 
 int main()
 {

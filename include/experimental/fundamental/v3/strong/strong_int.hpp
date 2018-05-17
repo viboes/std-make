@@ -58,7 +58,7 @@ inline namespace fundamental_v3
   }
 
   template <class Tag, class UT>
-  struct strong_integral final : strong_type<strong_integral<Tag, UT>, UT>, mixins<strong_integral<Tag, UT>
+  struct strong_integral final : strong_type<strong_integral<Tag, UT>, UT, Tag>, mixins<strong_integral<Tag, UT>
       , meta_mixin::additive_with_if<>
       , meta_mixin::bitwise_with_if<>
       , meta_mixin::comparable_with_if<>
@@ -71,7 +71,7 @@ inline namespace fundamental_v3
       static_assert(is_integral<UT>::value, "UT must be integral");
       static_assert(! is_same<UT, bool>::value, "UT cannot be bool");
 
-      using base_type = strong_type<strong_integral<Tag, UT>, UT>;
+      using base_type = strong_type<strong_integral<Tag, UT>, UT, Tag>;
       using base_type::base_type;
 
   };
@@ -82,13 +82,19 @@ inline namespace fundamental_v3
   {
     return strong_integral<Tag, R>(x);
   }
-
+  template <class R>
+  constexpr strong_integral<default_tag, R> make_strong_int(R x)
+  {
+    return strong_integral<default_tag, R>(x);
+  }
+#if __cplusplus <= 201402L || (! defined __clang__ && defined __GNUC__ && __GNUC__ <= 6)
   // < C++17 static_assert(std::is_pod<strong_integral<bool,int>>::value, "");
   static_assert(std::is_trivially_default_constructible<strong_integral<bool,int>>::value, "");
   static_assert(std::is_trivially_copyable<strong_integral<bool,int>>::value, "");
   static_assert(std::is_standard_layout<strong_integral<bool,int>>::value, "");
   static_assert(std::is_trivial<strong_integral<bool,int>>::value, "");
   static_assert(is_ordinal<strong_integral<bool,int>>::value, "");
+#endif
 
   // fixme: Should integer be a strong int without tag?
   using integer = strong_integral<default_tag, int>;

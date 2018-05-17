@@ -37,11 +37,11 @@ inline  namespace fundamental_v3
     //! * construction only from the underlying type (e.g. byte)
     //!    => They must add an SFINAE constructor
 
-    template <class Final, class UT>
+    template <class Final, class UT, class Tag=Final>
     struct strong_type
-    : tagged<Final, UT>
+    : tagged<Tag, UT>
     {
-      using base_type = tagged<Final, UT>;
+      using base_type = tagged<Tag, UT>;
       using base_type::base_type;
 
       using typename base_type::underlying_type;
@@ -116,7 +116,7 @@ inline  namespace fundamental_v3
 
     //! the mixin template class is a helper used to ovoid the repetition of the Final class.
     // The mixin is create with a Final class and a list of MetaMixins
-    // It is equivanel to inherit from all the application of all the MetaMixins to the Final class
+    // It is equivalent to inherit from all the application of all the MetaMixins to the Final class
     template <
       typename Final,
       typename ...MetaMixins
@@ -130,12 +130,13 @@ inline  namespace fundamental_v3
     //! Usage: Define a Final class that inheriting from this class
     template <
       typename Final,
+      typename Tag,
       typename UT,
       typename ...MetaMixins
     >
-    struct new_class : strong_type<Final, UT>, MetaMixins::template type<Final>...
+    struct new_class : strong_type<Final, UT, Tag>, MetaMixins::template type<Final>...
     {
-      using base_type = strong_type<Final, UT>;
+      using base_type = strong_type<Final, UT, Tag>;
       using base_type::base_type;
     };
 
@@ -147,9 +148,9 @@ inline  namespace fundamental_v3
       typename UT,
       typename ...MetaMixins
     >
-    struct new_type final : new_class<new_type<Tag, UT, MetaMixins...>, UT, MetaMixins...>
+    struct new_type final : new_class<new_type<Tag, UT, MetaMixins...>, Tag, UT, MetaMixins...>
     {
-      using base_type = new_class<new_type<Tag, UT, MetaMixins...>, UT, MetaMixins...>;
+      using base_type = new_class<new_type<Tag, UT, MetaMixins...>, Tag, UT, MetaMixins...>;
       using base_type::base_type;
     };
 

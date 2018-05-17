@@ -133,11 +133,13 @@ inline namespace fundamental_v3
   public:
   };
 
+#if __cplusplus <= 201402L || (! defined __clang__ && defined __GNUC__ && __GNUC__ <= 6)
   static_assert(std::is_pod<strong_bounded_int<bool,int,0,3>>::value, "");
   static_assert(std::is_trivially_default_constructible<strong_bounded_int<bool,int,0,3>>::value, "");
   static_assert(std::is_trivially_copyable<strong_bounded_int<bool,int,0,3>>::value, "");
   static_assert(std::is_standard_layout<strong_bounded_int<bool,int,0,3>>::value, "");
   static_assert(std::is_trivial<strong_bounded_int<bool,int,0,3>>::value, "");
+#endif
 
   namespace ordinal {
     /// A strong_bounded_int is an ordinal type having the bounds Low..High

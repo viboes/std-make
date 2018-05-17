@@ -29,9 +29,7 @@
 #include <memory>
 #include <cassert>
 
-#if __cplusplus <= 201402L
 #include <experimental/fundamental/v3/in_place.hpp>
-#endif
 
 namespace std
 {

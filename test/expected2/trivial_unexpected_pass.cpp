@@ -42,7 +42,7 @@ int main()
         BOOST_TEST(x.value.second == 2);
     }
     {
-        stdex::unexpected<std::pair<int, short>> x {std::in_place, 1,2};
+        stdex::unexpected<std::pair<int, short>> x {stdex::in_place, 1,2};
         BOOST_TEST(x.value.first == 1);
         BOOST_TEST(x.value.second == 2);
     }

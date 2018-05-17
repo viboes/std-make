@@ -79,11 +79,22 @@ int main()
 #else
       //EngineStarted es7 {cr};       // ko:no conversion between different strong bools
 
-      bool ans = es && !cr;           // ok - explicit conversion implied by the use of &&
-      BOOST_TEST(ans);
-      bool ans2 = es || !cr;           // ok - explicit conversion implied by the use of &&
-      BOOST_TEST(ans2);
+        {
+        bool ans = es && cr;           // ok - explicit conversion implied by the use of &&
+        BOOST_TEST(!ans);
+        bool ans2 = es || cr;           // ok - explicit conversion implied by the use of ||
+        BOOST_TEST(ans2);
+        }
+#if 0
+        {
+        bool ans = es && !cr;           // fails as explicit conversion is not implied by the use of !
+        BOOST_TEST(ans);
+        bool ans2 = es || !cr;           // fails as explicit conversion is not implied by the use of !
+        BOOST_TEST(ans2);
+        }
 #endif
+#endif
+
       if (cr)                         // ok - explicit conversion implied by the use cr in a if
         BOOST_TEST(false);
       else

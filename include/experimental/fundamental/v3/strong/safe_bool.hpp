@@ -80,11 +80,13 @@ inline namespace fundamental_v3
 
   template <class Bool>
   struct safe_bool final
-     : strong_type<safe_bool<Bool>, Bool>
-     , mixin::comparable_with_if<safe_bool<Bool>>
-     , mixin::explicit_convertible_to<safe_bool<Bool>, bool>
-     , mixin::hashable<safe_bool<Bool>>
-     , mixin::streamable<safe_bool<Bool>>
+     : strong_type<safe_bool<Bool>, Bool>, mixins<safe_bool<Bool>
+     , meta_mixin::comparable_with_if<>
+     , meta_mixin::explicit_convertible_to<bool>
+     , meta_mixin::hashable<>
+     , meta_mixin::streamable<>
+     , meta_mixin::ordinal<>
+  >
   {
       using base_type = strong_type<safe_bool<Bool>, Bool>;
       using base_type::base_type;
@@ -122,12 +124,13 @@ inline namespace fundamental_v3
   };
   template <>
   struct safe_bool<bool> final
-  : strong_type<safe_bool<bool>, bool>
-  , mixin::comparable<safe_bool<bool>>
-  , mixin::explicit_convertible_to<safe_bool<bool>, bool>
-  , mixin::hashable<safe_bool<bool>>
-  , mixin::streamable<safe_bool<bool>>
-  , mixin::ordinal<safe_bool<bool>>
+  : strong_type<safe_bool<bool>, bool>, mixins<safe_bool<bool>
+        , meta_mixin::comparable<>
+        , meta_mixin::explicit_convertible_to<bool>
+        , meta_mixin::hashable<>
+        , meta_mixin::streamable<>
+        , meta_mixin::ordinal<>
+  >
   {
       using base_type = strong_type<safe_bool<bool>, bool>;
       using base_type::base_type;
@@ -160,11 +163,13 @@ inline namespace fundamental_v3
 
   };
 
+#if __cplusplus <= 201402L || (! defined __clang__ && defined __GNUC__ && __GNUC__ <= 6)
   static_assert(std::is_pod<safe_bool<bool>>::value, "");
   static_assert(std::is_trivially_default_constructible<safe_bool<bool>>::value, "");
   static_assert(std::is_trivially_copyable<safe_bool<bool>>::value, "");
   static_assert(std::is_standard_layout<safe_bool<bool>>::value, "");
   static_assert(std::is_trivial<safe_bool<bool>>::value, "");
+#endif
 
   //! alias of safe_bool using the builtin bool
   using boolean = safe_bool<bool>;

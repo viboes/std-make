@@ -57,13 +57,13 @@ int main()
         BOOST_TEST(res.has_value());
     }
     {
-        stdex::result<std::pair<int, short>, short> res {std::in_place_type<stdex::success<std::pair<int, short>>>, std::in_place, 1, 2};
+        stdex::result<std::pair<int, short>, short> res {stdex::in_place_type<stdex::success<std::pair<int, short>>>, stdex::in_place, 1, 2};
         BOOST_TEST(res.has_value());
         BOOST_TEST(res.value().first == 1);
         BOOST_TEST(res.value().second == 2);
     }
     {
-        stdex::result<std::pair<int, short>, short> res {std::in_place_type<stdex::failure<short>>, std::in_place, 1};
+        stdex::result<std::pair<int, short>, short> res {stdex::in_place_type<stdex::failure<short>>, stdex::in_place, 1};
         BOOST_TEST(! res.has_value());
         BOOST_TEST(res.error() == 1);
     }

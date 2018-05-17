@@ -15,9 +15,7 @@
 #include <memory>
 #include <cassert>
 
-#if __cplusplus <= 201402L || ! defined __clang__
 #include <experimental/fundamental/v3/in_place.hpp>
-#endif
 
 namespace std
 {

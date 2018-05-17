@@ -10,7 +10,10 @@
 #include <experimental/ordinal.hpp>
 #include <experimental/fundamental/v2/config.hpp>
 #include <experimental/fundamental/v3/config/requires.hpp>
+#include <utility>
+//#if __cplusplus <= 201402L || (! defined __clang__ && defined __GNUC__ && __GNUC__ <= 6)
 #include <experimental/fundamental/v3/in_place.hpp>
+//#endif
 #include <experimental/type_traits.hpp>
 #include <experimental/wrapped.hpp>
 
@@ -29,6 +32,9 @@ inline  namespace fundamental_v3
     {
       //! the underlying type reflected type
       using underlying_type = UT;
+
+      template <class U>
+      friend struct wrapper;
 
       constexpr wrapper() noexcept = default;
       constexpr wrapper(wrapper const& e) = default;

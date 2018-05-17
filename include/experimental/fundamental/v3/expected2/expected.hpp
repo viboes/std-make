@@ -26,9 +26,7 @@
 
 #include <experimental/type_traits.hpp>
 #include <utility>
-#if __cplusplus <= 201402L || ! defined __clang__
 #include <experimental/fundamental/v3/in_place.hpp>
-#endif
 #include <experimental/fundamental/v3/expected2/unexpected.hpp>
 #include <experimental/fundamental/v3/expected2/bad_expected_access.hpp>
 

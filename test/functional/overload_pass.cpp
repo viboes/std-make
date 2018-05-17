@@ -736,7 +736,7 @@ int main()
   }
   {
     constexpr auto f = overload(function_without_state{}
-#if defined __GNUC__ and ! defined __clang__
+#if defined __GNUC__ && __GNUC__ == 6 && ! defined __clang__
         , [](std::string str) {
       return 1;
     }
@@ -749,7 +749,7 @@ int main()
   }
   {
     constexpr auto f = overload(function_without_state2{}
-#if defined __GNUC__ and ! defined __clang__
+#if defined __GNUC__ && __GNUC__ == 6 && ! defined __clang__
         , [](std::string str) {
       return 1;
     }
@@ -784,7 +784,7 @@ int main()
   {
     //overload/include_pass.cpp:468:9: note: non-literal type '(lambda at overload/include_pass.cpp:468:9)' cannot be used in a constant expression
     constexpr auto f = overload<int>(function_without_state2{}
-#if defined __GNUC__ and ! defined __clang__
+#if defined __GNUC__ && __GNUC__ == 6 && ! defined __clang__
         , [](std::string str) {
       return 1;
     }

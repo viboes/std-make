@@ -14,9 +14,7 @@
 #include <experimental/fundamental/v3/config/requires.hpp>
 #include <type_traits>
 #include <utility>
-#if __cplusplus <= 201402L || ! defined __clang__
 #include <experimental/fundamental/v3/in_place.hpp>
-#endif
 
 namespace std
 {

@@ -46,6 +46,8 @@ namespace std
 #endif
   }
   }
+#if __cplusplus <= 201402L || (! defined __clang__ && defined __GNUC__ && __GNUC__ <= 6)
+
   using std::experimental::in_place_t;
   using std::experimental::in_place;
   using std::experimental::in_place_type_t;
@@ -53,6 +55,7 @@ namespace std
 #if __cplusplus >= 201402L
   using std::experimental::in_place_type;
   using std::experimental::in_place_index;
+#endif
 #endif
 
 }

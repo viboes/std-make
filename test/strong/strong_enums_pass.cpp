@@ -57,6 +57,7 @@ typedef stdex::strong_enum<E, std::int8_t> ES;
 typedef stdex::strong_enum<SE::type, std::int8_t> SSE;
 typedef stdex::ordinal_enum<E, std::int8_t> OE;
 
+#if __cplusplus <= 201402L || (! defined __clang__ && defined __GNUC__ && __GNUC__ <= 6)
 static_assert(std::is_pod<EC>::value, "");
 static_assert(std::is_trivially_default_constructible<EC>::value, "");
 static_assert(std::is_trivially_copyable<EC>::value, "");
@@ -80,6 +81,7 @@ static_assert(std::is_standard_layout<OE>::value, "");
 static_assert(std::is_trivial<OE>::value, "");
 static_assert(std::is_trivially_destructible<OE>::value, "");
 static_assert(std::is_nothrow_default_constructible<OE>::value, "");
+#endif
 
 void f(ES) {}
 void f(SSE) {}

@@ -23,6 +23,7 @@
 namespace stdex = std::experimental;
 
 struct offset_tag {};
+struct offset_tag2 {};
 
 namespace std {
 namespace experimental {
@@ -36,18 +37,58 @@ namespace mixin {
 }
 
 using offset = stdex::strong_counter<offset_tag, std::int64_t>;
+using offset1 = stdex::tagged<offset_tag, std::int64_t>;
+using offset1u = stdex::tagged<offset_tag, std::int32_t>;
+using offset2 = stdex::tagged<offset_tag2, std::int64_t>;
+using offset3 = stdex::tagged<offset_tag2, std::int32_t>;
 
 using address = stdex::strong_random_incrementable<struct address_tag, std::int64_t, offset>;
+using address1 = stdex::strong_random_incrementable<struct address_tag, std::int64_t, offset>;
+using address1u = stdex::strong_random_incrementable<struct address_tag, std::int32_t, offset>;
+using address2 = stdex::strong_random_incrementable<struct address_tag2, std::int64_t, offset>;
+using address3 = stdex::strong_random_incrementable<struct address_tag2, std::int32_t, offset>;
 
 template <class T> struct check;
 int main()
 {
-  {
-    offset o1 {3};
-    offset o2 {4};
-    auto o =  o1 + o2;
-    BOOST_TEST_EQ(o.underlying() , 7);
-  }
+    {
+      offset o1 {3};
+      offset o2 {4};
+      auto o =  o1 + o2;
+      BOOST_TEST_EQ(o.underlying() , 7);
+    }
+    {
+      offset1 o1 {3};
+      offset1u o2 =offset1u{o1};
+      BOOST_TEST_EQ(o2.underlying() , 3);
+    }
+#if 0
+    {
+      offset1 o1 {3};
+      offset2 o2 =offset2{o1}; // must fail
+    }
+    {
+      offset1 o1 {3};
+      offset3 o2 =offset3{o1}; // must fail
+    }
+#endif
+    {
+      address1 a1 {4};
+      address1u a2 = address1u(a1);
+      BOOST_TEST_EQ(a2.underlying() , 4);
+    }
+#if 0
+    {
+      address1 a1 {4};
+      address2 a2 = address2(a1);
+      BOOST_TEST_EQ(a2.underlying() , 4); // must fail
+    }
+    {
+      address1 a1 {4};
+      address3 a2 = address3(a1);
+      BOOST_TEST_EQ(a2.underlying() , 4); // must fail
+    }
+#endif
   {
     address a {4};
     address a2 = ++a;

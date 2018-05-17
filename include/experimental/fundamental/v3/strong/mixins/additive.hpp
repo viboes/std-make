@@ -254,6 +254,21 @@ namespace meta_mixin
         template <class Final>
         using type = mixin::additive_with_if<Final, Check, Pred>;
     };
+
+    struct strong_type_post_increment_derived
+    {
+        template <class Final>
+        using type = mixin::strong_type_post_increment_derived<Final>;
+
+    };
+
+    struct strong_type_post_decrement_derived
+    {
+        template <class Final>
+        using type = mixin::strong_type_post_decrement_derived<Final>;
+
+    };
+
 }
 }
 }

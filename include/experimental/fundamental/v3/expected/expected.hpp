@@ -22,15 +22,14 @@
 #include <experimental/fundamental/v3/config/requires.hpp>
 #include <experimental/fundamental/v3/expected/error_traits.hpp>
 #include <experimental/fundamental/v3/expected/bad_expected_access.hpp>
+#include <utility>
 #include <experimental/fundamental/v3/in_place.hpp>
 #include <experimental/type_constructible.hpp>
 #include <experimental/meta/v1/rebind.hpp>
 #include <experimental/meta/v1/id.hpp>
 #include <experimental/fundamental/v3/result/success_failure.hpp>
 
-
 #include <stdexcept>
-#include <utility>
 #include <initializer_list>
 #include <type_traits>
 #include <memory>

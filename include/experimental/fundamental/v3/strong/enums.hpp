@@ -82,10 +82,11 @@ inline namespace fundamental_v3
 
   template <class Final, class E, class UT=underlying_type_t<E>>
   struct enum_wrapper
-      : strong_type<Final, UT>
-      , mixin::comparable<Final>
-      , mixin::hashable<Final>
-      , mixin::streamable<Final>
+      : strong_type<Final, UT>, mixins<Final
+            , meta_mixin::comparable<>
+            , meta_mixin::hashable<>
+            , meta_mixin::streamable<>
+      >
   {
       using base_type = strong_type<Final, UT>;
       using base_type::base_type;
