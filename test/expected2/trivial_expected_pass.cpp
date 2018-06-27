@@ -7,7 +7,7 @@
 // Copyright Vicente J. Botet Escriba 2018.
 
 #include <boost/detail/lightweight_test.hpp>
-#if __cplusplus > 201402L && defined __clang__
+#if __cplusplus > 201402L && (defined __clang__ || defined __GNUC__ >= 8)
 
 #include <experimental/expected2.hpp>
 #include <memory>
