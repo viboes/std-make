@@ -17,7 +17,7 @@
 #ifndef JASEL_EXPERIMENTAL_V3_EXPECTED_EXPECTED_HPP
 #define JASEL_EXPERIMENTAL_V3_EXPECTED_EXPECTED_HPP
 
-#if __cplusplus > 201402L && defined __clang__
+#if __cplusplus > 201402L && (defined __clang__ || __GNUC__ >= 8)
 
 #include <experimental/fundamental/v2/config.hpp>
 #include <experimental/fundamental/v3/result/helpers_detail.hpp>
