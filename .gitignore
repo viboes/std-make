@@ -1,5 +1,8 @@
 #projects
 .project
+.vscode
+c_cpp_properties.json
+settigs.jason
 
 # Compiled Object files
 *.slo
