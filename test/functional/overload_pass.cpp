@@ -616,7 +616,7 @@ int main()
         [](std::string && i)
         {
           std::cout << "string(string&&)" << std::endl;
-          return i;
+          return std::move(i);
         },
         [](auto)
         {
@@ -638,7 +638,7 @@ int main()
         [](std::string && i)
         {
           std::cout << "string(string&&)" << std::endl;
-          return i;
+          return std::move(i);
         },
         [](auto)
         {
