@@ -107,23 +107,23 @@ Without
 
 ```c++
 using B = bounded_int<1,10> ;
-for (int i = B::first; i<=B::last, ++i )
+for (int i = B::first_index; i<=B::last_index, ++i )
     do_someting(B(i));    
 ```
 
-With `irange` integral range factory we can simplify the things a little bit, but we need to use the associated integral underlying type. 
+With `iota` view we can simplify the things a little bit, but we need to state explicitly the bounds. 
 
 ```c++
 using B = bounded_int<1,10> ;
-for (int i : irange(B::first; B::last) )
-    do_someting(B(i));    
+for (auto b : iota(B::first; B::last) )
+    do_someting(b);    
 ```
 
-With `ordinal_range` we use directly the bounded ordinal type, instead of seen the associated integer.
+With `ordinal_range` we use directly the bounded ordinal type, instead of seen the associated bounds.
 
 ```c++
 using B = bounded_int<1,10> ;
-for (B b : ordinal_range<B>())
+for (auto b : ordinal_range<B>())
     do_someting(b);    
 ```
 
@@ -136,7 +136,7 @@ Examples of libraries that have tried to cope with some of these aspects are:
 *    Boost.SmartEnums has complex design to take care of iteration.
 *    BEnum.
 
-But most of them have been restricted to enum to string conversions. This paper don't takes in account this conversion, as we will have it almost for free with static reflection.
+But most of them have been restricted to enum to string conversions. This paper doesn't take in account this conversion, as we will have it almost for free with static reflection.
 
 # Proposal
 
@@ -163,8 +163,9 @@ The design of this proposal is based on a `traits` specialization instead of usi
 The alternative would be to add an additional parameter that coveys the *Ordinal* type.
 
 ```c++
-int ordinal_size(in_place_type<O>);
-O ordinal_pos(in_place_type<O>, int);
+size_t ordinal_size(identity_type<O>);
+O ordinal_val(identity_type<O>, size_t);
+size_t ordinal_pos(O);
 ```
 
 ## `ordinal_set` for ordinal types with small cardinality
@@ -173,7 +174,7 @@ O ordinal_pos(in_place_type<O>, int);
 
 However for ordinal sets with a small cardinality, we could expect to use a more compact memory than the one used by `bitset`.
 
-Before proposing an `ordinal_set` that could have a more compact representation,  we believe that we need to generalize the `bitset` interface with an additional block type. Lets, call it `basic_bitset<N, Block>`. In this way `bitset<N>` could have as representation a `basic_bitset<N, long>`. Then we could define a `basic_ordinal_set<O, Block=long>`. This proposal, don't propose such a `basic_bitset<N, long>` type.
+Before proposing an `ordinal_set` that could have a more compact representation,  we believe that we need to generalize the `bitset` interface with an additional block type. Lets, call it `basic_bitset<N, Block>`. In this way `bitset<N>` could have as representation a `basic_bitset<N, long>`. Then we could define a `basic_ordinal_set<O, Block=long>`. This proposal, doesn't propose such a `basic_bitset<N, long>` type yet.
 
 ## `ordinal_range` and the Range views
 
@@ -186,7 +187,6 @@ The range library proposes an integral range view factory `std::experimental:ran
 These changes are entirely based on library extensions and do not require any language features beyond what is available in C++17. There are however some classes in the standard that can be customized.
 
 Once we will have reflection, we could reflect enums with unique values as ordinal types.
-
 
 # Proposed Wording
 
@@ -531,7 +531,7 @@ inline namespace fundamentals_v3 {
     // requires Ordinal<O>
     class ordinal_array;
     
-  template <class T, class O>
+  // , comparable   template <class T, class O>
     bool operator==(const ordinal_array<T, O>& x, const ordinal_array<T, O>& y);
   template <class T, class O>
     bool operator!=(const ordinal_array<T, O>& x, const ordinal_array<T, O>& y);
@@ -544,10 +544,11 @@ inline namespace fundamentals_v3 {
   template <class T, class O>
     bool operator>=(const ordinal_array<T, O>& x, const ordinal_array<T, O>& y);
 
-  template <class T, class O >
+  // , swappable   template <class T, class O >
     void swap(ordinal_array<T, O>& x, ordinal_array<T, O>& y) noexcept(noexcept(x.swap(y)));
 
-  template <class T> class tuple_size;
+
+  // , tuple-like customization  template <class T> class tuple_size;
   template <size_t I, class T> class tuple_element;
   template <class T, class O> struct tuple_size<ordinal_array<T, O>>;
   template <size_t I, class T, class O> struct tuple_element<I, ordinal_array<T, O>>;
@@ -556,10 +557,11 @@ inline namespace fundamentals_v3 {
   template <size_t I, class T, class O> constexpr T&& get(ordinal_array<T, O>&&) noexcept;
   template <size_t I, class T, class O> constexpr const T&& get(const ordinal_array<T, O>&&) noexcept;    
 
+// , hash supporttemplate<class T, class O> struct hash<ordinal_array<T, O>>;
+
 }
 }
 ```
-
 
 #### Class template `ordinal_array` [ordinal_array]
 
@@ -620,6 +622,8 @@ struct ordinal_array
     
 ```
 
+## x.y.z Ordinal set [ordinal_set]
+
 ### x.y.z.1 Header <experimental/ordinal_set> synopsis [ordinal_set.synop]
 
 As `std::bitset` but replacing the size `N` by the ordinal type `O`. 
@@ -643,12 +647,18 @@ inline namespace fundamentals_v3 {
     template <class O>
         ordinal_set<O> operator^(const ordinal_set<O>&, const ordinal_set<O>&) noexcept;
 
+    // x.y.z.3 ordinal_set comparable:
+    
+    // x.y.z.3 ordinal_set swappable:
+
+    // x.y.z.3 ordinal_set streaming operators:
     template <class charT, class traits, class O>
         basic_istream<charT, traits>& operator>>(basic_istream<charT, traits>& is, ordinal_set<O>& x);
 
     template <class charT, class traits, class O>
         basic_ostream<charT, traits>& operator<<(basic_ostream<charT, traits>& os, const ordinal_set<O>& x);
 
+    // x.y.z.3 ordinal_set hash support:
     template <class O> struct hash<std::ordinal_set<NO>;
 
 }
