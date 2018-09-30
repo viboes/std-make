@@ -8,7 +8,7 @@
 #define JASEL_EXPERIMENTAL_VALUE_OR_NONE_HPP
 
 
-// ValueOrNone customizations
+// ValueOrNone customization
 // as functor
 //#include <experimental/fundamental/v3/value_or_none/transform.hpp>
 

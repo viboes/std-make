@@ -27,10 +27,10 @@ inline namespace fundamental_v3
 
   /**
   `strong_bool` is a strongly type that wraps a bool and behaves like an `bool`
-  The main goal is to be able to define strong bools that don't mix between them.
+  The main goal is to be able to define strong booleans that don't mix between them.
   The single conversion is the explicit conversion to bool type.
   This is a safe bool, in the sense that it doesn't allows conversions from integral, floating point and pointer types.
-  In addition it forbids conversions between different strong bools types.
+  In addition it forbids conversions between different strong booleans types.
 
   As any tagged type, it makes the parameter more explicit.
   Example

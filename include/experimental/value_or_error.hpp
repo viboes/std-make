@@ -27,7 +27,7 @@
 // result<T>
 
 
-// ValueOrError customizations
+// ValueOrError customization
 // as functor
 #include <experimental/fundamental/v3/value_or_error/transform.hpp>
 

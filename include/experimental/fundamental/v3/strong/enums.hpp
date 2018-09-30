@@ -99,7 +99,7 @@ inline namespace fundamental_v3
       enum_type to_enum() const noexcept { return enum_type(this->_value); }
       // Should the enum conversion be explicit?
       // As the tag for the strong type would depend on the type enum E, it seems valid to have an implicit conversion
-      // If we had an additional tag the conversion shoul dbe explicit, as several classes enum_wrapper classes could wrap the same enum.
+      // If we had an additional tag the conversion should be explicit, as several classes enum_wrapper classes could wrap the same enum.
       operator enum_type() const noexcept { return enum_type(this->_value); }
 
       // Shouldn't we provide a UT conversion as enums do?
