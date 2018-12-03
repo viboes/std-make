@@ -77,7 +77,7 @@ OSTREAM& operator<<(OSTREAM& os, PT const& pt) {
   os << "{" ;
   std::experimental::product_type::fold_left_index(pt, os, sepc{});
   return os << "}";
-};
+}
 }
 int main()
 {

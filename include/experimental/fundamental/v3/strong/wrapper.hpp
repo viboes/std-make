@@ -152,7 +152,7 @@ inline  namespace fundamental_v3
                         forward<U>(u).underlying()
         )
     };
-    };
+    }
 
 }
 }

@@ -32,12 +32,12 @@ int & refInt() {
     static int i=-1;
     ++i;
     return i;
-};
+}
 
 int const& refConstInt() {
     static const int i=0;
     return i;
-};
+}
 
 int main()
 {
