@@ -143,6 +143,15 @@ jasel_add_tests(
     #make_std_unique_ptr_pass
 )
 
+find_package(Threads REQUIRED)
+foreach(test IN ITEMS
+        emplace_ready_future_pass
+        make_ready_future_pass
+        make_std_future_pass
+        make_std_shared_future_pass)
+    target_link_libraries(factory.${test}-normal Threads::Threads)
+endforeach()
+
 jasel_add_tests(
     functional functional
     ######
