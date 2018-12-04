@@ -61,6 +61,10 @@ inline namespace fundamental_v3
 #endif
 #if __cplusplus >= 201402L || defined JASEL_DOXYGEN_INVOKED
 
+namespace functor {
+  template <>
+  struct traits<tuple<_t>> : product_type::as_functor {};
+  }
 namespace n_functor {
   template <>
   struct traits<tuple<_t>> : product_type::as_n_functor {};
