@@ -11,6 +11,8 @@
 #include <experimental/meta.hpp>
 #include <experimental/type_traits.hpp>
 #include <experimental/product_type.hpp>
+#include <experimental/functor.hpp>
+#include <experimental/applicative.hpp>
 #include <experimental/n_functor.hpp>
 #include <experimental/n_applicative.hpp>
 #include <experimental/p_functor.hpp>
@@ -72,6 +74,10 @@ namespace n_functor {
 namespace p_functor {
   template <>
   struct traits<tuple<_t>> : product_type::as_p_functor {};
+}
+namespace applicative {
+template <>
+struct traits<tuple<_t>> : product_type::as_applicative {};
 }
 namespace n_applicative {
   template <>

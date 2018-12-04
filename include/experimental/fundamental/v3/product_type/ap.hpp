@@ -112,6 +112,21 @@ namespace product_type
           product_type::element_sequence_for<ProductType>{});
   }
 
+  //! struct mapping a product_type to an Applicative.
+  struct as_applicative {
+    //! forwards to product_type::ap
+    template<class F, class T>
+    static constexpr auto ap(F&& f, T&& x) {
+      return product_type::ap(forward<F>(f), forward<T>(x));
+    }
+    //! forwards to factory::make<PT>
+    template <class PT, class ...Ts>
+    static auto pure(Ts&& ...xs)
+    {
+      return make<PT>(forward<Ts>(xs)...);
+    }
+  };
+
   //! struct mapping a product_type to a N-Applicative.
   struct as_n_applicative : n_applicative::tag
   {
