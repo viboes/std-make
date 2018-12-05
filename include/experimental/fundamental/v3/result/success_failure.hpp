@@ -179,11 +179,11 @@ struct success<void>
     using rebind = success<U>;
 };
 
-inline constexpr bool operator==(const success<void>& x, const success<void>& y)
+inline constexpr bool operator==(const success<void>&, const success<void>&)
 {
   return true;
 }
-inline constexpr bool operator!=(const success<void>& x, const success<void>& y)
+inline constexpr bool operator!=(const success<void>&, const success<void>&)
 {
   return false;
 }
@@ -314,11 +314,11 @@ struct failure<void>
     using rebind = failure<U>;
 };
 
-inline constexpr bool operator==(const failure<void>& x, const failure<void>& y)
+inline constexpr bool operator==(const failure<void>&, const failure<void>&)
 {
   return true;
 }
-inline constexpr bool operator!=(const failure<void>& x, const failure<void>& y)
+inline constexpr bool operator!=(const failure<void>&, const failure<void>&)
 {
   return false;
 }

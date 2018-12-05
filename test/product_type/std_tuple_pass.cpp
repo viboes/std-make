@@ -29,7 +29,7 @@ bool has_padding(PT const& pt) {
       }
   );
   return sizeof(PT) != sum;
-};
+}
 
 struct  SizeOf {
   template <class T>
@@ -51,7 +51,7 @@ template <class PT>
 constexpr bool has_padding_constexpr(PT const& pt) {
   constexpr auto const sum = std::experimental::product_type::fold_left(pt, 0u, accumulate_sizeof{});
   return sizeof(PT) != sum;
-};
+}
 
 
 
@@ -74,7 +74,7 @@ OSTREAM& operator<<(OSTREAM& os, PT const& pt) {
       }
   );
   return os << "}";
-};
+}
 }
 
 int main()
