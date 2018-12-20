@@ -378,6 +378,7 @@ test-suite utility
       [ run utility/out_param_pass.cpp  ]
       [ run utility/only_when_pass.cpp  ]
       [ run utility/not_null_pass.cpp  ]
+      [ run utility/narrow_pass.cpp  ]
     ;
 
 
