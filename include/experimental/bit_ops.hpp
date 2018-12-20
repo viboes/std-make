@@ -4,8 +4,8 @@
 //
 // (C) Copyright 2017 Vicente J. Botet Escriba
 
-#ifndef JASEL_EXPERIMENTAL_BIT_HPP
-#define JASEL_EXPERIMENTAL_BIT_HPP
+#ifndef JASEL_EXPERIMENTAL_BIT_OPS_HPP
+#define JASEL_EXPERIMENTAL_BIT_OPS_HPP
 
 #include <experimental/fundamental/v3/bits/bit_ops.hpp>
 
