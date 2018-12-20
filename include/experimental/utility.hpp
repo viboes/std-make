@@ -14,8 +14,12 @@
 #include <experimental/fundamental/v3/utility/constexpr_utility.hpp>
 #include <experimental/fundamental/v3/utility/decay_copy.hpp>
 #include <experimental/fundamental/v3/utility/dependent_false.hpp>
+#include <experimental/fundamental/v3/utility/discard.hpp>
 #include <experimental/fundamental/v3/utility/exchange.hpp>
+#include <experimental/fundamental/v3/utility/explicit_cast.hpp>
+#include <experimental/fundamental/v3/utility/incomplete_cast.hpp>
 #include <experimental/fundamental/v3/utility/lvalue_ref.hpp>
+#include <experimental/fundamental/v3/utility/maybe_unused.hpp>
 #include <experimental/fundamental/v3/utility/narrow.hpp>
 #include <experimental/fundamental/v3/utility/not_null.hpp>
 #include <experimental/fundamental/v3/utility/only_when.hpp>
