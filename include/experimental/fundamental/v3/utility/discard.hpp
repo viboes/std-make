@@ -10,13 +10,13 @@
 #define JASEL_FUNDAMENTAL_V3_UTILITY_DISCARD_HPP
 
 #include <utility>
-#include <type_traits>
 
 namespace std
 {
 namespace experimental
 {
-
+inline namespace fundamental_v3
+{
 // discards the value of an expression after evaluating it
 // Note that the intent is not the same as maybe_unused, which takes a lvalue. This can take an rvalue and it will be evaluated
 // use:
@@ -29,6 +29,7 @@ void discard(U&& u) {
     return static_cast<void>(std::forward<U>(u));
 }
 
+}
 }
 }
 

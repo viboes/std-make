@@ -9,7 +9,6 @@
 #ifndef JASEL_FUNDAMENTAL_V3_UTILITY_MAYBE_UNUSED_HPP
 #define JASEL_FUNDAMENTAL_V3_UTILITY_MAYBE_UNUSED_HPP
 
-#include <utility>
 #include <type_traits>
 
 // states that this lvalue is maybe not used

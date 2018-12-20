@@ -10,7 +10,6 @@
 #define JASEL_FUNDAMENTAL_V3_UTILITY_EXPLICIT_CAST_HPP
 
 #include <utility>
-#include <type_traits>
 
 namespace std
 {
