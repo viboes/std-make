@@ -7,7 +7,6 @@
 #ifndef JASEL_EXPERIMENTAL_BIT_HPP
 #define JASEL_EXPERIMENTAL_BIT_HPP
 
-#include <experimental/fundamental/v3/bits/bit_cast.hpp>
 #include <experimental/fundamental/v3/bits/bit_ops.hpp>
 #include <experimental/fundamental/v3/bits/bit_value.hpp>
 #include <experimental/fundamental/v3/bits/bit_reference.hpp>
