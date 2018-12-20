@@ -13,6 +13,7 @@
 
 #include <cstring>
 #include <type_traits>
+#include <utility>
 
 namespace std
 {
@@ -22,11 +23,15 @@ inline namespace fundamental_v3
 {
 
 template <class Target, class Source>
-Target bit_cast (const Source& from) {
-    static_assert(is_trivially_copyable<Source>::value, "Source must be trivially copyable");
-    static_assert(is_trivially_copyable<Target>::value, "Target must be trivially copyable");
-    static_assert(sizeof(Target) == sizeof(Source), "Provided types should have the same size");
-
+typename std::enable_if<
+    (sizeof(Target) == sizeof(Source)) &&
+    std::is_trivially_copyable<Source>::value &&
+    std::is_trivial<Target>::value,
+    // this implementation requires that Target is trivially default constructible, which is not surprising
+    Target>::type
+// constexpr support needs compiler magic
+bit_cast (const Source& from)
+{
     Target to;
     std::memcpy(&to, &from, sizeof(to));
     return to;
