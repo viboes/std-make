@@ -29,16 +29,22 @@ inline  namespace v1
   template <class T>
   using make_signed_t = typename make_signed<T>::type;
 
+  // this is equivalent to bit_cast to the signed type of the unsigned integral type where we don't need to use memcpy and pass the address of the integral but the value itself
+  // Note that the value passed as argument can be greater than the max signed value and that it will be seen as a negative number.
+
   template <class T>
-  constexpr make_signed_t<T> to_signed_bitcast(T x) noexcept
+  constexpr make_signed_t<T> to_signed_bit_cast(T x) noexcept
   {
       return static_cast<make_signed_t<T>>(x);
   }
+
+  // this is equivalent to a narrow cast to the signed type
   template <class T>
   constexpr make_signed_t<T> to_signed_cast(T x) noexcept
   {
       return narrow_cast<make_signed_t<T>>(x);
   }
+  // this is equivalent to narrow to the signed type
   template <class T>
   constexpr make_signed_t<T> to_signed(T x) noexcept
   {
@@ -50,16 +56,24 @@ inline  namespace v1
   struct make_unsigned : std::make_unsigned<T> {};
   template <class T>
   using make_unsigned_t = typename make_unsigned<T>::type;
+
+
+  // this is equivalent to bit_cast to the unsigned type of the signed integral type where we don't need to use memcpy and pass the address of the integral but the value itself
+  // Note that the value passed as argument can be negative
   template <class T>
-  constexpr make_unsigned_t<T> to_unsigned_bitcast(T x) noexcept
+  constexpr make_unsigned_t<T> to_unsigned_bit_cast(T x) noexcept
   {
       return static_cast<make_unsigned_t<T>>(x);
   }
+
+  // this is equivalent to a narrow cast to the unsigned type
   template <class T>
   constexpr make_unsigned_t<T> to_unsigned_cast(T x) noexcept
   {
       return narrow_cast<make_unsigned_t<T>>(x);
   }
+
+  // this is equivalent to narrow to the unsigned type
   template <class T>
   constexpr make_unsigned_t<T> to_unsigned(T x) noexcept
   {
@@ -136,26 +150,26 @@ inline  namespace v1
   typedef double_width<single_sword> double_sword;
   typedef double_width<single_uword> double_uword;
 
-  template <typename T>
-  constexpr half_width<make_unsigned_t<T>> split_upper( T a ) noexcept
+  template <typename T, typename H = half_width<make_unsigned_t<T>>>
+  constexpr H split_upper( T a ) noexcept
   {
-    static_assert(is_integral<T>::value, "T must be integral");
+      static_assert(is_integral<T>::value, "T must be integral");
 
-    return static_cast<half_width<make_unsigned_t<T>>>(to_half_width(to_unsigned_bitcast(a) >> (CHAR_BIT * sizeof(T) / 2)));
+    return to_half_width( to_unsigned_bit_cast(a) >> std::numeric_limits<H>::digits );
   }
-  template <typename T>
-  constexpr half_width<make_unsigned_t<T>> split_lower( T a ) noexcept
+  template <typename T, typename H = half_width<make_unsigned_t<T>>>
+  constexpr H split_lower( T a ) noexcept
   {
     static_assert(is_integral<T>::value, "T must be integral");
 
-    return to_half_width(to_unsigned_bitcast(a));
+    return to_half_width(to_unsigned_bit_cast(a));
   }
 
   template <typename T>
   constexpr make_unsigned_t<double_width<T>> wide_unsigned( T high, T low ) noexcept
   {
     static_assert(is_integral<T>::value, "T must be integral");
-    static_assert(is_unsigned<T>::value, "T must be integral");
+    static_assert(is_unsigned<T>::value, "T must be unsigned");
 
     return (to_double_width(high) << (CHAR_BIT * sizeof(T)))  | to_double_width(low);
   }
@@ -163,9 +177,9 @@ inline  namespace v1
   constexpr make_signed_t<double_width<T>> wide_signed( T high, T low ) noexcept
   {
     static_assert(is_integral<T>::value, "T must be integral");
-    static_assert(is_unsigned<T>::value, "T must be integral");
+    static_assert(is_unsigned<T>::value, "T must be unsigned");
 
-    return to_signed_bitcast(wide_unsigned(high, low));
+    return to_signed_bit_cast(wide_unsigned(high, low));
   }
 
 }
