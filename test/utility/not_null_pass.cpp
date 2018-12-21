@@ -106,7 +106,22 @@ void test_not_null_heterogeneous_copy_assignable()
     stdex::not_null<Y*> ptr = y;
     X x;
     stdex::not_null<X*> ptr2 = x;
+    ptr2 = ptr;
+    BOOST_TEST (&y == ptr2.get());
+    BOOST_TEST (&y == ptr.get());
+
+}
+void test_not_null_heterogeneous_move_assignable()
+{
+    struct X {};
+    struct Y : X {};
+    Y y;
+    stdex::not_null<Y*> ptr = y;
+    X x;
+    stdex::not_null<X*> ptr2 = x;
     ptr2 = std::move(ptr);
+    BOOST_TEST (&y == ptr2.get());
+    BOOST_TEST (&y == ptr.get());
 }
 
 
@@ -115,6 +130,12 @@ void test_not_null_explicit_convertible_to_ptr()
     int i=1;
     stdex::not_null<int*> ptr {&i};
     BOOST_TEST (&i == static_cast<int*>(ptr));
+}
+void test_not_null_explicit_convertible_to_bool()
+{
+    int i=1;
+    stdex::not_null<int*> ptr {&i};
+    BOOST_TEST (true == static_cast<bool>(ptr));
 }
 #if 0
 void test_not_null_heterogeneous_comparable()
@@ -163,7 +184,9 @@ int main()
     test_not_null_copy_assignable();
     test_not_null_move_assignable();
     test_not_null_heterogeneous_copy_assignable();
+    test_not_null_heterogeneous_move_assignable();
     test_not_null_explicit_convertible_to_ptr();
+    test_not_null_explicit_convertible_to_bool();
     test_not_null_heterogeneous_comparable();
 
     test_not_null_unique_ptr();

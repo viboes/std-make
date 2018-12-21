@@ -52,6 +52,8 @@ inline namespace fundamental_v3
         //    having it has IMO more trouble that benefit. We need to delete a lot of induced overloads as done in GSL.
         operator Ptr() const noexcept
         {   return get();}
+        operator bool() const noexcept
+        {   return true;}
 
         auto get() const JASEL_DECLTYPE_RETURN_NOEXCEPT(&*_ptr)
 
@@ -106,6 +108,9 @@ inline namespace fundamental_v3
         //    having it has IMO more trouble that benefit. We need to delete a lot of induced overloads as done in GSL.
         explicit operator T*() const noexcept
         {   return get();}
+        operator bool() const noexcept
+        {   return true;}
+
 
         // We don't want to be able to update the pointer from outside
         //T* const& underlying() const { return _ptr; }
