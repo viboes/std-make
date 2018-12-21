@@ -107,6 +107,16 @@ test-suite std_shared_ptr
       [ run make/make_std_shared_ptr_pass.cpp  ]
     ;
 
+test-suite observer_ptr
+    : 
+      [ run observer_ptr/observer_ptr_pass.cpp  ]
+    ;
+
+test-suite polymorphic_value
+    : 
+      [ run polymorphic_value/polymorphic_value_pass.cpp  ]
+    ;
+
 test-suite std_pair
     : 
       [ run make/make_std_pair_pass.cpp  ]
