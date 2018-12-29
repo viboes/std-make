@@ -117,91 +117,87 @@ inline namespace fundamental_v3
 
         auto get() const JASEL_DECLTYPE_RETURN_NOEXCEPT(_ptr)
 
-        auto operator*() const JASEL_DECLTYPE_RETURN_NOEXCEPT(*get())
-        auto operator->() const JASEL_DECLTYPE_RETURN_NOEXCEPT(get())
-
-//        friend bool operator==(not_null const& x, not_null const& y)
-//        {
-//            return x.get() == y.get();
-//        }
-//        friend bool operator!=(not_null const& x, not_null const& y)
-//        {
-//            return !(x == y);
-//        }
+        auto operator*() const JASEL_DECLTYPE_RETURN_NOEXCEPT(*_ptr)
+        auto operator->() const JASEL_DECLTYPE_RETURN_NOEXCEPT(_ptr)
 
         void swap( not_null& r ) noexcept
         {
             std::swap(_ptr, r._ptr);
         }
 
-        // non comparable with nullptr_t
-#if 0
-        template <class U>
-        friend bool operator==(not_null<U*> const& x, nullptr_t) = delete;
-        template <class U>
-        friend bool operator==(nullptr_t, not_null<U*> const&) = delete;
-        template <class U>
-        friend bool operator!=(not_null<U*> const& x, nullptr_t) = delete;
-        template <class U>
-        friend bool operator!=(nullptr_t, not_null<U*> const&) = delete;
-#endif
-        // compare with other not_null pointers
-        template <class U1, class U2>
-        friend bool operator==(not_null<U1*> const& x, not_null<U2*> const& y)
-        {
-            return x.get() == y.get();
-        }
-        template <class U1, class U2>
-        friend bool operator!=(not_null<U1*> const& x, not_null<U2*> const& y)
-        {
-            return !(x == y);
-        }
-        // compare with other pointers
-        template <class U1, class U2>
-        friend bool operator==(not_null<U1*> const& x, U2* y)
-        {
-            return x.get() == y;
-        }
-        template <class U1, class U2>
-        friend bool operator!=(not_null<U1*> const& x, U2* y)
-        {
-            return !(x == y);
-        }
-        template <class U1, class U2>
-        friend bool operator==(U1* x, not_null<U2*> const& y)
-        {
-            return x == y.get();
-        }
-        template <class U1, class U2>
-        friend bool operator==(U1* x, not_null<U2*> const& y)
-        {
-            return !(x == y);
-        }
-
-        friend bool operator<(not_null const& x, not_null const& y)
-        {
-            return x.get() < y.get();
-        }
-        friend bool operator<=(not_null const& x, not_null const& y)
-        {
-            return x.get() <= y.get();
-        }
-        friend bool operator>(not_null const& x, not_null const& y)
-        {
-            return x.get() > y.get();
-        }
-        friend bool operator>=(not_null const& x, not_null const& y)
-        {
-            return x.get() >= y.get();
-        }
-
     };
+
+    // non comparable with nullptr_t
+    template <class U>
+    bool operator==(not_null<U*> const& x, nullptr_t) = delete;
+    template <class U>
+    bool operator==(nullptr_t, not_null<U*> const&) = delete;
+    template <class U>
+    bool operator!=(not_null<U*> const& x, nullptr_t) = delete;
+    template <class U>
+    bool operator!=(nullptr_t, not_null<U*> const&) = delete;
+
+    // compare with other not_null pointers
+    template <class U1, class U2>
+    bool operator==(not_null<U1*> const& x, not_null<U2*> const& y)
+    {
+        return x.get() == y.get();
+    }
+    template <class U1, class U2>
+    bool operator!=(not_null<U1*> const& x, not_null<U2*> const& y)
+    {
+        return !(x == y);
+    }
+    // compare with other pointers
+    template <class U1, class U2>
+    bool operator==(not_null<U1*> const& x, U2* y)
+    {
+        return x.get() == y;
+    }
+    template <class U1, class U2>
+    bool operator!=(not_null<U1*> const& x, U2* y)
+    {
+        return !(x == y);
+    }
+    template <class U1, class U2>
+    bool operator==(U1* x, not_null<U2*> const& y)
+    {
+        return x == y.get();
+    }
+    template <class U1, class U2>
+    bool operator!=(U1* x, not_null<U2*> const& y)
+    {
+        return !(x == y);
+    }
+
+    template <class U1, class U2>
+    bool operator<(not_null<U1*> const& x, not_null<U2*> const& y)
+    {
+        return x.get() < y.get();
+    }
+    template <class U1, class U2>
+    bool operator<=(not_null<U1*> const& x, not_null<U2*> const& y)
+    {
+        return x.get() <= y.get();
+    }
+    template <class U1, class U2>
+    bool operator>(not_null<U1*> const& x, not_null<U2*> const& y)
+    {
+        return x.get() > y.get();
+    }
+    template <class U1, class U2>
+    bool operator>=(not_null<U1*> const& x, not_null<U2*> const& y)
+    {
+        return x.get() >= y.get();
+    }
+
     template< class Ptr >
     void swap( not_null<Ptr>& lhs, not_null<Ptr>& rhs ) noexcept
     {
         lhs.swap(rhs);
     }
 
+    // fixme:: this should use enable-if os << val.get()
     template <class CharT, class Traits, class Ptr>
     std::basic_ostream<CharT, Traits>& operator<<(std::basic_ostream<CharT, Traits>& os,
                                                   const not_null<Ptr>& p)
@@ -225,14 +221,6 @@ inline namespace fundamental_v3
 
     void as_not_null(nullptr_t) = delete;
 
-    // fixme:: this should use enable-if os << val.get()
-    template <class OSTREAM, class T>
-    OSTREAM& operator<<(OSTREAM& os, const not_null<T>& val)
-    {
-        os << val.get();
-        return os;
-    }
-
 }
 }
 
@@ -245,6 +233,8 @@ std::size_t operator()(const experimental::not_null<T>& value) const
     return hash<T> {}(value);
 }
 };
+
+
 }
 
 #endif // header
