@@ -10,6 +10,7 @@
 
 #include <cstdint>
 #include <climits>
+#include <limits>
 #include <cassert>
 #include <experimental/type_traits.hpp>
 #include <experimental/contract.hpp>

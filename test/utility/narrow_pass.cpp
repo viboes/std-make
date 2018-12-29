@@ -10,6 +10,7 @@
 
 #include <experimental/utility.hpp>
 #include <memory>
+#include <limits>
 
 #include <boost/detail/lightweight_test.hpp>
 
