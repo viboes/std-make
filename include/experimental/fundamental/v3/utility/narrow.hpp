@@ -65,7 +65,7 @@ JASEL_CXX14_CONSTEXPR std::pair<bool, T> narrow_to(U u) noexcept
     {
         return std::make_pair(false, T{});
     }
-    if (!detail::have_same_sign<T, U>::value && ((t < T{}) != (u < U{})))
+    if ((! detail::have_same_sign<T, U>::value) &&  ((t < T{}) != (u < U{})) )
     {
         return std::make_pair(false, T{});
     }
@@ -80,8 +80,15 @@ template <class T, class U>
 bool narrow_to(T* t, U u) noexcept
 {
     *t = static_cast<T>(u);
-    return (static_cast<U>(*t) != u) &&
-           (detail::have_same_sign<T, U>::value || ((*t < T{}) == (u < U{})));
+    if (static_cast<U>(*t) != u)
+    {
+        return false;
+    }
+    if ( (! detail::have_same_sign<T, U>::value) &&  ((*t < T{}) != (u < U{})) )
+    {
+        return false;
+    }
+    return true;
 }
 
 // checks if we can convert u to T without losing information
@@ -92,7 +99,7 @@ template <class T, class U>
 //  U is convertible from T
 JASEL_CXX14_CONSTEXPR bool can_narrow_to(U u) noexcept
 {
-    return narrow_to<T>(u).second;
+    return narrow_to<T>(u).first;
 }
 
 
