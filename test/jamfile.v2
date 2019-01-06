@@ -399,6 +399,10 @@ test-suite numbers
       [ run numerics/numbers/double_wide_arithmetic_pass.cpp  ]
       [ run numerics/numbers/overflow_detection_arithmetic_pass.cpp  ]
 
+    ;
+test-suite numerics
+    : 
+      [ run numerics/charconv_pass.cpp  ]
 
     ;
 
