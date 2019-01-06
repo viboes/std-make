@@ -17,9 +17,13 @@
 namespace stdex = std::experimental;
 namespace nmx = std::experimental::numerics;
 
+#if __cplusplus >= 201402L
+
 static_assert(nmx::overflow_cvt<short>(1) == std::make_pair(false, short(1)), "error");
 static_assert(nmx::overflow_cvt<short>(100000) == std::make_pair(true, short(0)), "error");
 static_assert(nmx::check_overflow_cvt<short>(100000) == true, "error");
+
+#endif
 
 int main()
 {

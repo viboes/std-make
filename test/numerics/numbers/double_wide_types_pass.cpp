@@ -36,8 +36,12 @@ static_assert(std::is_same<decltype(nmx::to_half_width(static_cast<std::uint32_t
 static_assert(std::is_same<decltype(nmx::to_half_width(static_cast<std::int64_t>(1))), std::int32_t>::value, "error");
 static_assert(std::is_same<decltype(nmx::to_half_width(static_cast<std::uint64_t>(1))), std::uint32_t>::value, "error");
 
+#if __cplusplus >= 201402L
+
 static_assert(nmx::to_unsigned_cast(1)==1u, "error");
 static_assert(nmx::to_signed_cast(1)==1, "error");
+
+#endif
 
 int main()
 {
