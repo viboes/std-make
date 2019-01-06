@@ -26,7 +26,7 @@ inline  namespace v1
 {
   // Why to redefine it? It can be specialized for UDT
   template < class T >
-  struct make_signed : std::make_signed<T> {};
+  struct make_signed : ::std::make_signed<T> {};
   template <class T>
   using make_signed_t = typename make_signed<T>::type;
 
@@ -40,6 +40,7 @@ inline  namespace v1
   }
 
   // this is equivalent to a narrow cast to the signed type
+  // precondition: can_narrow_to<make_signed_t<T>>(x)
   template <class T>
   constexpr make_signed_t<T> to_signed_cast(T x) noexcept
   {
@@ -47,20 +48,20 @@ inline  namespace v1
   }
   // this is equivalent to narrow to the signed type
   template <class T>
-  constexpr make_signed_t<T> to_signed(T x) noexcept
+  constexpr make_signed_t<T> to_signed(T x)
   {
       return narrow<make_signed_t<T>>(x);
   }
 
   // Why to redefine it? It can be specialized for UDT
   template < class T >
-  struct make_unsigned : std::make_unsigned<T> {};
+  struct make_unsigned : ::std::make_unsigned<T> {};
   template <class T>
   using make_unsigned_t = typename make_unsigned<T>::type;
 
 
   // this is equivalent to bit_cast to the unsigned type of the signed integral type where we don't need to use memcpy and pass the address of the integral but the value itself
-  // Note that the value passed as argument can be negative
+  // Note that the value passed as argument can be negative and the function is wide
   template <class T>
   constexpr make_unsigned_t<T> to_unsigned_bit_cast(T x) noexcept
   {
@@ -68,6 +69,7 @@ inline  namespace v1
   }
 
   // this is equivalent to a narrow cast to the unsigned type
+  // precondition: can_narrow_to<make_unsigned_t<T>>(x)
   template <class T>
   constexpr make_unsigned_t<T> to_unsigned_cast(T x) noexcept
   {
@@ -76,7 +78,7 @@ inline  namespace v1
 
   // this is equivalent to narrow to the unsigned type
   template <class T>
-  constexpr make_unsigned_t<T> to_unsigned(T x) noexcept
+  constexpr make_unsigned_t<T> to_unsigned(T x)
   {
       return narrow<make_unsigned_t<T>>(x);
   }

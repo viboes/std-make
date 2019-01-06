@@ -36,6 +36,9 @@ static_assert(std::is_same<decltype(nmx::to_half_width(static_cast<std::uint32_t
 static_assert(std::is_same<decltype(nmx::to_half_width(static_cast<std::int64_t>(1))), std::int32_t>::value, "error");
 static_assert(std::is_same<decltype(nmx::to_half_width(static_cast<std::uint64_t>(1))), std::uint32_t>::value, "error");
 
+
+static_assert(nmx::to_unsigned_cast(1)==1u, "error");
+
 int main()
 {
   //BOOST_TEST(  ! nmx::in_domain<unsigned int>(-1) );

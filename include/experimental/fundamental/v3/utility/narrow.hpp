@@ -42,8 +42,22 @@ struct have_same_sign
 }
 #endif
 
-// checks if we can convert u to T without losing information and if succeed update the t
+// checks if we can convert u to T without losing information and if succeed return the converted T
+// Note that int is convertible to unsigned int, that int(unsigned(-1)) == -1, no loss of information, but that
+// -1 < 0 and unsigned(-1) > 0, so
+// not only we need that there is no loss of information, but that the information is coherent.
+
+// if we want to convert int(-1) to unsigned we could use bit_cast instead.
+
+// However how to convert int(-1) to unsigned short? bit_cast doesn't work here as the size are not the same.
+// We will need to do a static_cast<unsigned short>(-1)) which do the expected conversion.
+
 template <class T, class U>
+// requires
+//  T and U are integral,
+//  T is convertible from U and
+//  U is convertible from T
+// better to use optional<T> or expected<T> as result type
 JASEL_CXX14_CONSTEXPR std::pair<bool, T> narrow_to(U u) noexcept
 {
     T t = static_cast<T>(u);
@@ -58,8 +72,24 @@ JASEL_CXX14_CONSTEXPR std::pair<bool, T> narrow_to(U u) noexcept
     return std::make_pair(true, t);
 }
 
+template <class T, class U>
+// requires
+//  T and U are integral,
+//  T is convertible from U and
+//  U is convertible from T
+bool narrow_to(T* t, U u) noexcept
+{
+    *t = static_cast<T>(u);
+    return (static_cast<U>(*t) != u) &&
+           (detail::have_same_sign<T, U>::value || ((*t < T{}) == (u < U{})));
+}
+
 // checks if we can convert u to T without losing information
 template <class T, class U>
+// requires
+//  T and U are integral (for the same sign),
+//  T is convertible from U and
+//  U is convertible from T
 JASEL_CXX14_CONSTEXPR bool can_narrow_to(U u) noexcept
 {
     return narrow_to<T>(u).second;
@@ -87,7 +117,7 @@ JASEL_CXX14_CONSTEXPR T narrow(U u)
     {
         throw narrowing_error();
     }
-	return res.second;
+    return res.second;
 }
 }
 }
