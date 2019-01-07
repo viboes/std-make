@@ -92,10 +92,10 @@ constexpr bool check_overflow_cvt( T a ) noexcept
     bool overflow_lsh( T* result, T a, int b ) noexcept
     {
         using promoted = decltype(a<<b);
-        if ( ! (0 <= b && b < numeric_limits<promoted>::digits()) )
+        if ( ! (0 <= b && b < numeric_limits<promoted>::digits) )
         return true;
         // Since C++20 operator<< is arithmetic left shift and so there is no other constraints
-        result = a << b;
+        *result = a << b;
         return false;
     }
 
@@ -107,10 +107,10 @@ constexpr bool check_overflow_cvt( T a ) noexcept
     bool overflow_rsh( T* result, T a, int b ) noexcept
     {
         using promoted = decltype(a>>b);
-        if ( ! (0 <= b && b < numeric_limits<promoted>::digits()) )
+        if ( ! (0 <= b && b < numeric_limits<promoted>::digits) )
         return true;
         // Since C++20 operator>> is arithmetic left shift and so there is no other constraints
-        result = a >> b;
+        *result = a >> b;
         return false;
     }
 

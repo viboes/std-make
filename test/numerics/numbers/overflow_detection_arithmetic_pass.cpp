@@ -6,7 +6,8 @@
 
 // <experimental/numerics/v1/numbers/double_wide_types.hpp>
 
-#define JASEL_CONFIG_CONTRACT_LEVEL_MASK 0x111
+//#define JASEL_CONFIG_CONTRACT_LEVEL_MASK 0x111
+#define JASEL_CONFIG_CONTRACT_VIOLATION_THROWS_V 1
 
 #include <iostream>
 #include <experimental/numerics/v1/numbers/overflow_detection_arithmetic.hpp>
@@ -27,20 +28,62 @@ static_assert(nmx::check_overflow_cvt<short>(100000) == true, "error");
 
 int main()
 {
-
     {
         int i=0;
         short s;
         BOOST_TEST_EQ(false, nmx::overflow_cvt(&s, i));
-        BOOST_TEST_EQ(s==0, 1);
-
+        BOOST_TEST_EQ(s, 0);
     }
     {
         int i=100000;
         short s;
         BOOST_TEST_EQ(true, nmx::overflow_cvt(&s, i));
-
     }
-
+    {
+        int i=1;
+        int r;
+        BOOST_TEST_EQ(false, nmx::overflow_neg(&r, i));
+        BOOST_TEST_EQ(r, -1);
+    }
+    {
+        signed char i=-128;
+        signed char r;
+        BOOST_TEST_EQ(true, nmx::overflow_neg(&r, i));
+    }
+    {
+        unsigned r;
+        unsigned x = 1;
+        BOOST_TEST_EQ(false, nmx::overflow_lsh(&r, x, 2));
+        BOOST_TEST_EQ(r, 4);
+    }
+    {
+        unsigned r;
+        unsigned x = 1;
+        BOOST_TEST_EQ(true, nmx::overflow_lsh(&r, x, -1));
+    }
+    {
+        unsigned r;
+        unsigned x = 1;
+        BOOST_TEST_EQ(true, nmx::overflow_lsh(&r, x, std::numeric_limits<unsigned>::digits));
+    }
+    {
+        unsigned r;
+        unsigned x = 1;
+        unsigned y = 1;
+        BOOST_TEST_EQ(false, nmx::overflow_add(&r, x, y));
+        BOOST_TEST_EQ(r, 2);
+    }
+    {
+        unsigned char r;
+        unsigned char x = 128;
+        unsigned char y = 128;
+        BOOST_TEST_EQ(true, nmx::overflow_add(&r, x, y));
+    }
+    {
+        signed char r;
+        signed char x = -64;
+        signed char y = -65;
+        BOOST_TEST_EQ(true, nmx::overflow_add(&r, x, y));
+    }
   return boost::report_errors();
 }
