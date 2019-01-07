@@ -6,7 +6,8 @@
 
 // <experimental/numerics/v1/numbers/double_wide_types.hpp>
 
-#define JASEL_CONFIG_CONTRACT_LEVEL_MASK 0x111
+//#define JASEL_CONFIG_CONTRACT_LEVEL_MASK 0x111
+#define JASEL_CONFIG_CONTRACT_VIOLATION_THROWS_V 1
 
 #include <iostream>
 #include <experimental/numerics/v1/numbers/double_wide_types.hpp>
