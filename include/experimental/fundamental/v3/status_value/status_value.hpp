@@ -64,8 +64,8 @@ public:
     constexpr const Status& status() const noexcept { return status_; }
 
     // ?.?.3.4 state observers
-    constexpr bool has_value() const noexcept { return optvalue_.has_value(); }
-    constexpr explicit operator bool() const noexcept { return optvalue_.has_value(); }
+    constexpr bool has_value() const noexcept { return bool(optvalue_); }
+    constexpr explicit operator bool() const noexcept { return bool(optvalue_); }
 
     // ?.?.3.5 value observers
     constexpr const Value&  value() const & { if (optvalue_) return *optvalue_; throw bad_status_value_access<Status>(status_); }
