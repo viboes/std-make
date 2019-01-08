@@ -20,6 +20,7 @@ namespace stdex = std::experimental;
 
 int main()
 {
+#if __cplusplus > 201402L
     {
         std::array<char, 10> str{"42"};
         int result;
@@ -29,6 +30,7 @@ int main()
         BOOST_TEST(std::errc{} == ec);
         BOOST_TEST_EQ(42, result);
     }
+#endif
     {
         std::array<char, 10> str{"42"};
         int result=0;
@@ -36,6 +38,7 @@ int main()
         BOOST_TEST_EQ(p, str.data()+2);
         BOOST_TEST_EQ(42, result);
     }
+#if __cplusplus > 201402L
     {
         std::array<char, 10> str{""};
         int result;
@@ -51,6 +54,7 @@ int main()
         BOOST_TEST_EQ(p, str.data());
         BOOST_TEST(std::errc::result_out_of_range == ec);
     }
+#endif
     {
         std::array<char, 10> str{"300"};
         char* tmp;
@@ -59,6 +63,7 @@ int main()
         BOOST_TEST_EQ(300 , via);
         BOOST_TEST(! stdex::can_narrow_to<signed char>(via));
     }
+#if __cplusplus > 201402L
     {
         BOOST_TEST(! stdex::can_narrow_to<unsigned char>(300));
         std::array<char, 10> str{"300"};
@@ -75,11 +80,13 @@ int main()
         BOOST_TEST_EQ(p, str.data());
         BOOST_TEST(std::errc::invalid_argument == ec);
     }
+#endif
     {
         std::array<char, 100> arr;
         (void) stdex::to_chars(arr.data(), arr.data()+100, 10);
         BOOST_TEST_EQ(std::strcmp("10", arr.data()), 0);
     }
+#if __cplusplus > 201402L
     {
         std::array<char, 10> str;
         int value = 44;
@@ -96,6 +103,7 @@ int main()
         BOOST_TEST_EQ(p, str.data()+3);
         BOOST_TEST_EQ(std::strcmp("-43", str.data()), 0);
     }
+#endif
     {
         std::array<char, 10> str;
         int value = 45;
