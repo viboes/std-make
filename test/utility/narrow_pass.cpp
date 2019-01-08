@@ -16,6 +16,11 @@
 
 namespace stdex = std::experimental;
 
+#if __cplusplus >= 201402L
+static_assert(stdex::narrow_to<short>(1) == std::make_pair(true, short(1)), "error");
+static_assert(stdex::narrow_to<short>(100000) == std::make_pair(false, short(0)), "error");
+static_assert(stdex::can_narrow_to<short>(100000) == false, "error");
+#endif
 
 void test_narrow_throws_when_narrowing_with_value_loss()
 {

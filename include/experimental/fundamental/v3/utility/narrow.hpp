@@ -57,6 +57,32 @@ template <class T, class U>
 //  T and U are integral,
 //  T is convertible from U and
 //  U is convertible from T
+// cannot be constexpr as the result value can not be a constexpr variable that is reassigned
+JASEL_CXX14_CONSTEXPR bool narrow_to(T* t, U u) noexcept
+{
+#if 0
+    pair<bool, T> res = narrow_to<T>(u);
+    *t = res.second;
+    return res.first;
+#else
+    *t = static_cast<T>(u);
+    if (static_cast<U>(*t) != u)
+    {
+        return false;
+    }
+    if ( (! detail::have_same_sign<T, U>::value) &&  ((*t < T{}) != (u < U{})) )
+    {
+        return false;
+    }
+    return true;
+}
+#endif
+
+template <class T, class U>
+// requires
+//  T and U are integral,
+//  T is convertible from U and
+//  U is convertible from T
 // better to use optional<T> or expected<T> as result type
 // an alternative is to replace it with status_value
 // * status_value<bool, T> true means success and false overflows.
@@ -64,10 +90,12 @@ template <class T, class U>
 
 JASEL_CXX14_CONSTEXPR std::pair<bool, T> narrow_to(U u) noexcept
 {
-//    pair<bool, T> res;
-//    res.first = narrow_to<T>(&res.second, u);
-//    return res;
-
+#if 0
+    pair<bool, T> res;
+    res.second = T{}; // this was an attempt to initialize it always, but it doesn't work
+    res.first = narrow_to<T>(&res.second, u);
+    return res;
+#else
     T t = static_cast<T>(u);
     if (static_cast<U>(t) != u)
     {
@@ -78,30 +106,10 @@ JASEL_CXX14_CONSTEXPR std::pair<bool, T> narrow_to(U u) noexcept
         return std::make_pair(false, T{});
     }
     return std::make_pair(true, t);
+#endif
 }
 
-template <class T, class U>
-// requires
-//  T and U are integral,
-//  T is convertible from U and
-//  U is convertible from T
-bool narrow_to(T* t, U u) noexcept
-{
-    pair<bool, T> res = narrow_to<T>(u);
-    *t = res.second;
-    return res.first;
 
-//    *t = static_cast<T>(u);
-//    if (static_cast<U>(*t) != u)
-//    {
-//        return false;
-//    }
-//    if ( (! detail::have_same_sign<T, U>::value) &&  ((*t < T{}) != (u < U{})) )
-//    {
-//        return false;
-//    }
-//    return true;
-}
 
 // checks if we can convert u to T without losing information
 template <class T, class U>
