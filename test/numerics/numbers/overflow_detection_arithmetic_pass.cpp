@@ -80,10 +80,71 @@ int main()
         BOOST_TEST_EQ(true, nmx::overflow_add(&r, x, y));
     }
     {
+        std::uint64_t r;
+        BOOST_TEST_EQ(true, nmx::overflow_add(&r, std::numeric_limits<std::uint64_t>::max(), std::uint64_t(1)));
+    }
+    {
         signed char r;
         signed char x = -64;
         signed char y = -65;
         BOOST_TEST_EQ(true, nmx::overflow_add(&r, x, y));
     }
-  return boost::report_errors();
+    {
+        unsigned r;
+        unsigned x = 1;
+        unsigned y = 1;
+        BOOST_TEST_EQ(false, nmx::overflow_sub(&r, x, y));
+        BOOST_TEST_EQ(r, 0);
+    }
+    {
+        unsigned char r;
+        unsigned char x = 1;
+        unsigned char y = 2;
+        BOOST_TEST_EQ(true, nmx::overflow_sub(&r, x, y));
+    }
+    {
+        signed char r;
+        signed char x = -64;
+        signed char y = 65;
+        BOOST_TEST_EQ(true, nmx::overflow_sub(&r, x, y));
+    }
+    {
+        unsigned r;
+        unsigned x = 2;
+        unsigned y = 3;
+        BOOST_TEST_EQ(false, nmx::overflow_mul(&r, x, y));
+        BOOST_TEST_EQ(r, 6);
+    }
+    {
+        unsigned char r;
+        unsigned char x = 2;
+        unsigned char y = 128;
+        BOOST_TEST_EQ(true, nmx::overflow_mul(&r, x, y));
+    }
+    {
+        signed char r;
+        signed char x = -65;
+        signed char y = 2;
+        BOOST_TEST_EQ(true, nmx::overflow_mul(&r, x, y));
+    }
+    {
+        unsigned r;
+        unsigned x = 4;
+        unsigned y = 2;
+        BOOST_TEST_EQ(false, nmx::overflow_div(&r, x, y));
+        BOOST_TEST_EQ(r, 2);
+    }
+    {
+        unsigned char r;
+        unsigned char x = 2;
+        unsigned char y = 0;
+        BOOST_TEST_EQ(true, nmx::overflow_div(&r, x, y));
+    }
+    {
+        unsigned char r;
+        unsigned char x = 2;
+        unsigned char y = 0;
+        BOOST_TEST_EQ(true, nmx::overflow_div(&r, x, y));
+    }
+    return boost::report_errors();
 }

@@ -58,8 +58,16 @@ template <class T, class U>
 //  T is convertible from U and
 //  U is convertible from T
 // better to use optional<T> or expected<T> as result type
+// an alternative is to replace it with status_value
+// * status_value<bool, T> true means success and false overflows.
+// * status_value<errc, T> - the single errc needed are success and overflow.
+
 JASEL_CXX14_CONSTEXPR std::pair<bool, T> narrow_to(U u) noexcept
 {
+//    pair<bool, T> res;
+//    res.first = narrow_to<T>(&res.second, u);
+//    return res;
+
     T t = static_cast<T>(u);
     if (static_cast<U>(t) != u)
     {
@@ -79,16 +87,20 @@ template <class T, class U>
 //  U is convertible from T
 bool narrow_to(T* t, U u) noexcept
 {
-    *t = static_cast<T>(u);
-    if (static_cast<U>(*t) != u)
-    {
-        return false;
-    }
-    if ( (! detail::have_same_sign<T, U>::value) &&  ((*t < T{}) != (u < U{})) )
-    {
-        return false;
-    }
-    return true;
+    pair<bool, T> res = narrow_to<T>(u);
+    *t = res.second;
+    return res.first;
+
+//    *t = static_cast<T>(u);
+//    if (static_cast<U>(*t) != u)
+//    {
+//        return false;
+//    }
+//    if ( (! detail::have_same_sign<T, U>::value) &&  ((*t < T{}) != (u < U{})) )
+//    {
+//        return false;
+//    }
+//    return true;
 }
 
 // checks if we can convert u to T without losing information
@@ -101,7 +113,6 @@ JASEL_CXX14_CONSTEXPR bool can_narrow_to(U u) noexcept
 {
     return narrow_to<T>(u).first;
 }
-
 
 // precondition: can_narrow_to<T>(u)
 template <class T, class U>
