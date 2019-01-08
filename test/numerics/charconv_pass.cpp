@@ -12,6 +12,7 @@
 #include <iostream>
 #include <experimental/numerics/v1/charconv.hpp>
 #include <string>
+#include <array>
 
 #include <boost/detail/lightweight_test.hpp>
 
