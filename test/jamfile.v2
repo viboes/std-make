@@ -122,6 +122,11 @@ test-suite status_value
       [ run status_value/status_value_pass.cpp  ]
     ;
 
+test-suite flat_map
+    : 
+      [ run flat_map/flat_map_pass.cpp  ]
+    ;
+
 test-suite std_pair
     : 
       [ run make/make_std_pair_pass.cpp  ]
