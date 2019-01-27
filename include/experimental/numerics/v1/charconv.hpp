@@ -12,6 +12,8 @@
 #include <system_error>
 #include <cstdlib>
 
+#include <experimental/numerics/v1/charsconv/strto.hpp>
+
 //! @file See https://en.cppreference.com/w/cpp/header/charconv
 //! Limited to
 //! * integral types
@@ -25,10 +27,8 @@ namespace std
 {
 namespace experimental
 {
-//namespace numerics
-//{
-//inline  namespace v1
-//{
+inline  namespace fundamental_v3
+{
 
 //! result of to_chars function
 struct JASEL_NODISCARD to_chars_result
@@ -65,7 +65,9 @@ char* to_chars_fmt_noerr(char* first, char* last,
     return  first+sz;
 }
 
-
+#if ! defined JASEL_DOXYGEN_INVOKED
+namespace charsconv_detail
+{
 //!{ format associated to a T type using a specific base
 inline const char* fmt(char, int base)
 {
@@ -151,12 +153,15 @@ inline const char* fmt(unsigned long long, int base)
         "%dull";
 }
 //!}
+}
+#endif
+
 //! to_chars as specific in the standard
 template <class T>
 inline to_chars_result to_chars(char* first, char* last,
                               T value, int base = 10)
 {
-    return to_chars_fmt(first, last, fmt(value, base), value);
+    return to_chars_fmt(first, last, charsconv_detail::fmt(value, base), value);
 }
 
 
@@ -165,32 +170,12 @@ template <class T>
 inline char* to_chars_noerr(char* first, char* last,
                               T value, int base = 10)
 {
-    return to_chars_fmt_noerr(first, last, fmt(value, base), value);
+    return to_chars_fmt_noerr(first, last, charsconv_detail::fmt(value, base), value);
 }
 
-/////////
-//!{ helper function to make generic strtoxx C functions depending on the result.
-template <class T>
-T strto(const char *str, char **str_end, int base = 10);
-
-template <>
-long strto<long>(const char *str, char **str_end, int base)
-{ return strtol(str, str_end, base); }
-template <>
-long long strto<long long>(const char *str, char **str_end, int base)
-{ return strtoll(str, str_end, base); }
-
-template <>
-unsigned long strto<unsigned long>(const char *str, char **str_end, int base)
-{ return strtoul(str, str_end, base); }
-template <>
-unsigned long long strto<unsigned long long>(const char *str, char **str_end, int base)
-{ return strtoull(str, str_end, base); }
-
-
-
-//!}
-
+#if ! defined JASEL_DOXYGEN_INVOKED
+namespace charsconv_detail
+{
 //! helper from_chars function stating the type Via used to do the parsing.
 //! This is needed as the C function doesn't have strtoxx functions for all the types.
 template <class Via, class T>
@@ -225,7 +210,7 @@ from_chars_result from_chars_direct(const char* first, const char* last,
     value = strto<T>(first, &tmp, base);
     if ( tmp == first ) {
         if ( ERANGE == errno ) {
-            if (via == 0)
+            if (value == 0)
                 return from_chars_result{first, std::errc::invalid_argument};
             else
                 return from_chars_result{first, std::errc::result_out_of_range };
@@ -254,83 +239,8 @@ const char* from_chars_noerr_via(const char* first, const char* last,
     value = static_cast<T>(l);
     return tmp;
 }
-
-//! { helper traits mapping a type and the integral type used to do the parsing
-template <class T, bool IsUnsigned>
-struct strto_via_type_aux {
-    using type = unsigned long;
-};
-
-template <class T>
-struct strto_via_type_aux<T, false> {
-    using type = long;
-};
-template <>
-struct strto_via_type_aux<long long, false> {
-    using type = long long;
-};
-template <>
-struct strto_via_type_aux<long long, true> {
-    using type = unsigned long long;
-};
-
-template <class T>
-struct strto_via_type : strto_via_type_aux<T, std::is_unsigned<T>::value> {};
-
-template <class T>
-using strto_via_type_t = typename strto_via_type<T>::type;
-//!}
-
-
-template <class T>
-T strto_via(const char *str, char **str_end, int base = 10)
-{
-    return strto<T>(str, str_end, base);
 }
-
-template <class T, class Via>
-T strto_T_via(const char *str, char **str_end, int base)
-{
-    auto via = strto<Via>(str, str_end, base);
-    if ( *str_end == str ) return 0;
-    if ( ! can_narrow_to<T>(via) ) {
-        *str_end = const_cast<char*>(str);
-        return 0;
-    }
-    return narrow_cast<T>(via);
-}
-
-template <>
-unsigned int strto_via<unsigned int>(const char *str, char **str_end, int base)
-{
-    return strto_T_via<unsigned int, unsigned long>(str, str_end, base);
-}
-template <>
-unsigned short strto_via<unsigned short>(const char *str, char **str_end, int base)
-{
-    return strto_T_via<unsigned short, unsigned long>(str, str_end, base);
-}
-template <>
-unsigned char strto_via<unsigned char>(const char *str, char **str_end, int base)
-{
-    return strto_T_via<unsigned char, unsigned long>(str, str_end, base);
-}
-
-template <>
-signed int strto_via<signed int>(const char *str, char **str_end, int base)
-{
-    return strto_T_via<signed int, signed long>(str, str_end, base);
-}
-template <>
-signed short strto_via<signed short>(const char *str, char **str_end, int base)
-{
-    return strto_T_via<signed short, signed long>(str, str_end, base);
-}
-template <>
-signed char strto_via<signed char>(const char *str, char **str_end, int base)
-{
-    return strto_T_via<signed char, signed long>(str, str_end, base);
-}
+#endif
 
 //! parse from the string [first, last) an integral type T using a specific base
 //! if there is an error returns it in the result
@@ -338,7 +248,7 @@ template <class T>
 inline from_chars_result from_chars(const char* first, const char* last,
                                T & value, int base = 10)
 {
-    return from_chars_via<strto_via_type_t<T>>(first, last, value, base);
+    return charsconv_detail::from_chars_via<charsconv_detail::strto_via_type_t<T>>(first, last, value, base);
 }
 
 //! parse from the string [first, last) an integral type T using a specific base
@@ -347,12 +257,10 @@ template <class T>
 inline const char* from_chars_noerr(const char* first, const char* last,
                                T & value, int base = 10)
 {
-    return from_chars_noerr_via<strto_via_type_t<T>>(first, last, value, base);
+    return charsconv_detail::from_chars_noerr_via<charsconv_detail::strto_via_type_t<T>>(first, last, value, base);
 }
 
-
 }
 }
-//}
-//}
+}
 #endif // header
