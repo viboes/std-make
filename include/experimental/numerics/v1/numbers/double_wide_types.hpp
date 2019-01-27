@@ -99,9 +99,9 @@ inline  namespace v1
   struct make_double_width <uint32_t> { using type = uint64_t; };
 #if 0
   template <  >
-  struct make_double_width <int64_t> { using type = int128_t; };
+  struct make_double_width <int64_t> { using type = __int128_t; };
   template <  >
-  struct make_double_width <uint64_t> { using type = uint128_t; };
+  struct make_double_width <uint64_t> { using type = __uint128_t; };
 #endif
 
   // fixme: Why not make_double_width_t?
@@ -109,6 +109,11 @@ inline  namespace v1
   using double_width = typename make_double_width<T>::type;
   template <class T>
   using make_double_width_t = typename make_double_width<T>::type;
+
+  template <class T>
+  using make_double_signed_t = make_double_width_t<make_signed_t<T>>;
+
+
   template <class T>
   constexpr double_width<T> to_double_width(T x) noexcept
   {
