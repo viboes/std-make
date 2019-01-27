@@ -9,8 +9,9 @@
 #define JASEL_NULMERIC_V1_CHARCONV_STRTO_HPP
 
 #include <experimental/contract.hpp>
+#include <experimental/utility.hpp>
 
-//! @file See https://en.cppreference.com/w/cpp/header/charconv
+//! @file See https://fr.cppreference.com/w/cpp/string/byte/strtol
 
 namespace std
 {

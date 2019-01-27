@@ -228,6 +228,8 @@ const char* from_chars_noerr_via(const char* first, const char* last,
 {
     char* tmp;
     Via l = strto<Via>(first, &tmp, base);
+    JASEL_ASSERT( tmp != first
+        && "invalid_argument");
     JASEL_ASSERT( tmp <= last
         && "invalid_argument");
     JASEL_ASSERT( !(ERANGE == errno && l == 0)
@@ -239,25 +241,132 @@ const char* from_chars_noerr_via(const char* first, const char* last,
     value = static_cast<T>(l);
     return tmp;
 }
+
+template <class T>
+const char* from_chars_noerr_direct(const char* first, const char* last,
+                               T & value, int base = 10) noexcept
+{
+    char* tmp;
+    value = strto<T>(first, &tmp, base);
+    JASEL_ASSERT( tmp != first
+        && "invalid_argument");
+    JASEL_ASSERT( tmp <= last
+        && "invalid_argument");
+    JASEL_ASSERT( !(ERANGE == errno && value == 0)
+        && "invalid_argument");
+    JASEL_ASSERT( !(ERANGE == errno && value != 0)
+        && "result_out_of_range" );
+    return tmp;
+}
 }
 #endif
 
 //! parse from the string [first, last) an integral type T using a specific base
 //! if there is an error returns it in the result
-template <class T>
 inline from_chars_result from_chars(const char* first, const char* last,
-                               T & value, int base = 10)
+                                    unsigned char & value, int base = 10)
 {
-    return charsconv_detail::from_chars_via<charsconv_detail::strto_via_type_t<T>>(first, last, value, base);
+    return charsconv_detail::from_chars_via<charsconv_detail::strto_via_type_t<unsigned char>>(first, last, value, base);
+}
+inline from_chars_result from_chars(const char* first, const char* last,
+                                    unsigned short & value, int base = 10)
+{
+    return charsconv_detail::from_chars_via<charsconv_detail::strto_via_type_t<unsigned short>>(first, last, value, base);
+}
+inline from_chars_result from_chars(const char* first, const char* last,
+                                    unsigned int & value, int base = 10)
+{
+    return charsconv_detail::from_chars_via<charsconv_detail::strto_via_type_t<unsigned int>>(first, last, value, base);
+}
+inline from_chars_result from_chars(const char* first, const char* last,
+                                    unsigned long & value, int base = 10)
+{
+    return charsconv_detail::from_chars_direct(first, last, value, base);
+}
+inline from_chars_result from_chars(const char* first, const char* last,
+                                    unsigned long long & value, int base = 10)
+{
+    return charsconv_detail::from_chars_direct(first, last, value, base);
+}
+
+inline from_chars_result from_chars(const char* first, const char* last,
+                                    signed char & value, int base = 10)
+{
+    return charsconv_detail::from_chars_via<charsconv_detail::strto_via_type_t<signed char>>(first, last, value, base);
+}
+inline from_chars_result from_chars(const char* first, const char* last,
+                                    signed short & value, int base = 10)
+{
+    return charsconv_detail::from_chars_via<charsconv_detail::strto_via_type_t<signed short>>(first, last, value, base);
+}
+inline from_chars_result from_chars(const char* first, const char* last,
+                                    signed int & value, int base = 10)
+{
+    return charsconv_detail::from_chars_via<charsconv_detail::strto_via_type_t<signed int>>(first, last, value, base);
+}
+inline from_chars_result from_chars(const char* first, const char* last,
+                                    signed long & value, int base = 10)
+{
+    return charsconv_detail::from_chars_direct(first, last, value, base);
+}
+inline from_chars_result from_chars(const char* first, const char* last,
+                                    signed long long & value, int base = 10)
+{
+    return charsconv_detail::from_chars_direct(first, last, value, base);
 }
 
 //! parse from the string [first, last) an integral type T using a specific base
 //! The pre-condition is that there is such a T type, and so no error needs to be reported
-template <class T>
 inline const char* from_chars_noerr(const char* first, const char* last,
-                               T & value, int base = 10)
+                                    unsigned char & value, int base = 10)
 {
-    return charsconv_detail::from_chars_noerr_via<charsconv_detail::strto_via_type_t<T>>(first, last, value, base);
+    return charsconv_detail::from_chars_noerr_via<unsigned long>(first, last, value, base);
+}
+inline const char* from_chars_noerr(const char* first, const char* last,
+                                    unsigned short & value, int base = 10)
+{
+    return charsconv_detail::from_chars_noerr_via<unsigned long>(first, last, value, base);
+}
+inline const char* from_chars_noerr(const char* first, const char* last,
+                                    unsigned int & value, int base = 10)
+{
+    return charsconv_detail::from_chars_noerr_via<unsigned long>(first, last, value, base);
+}
+inline const char* from_chars_noerr(const char* first, const char* last,
+                                    unsigned long & value, int base = 10)
+{
+    return charsconv_detail::from_chars_noerr_direct(first, last, value, base);
+}
+inline const char* from_chars_noerr(const char* first, const char* last,
+                                    unsigned long long & value, int base = 10)
+{
+    return charsconv_detail::from_chars_noerr_direct(first, last, value, base);
+}
+
+inline const char* from_chars_noerr(const char* first, const char* last,
+                                    signed char & value, int base = 10)
+{
+    return charsconv_detail::from_chars_noerr_via<signed long>(first, last, value, base);
+}
+inline const char* from_chars_noerr(const char* first, const char* last,
+                                    signed short & value, int base = 10)
+{
+    return charsconv_detail::from_chars_noerr_via<signed long>(first, last, value, base);
+}
+inline const char* from_chars_noerr(const char* first, const char* last,
+                                    signed int & value, int base = 10)
+{
+    return charsconv_detail::from_chars_noerr_via<signed long>(first, last, value, base);
+}
+inline const char* from_chars_noerr(const char* first, const char* last,
+                                    signed long & value, int base = 10)
+{
+    return charsconv_detail::from_chars_noerr_direct(first, last, value, base);
+}
+inline const char* from_chars_noerr(const char* first, const char* last,
+                                    signed long long & value, int base = 10)
+{
+    return charsconv_detail::from_chars_noerr_direct(first, last, value, base);
 }
 
 }
