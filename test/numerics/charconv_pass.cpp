@@ -58,10 +58,75 @@ int main()
     {
         std::array<char, 10> str{"300"};
         char* tmp;
-        long via = stdex::strto<long>(str.data(), &tmp, 10);
+        auto via = stdex::strto_via<unsigned int>(str.data(), &tmp, 10);
+        BOOST_TEST_EQ(tmp , str.data()+3);
+        BOOST_TEST_EQ(300 , via);
+    }
+    {
+        std::array<char, 10> str{"300"};
+        char* tmp;
+        auto via = stdex::strto_via<unsigned short>(str.data(), &tmp, 10);
+        BOOST_TEST_EQ(tmp , str.data()+3);
+        BOOST_TEST_EQ(300 , via);
+    }
+    {
+        std::array<char, 10> str{"200"};
+        char* tmp;
+        auto via = stdex::strto_via<unsigned char>(str.data(), &tmp, 10);
+        BOOST_TEST_EQ(tmp , str.data()+3);
+        BOOST_TEST_EQ(200 , via);
+    }
+    {
+        std::array<char, 10> str{"300"};
+        char* tmp;
+        auto via = stdex::strto_via<unsigned char>(str.data(), &tmp, 10);
+        BOOST_TEST_EQ(tmp , str.data());
+        BOOST_TEST_EQ(0 , via);
+    }
+    {
+        std::array<char, 10> str{"300"};
+        char* tmp;
+        auto via = stdex::strto_via<int>(str.data(), &tmp, 10);
+        BOOST_TEST_EQ(tmp , str.data()+3);
+        BOOST_TEST_EQ(300 , via);
+    }
+    {
+        std::array<char, 10> str{"300"};
+        char* tmp;
+        auto via = stdex::strto<unsigned long>(str.data(), &tmp, 10);
         BOOST_TEST_EQ(tmp , str.data()+3);
         BOOST_TEST_EQ(300 , via);
         BOOST_TEST(! stdex::can_narrow_to<signed char>(via));
+    }
+    {
+        std::array<char, 10> str{"300"};
+        char* tmp;
+        auto via = stdex::strto<long>(str.data(), &tmp, 10);
+        BOOST_TEST_EQ(tmp , str.data()+3);
+        BOOST_TEST_EQ(300 , via);
+        BOOST_TEST(! stdex::can_narrow_to<signed char>(via));
+    }
+    {
+        std::array<char, 10> str{"-30"};
+        char* tmp;
+        auto via = stdex::strto<long>(str.data(), &tmp, 10);
+        BOOST_TEST_EQ(tmp , str.data()+3);
+        BOOST_TEST_EQ(-30 , via);
+        BOOST_TEST(stdex::can_narrow_to<signed char>(via));
+    }
+    {
+        std::array<char, 10> str{"300"};
+        char* tmp;
+        auto via = stdex::strto<unsigned long long>(str.data(), &tmp, 10);
+        BOOST_TEST_EQ(tmp , str.data()+3);
+        BOOST_TEST_EQ(300 , via);
+    }
+    {
+        std::array<char, 10> str{"-30"};
+        char* tmp;
+        auto via = stdex::strto<long long>(str.data(), &tmp, 10);
+        BOOST_TEST_EQ(tmp , str.data()+3);
+        BOOST_TEST_EQ(-30 , via);
     }
 #if __cplusplus > 201402L
     {
