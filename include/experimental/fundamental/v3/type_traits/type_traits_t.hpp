@@ -14,30 +14,33 @@
 #if __cplusplus == 201103L
 namespace std
 {
-  template< class T >
-  using add_const_t = typename add_const<T>::type;
+template <class T>
+using add_const_t = typename add_const<T>::type;
 
-  template< class T >
-  using add_pointer_t = typename add_pointer<T>::type;
+template <class T>
+using add_pointer_t = typename add_pointer<T>::type;
 
-  template< class... T >
-  using common_type_t = typename common_type<T...>::type;
+template <class... T>
+using common_type_t = typename common_type<T...>::type;
 
-  template< bool B, class T, class F >
-  using conditional_t = typename conditional<B,T,F>::type;
+template <bool B, class T, class F>
+using conditional_t = typename conditional<B, T, F>::type;
 
-  template< class T >
-  using decay_t = typename decay<T>::type;
+template <class T>
+using decay_t = typename decay<T>::type;
 
-  template< bool B, class T = void >
-  using enable_if_t = typename enable_if<B,T>::type;
+template <bool B, class T = void>
+using enable_if_t = typename enable_if<B, T>::type;
 
-  template< class T >
-  using remove_reference_t = typename remove_reference<T>::type;
+template <class T>
+using remove_const_t = typename remove_const<T>::type;
 
-  template< class T >
-  using remove_cv_t = typename remove_cv<T>::type;
+template <class T>
+using remove_cv_t = typename remove_cv<T>::type;
 
-}
+template <class T>
+using remove_reference_t = typename remove_reference<T>::type;
+
+} // namespace std
 #endif
 #endif // header
