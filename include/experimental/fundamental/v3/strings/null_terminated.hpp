@@ -55,7 +55,7 @@ JASEL_CXX14_CONSTEXPR bool valid(const charT *str, size_t len)
 template <size_t N, class charT>
 JASEL_CXX14_CONSTEXPR bool test_and_set_length(const charT *str, size_t &length)
 {
-	for (length = 0; length < end; ++length)
+	for (length = 0; length < N; ++length)
 	{
 		if (charT() == str[length])
 			return true;
