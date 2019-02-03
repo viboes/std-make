@@ -9,7 +9,9 @@
 
 #if __cplusplus > 201402L
 
+#include <experimental/contract.hpp>
 #include <experimental/fundamental/v2/config.hpp>
+#include <experimental/fundamental/v3/config/requires.hpp>
 #include <experimental/fundamental/v3/strings/null_terminated.hpp>
 #include <cstring>
 #include <string_view>
@@ -28,7 +30,7 @@ template <class charT, class traits>
 class basic_cstring_view {
 	constexpr bool null_terminated()
 	{
-		return valid_ntbs(sv_.data(), sv_.length());
+		return ntxs::valid(sv_.data(), sv_.length());
 	}
 
 public:
@@ -69,13 +71,12 @@ public:
 	}
 
 	constexpr basic_cstring_view(null_terminated_t, const string_view_type &sv) noexcept
-	        : sv_(sv)
+	        : basic_cstring_view(sv.data(), sv.length())
 	{
-		JASEL_EXPECTS(null_terminated());
 	}
 
 	constexpr basic_cstring_view(const string_type &str) noexcept
-	        : sv_(str.c_str(), str.length())
+	        : basic_cstring_view(str.c_str(), str.length())
 	{
 	}
 

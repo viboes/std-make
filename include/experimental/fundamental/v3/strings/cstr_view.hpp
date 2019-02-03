@@ -10,6 +10,7 @@
 #include <experimental/contract.hpp>
 #include <experimental/cstring_view.hpp>
 #include <experimental/fundamental/v2/config.hpp>
+#include <experimental/fundamental/v3/config/requires.hpp>
 #include <experimental/fundamental/v3/strings/null_terminated.hpp>
 #include <cstring>
 #include <string> // this should be removed when string woukd depend on cstr_view as we had for string_view
@@ -91,16 +92,13 @@ public:
 	constexpr basic_cstr_view(null_terminated_t, const charT *str) : ptr(str) {}
 	JASEL_CXX14_CONSTEXPR basic_cstr_view(null_terminated_t, const charT *str, size_t len) : ptr(str)
 	{
-		JASEL_EXPECTS(valid_ntbs(str, len));
+		JASEL_EXPECTS(ntxs::valid(str, len));
 	}
 
-	// todo Add this for C++17
 #if __cplusplus > 201402L
-	// expected strview.c_str() is not null and points to a NTBS The first '\0' is located at strview.c_str() + strview.size()
 	constexpr explicit basic_cstr_view(null_terminated_t, const string_view_type &strview) noexcept
-	        : ptr(strview.c_str())
+	        : basic_cstr_view(strview.data(), strview.length())
 	{
-		JASEL_EXPECTS(valid_ntbs(strview.data(), strview.size()));
 	}
 	constexpr basic_cstr_view(const cstring_view_type &strview) noexcept
 	        : ptr(strview.c_str())
