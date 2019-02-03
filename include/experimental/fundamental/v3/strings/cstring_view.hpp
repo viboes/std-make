@@ -4,13 +4,13 @@
 //
 // (C) Copyright 2019 Vicente J. Botet Escriba
 
-#ifndef JASEL_EXPERIMENTAL_STRINGS_CSTRING_VIEW_CSTRING_VIEW_HPP
-#define JASEL_EXPERIMENTAL_STRINGS_CSTRING_VIEW_CSTRING_VIEW_HPP
+#ifndef JASEL_EXPERIMENTAL_STRINGS_CSTRING_VIEW_HPP
+#define JASEL_EXPERIMENTAL_STRINGS_CSTRING_VIEW_HPP
 
 #if __cplusplus > 201402L
 
 #include <experimental/fundamental/v2/config.hpp>
-#include <experimental/fundamental/v3/strings/cstring_view/null_terminated.hpp>
+#include <experimental/fundamental/v3/strings/null_terminated.hpp>
 #include <cstring>
 #include <string_view>
 

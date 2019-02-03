@@ -4,13 +4,13 @@
 //
 // (C) Copyright 2019 Vicente J. Botet Escriba
 
-#ifndef JASEL_EXPERIMENTAL_STRINGS_CSTRING_VIEW_CSTR_VIEW_HPP
-#define JASEL_EXPERIMENTAL_STRINGS_CSTRING_VIEW_CSTR_VIEW_HPP
+#ifndef JASEL_EXPERIMENTAL_STRINGS_CSTR_VIEW_HPP
+#define JASEL_EXPERIMENTAL_STRINGS_CSTR_VIEW_HPP
 
 #include <experimental/contract.hpp>
 #include <experimental/cstring_view.hpp>
 #include <experimental/fundamental/v2/config.hpp>
-#include <experimental/fundamental/v3/strings/cstring_view/null_terminated.hpp>
+#include <experimental/fundamental/v3/strings/null_terminated.hpp>
 #include <cstring>
 #include <string> // this should be removed when string woukd depend on cstr_view as we had for string_view
 #if __cplusplus > 201402L

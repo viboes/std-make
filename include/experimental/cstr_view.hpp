@@ -7,6 +7,6 @@
 #ifndef JASEL_EXPERIMENTAL_CSTR_VIEW_HPP
 #define JASEL_EXPERIMENTAL_CSTR_VIEW_HPP
 
-#include <experimental/fundamental/v3/strings/cstring_view/cstr_view.hpp>
+#include <experimental/fundamental/v3/strings/cstr_view.hpp>
 
 #endif // header
