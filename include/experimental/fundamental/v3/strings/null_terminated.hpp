@@ -24,12 +24,12 @@ inline constexpr null_terminated_t null_terminated;
 #endif
 
 template <class charT>
-struct basic_cstring
+struct null_terminated_traits
 {
-	static const charT empty;
+	static const charT zero;
 };
 template <class charT>
-const charT basic_cstring<charT>::empty = charT();
+const charT null_terminated_traits<charT>::zero = charT();
 
 template <class charT>
 JASEL_CXX14_CONSTEXPR bool all_non_zero(const charT *str, size_t end)

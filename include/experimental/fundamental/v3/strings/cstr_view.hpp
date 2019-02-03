@@ -84,7 +84,7 @@ public:
 	static constexpr size_type npos = size_type(-1);
 
 	// [string.view.cstr], construction and assignment
-	constexpr basic_cstr_view() noexcept : ptr(&basic_cstring<charT>::empty) {}
+	constexpr basic_cstr_view() noexcept : ptr(&null_terminated_traits<charT>::zero) {}
 	constexpr basic_cstr_view(const basic_cstr_view &) noexcept = default;
 	JASEL_CXX14_CONSTEXPR basic_cstr_view &operator=(const basic_cstr_view &) noexcept = default;
 	// expected str is not null and points to a NTBS

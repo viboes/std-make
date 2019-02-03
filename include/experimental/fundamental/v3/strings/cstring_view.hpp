@@ -51,13 +51,14 @@ public:
 	static constexpr size_type npos = size_type(-1);
 
 	// [string.view.cstring], construction and assignment
-	constexpr basic_cstring_view() noexcept : sv_(&basic_cstring<charT>::empty, 0) {}
+	constexpr basic_cstring_view() noexcept : sv_(&null_terminated_traits<charT>::zero, 0) {}
 	constexpr basic_cstring_view(const basic_cstring_view &) noexcept = default;
 	constexpr basic_cstring_view &operator=(const basic_cstring_view &) noexcept = default;
 	constexpr basic_cstring_view(null_terminated_t, const charT *str)
 	        : sv_(str, traits::length(str))
 	{
-		JASEL_EXPECTS(null_terminated());
+		// There is no way to check the following, as we don't have a limit for the string
+		// JASEL_EXPECTS(null_terminated());
 	}
 
 	// this is useful for cstring
