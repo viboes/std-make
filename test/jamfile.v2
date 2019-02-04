@@ -135,6 +135,7 @@ test-suite static_vector
 test-suite cstr_view
     : 
       [ run cstr_view/cstr_view_pass.cpp  ]
+      [ run cstr_view/static_cstring_pass.cpp  ]
     ;
 
 test-suite std_pair
