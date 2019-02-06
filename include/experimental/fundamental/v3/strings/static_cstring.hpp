@@ -29,12 +29,17 @@ namespace experimental
 inline namespace fundamental_v3
 {
 
+//! std::string like class with fixed capacity at compile time.
+//! static_cstring is to std::string what static_vector is to std::vector.
+//! In order to make operations as efficient as possible it stores like std::string the length of the string
+//! As std::string stores as well the zero identifying a null terminated string, and so the storage with be charT [N+1]
 template <class charT, size_t N, class sizeType = size_t, class traits = char_traits<charT>>
 class basic_static_cstring;
 
 template <class charT, size_t N, class sizeType, class traits>
 class basic_static_cstring {
-	constexpr bool null_terminated()
+	//! checks is the stored string is null terminated
+	constexpr bool null_terminated() noexcept
 	{
 		return length() <= (N + 1) && ntxs::valid(data(), length());
 	}
@@ -47,8 +52,8 @@ public:
 	using const_pointer          = const value_type *;
 	using reference              = value_type &;
 	using const_reference        = const value_type &;
+	using iterator               = value_type *;
 	using const_iterator         = value_type const *;
-	using iterator               = const_iterator;
 	using const_reverse_iterator = reverse_iterator<const_iterator>;
 	using reverse_iterator       = const_reverse_iterator;
 	using size_type              = sizeType;
@@ -58,55 +63,81 @@ public:
 
 	static constexpr size_type npos = size_type(-1);
 
-	// [string.view.cstring], construction and assignment
+	// [string.static_cstring], construction and assignment
+
+	//! constructs a NTXS of length 0
+	//! ensures empty()
 	JASEL_CXX14_CONSTEXPR basic_static_cstring() noexcept
 	        : len_(0)
 	{
 		data_[0] = null_terminated_traits<charT>::zero;
 	}
-	//The following operations could be optimized by copying only the significant chars
+	// The following operations could be optimized by copying only the significant chars
+	// this depends if we want that this class is trivially copyable or not
 	constexpr basic_static_cstring(const basic_static_cstring &) noexcept = default;
 	JASEL_CXX14_CONSTEXPR basic_static_cstring &operator=(const basic_static_cstring &) noexcept = default;
-	template <class CharT>
+
+	//! trick used to disambiguate the const char* and the const char(&)[N] overloads
+	//template <class CharT>
 	struct cvt
 	{
-		const CharT *ptr;
-		constexpr cvt(const CharT *p) : ptr(p) {}
+		const charT *ptr;
+		//cvt(nullptr_t) = delete;
+		constexpr cvt(const charT *p) noexcept
+		        : ptr(p)
+		{
+		}
 	};
-	template <class CharT>
-	JASEL_CXX14_CONSTEXPR basic_static_cstring(null_terminated_t, cvt<CharT> str)
+
+	//! constructs a NTXS from a const charT*
+	//! expects str to be a NTXS with length lt the N+1
+	JASEL_CXX14_CONSTEXPR basic_static_cstring(null_terminated_t, nullptr_t) = delete;
+	//template <class CharT>
+	JASEL_CXX14_CONSTEXPR basic_static_cstring(null_terminated_t, cvt str)
 	{
+		JASEL_EXPECTS(str.ptr != 0);
 		bool b = ntxs::test_and_set_length<N>(str.ptr, len_);
 		JASEL_EXPECTS(b);
 		traits::copy(data(), str.ptr, len_);
 	}
+	//! constructs a NTXS from a const char(&)[M] representing a NTXS literal
+	//! expects str to be a NTXS with length lt the N+1
+	// Note: All const charT (&str)[M] are not NTXS
 	template <size_t M, JASEL_REQUIRES(M <= (N + 1))>
 	JASEL_CXX14_CONSTEXPR basic_static_cstring(null_terminated_t, const charT (&str)[M])
-	        : len_(M)
+	        : len_(M - 1)
 	{
 		JASEL_EXPECTS(charT() == str[M - 1]);
 		traits::copy(data(), str, M);
 	}
 
+	//! constructs a NTXS from a const char* representing a NTXS of length len
+	//! expects len <= N+1
 	JASEL_CXX14_CONSTEXPR basic_static_cstring(null_terminated_t, const charT *str, size_type len)
 	        : len_(len)
 	{
+		JASEL_EXPECTS(str != 0);
 		JASEL_EXPECTS(len <= N + 1);
 		JASEL_EXPECTS(ntxs::valid(str, len));
 		traits::copy(data(), str, len);
 	}
 
-	constexpr basic_static_cstring(null_terminated_t tag, const string_view_type &sv) noexcept
-	        : basic_static_cstring(tag, sv.data(), sv.length())
-	{
-	}
+	//! constructs a NTXS from a sting_view representing a NTXS of length sv.length()
+	//! expects sv.length() <= N+1
+	// constexpr basic_static_cstring(null_terminated_t tag, const string_view_type &sv)
+	//         : basic_static_cstring(tag, sv.data(), sv.length())
+	// {
+	// 	std::cout << "string_view_type " << sv.data() << std::endl;
+	// }
 
-	constexpr basic_static_cstring(const string_type &str) noexcept
+	//! constructs a NTXS from a sting representing a NTXS of length str.length()
+	//! expects str.length() <= N+1
+	constexpr basic_static_cstring(const string_type &str)
 	        : basic_static_cstring(null_terminated_t{}, str.c_str(), str.length())
 	{
 	}
 
-	// [string.view.cstring], iterator support
+	// [string.static_cstring], iterator support
 	JASEL_CXX14_CONSTEXPR iterator begin() noexcept { return data_.begin(); }
 	JASEL_CXX14_CONSTEXPR const_iterator begin() const noexcept { return data_.begin(); }
 	JASEL_CXX14_CONSTEXPR iterator end() noexcept { return &data_[len_]; }
@@ -146,12 +177,12 @@ public:
 	{
 		return str.end();
 	}
-	// [string.view.cstring], capacity
+	// [string.static_cstring], capacity
 	constexpr size_type          size() const noexcept { return len_; }
 	constexpr size_type          length() const noexcept { return size(); }
 	constexpr size_type          max_size() const noexcept { return N; }
 	[[nodiscard]] constexpr bool empty() const noexcept { return size() == 0; }
-	// [string.view.cstring], element access
+	// [string.static_cstring], element access
 	JASEL_CXX14_CONSTEXPR const_reference operator[](size_type pos) const { return data_[pos]; }
 	JASEL_CXX14_CONSTEXPR reference operator[](size_type pos) { return data_[pos]; }
 	JASEL_CXX14_CONSTEXPR const_reference at(size_type pos) const
@@ -175,11 +206,14 @@ public:
 	constexpr const charT *             c_str() const noexcept { return &data_[0]; }
 
 	// implicit conversions
+
+	//! implicit conversion to a cstr view
 	operator basic_cstr_view<charT, traits>() const noexcept
 	{
 		return basic_cstr_view<charT, traits>(data(), size());
 	}
 #if __cplusplus > 201402L
+	//! implicit conversion to a cstring view
 	operator basic_cstring_view<charT, traits>() const noexcept
 	{
 		return basic_cstring_view<charT, traits>(data(), size());
@@ -188,54 +222,80 @@ public:
 	{
 		return basic_string_view<charT, traits>(data(), size());
 	}
+	//! implicit conversion to a string view
 	operator basic_string_view<charT, traits>() const noexcept { return to_string_view(); }
 #endif
 	// explicit conversions
 	basic_string<charT, traits> to_string() const noexcept
 	{
 		// we are missing a construction of std::string from a const char* with a know length
-		return basic_string<charT, traits>(data());
+		basic_string<charT, traits> res(data());
+		res.resize(size());
+		return res;
 	}
+	//! explicit conversion to a string (expensive as allocation and copy takes place)
 	explicit operator basic_string<charT, traits>() const noexcept { return to_string(); }
 
-	JASEL_CXX14_CONSTEXPR void clear()
+	JASEL_CXX14_CONSTEXPR void clear() noexcept
 	{
 		len_ = 0;
+		traits::assign(data_[len_], charT{});
 	}
 	// insert
 	// erase
 
+	//! expects lengtn() < N
 	JASEL_CXX14_CONSTEXPR void push_back(charT ch)
 	{
-		traits::assign(data_[len_++], ch);
+		JASEL_EXPECTS(len_ < N);
+
+		traits::assign(data_[len_], ch);
+		++len_;
+		traits::assign(data_[len_], charT{});
 	}
+	//! expects ! empty()
 	JASEL_CXX14_CONSTEXPR void pop_back()
 	{
+		JASEL_EXPECTS(!empty());
 		--len_;
+		traits::assign(data_[len_], charT{});
 	}
 
 	// replace
 
+	//! expects count <= N
 	JASEL_CXX14_CONSTEXPR void resize(size_type count)
 	{
-		traits::assign(end(), count, charT{});
-		len_ += count;
-	}
-	JASEL_CXX14_CONSTEXPR void resize(size_type count, charT ch)
-	{
-		traits::assign(end(), count, ch);
-		len_ += count;
+		resize(count, charT{});
 	}
 
-	// [string.view.cstring], modifiers
+	//! expects count <= N
+	JASEL_CXX14_CONSTEXPR void resize(size_type count, charT ch)
+	{
+		JASEL_EXPECTS(count <= N);
+		if (count > len_)
+		{
+			traits::assign(end(), count - len_, ch);
+			len_ = count;
+		}
+		else
+		{
+			len_ = count;
+		}
+		traits::assign(data_[len_], charT{});
+	}
+
+	// [string.static_cstring], modifiers
 	JASEL_CXX14_CONSTEXPR void remove_prefix(size_type n)
 	{
+		JASEL_EXPECTS(length() >= n);
 		traits::move(data(), data() + n, len_ - n + 1);
 		len_ -= n;
 	}
 	// This implies to move set the \0
 	JASEL_CXX14_CONSTEXPR void remove_suffix(size_type n)
 	{
+		JASEL_EXPECTS(length() >= n);
 		len_ -= n;
 		data_[len_] = charT();
 	}
@@ -246,7 +306,7 @@ public:
 		swap(len_, other.len_);
 	}
 #if __cplusplus > 201402L
-	// [string.view.cstring], string operations
+	// [string.static_cstring], string operations
 	constexpr size_type copy(charT *s, size_type n, size_type pos = 0) const
 	{
 		return to_string_view().copy(s, n, pos);
@@ -306,7 +366,7 @@ public:
 	{
 		return to_string_view().ends_with(x);
 	}
-	// [string.view.cstring], searching
+	// [string.static_cstring], searching
 	constexpr size_type find(string_view_type s, size_type pos = 0) const noexcept
 	{
 		return to_string_view().find(s, pos);

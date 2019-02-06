@@ -26,6 +26,7 @@ inline constexpr null_terminated_t null_terminated;
 template <class charT>
 struct null_terminated_traits
 {
+	//! the zero used to identify a null terminated string
 	static const charT zero;
 };
 template <class charT>
@@ -35,25 +36,27 @@ const charT null_terminated_traits<charT>::zero = charT();
 namespace ntxs
 {
 
+//! checks if all the chars in the range [0,len) are non zero as required for a ntxs of length len
 template <class charT>
-JASEL_CXX14_CONSTEXPR bool all_non_zero(const charT *str, size_t end)
+JASEL_CXX14_CONSTEXPR bool all_non_zero(const charT *str, size_t len) noexcept
 {
-	for (int i = 0; i < end; ++i)
+	for (int i = 0; i < len; ++i)
 	{
 		if (charT() == str[i])
 			return false;
 	}
 	return true;
 }
+//! checks if str is  a valid NTXS, that is all chars until len are non zero and the len char is zero
 template <class charT>
-JASEL_CXX14_CONSTEXPR bool valid(const charT *str, size_t len)
+JASEL_CXX14_CONSTEXPR bool valid(const charT *str, size_t len) noexcept
 {
-	return charT() == *(str + len) && all_non_zero(str, len);
+	return charT() == str[len] && all_non_zero(str, len);
 }
 
-// this function calculate the length of a NTXS a check that the length is less than a specific capacity N
+//! this function calculate the length of a NTXS a check that the length is less than a specific capacity N
 template <size_t N, class charT>
-JASEL_CXX14_CONSTEXPR bool test_and_set_length(const charT *str, size_t &length)
+JASEL_CXX14_CONSTEXPR bool test_and_set_length(const charT *str, size_t &length) noexcept
 {
 	for (length = 0; length < N; ++length)
 	{
