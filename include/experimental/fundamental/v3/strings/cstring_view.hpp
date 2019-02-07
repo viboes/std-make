@@ -56,6 +56,8 @@ public:
 	constexpr basic_cstring_view() noexcept : sv_(&null_terminated_traits<charT>::zero, 0) {}
 	constexpr basic_cstring_view(const basic_cstring_view &) noexcept = default;
 	constexpr basic_cstring_view &operator=(const basic_cstring_view &) noexcept = default;
+
+	// explicit conversion from a c-string
 	constexpr basic_cstring_view(null_terminated_t, const charT *str)
 	        : sv_(str, traits::length(str))
 	{
@@ -63,20 +65,21 @@ public:
 		// JASEL_EXPECTS(null_terminated());
 	}
 
-	// this is useful for cstring
+	// explicit conversion from a a c-string and his length
 	constexpr basic_cstring_view(null_terminated_t, const charT *str, size_type len)
 	        : sv_(str, len)
 	{
 		JASEL_EXPECTS(null_terminated());
 	}
-
+	// explicit conversion from a string view which must be null terminated
 	constexpr basic_cstring_view(null_terminated_t, const string_view_type &sv) noexcept
 	        : basic_cstring_view(sv.data(), sv.length())
 	{
 	}
 
+	// implicit conversion from a string
 	constexpr basic_cstring_view(const string_type &str) noexcept
-	        : basic_cstring_view(str.c_str(), str.length())
+	        : sv_(str.c_str(), str.length())
 	{
 	}
 
