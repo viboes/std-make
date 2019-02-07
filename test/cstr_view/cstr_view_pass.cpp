@@ -74,22 +74,26 @@ int main()
 		stdex::cstr_view sv(stdex::null_terminated_t{}, str);
 		BOOST_TEST(sv.to_string() == str);
 	}
+	// constructor from const char *
 	{
 		const char *     str = "Hello";
 		stdex::cstr_view sv(stdex::null_terminated_t{}, str);
 		BOOST_TEST(std::string(sv) == str);
 	}
+	// constructor from std::string
 	{
-		const char *     str = "Hello";
-		stdex::cstr_view sv(stdex::null_terminated_t{}, str);
-		BOOST_TEST(std::string(sv) == str);
+		std::string      str = "Hello";
+		stdex::cstr_view sv  = str;
+		BOOST_TEST(sv.to_string() == str);
 	}
+	// remove_prefix
 	{
 		const char *     str = "Hello World";
 		stdex::cstr_view sv(stdex::null_terminated_t{}, str);
 		sv.remove_prefix(6);
 		BOOST_TEST(sv.to_string() == "World");
 	}
+	// swap
 	{
 		const char *     hello = "Hello";
 		const char *     world = "World";
@@ -98,6 +102,7 @@ int main()
 		swap(sv, sw);
 		BOOST_TEST(sv.to_string() == "World");
 	}
+	// compare
 	{
 		const char *     hello = "Hello";
 		const char *     world = "World";

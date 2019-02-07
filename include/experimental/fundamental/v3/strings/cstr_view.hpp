@@ -95,16 +95,25 @@ public:
 		JASEL_EXPECTS(ntxs::valid(str, len));
 	}
 
+	//! explicit conversion from a string_view, which must be null terminated
 #if __cplusplus > 201402L
 	constexpr explicit basic_cstr_view(null_terminated_t, const string_view_type &strview) noexcept
 	        : basic_cstr_view(strview.data(), strview.length())
 	{
 	}
+	//! implicit conversions from a csting view
 	constexpr basic_cstr_view(const cstring_view_type &strview) noexcept
 	        : ptr(strview.c_str())
 	{
 	}
 #endif
+	//! implicit conversions from a string
+	// this should be moved to the class string
+	constexpr basic_cstr_view(const string_type &str) noexcept
+	        : ptr(str.c_str())
+	{
+	}
+
 	// [string.view.cstr], iterator support
 	constexpr const_iterator begin() const noexcept { return ptr; }
 	constexpr const_sentinel end() const noexcept { return const_sentinel{}; }

@@ -27,7 +27,7 @@ int main()
 		BOOST_TEST(sv.c_str() == std::string());
 	}
 	std::cout << __LINE__ << std::endl;
-	// constructor from a NTXS of lenthe > 0
+	// constructor from a NTXS of length > 0
 	{
 		const char *              str = "Hello";
 		stdex::static_cstring<20> sv(stdex::null_terminated_t{}, str);
@@ -44,6 +44,7 @@ int main()
 #endif
 	std::cout << __LINE__ << std::endl;
 	// constructor from a const char* equal to nullptr is UB, don't do it
+	if (0)
 	{
 		try
 		{
@@ -68,6 +69,14 @@ int main()
 		BOOST_TEST(sv.to_string().empty());
 		BOOST_TEST(sv.empty());
 		BOOST_TEST(sv.c_str() == std::string());
+	}
+	std::cout << __LINE__ << std::endl;
+	// construction from std::string
+	{
+		std::string               str("Hello");
+		stdex::static_cstring<20> sv(str);
+		BOOST_TEST(!sv.empty());
+		BOOST_TEST(sv.c_str() == str);
 	}
 	std::cout << __LINE__ << std::endl;
 #if __cplusplus > 201402L

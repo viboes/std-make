@@ -59,6 +59,8 @@ public:
 	using size_type              = sizeType;
 	using difference_type        = ptrdiff_t;
 	using string_view_type       = basic_string_view<charT, traits>;
+	using cstring_view_type      = basic_cstring_view<charT, traits>;
+	using cstr_view_type         = basic_cstr_view<charT, traits>;
 	using string_type            = basic_string<charT, traits>;
 
 	static constexpr size_type npos = size_type(-1);
@@ -72,13 +74,9 @@ public:
 	{
 		data_[0] = null_terminated_traits<charT>::zero;
 	}
-	// The following operations could be optimized by copying only the significant chars
-	// this depends if we want that this class is trivially copyable or not
-	constexpr basic_static_cstring(const basic_static_cstring &) noexcept = default;
-	JASEL_CXX14_CONSTEXPR basic_static_cstring &operator=(const basic_static_cstring &) noexcept = default;
 
 	//! trick used to disambiguate the const char* and the const char(&)[N] overloads
-	//template <class CharT>
+	//template <class charT>
 	struct cvt
 	{
 		const charT *ptr;
@@ -92,14 +90,14 @@ public:
 	//! constructs a NTXS from a const charT*
 	//! expects str to be a NTXS with length lt the N+1
 	JASEL_CXX14_CONSTEXPR basic_static_cstring(null_terminated_t, nullptr_t) = delete;
-	//template <class CharT>
-	JASEL_CXX14_CONSTEXPR basic_static_cstring(null_terminated_t, cvt str)
-	{
-		JASEL_EXPECTS(str.ptr != 0);
-		bool b = ntxs::test_and_set_length<N>(str.ptr, len_);
-		JASEL_EXPECTS(b);
-		traits::copy(data(), str.ptr, len_);
-	}
+	//template <class charT>
+	// JASEL_CXX14_CONSTEXPR basic_static_cstring(null_terminated_t, cvt str)
+	// {
+	// 	JASEL_EXPECTS(str.ptr != 0);
+	// 	bool b = ntxs::test_and_set_length<N>(str.ptr, len_);
+	// 	JASEL_EXPECTS(b);
+	// 	traits::copy(data(), str.ptr, len_);
+	// }
 	//! constructs a NTXS from a const char(&)[M] representing a NTXS literal
 	//! expects str to be a NTXS with length lt the N+1
 	// Note: All const charT (&str)[M] are not NTXS
@@ -124,21 +122,83 @@ public:
 
 	//! constructs a NTXS from a sting_view representing a NTXS of length sv.length()
 	//! expects sv.length() <= N+1
-	// constexpr basic_static_cstring(null_terminated_t tag, const string_view_type &sv)
-	//         : basic_static_cstring(tag, sv.data(), sv.length())
-	// {
-	// 	std::cout << "string_view_type " << sv.data() << std::endl;
-	// }
+	// fixme: This overload doesn't support conversion from const char* equal to nullptr.
+	constexpr basic_static_cstring(null_terminated_t tag, const string_view_type &sv)
+	        : basic_static_cstring(tag, sv.data(), sv.length())
+	{
+		JASEL_EXPECTS(sv.data() != 0);
+	}
 
 	//! constructs a NTXS from a sting representing a NTXS of length str.length()
 	//! expects str.length() <= N+1
-	constexpr basic_static_cstring(const string_type &str)
+	constexpr basic_static_cstring(const cstring_view_type &str)
 	        : basic_static_cstring(null_terminated_t{}, str.c_str(), str.length())
 	{
 	}
+	// The following operations could be optimized by copying only the significant chars
+	// this depends if we want that this class is trivially copyable or not
+	JASEL_CXX14_CONSTEXPR basic_static_cstring(const basic_static_cstring &) noexcept = default;
+	JASEL_CXX14_CONSTEXPR basic_static_cstring &operator=(const basic_static_cstring &) noexcept = default;
+	JASEL_CXX14_CONSTEXPR basic_static_cstring &operator                                         =(const charT *s);
+	JASEL_CXX14_CONSTEXPR basic_static_cstring &operator                                         =(charT ch);
+	JASEL_CXX14_CONSTEXPR basic_static_cstring &operator                                         =(std::initializer_list<charT> ilist);
+	template <class T>
+	JASEL_CXX14_CONSTEXPR basic_static_cstring &operator=(const T &t);
+
+	// assign
+	basic_static_cstring &assign(size_type count,
+	                             charT     ch);
+	basic_static_cstring &assign(const basic_static_cstring &str);
+	basic_static_cstring &assign(const basic_static_cstring &str,
+	                             size_type                   pos,
+	                             size_type                   count = npos);
+	basic_static_cstring &assign(basic_static_cstring &&str); //noexcept(/* see below */);
+	basic_static_cstring &assign(const charT *s,
+	                             size_type    count);
+	basic_static_cstring &assign(const charT *s);
+	template <class InputIt>
+	basic_static_cstring &assign(InputIt first,
+	                             InputIt last);
+	basic_static_cstring &assign(std::initializer_list<charT> ilist);
+	template <class T>
+	basic_static_cstring &assign(const T &t);
+	template <class T>
+	basic_static_cstring &assign(const T & t,
+	                             size_type pos,
+	                             size_type count = npos);
+
+	//append
+	basic_static_cstring &append(size_type count, charT ch);
+	basic_static_cstring &append(const basic_static_cstring &str);
+	basic_static_cstring &append(const basic_static_cstring &str,
+	                             size_type                   pos,
+	                             size_type                   count = npos);
+	basic_static_cstring &append(const charT *s,
+	                             size_type    count);
+	template <class InputIt>
+	basic_static_cstring &append(InputIt first, InputIt last);
+	basic_static_cstring &append(std::initializer_list<charT> ilist);
+	template <class T>
+	basic_static_cstring &append(const T &t);
+	template <class T>
+
+	basic_static_cstring &append(const T &t, size_type pos,
+	                             size_type count = npos);
+
+	//operator+=
+	basic_static_cstring &operator+=(const basic_static_cstring &str);
+	basic_static_cstring &operator+=(charT ch);
+	basic_static_cstring &operator+=(const charT *s);
+	basic_static_cstring &operator+=(std::initializer_list<charT> ilist);
+	template <class T>
+	basic_static_cstring &operator+=(const T &t);
 
 	// [string.static_cstring], iterator support
-	JASEL_CXX14_CONSTEXPR iterator begin() noexcept { return data_.begin(); }
+	JASEL_CXX14_CONSTEXPR iterator
+	begin() noexcept
+	{
+		return data_.begin();
+	}
 	JASEL_CXX14_CONSTEXPR const_iterator begin() const noexcept { return data_.begin(); }
 	JASEL_CXX14_CONSTEXPR iterator end() noexcept { return &data_[len_]; }
 	JASEL_CXX14_CONSTEXPR const_iterator end() const noexcept { return &data_[len_]; }
@@ -242,7 +302,30 @@ public:
 		traits::assign(data_[len_], charT{});
 	}
 	// insert
+	basic_static_cstring &insert(size_type index, size_type count, charT ch);
+	basic_static_cstring &insert(size_type index, const charT *s);
+	basic_static_cstring &insert(size_type index, const charT *s, size_type count);
+	basic_static_cstring &insert(size_type index, const basic_static_cstring &str);
+	basic_static_cstring &insert(size_type index, const basic_static_cstring &str,
+	                             size_type index_str, size_type count = npos);
+	iterator              insert(const_iterator pos, charT ch);
+	iterator              insert(const_iterator pos, size_type count, charT ch);
+
+	template <class InputIt>
+	iterator insert(const_iterator pos, InputIt first, InputIt last);
+
+	iterator insert(const_iterator pos, std::initializer_list<charT> ilist);
+	template <class T>
+	basic_static_cstring &insert(size_type pos, const T &t);
+	template <class T>
+	basic_static_cstring &insert(size_type index, const T &t,
+	                             size_type index_str, size_type count = npos);
+
 	// erase
+
+	basic_static_cstring &erase(size_type index = 0, size_type count = npos);
+	iterator              erase(const_iterator position);
+	iterator              erase(const_iterator first, const_iterator last);
 
 	//! expects lengtn() < N
 	JASEL_CXX14_CONSTEXPR void push_back(charT ch)
@@ -262,6 +345,37 @@ public:
 	}
 
 	// replace
+	basic_static_cstring &replace(const_iterator first, const_iterator last,
+	                              const basic_static_cstring &str);
+	basic_static_cstring &replace(size_type pos, size_type count,
+	                              const basic_static_cstring &str,
+	                              size_type pos2, size_type count2 = npos);
+	template <class InputIt>
+	basic_static_cstring &replace(const_iterator first, const_iterator last,
+	                              InputIt first2, InputIt last2);
+	basic_static_cstring &replace(size_type pos, size_type count,
+	                              const charT *cstr, size_type count2);
+	basic_static_cstring &replace(const_iterator first, const_iterator last,
+	                              const charT *cstr, size_type count2);
+	basic_static_cstring &replace(size_type pos, size_type count,
+	                              const charT *cstr);
+	basic_static_cstring &replace(const_iterator first, const_iterator last,
+	                              const charT *cstr);
+	basic_static_cstring &replace(size_type pos, size_type count,
+	                              size_type count2, charT ch);
+	basic_static_cstring &replace(const_iterator first, const_iterator last,
+	                              size_type count2, charT ch);
+	basic_static_cstring &replace(const_iterator first, const_iterator last,
+	                              std::initializer_list<charT> ilist);
+	template <class T>
+	basic_static_cstring &replace(size_type pos, size_type count,
+	                              const T &t);
+	template <class T>
+	basic_static_cstring &replace(const_iterator first, const_iterator last,
+	                              const T &t);
+	template <class T>
+	basic_static_cstring &replace(size_type pos, size_type count, const T &t,
+	                              size_type pos2, size_type count2 = npos);
 
 	//! expects count <= N
 	JASEL_CXX14_CONSTEXPR void resize(size_type count)
@@ -472,6 +586,48 @@ private:
 	std::array<charT, N + 1> data_;
 	//charT     data_[N + 1];
 };
+
+// operator+
+
+// operator==
+
+//swap
+
+// erase
+// erase_if
+
+// operator<<
+template <class CharT, size_t N, class SizeType, class Traits>
+basic_ostream<CharT, Traits> &
+operator<<(basic_ostream<CharT, Traits> &                          os,
+           const basic_static_cstring<CharT, N, SizeType, Traits> &str)
+{
+	os << str.c_str();
+	return os;
+}
+
+template <class CharT, size_t N, class SizeType, class Traits>
+basic_istream<CharT, Traits> &
+operator>>(basic_istream<CharT, Traits> &                    is,
+           basic_static_cstring<CharT, N, SizeType, Traits> &scstr)
+{
+	// todo: we should read from the stream up to N chars and no more, isn't it?
+	basic_string<CharT, Traits> str;
+	is >> str;
+	scstr.assign(str);
+	return is;
+}
+
+// operator>>
+
+// getline
+
+// sto
+
+// to_static_cstring
+// to_static_cwstring
+
+// hash
 
 template <size_t N>
 using static_cstring = basic_static_cstring<char, N>;
