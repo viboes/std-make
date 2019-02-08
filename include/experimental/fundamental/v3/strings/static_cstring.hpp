@@ -213,45 +213,35 @@ public:
 	}
 
 	template <class InputIt>
+	// requires InputIterator<InputIt>
 	basic_static_cstring &assign(InputIt first,
 	                             InputIt last)
 	{
 		clear();
 		return append(first, last);
-		// len_ = 0;
-		// while (first != last)
-		// {
-		// 	JASEL_EXPECTS(len_ <= N);
-		// 	traits::assign(data_[len_], *first);
-		// 	++len_;
-		// 	++first;
-		// }
-		// traits::assign(data_[len_], charT{});
-		// return *this;
 	}
+
 	basic_static_cstring &assign(std::initializer_list<charT> ilist)
 	{
 		return assign(ilist.begin(), ilist.end());
 	}
+
 	template <class T>
+	// requires ConvertibleTo<basic_string_view>
 	basic_static_cstring &assign(const T &t)
 	{
 		clear();
 		return append(t);
 	}
+
 	template <class T>
+	// requires ConvertibleTo<basic_string_view>
 	basic_static_cstring &assign(const T & t,
 	                             size_type pos,
-	                             size_type count = npos)
+	                             size_type count) // = npos)
 	{
 		clear();
 		return append(t, pos, count);
-		// std::basic_string_view<charT, traits> sv = t;
-		// if (count == npos || count > sv.size())
-		// {
-		// 	count = sv.size() - pos + 1;
-		// }
-		// return assign(sv.data() + pos, count);
 	}
 
 	//append
@@ -267,7 +257,7 @@ public:
 	basic_static_cstring &append(const basic_static_cstring &str)
 	{
 		JASEL_EXPECTS(size() + str.size() <= N);
-		traits::assign(end(), str.size(), str.data());
+		traits::copy(end(), str.data(), str.size());
 		len_ += str.size();
 		traits::assign(data_[len_], charT{});
 		return *this;
@@ -276,9 +266,9 @@ public:
 	                             size_type                   pos,
 	                             size_type                   count = npos)
 	{
-		if (count == npos || count > str.size())
+		if (count == npos || count > (str.size() - pos))
 		{
-			count = str.size() - pos + 1;
+			count = str.size() - pos;
 		}
 		JASEL_EXPECTS(size() + count <= N);
 		traits::copy(end(), str.data() + pos, count);
@@ -322,6 +312,8 @@ public:
 	{
 		return append(ilist.begin(), ilist.end());
 	}
+
+	// todo:: sfinae
 	template <class T>
 	basic_static_cstring &append(const T &t)
 	{
@@ -329,6 +321,7 @@ public:
 		return append(sv.data(), sv.size());
 	}
 
+	// todo:: sfinae
 	template <class T>
 	basic_static_cstring &append(const T &t, size_type pos,
 	                             size_type count = npos)
@@ -442,7 +435,7 @@ public:
 	//! implicit conversion to a cstr view
 	operator basic_cstr_view<charT, traits>() const noexcept
 	{
-		return basic_cstr_view<charT, traits>(data(), size());
+		return basic_cstr_view<charT, traits>(null_terminated_t{}, data(), size());
 	}
 #if __cplusplus > 201402L
 	//! implicit conversion to a cstring view

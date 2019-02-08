@@ -98,6 +98,99 @@ int main()
 		BOOST_TEST(sv.to_string() == "aaaaa");
 	}
 #endif
+	// operator=
+
+	// assign
+	std::cout << __LINE__ << std::endl;
+	// Assign n chars
+	{
+		stdex::static_cstring<20> sv;
+		sv.assign(3, 'X');
+		BOOST_TEST(sv.to_string() == "XXX");
+	}
+	std::cout << __LINE__ << std::endl;
+	// Assign another string
+	{
+		stdex::static_cstring<20> sw{stdex::null_terminated_t{}, "Hello"};
+		stdex::static_cstring<20> sv;
+		sv.assign(sw);
+		BOOST_TEST(sv.to_string() == "Hello");
+	}
+	std::cout << __LINE__ << std::endl;
+	// Assign another substring
+	{
+		stdex::static_cstring<20> sw{stdex::null_terminated_t{}, "Hello"};
+		stdex::static_cstring<20> sv;
+		sv.assign(sw, 1, 3);
+		BOOST_TEST(sv.to_string() == "ell");
+	}
+	std::cout << __LINE__ << std::endl;
+	// Assign another substring over
+	{
+		stdex::static_cstring<20> sw{stdex::null_terminated_t{}, "Hello"};
+		stdex::static_cstring<20> sv;
+		sv.assign(sw, 1, 5);
+		std::cout << sv.c_str() << " " << sv.size() << std::endl;
+		BOOST_TEST(sv.to_string() == "ello");
+	}
+	std::cout << __LINE__ << std::endl;
+	// Assign another substring npos
+	{
+		stdex::static_cstring<20> sw{stdex::null_terminated_t{}, "Hello"};
+		stdex::static_cstring<20> sv;
+		sv.assign(sw, 1, stdex::static_cstring<20>::npos);
+		std::cout << sv.c_str() << " " << sv.size() << std::endl;
+		BOOST_TEST(sv.to_string() == "ello");
+	}
+	std::cout << __LINE__ << std::endl;
+	// Assign another empty substring
+	{
+		stdex::static_cstring<20> sw{stdex::null_terminated_t{}, "Hello"};
+		stdex::static_cstring<20> sv;
+		sv.assign(sw, 1, 0);
+		std::cout << sv.c_str() << " " << sv.size() << std::endl;
+		BOOST_TEST(sv.to_string() == "");
+	}
+	std::cout << __LINE__ << std::endl;
+	// Assign a literal string
+	{
+		stdex::static_cstring<20> sv;
+		sv.assign("Hello");
+		BOOST_TEST(sv.to_string() == "Hello");
+	}
+	std::cout << __LINE__ << std::endl;
+	// Assign a const char *
+	{
+		const char *              str = "Hello";
+		stdex::static_cstring<20> sv;
+		sv.assign(str);
+		BOOST_TEST(sv.to_string() == "Hello");
+	}
+	std::cout << __LINE__ << std::endl;
+	// Assign a prefix of a const char *
+	{
+		const char *              str = "Hello";
+		stdex::static_cstring<20> sv;
+		sv.assign(str, 3);
+		BOOST_TEST(sv.to_string() == "Hel");
+	}
+	std::cout << __LINE__ << std::endl;
+	// Assign a range
+	{
+		const char *              str = "Hello";
+		stdex::static_cstring<20> sv;
+		sv.assign(str + 1, str + 3);
+		BOOST_TEST(sv.to_string() == "el");
+	}
+	std::cout << __LINE__ << std::endl;
+	// Assign a range
+	{
+		stdex::static_cstring<20> sv;
+		sv.assign({'e', 'l'});
+		BOOST_TEST(sv.to_string() == "el");
+	}
+
+	// range based for loop
 	std::cout << __LINE__ << std::endl;
 	// iteration over the chars using index and size
 	{
@@ -171,13 +264,36 @@ int main()
 		stdex::static_cstring<20> sv(stdex::null_terminated_t{}, str);
 		BOOST_TEST(sv.c_str() == std::string(str));
 	}
-	// to_string explicit conversion
+#if __cplusplus > 201402L
+	// implicit conversion to string_view
+	{
+		const char *              str = "Hello";
+		stdex::static_cstring<20> scstr(stdex::null_terminated_t{}, str);
+		std::string_view          sv{scstr};
+		BOOST_TEST(sv.data() == scstr.data());
+	}
+	// implicit conversion to cstring_view
+	{
+		const char *              str = "Hello";
+		stdex::static_cstring<20> scstr(stdex::null_terminated_t{}, str);
+		stdex::cstring_view       sv{scstr};
+		BOOST_TEST(sv.data() == scstr.data());
+	}
+#endif
+	// implicit conversion to cstr_view
+	{
+		const char *              str = "Hello";
+		stdex::static_cstring<20> scstr(stdex::null_terminated_t{}, str);
+		stdex::cstr_view          sv{scstr};
+		BOOST_TEST(sv.data() == scstr.data());
+	}
+	// to_string
 	{
 		const char *              str = "Hello";
 		stdex::static_cstring<20> sv(stdex::null_terminated_t{}, str);
 		BOOST_TEST(sv.to_string() == str);
 	}
-	// string explicit conversion
+	// explicit conversion to string
 	{
 		const char *              str = "Hello";
 		stdex::static_cstring<20> sv(stdex::null_terminated_t{}, str);
@@ -191,7 +307,9 @@ int main()
 		BOOST_TEST(sv.to_string() == "");
 	}
 	// insert
+
 	// erase
+
 	// push_back
 	{
 		const char *              str = "Hello";
@@ -207,6 +325,7 @@ int main()
 		BOOST_TEST(sv.to_string() == "Hell");
 	}
 	// replace
+
 	// resize
 	{
 		const char *              str = "XXX";
@@ -228,10 +347,10 @@ int main()
 		stdex::static_cstring<20> sv(stdex::null_terminated_t{}, str);
 		sv.resize(5);
 		BOOST_TEST(sv.size() == 5);
-		BOOST_TEST(sv.to_string().size() == 5);
-		std::cout << "#" << sv.to_string() << "#" << std::endl;
-		// fixme: this doesn't work yet
-		//BOOST_TEST(sv.to_string() == "XXX");
+		BOOST_TEST(sv[3] == '\0');
+		BOOST_TEST(sv[4] == '\0');
+		BOOST_TEST(sv[5] == '\0');
+		BOOST_TEST(sv.c_str() == std::string("XXX"));
 	}
 	// resize
 	{
