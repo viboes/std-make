@@ -89,6 +89,14 @@ int main()
 			os << ch;
 		BOOST_TEST(os.str() == str);
 	}
+	// iteration over the chars using range-based for loop
+	{
+		const char *              str = "Hello";
+		stdex::static_cstring<20> sv(stdex::null_terminated_t{}, str);
+		for (auto &ch : sv)
+			ch = 'a';
+		BOOST_TEST(sv.to_string() == "aaaaa");
+	}
 #endif
 	std::cout << __LINE__ << std::endl;
 	// iteration over the chars using index and size
@@ -100,13 +108,30 @@ int main()
 			os << sv[i];
 		BOOST_TEST(os.str() == str);
 	}
+	std::cout << __LINE__ << std::endl;
+	// iteration over the chars using index and size
+	{
+		const char *              str = "Hello";
+		stdex::static_cstring<20> sv(stdex::null_terminated_t{}, str);
+		for (std::size_t i = 0, l = sv.size(); i < l; ++i)
+			sv[i] = 'b';
+		BOOST_TEST(sv.to_string() == "bbbbb");
+	}
 #if __cplusplus > 201402L
 	std::cout << __LINE__ << std::endl;
-	// at good index access
+	// at good index read access
 	{
 		const char *              str = "Hello";
 		stdex::static_cstring<20> sv(stdex::null_terminated_t{}, str);
 		BOOST_TEST(sv.at(0) == 'H');
+	}
+	std::cout << __LINE__ << std::endl;
+	// at good index write access
+	{
+		const char *              str = "Hello";
+		stdex::static_cstring<20> sv(stdex::null_terminated_t{}, str);
+		sv.at(0) = 'h';
+		BOOST_TEST(sv.to_string() == "hello");
 	}
 #endif
 	// front/back good index access
@@ -116,6 +141,22 @@ int main()
 		BOOST_TEST(sv.front() == 'H');
 #if __cplusplus > 201402L
 		BOOST_TEST(sv.back() == 'o');
+#endif
+	}
+	// front/back good index access
+	{
+		const char *              str = "Hello";
+		stdex::static_cstring<20> sv(stdex::null_terminated_t{}, str);
+		sv.front() = 'h';
+		BOOST_TEST(sv.to_string() == "hello");
+	}
+	// front/back good index access
+	{
+#if __cplusplus > 201402L
+		const char *              str = "Hello";
+		stdex::static_cstring<20> sv(stdex::null_terminated_t{}, str);
+		sv.back() = 'a';
+		BOOST_TEST(sv.to_string() == "Hella");
 #endif
 	}
 	// data access

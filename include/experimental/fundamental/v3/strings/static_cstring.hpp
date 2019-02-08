@@ -59,9 +59,11 @@ public:
 	using size_type              = sizeType;
 	using difference_type        = ptrdiff_t;
 	using string_view_type       = basic_string_view<charT, traits>;
-	using cstring_view_type      = basic_cstring_view<charT, traits>;
-	using cstr_view_type         = basic_cstr_view<charT, traits>;
-	using string_type            = basic_string<charT, traits>;
+#if __cplusplus > 201402L
+	using cstring_view_type = basic_cstring_view<charT, traits>;
+#endif
+	using cstr_view_type = basic_cstr_view<charT, traits>;
+	using string_type    = basic_string<charT, traits>;
 
 	static constexpr size_type npos = size_type(-1);
 
@@ -90,14 +92,7 @@ public:
 	//! constructs a NTXS from a const charT*
 	//! expects str to be a NTXS with length lt the N+1
 	JASEL_CXX14_CONSTEXPR basic_static_cstring(null_terminated_t, nullptr_t) = delete;
-	//template <class charT>
-	// JASEL_CXX14_CONSTEXPR basic_static_cstring(null_terminated_t, cvt str)
-	// {
-	// 	JASEL_EXPECTS(str.ptr != 0);
-	// 	bool b = ntxs::test_and_set_length<N>(str.ptr, len_);
-	// 	JASEL_EXPECTS(b);
-	// 	traits::copy(data(), str.ptr, len_);
-	// }
+
 	//! constructs a NTXS from a const char(&)[M] representing a NTXS literal
 	//! expects str to be a NTXS with length lt the N+1
 	// Note: All const charT (&str)[M] are not NTXS
@@ -120,6 +115,7 @@ public:
 		traits::copy(data(), str, len);
 	}
 
+#if __cplusplus > 201402L
 	//! constructs a NTXS from a sting_view representing a NTXS of length sv.length()
 	//! expects sv.length() <= N+1
 	// fixme: This overload doesn't support conversion from const char* equal to nullptr.
@@ -128,70 +124,246 @@ public:
 	{
 		JASEL_EXPECTS(sv.data() != 0);
 	}
-
+#else
+	JASEL_CXX14_CONSTEXPR basic_static_cstring(null_terminated_t, cvt str)
+	{
+		JASEL_EXPECTS(str.ptr != 0);
+		bool b = ntxs::test_and_set_length<N>(str.ptr, len_);
+		JASEL_EXPECTS(b);
+		traits::copy(data(), str.ptr, len_);
+	}
+	JASEL_CXX14_CONSTEXPR basic_static_cstring(std::string const &str)
+	        : basic_static_cstring(null_terminated_t{}, str.c_str(), str.size())
+	{
+	}
+#endif
+#if __cplusplus > 201402L
 	//! constructs a NTXS from a sting representing a NTXS of length str.length()
 	//! expects str.length() <= N+1
 	constexpr basic_static_cstring(const cstring_view_type &str)
 	        : basic_static_cstring(null_terminated_t{}, str.c_str(), str.length())
 	{
 	}
+#endif
 	// The following operations could be optimized by copying only the significant chars
 	// this depends if we want that this class is trivially copyable or not
 	JASEL_CXX14_CONSTEXPR basic_static_cstring(const basic_static_cstring &) noexcept = default;
 	JASEL_CXX14_CONSTEXPR basic_static_cstring &operator=(const basic_static_cstring &) noexcept = default;
-	JASEL_CXX14_CONSTEXPR basic_static_cstring &operator                                         =(const charT *s);
-	JASEL_CXX14_CONSTEXPR basic_static_cstring &operator                                         =(charT ch);
-	JASEL_CXX14_CONSTEXPR basic_static_cstring &operator                                         =(std::initializer_list<charT> ilist);
+
+	//
+	JASEL_CXX14_CONSTEXPR basic_static_cstring &operator=(const charT *s)
+	{
+		return assign(s);
+	}
+
+	JASEL_CXX14_CONSTEXPR basic_static_cstring &operator=(charT ch)
+	{
+		return assign(ch);
+	}
+
+	JASEL_CXX14_CONSTEXPR basic_static_cstring &operator=(std::initializer_list<charT> ilist)
+	{
+		return assign(ilist);
+	}
+
 	template <class T>
-	JASEL_CXX14_CONSTEXPR basic_static_cstring &operator=(const T &t);
+	JASEL_CXX14_CONSTEXPR basic_static_cstring &operator=(const T &t)
+	{
+		return assign(t);
+	}
 
 	// assign
 	basic_static_cstring &assign(size_type count,
-	                             charT     ch);
-	basic_static_cstring &assign(const basic_static_cstring &str);
+	                             charT     ch)
+	{
+		clear();
+		return append(count, ch);
+	}
+
+	basic_static_cstring &assign(const basic_static_cstring &str)
+	{
+		clear();
+		return append(str);
+	}
+
 	basic_static_cstring &assign(const basic_static_cstring &str,
 	                             size_type                   pos,
-	                             size_type                   count = npos);
-	basic_static_cstring &assign(basic_static_cstring &&str); //noexcept(/* see below */);
+	                             size_type                   count = npos)
+	{
+		clear();
+		return append(str, pos, count);
+	}
+	basic_static_cstring &assign(basic_static_cstring &&str) //noexcept(/* see below */);
+	{
+		clear();
+		return append(move(str));
+	}
+
 	basic_static_cstring &assign(const charT *s,
-	                             size_type    count);
-	basic_static_cstring &assign(const charT *s);
+	                             size_type    count)
+	{
+		clear();
+		return append(s, count);
+	}
+
+	basic_static_cstring &assign(const charT *s)
+	{
+		clear();
+		return append(s);
+	}
+
 	template <class InputIt>
 	basic_static_cstring &assign(InputIt first,
-	                             InputIt last);
-	basic_static_cstring &assign(std::initializer_list<charT> ilist);
+	                             InputIt last)
+	{
+		clear();
+		return append(first, last);
+		// len_ = 0;
+		// while (first != last)
+		// {
+		// 	JASEL_EXPECTS(len_ <= N);
+		// 	traits::assign(data_[len_], *first);
+		// 	++len_;
+		// 	++first;
+		// }
+		// traits::assign(data_[len_], charT{});
+		// return *this;
+	}
+	basic_static_cstring &assign(std::initializer_list<charT> ilist)
+	{
+		return assign(ilist.begin(), ilist.end());
+	}
 	template <class T>
-	basic_static_cstring &assign(const T &t);
+	basic_static_cstring &assign(const T &t)
+	{
+		clear();
+		return append(t);
+	}
 	template <class T>
 	basic_static_cstring &assign(const T & t,
 	                             size_type pos,
-	                             size_type count = npos);
+	                             size_type count = npos)
+	{
+		clear();
+		return append(t, pos, count);
+		// std::basic_string_view<charT, traits> sv = t;
+		// if (count == npos || count > sv.size())
+		// {
+		// 	count = sv.size() - pos + 1;
+		// }
+		// return assign(sv.data() + pos, count);
+	}
 
 	//append
-	basic_static_cstring &append(size_type count, charT ch);
-	basic_static_cstring &append(const basic_static_cstring &str);
+	basic_static_cstring &append(size_type count, charT ch)
+	{
+		JASEL_EXPECTS(size() + count <= N);
+		traits::assign(end(), count, ch);
+		len_ += count;
+		traits::assign(data_[len_], charT{});
+		return *this;
+	}
+
+	basic_static_cstring &append(const basic_static_cstring &str)
+	{
+		JASEL_EXPECTS(size() + str.size() <= N);
+		traits::assign(end(), str.size(), str.data());
+		len_ += str.size();
+		traits::assign(data_[len_], charT{});
+		return *this;
+	}
 	basic_static_cstring &append(const basic_static_cstring &str,
 	                             size_type                   pos,
-	                             size_type                   count = npos);
-	basic_static_cstring &append(const charT *s,
-	                             size_type    count);
-	template <class InputIt>
-	basic_static_cstring &append(InputIt first, InputIt last);
-	basic_static_cstring &append(std::initializer_list<charT> ilist);
-	template <class T>
-	basic_static_cstring &append(const T &t);
-	template <class T>
+	                             size_type                   count = npos)
+	{
+		if (count == npos || count > str.size())
+		{
+			count = str.size() - pos + 1;
+		}
+		JASEL_EXPECTS(size() + count <= N);
+		traits::copy(end(), str.data() + pos, count);
+		len_ += count;
+		traits::assign(data_[len_], charT{});
+		return *this;
+	}
 
+	basic_static_cstring &append(const charT *s)
+	{
+		// todo: optimize by doing a single pass
+		auto count = traits::length(s);
+		return append(s, count);
+	}
+
+	basic_static_cstring &append(const charT *s,
+	                             size_type    count)
+	{
+		JASEL_EXPECTS(size() + count <= N);
+		traits::copy(end(), s, count);
+		len_ += count;
+		traits::assign(data_[len_], charT{});
+		return *this;
+	}
+
+	template <class InputIt>
+	basic_static_cstring &append(InputIt first, InputIt last)
+	{
+		while (first != last)
+		{
+			JASEL_EXPECTS(len_ <= N);
+			traits::assign(data_[len_], *first);
+			++len_;
+			++first;
+		}
+		traits::assign(data_[len_], charT{});
+		return *this;
+	}
+
+	basic_static_cstring &append(std::initializer_list<charT> ilist)
+	{
+		return append(ilist.begin(), ilist.end());
+	}
+	template <class T>
+	basic_static_cstring &append(const T &t)
+	{
+		std::basic_string_view<charT, traits> sv = t;
+		return append(sv.data(), sv.size());
+	}
+
+	template <class T>
 	basic_static_cstring &append(const T &t, size_type pos,
-	                             size_type count = npos);
+	                             size_type count = npos)
+	{
+		std::basic_string_view<charT, traits> sv = t;
+		if (count == npos || count > sv.size())
+		{
+			count = sv.size() - pos + 1;
+		}
+		return append(sv.data() + pos, count);
+	}
 
 	//operator+=
-	basic_static_cstring &operator+=(const basic_static_cstring &str);
-	basic_static_cstring &operator+=(charT ch);
-	basic_static_cstring &operator+=(const charT *s);
-	basic_static_cstring &operator+=(std::initializer_list<charT> ilist);
+	basic_static_cstring &operator+=(const basic_static_cstring &str)
+	{
+		return append(str);
+	}
+	basic_static_cstring &operator+=(charT ch)
+	{
+		return append(ch);
+	}
+	basic_static_cstring &operator+=(const charT *s)
+	{
+		return append(s);
+	}
+
+	basic_static_cstring &operator+=(std::initializer_list<charT> ilist)
+	{
+		return append(ilist);
+	}
 	template <class T>
-	basic_static_cstring &operator+=(const T &t);
+	basic_static_cstring &operator+=(const T &t)
+	{
+		return append(t);
+	}
 
 	// [string.static_cstring], iterator support
 	JASEL_CXX14_CONSTEXPR iterator
@@ -276,7 +448,7 @@ public:
 	//! implicit conversion to a cstring view
 	operator basic_cstring_view<charT, traits>() const noexcept
 	{
-		return basic_cstring_view<charT, traits>(data(), size());
+		return basic_cstring_view<charT, traits>(null_terminated_t{}, data(), size());
 	}
 	basic_string_view<charT, traits> to_string_view() const noexcept
 	{
@@ -302,14 +474,43 @@ public:
 		traits::assign(data_[len_], charT{});
 	}
 	// insert
-	basic_static_cstring &insert(size_type index, size_type count, charT ch);
-	basic_static_cstring &insert(size_type index, const charT *s);
-	basic_static_cstring &insert(size_type index, const charT *s, size_type count);
-	basic_static_cstring &insert(size_type index, const basic_static_cstring &str);
+	basic_static_cstring &insert(size_type index, size_type count, charT ch)
+	{
+		JASEL_EXPECTS(size() + count <= N);
+		traits::move(data() + index + count, data() + index, len_ - index + 1);
+		traits::assign(data() + index, count, ch);
+		len_ += count;
+		traits::assign(data_[len_], charT{});
+		return *this;
+	}
+	basic_static_cstring &insert(size_type index, const charT *s)
+	{
+		auto count = traits::length(s);
+		return insert(index, s, count);
+	}
+
+	basic_static_cstring &insert(size_type index, const charT *s, size_type count)
+	{
+		JASEL_EXPECTS(size() + count <= N);
+		traits::move(data() + index + count, data() + index, len_ - index + 1);
+		traits::copy(data() + index, s, count);
+		len_ += count;
+		traits::assign(data_[len_], charT{});
+		return *this;
+	}
+
+	basic_static_cstring &insert(size_type index, const basic_static_cstring &str)
+	{
+		return insert(index, str.data(), str.size());
+	}
+
 	basic_static_cstring &insert(size_type index, const basic_static_cstring &str,
-	                             size_type index_str, size_type count = npos);
-	iterator              insert(const_iterator pos, charT ch);
-	iterator              insert(const_iterator pos, size_type count, charT ch);
+	                             size_type index_str, size_type count = npos)
+	{
+		return insert(index, str.data() + index_str, count);
+	}
+	iterator insert(const_iterator pos, charT ch);
+	iterator insert(const_iterator pos, size_type count, charT ch);
 
 	template <class InputIt>
 	iterator insert(const_iterator pos, InputIt first, InputIt last);
