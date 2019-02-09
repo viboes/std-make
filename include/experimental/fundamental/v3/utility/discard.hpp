@@ -25,12 +25,12 @@ inline namespace fundamental_v3
 //      discard(expr);
 
 template <class U>
-void discard(U&& u) {
-    return static_cast<void>(std::forward<U>(u));
+void discard(U &&)
+{
 }
 
-}
-}
-}
+} // namespace fundamental_v3
+} // namespace experimental
+} // namespace std
 
 #endif // header
