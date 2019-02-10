@@ -27,12 +27,41 @@ int main()
 		BOOST_TEST(sv.c_str() == std::string());
 	}
 	std::cout << __LINE__ << std::endl;
+	// default constructor implies empty string
+	{
+		stdex::static_cstring<20> sv{};
+		BOOST_TEST(sv.empty());
+		BOOST_TEST(sv.size() == 0);
+		BOOST_TEST(sv.c_str() == std::string());
+	}
+	std::cout << __LINE__ << std::endl;
 	// constructor from a NTXS of length > 0
 	{
+		const char *str = "Hello";
+		std::size_t len;
+		bool        b = stdex::ntxs::test_and_set_length<20>(str, len);
+		BOOST_TEST(b);
+		BOOST_TEST_EQ(5, len);
+	}
+	{
 		const char *              str = "Hello";
-		stdex::static_cstring<20> sv(stdex::null_terminated_t{}, str);
+		std::size_t               len = 5;
+		stdex::static_cstring<20> sv(stdex::null_terminated_t{}, str, len);
 		BOOST_TEST(!sv.empty());
-		BOOST_TEST(sv.c_str() == std::string(str));
+		BOOST_TEST_EQ(5, sv.size());
+	}
+	{
+		const char *              str = "Hello";
+		stdex::static_cstring<20> sv{stdex::null_terminated_t{}, str};
+		BOOST_TEST(!sv.empty());
+		BOOST_TEST_EQ(5, sv.size());
+#if __cplusplus > 201402L
+		BOOST_TEST_EQ(std::string_view(sv), std::string(str));
+#endif
+		BOOST_TEST_EQ(sv.to_string(), std::string(str));
+		BOOST_TEST_EQ(std::string(sv.c_str()).size(), std::string(str).size());
+		BOOST_TEST_EQ(std::string(sv.c_str()), std::string(str));
+		BOOST_TEST_EQ(sv.c_str(), std::string(str));
 	}
 	std::cout << __LINE__ << std::endl;
 #if 0
@@ -44,7 +73,10 @@ int main()
 #endif
 	std::cout << __LINE__ << std::endl;
 	// constructor from a const char* equal to nullptr is UB, don't do it
+	// string_view doesn't throws when not valid as it is required to be UB
+#if __cplusplus > 201402L
 	if (0)
+#endif
 	{
 		try
 		{
@@ -77,6 +109,42 @@ int main()
 		stdex::static_cstring<20> sv(str);
 		BOOST_TEST(!sv.empty());
 		BOOST_TEST(sv.c_str() == str);
+	}
+	std::cout << __LINE__ << std::endl;
+	// construction from std::string
+	{
+		std::string               str{"Hello"};
+		stdex::static_cstring<20> sv(str);
+		BOOST_TEST(!sv.empty());
+		BOOST_TEST(sv.c_str() == str);
+	}
+	std::cout << __LINE__ << std::endl;
+	// construction from N char
+	{
+		stdex::static_cstring<20> sv(stdex::length_tag_t{}, 3, 'X');
+		BOOST_TEST(!sv.empty());
+		BOOST_TEST(sv.to_string() == "XXX");
+	}
+	std::cout << __LINE__ << std::endl;
+// implicit construction from N char  compile fails
+#if 0
+	{
+		stdex::static_cstring<20> sv(48, 'X');
+	}
+#endif
+	std::cout << __LINE__ << std::endl;
+	// implicit construction from a initializer list
+	// construction from N char
+	{
+		stdex::static_cstring<20> sv{48, 'X'};
+		BOOST_TEST(!sv.empty());
+		BOOST_TEST(sv.to_string() == "0X");
+	}
+	std::cout << __LINE__ << std::endl;
+	{
+		stdex::static_cstring<20> sv = {48, 'X'};
+		BOOST_TEST(!sv.empty());
+		BOOST_TEST(sv.to_string() == "0X");
 	}
 	std::cout << __LINE__ << std::endl;
 #if __cplusplus > 201402L
@@ -307,6 +375,69 @@ int main()
 		BOOST_TEST(sv.to_string() == "");
 	}
 	// insert
+	// ambiguous interface when using 0, which is convertible to size_t and char const* :(
+	//         basic_static_cstring &insert(size_type 	 index, size_type count, charT ch)
+	//         iterator 			 insert(const_iterator pos, size_type count, charT ch)
+	{
+		stdex::static_cstring<20> sv(stdex::null_terminated_t{}, "0123456");
+		sv.insert(0ul, 3, 'x');
+		BOOST_TEST(sv.to_string() == "xxx0123456");
+	}
+	{
+		stdex::static_cstring<20> sv(stdex::null_terminated_t{}, "0123456");
+		sv.insert(3, 2, 'x');
+		BOOST_TEST(sv.to_string() == "012xx3456");
+	}
+	{
+		stdex::static_cstring<20> sv(stdex::null_terminated_t{}, "01234");
+		sv.insert(5, 2, 'x');
+		BOOST_TEST(sv.to_string() == "01234xx");
+	}
+	try
+	{
+
+		stdex::static_cstring<20> sv(stdex::null_terminated_t{}, "01234");
+		sv.insert(6, 2, 'x');
+		BOOST_TEST(false);
+	}
+	catch (stdex::contract_failed &ex)
+	{
+		std::string_view msg = ex.what();
+		BOOST_TEST_EQ(msg.substr(0, 28), "JASEL: Pre-condition failure");
+	}
+	{
+		stdex::static_cstring<20> sv(stdex::null_terminated_t{}, "0123456");
+		sv.insert(0ul, "xxx");
+		BOOST_TEST(sv.to_string() == "xxx0123456");
+	}
+	{
+		stdex::static_cstring<20> sv(stdex::null_terminated_t{}, "0123456");
+		sv.insert(2, "xxx");
+		BOOST_TEST(sv.to_string() == "01xxx23456");
+	}
+	try
+	{
+		stdex::static_cstring<20> sv(stdex::null_terminated_t{}, "012");
+		sv.insert(6, "xxx");
+		BOOST_TEST(false);
+	}
+	catch (stdex::contract_failed &ex)
+	{
+		std::string_view msg = ex.what();
+		BOOST_TEST_EQ(msg.substr(0, 28), "JASEL: Pre-condition failure");
+	}
+	{
+		stdex::static_cstring<20> sv(stdex::null_terminated_t{}, "0123456");
+		auto                      it = sv.insert(sv.data(), 3, 'x');
+		BOOST_TEST(it == sv.data());
+		BOOST_TEST(sv.to_string() == "xxx0123456");
+	}
+	{
+		stdex::static_cstring<20> letters(stdex::null_terminated_t{}, "abcdef");
+		stdex::static_cstring<20> sv(stdex::null_terminated_t{}, "0123456");
+		sv.insert(sv.data() + 2, letters.data() + 2, letters.data() + 4);
+		BOOST_TEST(sv.to_string() == "01cd23456");
+	}
 
 	// erase
 
@@ -405,7 +536,7 @@ int main()
 		stdex::static_cstring<20> sv(stdex::null_terminated_t{}, hello);
 		BOOST_TEST(sv.compare("Hello") == 0);
 	}
-	// test for all the string_view specific functions go here
+// test for all the string_view specific functions go here
 #endif
 
 	return ::boost::report_errors();

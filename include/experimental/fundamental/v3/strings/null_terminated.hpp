@@ -23,6 +23,13 @@ struct null_terminated_t
 inline constexpr null_terminated_t null_terminated;
 #endif
 
+struct length_tag_t
+{
+};
+#if __cplusplus > 201402L
+inline constexpr length_tag_t length_tag;
+#endif
+
 template <class charT>
 struct null_terminated_traits
 {

@@ -262,17 +262,33 @@ public:
 	//constexpr int compare(size_type pos1, size_type n1, const charT* s) const;
 	//constexpr int compare(size_type pos1, size_type n1, const charT* s, size_type n2) const;
 
-#if __cplusplus > 201402L
-	constexpr bool starts_with(string_view_type x) const noexcept;
-#endif
-	constexpr bool starts_with(charT x) const noexcept;
-	constexpr bool starts_with(const charT *x) const;
+#if __cplusplus > 201703L
+	constexpr bool starts_with(string_view_type x) const noexcept
+	{
+		return to_string_view().starts_with(x);
+	}
+	constexpr bool starts_with(charT x) const noexcept
+	{
+		return starts_with(string_view_type(std::addressof(x), 1));
+	}
 
-#if __cplusplus > 201402L
-	constexpr bool ends_with(string_view_type x) const noexcept;
+	constexpr bool starts_with(const charT *x) const
+	{
+		return starts_with(string_view_type(x));
+	}
+	constexpr bool ends_with(string_view_type x) const noexcept
+	{
+		return to_string_view().ends_with(x);
+	}
+	constexpr bool ends_with(charT x) const noexcept
+	{
+		return ends_with(string_view_type(std::addressof(x), 1));
+	}
+	constexpr bool ends_with(const charT *x) const
+	{
+		return ends_with(string_view_type(x));
+	}
 #endif
-	constexpr bool ends_with(charT x) const noexcept;
-	constexpr bool ends_with(const charT *x) const;
 	// [string.view.cstr], searching
 #if __cplusplus > 201402L
 	constexpr size_type find(string_view_type s, size_type pos = 0) const noexcept;
