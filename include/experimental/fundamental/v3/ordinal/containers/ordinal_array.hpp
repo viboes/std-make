@@ -76,6 +76,7 @@ inline namespace fundamental_v3
     @tparam O array's index ordinal
   */
 
+    // todo: make use of std::array to make the implementation easier, e.g. at. order, ...
     template<class T, typename O>
     class ordinal_array {
     public:
