@@ -4,6 +4,11 @@
 //
 // (C) Copyright 2019 Vicente J. Botet Escriba
 
+// See http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2019/p1072r3.html for resize_defalt_init motivation
+// See http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2019/p1402r0.pdf for a c-string \0 justification
+// See http : //www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0259r0.pdf for a motivation of a fixed_string
+// See http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2019/p0843r3.html for a justification for a static vector
+
 #ifndef JASEL_EXPERIMENTAL_STRINGS_STATIC_CSTRING_HPP
 #define JASEL_EXPERIMENTAL_STRINGS_STATIC_CSTRING_HPP
 
@@ -647,6 +652,14 @@ public:
 	template <class T>
 	basic_static_cstring &replace(size_type pos, size_type count, const T &t,
 	                              size_type pos2, size_type count2 = npos);
+
+	//! expects count <= N
+	JASEL_CXX14_CONSTEXPR void resize_default_init(size_type count)
+	{
+		JASEL_EXPECTS(count <= N);
+		len_ = count;
+		traits::assign(data_[len_], charT{});
+	}
 
 	//! expects count <= N
 	JASEL_CXX14_CONSTEXPR void resize(size_type count)
