@@ -41,17 +41,17 @@ int cstrcmp(wchar_t const *lhs, wchar_t const *rhs)
 }
 
 // this class contains a pointer to a char const char* NTCS
-template <class charT, class traits = char_traits<charT>>
+template <class CharT, class Traits = char_traits<CharT>>
 class basic_cstr_view;
 
-template <class charT, class traits>
+template <class CharT, class Traits>
 class basic_cstr_view {
-	const charT *ptr;
+	const CharT *ptr;
 
 public:
 	// types
-	using traits_type     = traits;
-	using value_type      = charT;
+	using traits_type     = Traits;
+	using value_type      = CharT;
 	using pointer         = value_type *;
 	using const_pointer   = const value_type *;
 	using reference       = value_type &;
@@ -62,16 +62,16 @@ public:
 	using const_reverse_iterator = reverse_iterator<const_iterator>;
 	using reverse_iterator       = const_reverse_iterator;
 #if __cplusplus > 201402L
-	using cstring_view_type = basic_cstring_view<charT, traits>;
-	using string_view_type  = basic_string_view<charT, traits>;
+	using cstring_view_type = basic_cstring_view<CharT, Traits>;
+	using string_view_type  = basic_string_view<CharT, Traits>;
 #endif
-	using string_type = basic_string<charT, traits>;
+	using string_type = basic_string<CharT, Traits>;
 
 	struct ntbs_sentiel
 	{
 		friend constexpr bool operator==(const iterator &x, const ntbs_sentiel &)
 		{
-			return *x == charT();
+			return *x == CharT();
 		}
 		friend constexpr bool operator==(const ntbs_sentiel &x, const iterator &y) { return y == x; }
 		friend constexpr bool operator!=(const iterator &x, const ntbs_sentiel &y) { return !(x == y); }
@@ -85,12 +85,12 @@ public:
 	static constexpr size_type npos = size_type(-1);
 
 	// [string.view.cstr], construction and assignment
-	constexpr basic_cstr_view() noexcept : ptr(&null_terminated_traits<charT>::zero) {}
+	constexpr basic_cstr_view() noexcept : ptr(&null_terminated_traits<CharT>::zero) {}
 	constexpr basic_cstr_view(const basic_cstr_view &) noexcept = default;
 	JASEL_CXX14_CONSTEXPR basic_cstr_view &operator=(const basic_cstr_view &) noexcept = default;
 	// expected str is not null and points to a NTBS
-	constexpr basic_cstr_view(null_terminated_t, const charT *str) : ptr(str) {}
-	JASEL_CXX14_CONSTEXPR basic_cstr_view(null_terminated_t, const charT *str, size_t len) : ptr(str)
+	constexpr basic_cstr_view(null_terminated_t, const CharT *str) : ptr(str) {}
+	JASEL_CXX14_CONSTEXPR basic_cstr_view(null_terminated_t, const CharT *str, size_t len) : ptr(str)
 	{
 		JASEL_EXPECTS(ntxs::valid(str, len));
 	}
@@ -152,14 +152,14 @@ public:
 
 	constexpr size_type length() const noexcept
 	{
-		return traits::length(ptr);
+		return Traits::length(ptr);
 	}
 #endif
 	constexpr size_type max_size() const noexcept;
 
 	[[nodiscard]] constexpr bool empty() const noexcept
 	{
-		return *ptr == charT();
+		return *ptr == CharT();
 	}
 	// [string.view.cstr], element access
 	constexpr const_reference operator[](size_type pos) const
@@ -192,20 +192,20 @@ public:
 	{
 		return ptr;
 	}
-	constexpr const charT *c_str() const noexcept { return ptr; }
+	constexpr const CharT *c_str() const noexcept { return ptr; }
 
 #if __cplusplus > 201402L
-	basic_string_view<charT, traits> to_string_view() const noexcept
+	basic_string_view<CharT, Traits> to_string_view() const noexcept
 	{
-		return basic_string_view<charT, traits>(ptr);
+		return basic_string_view<CharT, Traits>(ptr);
 	}
-	explicit operator basic_string_view<charT, traits>() const noexcept { return to_string_view(); }
+	explicit operator basic_string_view<CharT, Traits>() const noexcept { return to_string_view(); }
 #endif
-	basic_string<charT, traits> to_string() const noexcept
+	basic_string<CharT, Traits> to_string() const noexcept
 	{
-		return basic_string<charT, traits>(ptr);
+		return basic_string<CharT, Traits>(ptr);
 	}
-	explicit operator basic_string<charT, traits>() const noexcept { return to_string(); }
+	explicit operator basic_string<CharT, Traits>() const noexcept { return to_string(); }
 
 	// [string.view.cstr], modifiers
 	JASEL_CXX14_CONSTEXPR void remove_prefix(size_type n) { ptr += n; }
@@ -218,7 +218,7 @@ public:
 	// [string.view.cstr], string operations
 #if defined JASEL_CSTR_VIEW_EXPENSIVE
 #if __cplusplus > 201402L
-	constexpr size_type copy(charT *s, size_type n, size_type pos = 0) const
+	constexpr size_type copy(CharT *s, size_type n, size_type pos = 0) const
 	{
 		return to_string_view().copy(s, n, pos);
 	}
@@ -237,7 +237,7 @@ public:
 	constexpr int compare(basic_cstr_view s) const noexcept
 	{
 		// unfortunately the following doesn't works without comparing before the lengths
-		//traits::compare(data(), s.data(), s.size());
+		//Traits::compare(data(), s.data(), s.size());
 
 		return cstrcmp(data(), s.data());
 	}
@@ -255,24 +255,24 @@ public:
 	//constexpr int compare(size_type pos1, size_type n1, string_view_type s) const;
 	//constexpr int compare(size_type pos1, size_type n1, string_view_type s,
 	//                size_type pos2, size_type n2) const;
-	constexpr int compare(const charT *s) const
+	constexpr int compare(const CharT *s) const
 	{
 		return cstrcmp(data(), s);
 	}
-	//constexpr int compare(size_type pos1, size_type n1, const charT* s) const;
-	//constexpr int compare(size_type pos1, size_type n1, const charT* s, size_type n2) const;
+	//constexpr int compare(size_type pos1, size_type n1, const CharT* s) const;
+	//constexpr int compare(size_type pos1, size_type n1, const CharT* s, size_type n2) const;
 
 #if __cplusplus > 201703L
 	constexpr bool starts_with(string_view_type x) const noexcept
 	{
 		return to_string_view().starts_with(x);
 	}
-	constexpr bool starts_with(charT x) const noexcept
+	constexpr bool starts_with(CharT x) const noexcept
 	{
 		return starts_with(string_view_type(std::addressof(x), 1));
 	}
 
-	constexpr bool starts_with(const charT *x) const
+	constexpr bool starts_with(const CharT *x) const
 	{
 		return starts_with(string_view_type(x));
 	}
@@ -280,11 +280,11 @@ public:
 	{
 		return to_string_view().ends_with(x);
 	}
-	constexpr bool ends_with(charT x) const noexcept
+	constexpr bool ends_with(CharT x) const noexcept
 	{
 		return ends_with(string_view_type(std::addressof(x), 1));
 	}
-	constexpr bool ends_with(const charT *x) const
+	constexpr bool ends_with(const CharT *x) const
 	{
 		return ends_with(string_view_type(x));
 	}
@@ -293,42 +293,42 @@ public:
 #if __cplusplus > 201402L
 	constexpr size_type find(string_view_type s, size_type pos = 0) const noexcept;
 #endif
-	constexpr size_type find(charT c, size_type pos = 0) const noexcept;
-	constexpr size_type find(const charT *s, size_type pos, size_type n) const;
-	constexpr size_type find(const charT *s, size_type pos = 0) const;
+	constexpr size_type find(CharT c, size_type pos = 0) const noexcept;
+	constexpr size_type find(const CharT *s, size_type pos, size_type n) const;
+	constexpr size_type find(const CharT *s, size_type pos = 0) const;
 #if __cplusplus > 201402L
 	constexpr size_type rfind(string_view_type s, size_type pos = npos) const noexcept;
 #endif
-	constexpr size_type rfind(charT c, size_type pos = npos) const noexcept;
-	constexpr size_type rfind(const charT *s, size_type pos, size_type n) const;
-	constexpr size_type rfind(const charT *s, size_type pos = npos) const;
+	constexpr size_type rfind(CharT c, size_type pos = npos) const noexcept;
+	constexpr size_type rfind(const CharT *s, size_type pos, size_type n) const;
+	constexpr size_type rfind(const CharT *s, size_type pos = npos) const;
 #if __cplusplus > 201402L
 	constexpr size_type find_first_of(string_view_type s, size_type pos = 0) const noexcept;
 #endif
-	constexpr size_type find_first_of(charT c, size_type pos = 0) const noexcept;
-	constexpr size_type find_first_of(const charT *s, size_type pos, size_type n) const;
-	constexpr size_type find_first_of(const charT *s, size_type pos = 0) const;
+	constexpr size_type find_first_of(CharT c, size_type pos = 0) const noexcept;
+	constexpr size_type find_first_of(const CharT *s, size_type pos, size_type n) const;
+	constexpr size_type find_first_of(const CharT *s, size_type pos = 0) const;
 #if __cplusplus > 201402L
 	constexpr size_type find_last_of(string_view_type s, size_type pos = npos) const noexcept;
 #endif
-	constexpr size_type find_last_of(charT c, size_type pos = npos) const noexcept;
-	constexpr size_type find_last_of(const charT *s, size_type pos, size_type n) const;
-	constexpr size_type find_last_of(const charT *s, size_type pos = npos) const;
+	constexpr size_type find_last_of(CharT c, size_type pos = npos) const noexcept;
+	constexpr size_type find_last_of(const CharT *s, size_type pos, size_type n) const;
+	constexpr size_type find_last_of(const CharT *s, size_type pos = npos) const;
 #if __cplusplus > 201402L
 	constexpr size_type find_first_not_of(string_view_type s, size_type pos = 0) const noexcept;
 #endif
-	constexpr size_type find_first_not_of(charT c, size_type pos = 0) const noexcept;
-	constexpr size_type find_first_not_of(const charT *s, size_type pos,
+	constexpr size_type find_first_not_of(CharT c, size_type pos = 0) const noexcept;
+	constexpr size_type find_first_not_of(const CharT *s, size_type pos,
 	                                      size_type n) const;
-	constexpr size_type find_first_not_of(const charT *s, size_type pos = 0) const;
+	constexpr size_type find_first_not_of(const CharT *s, size_type pos = 0) const;
 #if __cplusplus > 201402L
 	constexpr size_type find_last_not_of(string_view_type s,
 	                                     size_type        pos = npos) const noexcept;
 #endif
-	constexpr size_type find_last_not_of(charT c, size_type pos = npos) const noexcept;
-	constexpr size_type find_last_not_of(const charT *s, size_type pos,
+	constexpr size_type find_last_not_of(CharT c, size_type pos = npos) const noexcept;
+	constexpr size_type find_last_not_of(const CharT *s, size_type pos,
 	                                     size_type n) const;
-	constexpr size_type find_last_not_of(const charT *s, size_type pos = npos) const;
+	constexpr size_type find_last_not_of(const CharT *s, size_type pos = npos) const;
 
 private:
 	//string_view_type sv_; // exposition only

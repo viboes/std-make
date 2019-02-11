@@ -30,44 +30,44 @@ struct length_tag_t
 inline constexpr length_tag_t length_tag;
 #endif
 
-template <class charT>
+template <class CharT>
 struct null_terminated_traits
 {
 	//! the zero used to identify a null terminated string
-	static const charT zero;
+	static const CharT zero;
 };
-template <class charT>
-const charT null_terminated_traits<charT>::zero = charT();
+template <class CharT>
+const CharT null_terminated_traits<CharT>::zero = CharT();
 
 // Null terminated byte/wise strings functions
 namespace ntxs
 {
 
 //! checks if all the chars in the range [0,len) are non zero as required for a ntxs of length len
-template <class charT>
-JASEL_CXX14_CONSTEXPR bool all_non_zero(const charT *str, size_t len) noexcept
+template <class CharT>
+JASEL_CXX14_CONSTEXPR bool all_non_zero(const CharT *str, size_t len) noexcept
 {
 	for (int i = 0; i < len; ++i)
 	{
-		if (charT() == str[i])
+		if (CharT() == str[i])
 			return false;
 	}
 	return true;
 }
 //! checks if str is  a valid NTXS, that is all chars until len are non zero and the len char is zero
-template <class charT>
-JASEL_CXX14_CONSTEXPR bool valid(const charT *str, size_t len) noexcept
+template <class CharT>
+JASEL_CXX14_CONSTEXPR bool valid(const CharT *str, size_t len) noexcept
 {
-	return charT() == str[len] && all_non_zero(str, len);
+	return CharT() == str[len] && all_non_zero(str, len);
 }
 
 //! this function calculate the length of a NTXS a check that the length is less than a specific capacity N
-template <size_t N, class charT>
-JASEL_CXX14_CONSTEXPR bool test_and_set_length(const charT *str, size_t &length) noexcept
+template <size_t N, class CharT>
+JASEL_CXX14_CONSTEXPR bool test_and_set_length(const CharT *str, size_t &length) noexcept
 {
 	for (length = 0; length < N; ++length)
 	{
-		if (charT() == str[length])
+		if (CharT() == str[length])
 			return true;
 	}
 	return false;
