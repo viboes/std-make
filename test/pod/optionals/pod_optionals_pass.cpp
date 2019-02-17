@@ -48,6 +48,11 @@ int main()
 		BOOST_TEST(!(opt_a_b.template has_value<0>()));
 	}
 	{
+		stdex::pod::optionals<A, B> opt_a_b;
+		opt_a_b = stdex::pod::default_initializer{};
+		BOOST_TEST(!(opt_a_b.template has_value<0>()));
+	}
+	{
 		stdex::pod::optionals<A, B> opt_a_b = {};
 		//stdex::pod::optional_ref<A> opt_a = stdex::pod::get<0>(opt_a_b);
 		auto opt_a = stdex::pod::get<0>(opt_a_b);
@@ -138,6 +143,30 @@ int main()
 		swap(opts1, opts2);
 		BOOST_TEST(!(opts1.template has_value<0>()));
 		BOOST_TEST(!(opts2.template has_value<0>()));
+	}
+	{
+		stdex::pod::optionals<A, B> opt_a_b = {};
+		auto                        opt_a   = stdex::pod::get_if<0>(opt_a_b);
+		BOOST_TEST(!opt_a);
+		BOOST_TEST(opt_a == nullptr);
+		auto opt_b = stdex::pod::get_if<1>(opt_a_b);
+		BOOST_TEST(opt_b == nullptr);
+	}
+	{
+		stdex::pod::optionals<A, B> opt_a_b = {};
+		auto                        opt_a   = stdex::pod::get<0>(opt_a_b);
+		opt_a                               = A{};
+		auto opt_a_p                        = stdex::pod::get_if<0>(opt_a_b);
+		BOOST_TEST(opt_a_p);
+		BOOST_TEST(opt_a_p != nullptr);
+	}
+	{
+		stdex::pod::optionals<A, B> opt_a_b = {};
+		auto                        opt_a   = stdex::pod::get<A>(opt_a_b);
+		opt_a                               = A{};
+		auto opt_a_p                        = stdex::pod::get_if<A>(opt_a_b);
+		BOOST_TEST(opt_a_p);
+		BOOST_TEST(opt_a_p != nullptr);
 	}
 	return ::boost::report_errors();
 }
