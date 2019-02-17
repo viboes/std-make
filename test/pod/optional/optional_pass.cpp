@@ -445,9 +445,42 @@ int main()
 	}
 	{
 		stdex::pod::optional<int> oi;
+		stdex::pod::zero_initialize(oi);
+		BOOST_TEST(!oi);
+	}
+	// {
+	// 	stdex::pod::optional<int> oi;
+	// 	oi = stdex::pod::optional<int>(stdex::pod::zero_initializer{});
+	// //fails trying to convert to int, fixme: why is not ambiguous?
+	// 	BOOST_TEST(!oi);
+	// }
+	{
+		stdex::pod::optional<int> oi;
+		stdex::pod::default_initialize(oi);
+		BOOST_TEST(!oi);
+	}
+	{
+		stdex::pod::optional<int> oi;
 		oi = stdex::pod::default_initializer{}; // works for C++98
 		BOOST_TEST(!oi);
 	}
+	// {
+	// 	stdex::pod::optional<stdex::pod::optional<int>> oi;
+	// 	oi = stdex::pod::default_initializer{};
+	// 	//fails trying to convert to stdex::pod::optional<int>, fixme: why is not ambiguous?
+	// 	BOOST_TEST(!oi);
+	// }
+	{
+		stdex::pod::optional<int> oi;
+		stdex::pod::value_initialize(oi);
+		BOOST_TEST(!oi);
+	}
+	// {
+	// 	stdex::pod::optional<int> oi;
+	// 	oi = stdex::pod::value_initializer{};
+	// //fails trying to convert to int, fixme: why is not ambiguous?
+	// 	BOOST_TEST(!oi);
+	// }
 	{
 		stdex::pod::optional<int> oi;
 		oi = {}; // fails for C++98
