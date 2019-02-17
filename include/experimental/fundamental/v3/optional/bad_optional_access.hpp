@@ -12,25 +12,24 @@
 #if __cplusplus > 201402L && defined __clang__
 #include <optional>
 #endif
-
 #include <stdexcept>
 
 namespace std
 {
-  namespace experimental
-  {
-  inline  namespace fundamental_v3
-  {
-    // 20.5.8, class bad_optional_access
-    class bad_optional_access : public logic_error
-    {
-    public:
-      explicit bad_optional_access() : logic_error{"bad_optional_access"}
-      {}
-    };
+namespace experimental
+{
+inline namespace fundamental_v3
+{
+// 20.5.8, class bad_optional_access
+class bad_optional_access : public logic_error {
+public:
+	explicit bad_optional_access() : logic_error{"bad_optional_access"}
+	{
+	}
+};
 
-  }
-  }
-}
+} // namespace fundamental_v3
+} // namespace experimental
+} // namespace std
 
 #endif // header

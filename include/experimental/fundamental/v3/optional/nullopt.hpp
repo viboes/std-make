@@ -15,25 +15,26 @@
 
 namespace std
 {
-  namespace experimental
-  {
-  inline  namespace fundamental_v3
-  {
-    // 20.5.7, Disengaged state indicator
-    struct nullopt_t
-    {
-        struct init
-        {};
-        constexpr explicit nullopt_t(init) noexcept
-        {}
-    };
+namespace experimental
+{
+inline namespace fundamental_v3
+{
+// 20.5.7, Disengaged state indicator
+struct nullopt_t
+{
+	struct init
+	{
+	};
+	constexpr explicit nullopt_t(init) noexcept
+	{
+	}
+};
 #if (__clang_major__ >= 4) && (__cplusplus > 201402L)
-    inline
+inline
 #endif
-    constexpr nullopt_t nullopt
-    { nullopt_t::init() };
+        constexpr nullopt_t nullopt{nullopt_t::init()};
 
-  }
-  }
-}
+} // namespace fundamental_v3
+} // namespace experimental
+} // namespace std
 #endif // header
