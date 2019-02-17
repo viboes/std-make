@@ -20,11 +20,12 @@
 
 #include <experimental/fundamental/v2/config.hpp>
 #include <experimental/fundamental/v3/config/requires.hpp>
+#include <experimental/optional.hpp>
 #include <experimental/type_traits.hpp>
 #include <experimental/utility.hpp>
-
-#include <experimental/optional.hpp>
 #include <functional>
+
+#include <experimental/fundamental/v3/pod/initializer/initializer.hpp>
 
 namespace std
 {
@@ -74,14 +75,16 @@ public:
 
 	//! In C++98 you should use instead
 	//!   pod::optional<T> opt;
-	//!   opt.construct(); // or
+	//!   opt.default_initialize(); // or
 	//!   opt = nullopt; // or
-	//!   opt.reset();
+	//!   opt.reset(); // or
+	//!   opt = default_initializer{};
 	//! or
 	//!   pod::optional<T> opt = {};
 	//!
 	//! @par Effects Constructs the object that does not contain a value.
-	void construct() noexcept
+
+	void default_initialize() noexcept
 	{
 		m_present = bool_type(false);
 	}
@@ -596,6 +599,12 @@ constexpr optional<T> make_optional( initializer_list<U> il, Args&&... args)
     return optional<T>(il, forward<Args>(args)...);
 }
 #endif
+
+template <class T>
+struct is_default_initializable<optional<T>> : is_pod<T>
+{
+};
+
 } // namespace pod
 
 static_assert(is_pod<pod::optional<int>>::value, "");

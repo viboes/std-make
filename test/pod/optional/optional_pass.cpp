@@ -6,6 +6,8 @@
 // <experimental/strong_id.hpp>
 
 #include <experimental/pod/optional.hpp>
+#include <algorithm>
+#include <array>
 #include <memory>
 #include <sstream>
 
@@ -75,10 +77,6 @@ struct BigBufP
 
 	P value() const
 	{
-		//        P res;
-		//        res.x = x.value();
-		//        res.y = y.value();
-		//        return res;
 		return {x.value(), y.value()};
 	}
 };
@@ -442,16 +440,31 @@ int main()
 	}
 	//#endif
 	{
-		constexpr stdex::pod::optional<int> oi = {}; // no default constructor
+		constexpr stdex::pod::optional<int> oi = {}; // no default constructor. zero initialize
 		BOOST_TEST(!oi);
 	}
 	{
-		constexpr stdex::pod::optional<big_int16_t> oi = {}; // no default constructor
+		stdex::pod::optional<int> oi;
+		oi = stdex::pod::default_initializer{}; // works for C++98
 		BOOST_TEST(!oi);
 	}
 	{
-		stdex::pod::optional<int> oi = {}; // no default constructor
-		stdex::pod::optional<int> oj = oi;
+		stdex::pod::optional<int> oi;
+		oi = {}; // fails for C++98
+		BOOST_TEST(!oi);
+	}
+	{
+		std::array<stdex::pod::optional<int>, 3> aoi;
+		std::fill(aoi.begin(), aoi.end(), stdex::pod::nullopt);
+		BOOST_TEST(!aoi[0]);
+	}
+	{
+		constexpr stdex::pod::optional<big_int16_t> oi = {}; // no default constructor. zero initialize
+		BOOST_TEST(!oi);
+	}
+	{
+		stdex::pod::optional<int> oi = {}; // no default constructor. zero initialize
+		stdex::pod::optional<int> oj = oi; // default copy constructor
 
 		BOOST_TEST(!oj);
 		BOOST_TEST(oj == oi);
@@ -474,7 +487,7 @@ int main()
 		BOOST_TEST(*ol == 1);
 	}
 	{
-		stdex::pod::optional<int> oi{stdex::pod::in_place};
+		stdex::pod::optional<int> oi{stdex::pod::in_place}; // construct a int in place value initialized
 		BOOST_TEST(oi != stdex::pod::nullopt);
 		BOOST_TEST(*oi == 0);
 		BOOST_TEST(bool(oi));
@@ -489,11 +502,13 @@ int main()
 		stdex::pod::optional<int> oi{stdex::pod::in_place, 1};
 		BOOST_TEST(oi != stdex::pod::nullopt);
 		BOOST_TEST(bool(oi));
+		BOOST_TEST(*oi == 1);
 	}
 	{
 		stdex::pod::optional<big_int16_t> oi{stdex::pod::in_place, 1};
 		BOOST_TEST(oi != stdex::pod::nullopt);
 		BOOST_TEST(bool(oi));
+		BOOST_TEST(*oi == 1);
 	}
 	{
 		stdex::pod::optional<P> oi{stdex::pod::in_place};
