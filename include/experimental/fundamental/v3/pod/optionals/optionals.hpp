@@ -2,7 +2,7 @@
 // accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 //
-// Copyright (C) 2016,2017 Vicente J. Botet Escriba
+// Copyright (C) 2017-2019 Vicente J. Botet Escriba
 
 #ifndef JASEL_FUNDAMENTAL_V3_POD_OPTIONALS_HPP
 #define JASEL_FUNDAMENTAL_V3_POD_OPTIONALS_HPP

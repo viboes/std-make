@@ -2,7 +2,7 @@
 // accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 //
-// Copyright (C) 2017-2018 Vicente J. Botet Escriba
+// Copyright (C) 2017-2019 Vicente J. Botet Escriba
 
 // todo
 // * add view::optional that contains a pointer to a class C and is parameterized by the present data member pointer and
