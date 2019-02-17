@@ -9,137 +9,135 @@
 // * add constexpr tests
 // * add noexcept tests
 
-#include <boost/detail/lightweight_test.hpp>
 #include <experimental/pod/optionals.hpp>
+#include <boost/detail/lightweight_test.hpp>
 
 namespace stdex = std::experimental;
 
 struct A
 {
-  constexpr A() :
-      v(4)
-  {
-  }
-  int v;
+	constexpr A() : v(4)
+	{
+	}
+	int v;
 };
 struct B
 {
 };
 
-void f1(stdex::pod::optionals<A, B> const& opt_a_b)
+void f1(stdex::pod::optionals<A, B> const &opt_a_b)
 {
-  BOOST_TEST(! (opt_a_b.template has_value<0>()));
-  //stdex::pod::optional_ref<0, const A> opt_a = stdex::pod::get<0>(opt_a_b);
-  auto opt_a = stdex::pod::get<0>(opt_a_b);
-  BOOST_TEST(!opt_a);
+	BOOST_TEST(!(opt_a_b.template has_value<0>()));
+	//stdex::pod::optional_ref<0, const A> opt_a = stdex::pod::get<0>(opt_a_b);
+	auto opt_a = stdex::pod::get<0>(opt_a_b);
+	BOOST_TEST(!opt_a);
 }
 
-void f2(stdex::pod::optionals<A, B> const& opt_a_b)
+void f2(stdex::pod::optionals<A, B> const &opt_a_b)
 {
-  //stdex::pod::optional_ref<0, const A> opt_a = stdex::pod::get<0>(opt_a_b);
-  auto opt_a = stdex::pod::get<0>(opt_a_b);
-  BOOST_TEST(opt_a->v == 4);
+	//stdex::pod::optional_ref<0, const A> opt_a = stdex::pod::get<0>(opt_a_b);
+	auto opt_a = stdex::pod::get<0>(opt_a_b);
+	BOOST_TEST(opt_a->v == 4);
 }
 
 int main()
 {
 
-  {
-    stdex::pod::optionals<A, B> opt_a_b = {};
-    BOOST_TEST(! (opt_a_b.template has_value<0>()));
-  }
-  {
-    stdex::pod::optionals<A, B> opt_a_b = {};
-    //stdex::pod::optional_ref<A> opt_a = stdex::pod::get<0>(opt_a_b);
-    auto opt_a = stdex::pod::get<0>(opt_a_b);
-    BOOST_TEST(!opt_a);
-    BOOST_TEST(opt_a == stdex::nullopt);
-    BOOST_TEST(stdex::nullopt == opt_a);
-    //stdex::pod::optional_ref<1,B> opt_b = stdex::pod::get<1>(opt_a_b);
-    auto opt_b = stdex::pod::get<1>(opt_a_b);
-    BOOST_TEST(!opt_b);
-  }
-  {
-    stdex::pod::optionals<A, B> opt_a_b = {};
-    //fixme
-    //constexpr
-    //stdex::pod::optional_ref<0, const A> opt_a = stdex::pod::get<0>(opt_a_b);
-    auto opt_a = stdex::pod::get<0>(opt_a_b);
-    BOOST_TEST(!opt_a);
-    BOOST_TEST(opt_a == stdex::nullopt);
-    BOOST_TEST(stdex::nullopt == opt_a);
-    //stdex::pod::optional_ref<1, const B> opt_b = stdex::pod::get<1>(opt_a_b);
-    auto opt_b = stdex::pod::get<1>(opt_a_b);
-    BOOST_TEST(!opt_b);
-  }
-  {
-    stdex::pod::optionals<A, B> opt_a_b = {};
-    //stdex::pod::optional_ref<0, A> opt_a = stdex::pod::get<0>(opt_a_b);
-    auto opt_a = stdex::pod::get<0>(opt_a_b);
-    opt_a = A {};
-    BOOST_TEST(opt_a);
-    BOOST_TEST(opt_a != stdex::nullopt);
-    BOOST_TEST(stdex::nullopt != opt_a);
-    BOOST_TEST( (opt_a_b.template has_value<0>()));
-    BOOST_TEST(opt_a->v == 4);
-    BOOST_TEST((*opt_a).v == 4);
+	{
+		stdex::pod::optionals<A, B> opt_a_b = {};
+		BOOST_TEST(!(opt_a_b.template has_value<0>()));
+	}
+	{
+		stdex::pod::optionals<A, B> opt_a_b = {};
+		//stdex::pod::optional_ref<A> opt_a = stdex::pod::get<0>(opt_a_b);
+		auto opt_a = stdex::pod::get<0>(opt_a_b);
+		BOOST_TEST(!opt_a);
+		BOOST_TEST(opt_a == stdex::nullopt);
+		BOOST_TEST(stdex::nullopt == opt_a);
+		//stdex::pod::optional_ref<1,B> opt_b = stdex::pod::get<1>(opt_a_b);
+		auto opt_b = stdex::pod::get<1>(opt_a_b);
+		BOOST_TEST(!opt_b);
+	}
+	{
+		stdex::pod::optionals<A, B> opt_a_b = {};
+		//fixme
+		//constexpr
+		//stdex::pod::optional_ref<0, const A> opt_a = stdex::pod::get<0>(opt_a_b);
+		auto opt_a = stdex::pod::get<0>(opt_a_b);
+		BOOST_TEST(!opt_a);
+		BOOST_TEST(opt_a == stdex::nullopt);
+		BOOST_TEST(stdex::nullopt == opt_a);
+		//stdex::pod::optional_ref<1, const B> opt_b = stdex::pod::get<1>(opt_a_b);
+		auto opt_b = stdex::pod::get<1>(opt_a_b);
+		BOOST_TEST(!opt_b);
+	}
+	{
+		stdex::pod::optionals<A, B> opt_a_b = {};
+		//stdex::pod::optional_ref<0, A> opt_a = stdex::pod::get<0>(opt_a_b);
+		auto opt_a = stdex::pod::get<0>(opt_a_b);
+		opt_a      = A{};
+		BOOST_TEST(opt_a);
+		BOOST_TEST(opt_a != stdex::nullopt);
+		BOOST_TEST(stdex::nullopt != opt_a);
+		BOOST_TEST((opt_a_b.template has_value<0>()));
+		BOOST_TEST(opt_a->v == 4);
+		BOOST_TEST((*opt_a).v == 4);
 
-    opt_a = stdex::nullopt;
-    BOOST_TEST(!opt_a);
-    BOOST_TEST(! (opt_a_b.template has_value<0>()));
-  }
-  {
-    stdex::pod::optionals<int, B> opt_a_b = {};
-    //stdex::pod::optional_ref<0, int> opt_a = stdex::pod::get<0>(opt_a_b);
-    auto opt_a = stdex::pod::get<0>(opt_a_b);
-    opt_a = 1;
-    BOOST_TEST(opt_a);
-    BOOST_TEST( (opt_a_b.template has_value<0>()));
-    BOOST_TEST(opt_a == 1);
-    BOOST_TEST(opt_a > 0);
-    BOOST_TEST(opt_a >= 0);
-    BOOST_TEST(opt_a >= 1);
-    BOOST_TEST(opt_a < 2);
-    BOOST_TEST(opt_a <= 1);
-    BOOST_TEST(opt_a <= 2);
+		opt_a = stdex::nullopt;
+		BOOST_TEST(!opt_a);
+		BOOST_TEST(!(opt_a_b.template has_value<0>()));
+	}
+	{
+		stdex::pod::optionals<int, B> opt_a_b = {};
+		//stdex::pod::optional_ref<0, int> opt_a = stdex::pod::get<0>(opt_a_b);
+		auto opt_a = stdex::pod::get<0>(opt_a_b);
+		opt_a      = 1;
+		BOOST_TEST(opt_a);
+		BOOST_TEST((opt_a_b.template has_value<0>()));
+		BOOST_TEST(opt_a == 1);
+		BOOST_TEST(opt_a > 0);
+		BOOST_TEST(opt_a >= 0);
+		BOOST_TEST(opt_a >= 1);
+		BOOST_TEST(opt_a < 2);
+		BOOST_TEST(opt_a <= 1);
+		BOOST_TEST(opt_a <= 2);
 
-    opt_a = stdex::nullopt;
-    BOOST_TEST(!opt_a);
-    BOOST_TEST(! (opt_a_b.template has_value<0>()));
-  }
-  {
-    stdex::pod::optionals<A, B> opts1 = {};
-    stdex::pod::optionals<A, B> opts2; // [[uninitialized]]
-    opts2 = opts1;
-    BOOST_TEST(! (opts1.template has_value<0>()));
-    BOOST_TEST(! (opts1.template has_value<1>()));
-    BOOST_TEST(! (opts2.template has_value<0>()));
-    BOOST_TEST(! (opts2.template has_value<1>()));
-  }
-  {
-    stdex::pod::optionals<A, B> opts1 = {};
-    //stdex::pod::optional_ref<0, A> opt_a = stdex::pod::get<0>(opts1);
-    auto opt_a = stdex::pod::get<0>(opts1);
-    BOOST_TEST(! (opts1.template has_value<0>()));
-    opt_a = A {};
-    BOOST_TEST( (opts1.template has_value<0>()));
-    BOOST_TEST(! (opts1.template has_value<1>()));
-    stdex::pod::optionals<A, B> opts2;
-    opts2 = opts1;
-    BOOST_TEST( (opts1.template has_value<0>()));
-    BOOST_TEST(! (opts1.template has_value<1>()));
-    BOOST_TEST( (opts2.template has_value<0>()));
-    BOOST_TEST(! (opts2.template has_value<1>()));
-  }
-  {
-    stdex::pod::optionals<A, B> opts1 = {};
-    stdex::pod::optionals<A, B> opts2 = {};
-    BOOST_TEST(! (opts1.template has_value<0>()));
-    BOOST_TEST(! (opts2.template has_value<0>()));
-    swap(opts1, opts2);
-    BOOST_TEST(! (opts1.template has_value<0>()));
-    BOOST_TEST(! (opts2.template has_value<0>()));
-  }
-  return ::boost::report_errors();
+		opt_a = stdex::nullopt;
+		BOOST_TEST(!opt_a);
+		BOOST_TEST(!(opt_a_b.template has_value<0>()));
+	}
+	{
+		stdex::pod::optionals<A, B> opts1 = {};
+		stdex::pod::optionals<A, B> opts2; // [[uninitialized]]
+		opts2 = opts1;
+		BOOST_TEST(!(opts1.template has_value<0>()));
+		BOOST_TEST(!(opts1.template has_value<1>()));
+		BOOST_TEST(!(opts2.template has_value<0>()));
+		BOOST_TEST(!(opts2.template has_value<1>()));
+	}
+	{
+		stdex::pod::optionals<A, B> opts1 = {};
+		//stdex::pod::optional_ref<0, A> opt_a = stdex::pod::get<0>(opts1);
+		auto opt_a = stdex::pod::get<0>(opts1);
+		BOOST_TEST(!(opts1.template has_value<0>()));
+		opt_a = A{};
+		BOOST_TEST((opts1.template has_value<0>()));
+		BOOST_TEST(!(opts1.template has_value<1>()));
+		stdex::pod::optionals<A, B> opts2;
+		opts2 = opts1;
+		BOOST_TEST((opts1.template has_value<0>()));
+		BOOST_TEST(!(opts1.template has_value<1>()));
+		BOOST_TEST((opts2.template has_value<0>()));
+		BOOST_TEST(!(opts2.template has_value<1>()));
+	}
+	{
+		stdex::pod::optionals<A, B> opts1 = {};
+		stdex::pod::optionals<A, B> opts2 = {};
+		BOOST_TEST(!(opts1.template has_value<0>()));
+		BOOST_TEST(!(opts2.template has_value<0>()));
+		swap(opts1, opts2);
+		BOOST_TEST(!(opts1.template has_value<0>()));
+		BOOST_TEST(!(opts2.template has_value<0>()));
+	}
+	return ::boost::report_errors();
 }
-
