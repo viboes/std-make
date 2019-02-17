@@ -20,12 +20,11 @@
 
 #include <experimental/fundamental/v2/config.hpp>
 #include <experimental/fundamental/v3/config/requires.hpp>
+#include <experimental/fundamental/v3/pod/initializer/initializer.hpp>
 #include <experimental/optional.hpp>
 #include <experimental/type_traits.hpp>
 #include <experimental/utility.hpp>
 #include <functional>
-
-#include <experimental/fundamental/v3/pod/initializer/initializer.hpp>
 
 namespace std
 {
