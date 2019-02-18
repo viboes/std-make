@@ -59,9 +59,7 @@ int main()
 		BOOST_TEST_EQ(std::string_view(sv), std::string(str));
 #endif
 		BOOST_TEST_EQ(sv.to_string(), std::string(str));
-		BOOST_TEST_EQ(std::string(sv.c_str()).size(), std::string(str).size());
-		BOOST_TEST_EQ(std::string(sv.c_str()), std::string(str));
-		BOOST_TEST_EQ(sv.c_str(), std::string(str));
+		BOOST_TEST_EQ(std::string(sv), std::string(str));
 	}
 	std::cout << __LINE__ << std::endl;
 #if 0

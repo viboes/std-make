@@ -24,6 +24,8 @@
 #include <stdexcept>
 #include <string>
 
+#include <utility>
+
 #if __cplusplus > 201402L
 #include <string_view>
 #endif
@@ -452,7 +454,7 @@ public:
 	JASEL_CXX14_CONSTEXPR const_reference back() const { return data_[size() - 1]; }
 	JASEL_CXX14_CONSTEXPR pointer data() noexcept { return &data_[0]; }
 	JASEL_CXX14_CONSTEXPR const_pointer data() const noexcept { return &data_[0]; }
-	constexpr const CharT *             c_str() const noexcept { return &data_[0]; }
+	JASEL_CXX14_CONSTEXPR const CharT *c_str() const noexcept { return &data_[0]; }
 
 	// implicit conversions
 
@@ -701,7 +703,7 @@ public:
 	{
 		// possible optimization to swap only the significant chars
 		data_.swap(other.data_);
-		swap(len_, other.len_);
+		std::swap(len_, other.len_);
 	}
 #if __cplusplus > 201402L
 	// [string.static_cstring], string operations
@@ -876,10 +878,9 @@ private:
 // operator==
 
 // swap
-template <class CharT, class Traits, class Alloc>
-
-void swap(std::basic_string<CharT, Traits, Alloc> &lhs,
-          std::basic_string<CharT, Traits, Alloc> &rhs) noexcept(noexcept(lhs.swap(rhs)))
+template <class CharT, size_t N, class SizeType, class Traits>
+void swap(basic_static_cstring<CharT, N, SizeType, Traits> &lhs,
+          basic_static_cstring<CharT, N, SizeType, Traits> &rhs) noexcept(noexcept(lhs.swap(rhs)))
 {
 	lhs.swap(rhs);
 }
