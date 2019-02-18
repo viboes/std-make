@@ -44,20 +44,18 @@ int main()
 			os << sv[i];
 		BOOST_TEST(os.str() == str);
 	}
-#if __cplusplus > 201402L
+
 	{
 		const char *     str = "Hello";
 		stdex::cstr_view sv(stdex::null_terminated_t{}, str);
 		BOOST_TEST(sv.at(0) == 'H');
 	}
-#endif
+
 	{
 		const char *     str = "Hello";
 		stdex::cstr_view sv(stdex::null_terminated_t{}, str);
 		BOOST_TEST(sv.front() == 'H');
-#if __cplusplus > 201402L
 		BOOST_TEST(sv.back() == 'o');
-#endif
 	}
 	{
 		const char *     str = "Hello";

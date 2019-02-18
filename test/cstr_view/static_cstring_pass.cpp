@@ -55,9 +55,7 @@ int main()
 		stdex::static_cstring<20> sv{stdex::null_terminated_t{}, str};
 		BOOST_TEST(!sv.empty());
 		BOOST_TEST_EQ(5, sv.size());
-#if __cplusplus > 201402L
-		BOOST_TEST_EQ(std::string_view(sv), std::string(str));
-#endif
+		BOOST_TEST_EQ(stdex::string_view(sv), std::string(str));
 		BOOST_TEST_EQ(sv.to_string(), std::string(str));
 		BOOST_TEST_EQ(std::string(sv), std::string(str));
 	}
@@ -72,9 +70,7 @@ int main()
 	std::cout << __LINE__ << std::endl;
 	// constructor from a const char* equal to nullptr is UB, don't do it
 	// string_view doesn't throws when not valid as it is required to be UB
-#if __cplusplus > 201402L
 	if (0)
-#endif
 	{
 		try
 		{
@@ -145,7 +141,6 @@ int main()
 		BOOST_TEST(sv.to_string() == "0X");
 	}
 	std::cout << __LINE__ << std::endl;
-#if __cplusplus > 201402L
 	// iteration over the chars using range-based for loop
 	{
 		const char *              str = "Hello";
@@ -163,7 +158,6 @@ int main()
 			ch = 'a';
 		BOOST_TEST(sv.to_string() == "aaaaa");
 	}
-#endif
 	// operator=
 
 	// assign
@@ -276,7 +270,6 @@ int main()
 			sv[i] = 'b';
 		BOOST_TEST(sv.to_string() == "bbbbb");
 	}
-#if __cplusplus > 201402L
 	std::cout << __LINE__ << std::endl;
 	// at good index read access
 	{
@@ -292,15 +285,12 @@ int main()
 		sv.at(0) = 'h';
 		BOOST_TEST(sv.to_string() == "hello");
 	}
-#endif
 	// front/back good index access
 	{
 		const char *              str = "Hello";
 		stdex::static_cstring<20> sv(stdex::null_terminated_t{}, str);
 		BOOST_TEST(sv.front() == 'H');
-#if __cplusplus > 201402L
 		BOOST_TEST(sv.back() == 'o');
-#endif
 	}
 	// front/back good index access
 	{
@@ -311,12 +301,10 @@ int main()
 	}
 	// front/back good index access
 	{
-#if __cplusplus > 201402L
 		const char *              str = "Hello";
 		stdex::static_cstring<20> sv(stdex::null_terminated_t{}, str);
 		sv.back() = 'a';
 		BOOST_TEST(sv.to_string() == "Hella");
-#endif
 	}
 	// data access
 	{
@@ -330,12 +318,11 @@ int main()
 		stdex::static_cstring<20> sv(stdex::null_terminated_t{}, str);
 		BOOST_TEST(sv.c_str() == std::string(str));
 	}
-#if __cplusplus > 201402L
 	// implicit conversion to string_view
 	{
 		const char *              str = "Hello";
 		stdex::static_cstring<20> scstr(stdex::null_terminated_t{}, str);
-		std::string_view          sv{scstr};
+		stdex::string_view        sv{scstr};
 		BOOST_TEST(sv.data() == scstr.data());
 	}
 	// implicit conversion to cstring_view
@@ -345,12 +332,20 @@ int main()
 		stdex::cstring_view       sv{scstr};
 		BOOST_TEST(sv.data() == scstr.data());
 	}
-#endif
-	// implicit conversion to cstr_view
+// implicit conversion to cstr_view
+#if __cplusplus > 201402L
+	// fixme: why this is ambiguous and not the following
 	{
 		const char *              str = "Hello";
 		stdex::static_cstring<20> scstr(stdex::null_terminated_t{}, str);
-		stdex::cstr_view          sv{scstr};
+		stdex::cstr_view          sv(scstr);
+		BOOST_TEST(sv.data() == scstr.data());
+	}
+#endif
+	{
+		const char *              str = "Hello";
+		stdex::static_cstring<20> scstr(stdex::null_terminated_t{}, str);
+		stdex::cstr_view          sv = scstr;
 		BOOST_TEST(sv.data() == scstr.data());
 	}
 	// to_string
@@ -400,7 +395,7 @@ int main()
 	}
 	catch (stdex::contract_failed &ex)
 	{
-		std::string_view msg = ex.what();
+		stdex::string_view msg = ex.what();
 		BOOST_TEST_EQ(msg.substr(0, 28), "JASEL: Pre-condition failure");
 	}
 	{
@@ -421,7 +416,7 @@ int main()
 	}
 	catch (stdex::contract_failed &ex)
 	{
-		std::string_view msg = ex.what();
+		stdex::string_view msg = ex.what();
 		BOOST_TEST_EQ(msg.substr(0, 28), "JASEL: Pre-condition failure");
 	}
 	{
@@ -511,7 +506,7 @@ int main()
 		swap(sv, sw);
 		BOOST_TEST(sv.to_string() == "World");
 	}
-#if __cplusplus > 201402L
+
 	// compare different
 	{
 		const char *              hello = "Hello";
@@ -534,8 +529,7 @@ int main()
 		stdex::static_cstring<20> sv(stdex::null_terminated_t{}, hello);
 		BOOST_TEST(sv.compare("Hello") == 0);
 	}
-// test for all the string_view specific functions go here
-#endif
+	// test for all the string_view specific functions go here
 	{
 		auto str = stdex::to_static_cstring<10>(100);
 		BOOST_TEST(str.to_string() == std::string("100"));

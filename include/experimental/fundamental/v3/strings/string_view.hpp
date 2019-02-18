@@ -12,6 +12,7 @@
 #include <experimental/contract.hpp>
 #include <experimental/fundamental/v2/config.hpp>
 #include <experimental/fundamental/v3/config/requires.hpp>
+#include <algorithm>
 #include <string> // this should be removed when string would depend on this string_view implementation
 #if __cplusplus > 201703L
 #include <string_view>
@@ -195,21 +196,25 @@ public:
 		swap(len, s.len);
 	}
 	// [string.view.cstr], string operations
-	constexpr size_type copy(CharT *s, size_type count, size_type pos = 0) const
+	JASEL_CXX14_CONSTEXPR size_type copy(CharT *s, size_type count, size_type pos = 0) const
 	{
-		auto rcount = min(count, size() - pos);
+		size_type lcount = size() - pos;
+		auto      rcount = (std::min)(count, lcount);
 		return Traits::copy(s, data() + pos, rcount);
 	}
 
-	constexpr basic_string_view substr(size_type pos, size_type n = npos) const
+	JASEL_CXX14_CONSTEXPR basic_string_view substr(size_type pos, size_type count = npos) const
 	{
-		auto rcount = min(count, size() - pos);
+		size_type lcount = size() - pos;
+		auto      rcount = (std::min)(count, lcount);
 		return basic_string_view(data() + pos, rcount);
 	}
 	JASEL_CXX14_CONSTEXPR int compare(basic_string_view v) const noexcept
 	{
-		auto rlen = min(size(), v.size());
-		auto res  = Traits::compare(data(), v.data(), rlen);
+		size_type ls   = size();
+		size_type rs   = v.size();
+		auto      rlen = (std::min)(ls, rs);
+		auto      res  = Traits::compare(data(), v.data(), rlen);
 		if (res != 0)
 			return res;
 		if (size() < v.size())
@@ -278,7 +283,7 @@ public:
 		                                  s.cbegin(), s.cend(), Traits::eq);
 		return iter == this->cend() ? npos : std::distance(this->cbegin(), iter);
 	}
-	constexpr size_type find(CharT ch, size_type pos = 0) const noexcept
+	JASEL_CXX14_CONSTEXPR size_type find(CharT ch, size_type pos = 0) const noexcept
 	{
 		const_iterator iter = std::find_if(this->cbegin() + pos, this->cend(),
 		                                   detail::Traits_eq_to<CharT, Traits>(ch));
@@ -293,18 +298,21 @@ public:
 		return find(basic_string_view(s), pos);
 	}
 
-	constexpr size_type rfind(basic_string_view s, size_type pos = npos) const noexcept
+	JASEL_CXX14_CONSTEXPR size_type rfind(basic_string_view s, size_type pos = npos) const noexcept
 	{
 		if (size() < s.size())
 			return npos;
 		if (s.empty())
-			return (min)(size(), pos);
+		{
+			size_type s = size();
+			return (std::min)(s, pos);
+		}
 		const_reverse_iterator iter = std::search(this->crbegin() + pos, this->crend(),
 		                                          s.crbegin(), s.crend(), Traits::eq);
 		return iter == this->crend() ? npos : (std::distance(iter, this->crend()) - s.size());
 	}
 
-	constexpr size_type rfind(CharT c, size_type pos = npos) const noexcept
+	JASEL_CXX14_CONSTEXPR size_type rfind(CharT c, size_type pos = npos) const noexcept
 	{
 		const_reverse_iterator iter = std::find_if(this->crbegin() + pos, this->crend(),
 		                                           detail::Traits_eq_to<CharT, Traits>(c));
@@ -319,7 +327,7 @@ public:
 		return rfind(basic_string_view(s), pos);
 	}
 
-	constexpr size_type find_first_of(basic_string_view s, size_type pos = 0) const noexcept
+	JASEL_CXX14_CONSTEXPR size_type find_first_of(basic_string_view s, size_type pos = 0) const noexcept
 	{
 		const_iterator iter = std::find_first_of(this->cbegin() + pos, this->cend(), s.cbegin(), s.cend(), Traits::eq);
 		return iter == this->cend() ? npos : std::distance(this->cbegin(), iter);
@@ -337,7 +345,7 @@ public:
 		return find_first_of(basic_string_view(s), pos);
 	}
 
-	constexpr size_type find_last_of(basic_string_view s, size_type pos = npos) const noexcept
+	JASEL_CXX14_CONSTEXPR size_type find_last_of(basic_string_view s, size_type pos = npos) const noexcept
 	{
 		const_reverse_iterator iter = std::find_first_of(this->crbegin() + pos, this->crend(), s.cbegin(), s.cend(), Traits::eq);
 		return iter == this->crend() ? npos : (this->size() - 1 - std::distance(this->crbegin(), iter));
@@ -405,8 +413,8 @@ using wstring_view   = basic_string_view<wchar_t>;
 // relational operators
 
 template <class CharT, class Traits>
-constexpr bool operator==(basic_string_view<CharT, Traits> lhs,
-                          basic_string_view<CharT, Traits> rhs) noexcept
+JASEL_CXX14_CONSTEXPR bool operator==(basic_string_view<CharT, Traits> lhs,
+                                      basic_string_view<CharT, Traits> rhs) noexcept
 {
 	if (lhs.size() != rhs.size())
 		return false;
@@ -441,6 +449,47 @@ constexpr bool operator>=(basic_string_view<CharT, Traits> lhs,
                           basic_string_view<CharT, Traits> rhs) noexcept
 {
 	return lhs.compare(rhs) >= 0;
+}
+
+template <class CharT, class Traits>
+constexpr bool operator==(basic_string_view<CharT, Traits>   lhs,
+                          basic_string<CharT, Traits> const &rhs) noexcept
+{
+	return lhs.compare(basic_string_view<CharT, Traits>(rhs)) == 0;
+}
+
+template <class CharT, class Traits>
+constexpr bool operator==(basic_string<CharT, Traits>             lhs,
+                          basic_string_view<CharT, Traits> const &rhs) noexcept
+{
+	return rhs.compare(basic_string_view<CharT, Traits>(lhs)) == 0;
+}
+template <class CharT, class Traits>
+constexpr bool operator==(basic_string_view<CharT, Traits> lhs,
+                          CharT const *                    rhs) noexcept
+{
+	return lhs.compare(basic_string_view<CharT, Traits>(rhs)) == 0;
+}
+
+template <class CharT, class Traits>
+constexpr bool operator==(CharT const *                           lhs,
+                          basic_string_view<CharT, Traits> const &rhs) noexcept
+{
+	return rhs.compare(basic_string_view<CharT, Traits>(lhs)) == 0;
+}
+
+template <class CharT, class Traits>
+constexpr bool operator!=(basic_string_view<CharT, Traits>   lhs,
+                          basic_string<CharT, Traits> const &rhs) noexcept
+{
+	return !(lhs == rhs);
+}
+
+template <class CharT, class Traits>
+constexpr bool operator!=(basic_string<CharT, Traits>             lhs,
+                          basic_string_view<CharT, Traits> const &rhs) noexcept
+{
+	return !(lhs == rhs);
 }
 
 // Stream Inserter

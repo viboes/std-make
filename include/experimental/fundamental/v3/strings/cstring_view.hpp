@@ -7,14 +7,12 @@
 #ifndef JASEL_EXPERIMENTAL_STRINGS_CSTRING_VIEW_HPP
 #define JASEL_EXPERIMENTAL_STRINGS_CSTRING_VIEW_HPP
 
-#if __cplusplus > 201402L
-
 #include <experimental/contract.hpp>
 #include <experimental/fundamental/v2/config.hpp>
 #include <experimental/fundamental/v3/config/requires.hpp>
 #include <experimental/fundamental/v3/strings/null_terminated.hpp>
+#include <experimental/string_view.hpp>
 #include <cstring>
-#include <string_view>
 
 namespace std
 {
@@ -55,7 +53,7 @@ public:
 	// [string.view.cstring], construction and assignment
 	constexpr basic_cstring_view() noexcept : sv_(&null_terminated_traits<CharT>::zero, 0) {}
 	constexpr basic_cstring_view(const basic_cstring_view &) noexcept = default;
-	constexpr basic_cstring_view &operator=(const basic_cstring_view &) noexcept = default;
+	JASEL_CXX14_CONSTEXPR basic_cstring_view &operator=(const basic_cstring_view &) noexcept = default;
 
 	// explicit conversion from a c-string
 	constexpr basic_cstring_view(null_terminated_t, const CharT *str)
@@ -66,7 +64,7 @@ public:
 	}
 
 	// explicit conversion from a a c-string and his length
-	constexpr basic_cstring_view(null_terminated_t, const CharT *str, size_type len)
+	JASEL_CXX14_CONSTEXPR basic_cstring_view(null_terminated_t, const CharT *str, size_type len)
 	        : sv_(str, len)
 	{
 		JASEL_EXPECTS(null_terminated());
@@ -114,9 +112,9 @@ public:
 	constexpr const CharT *   c_str() const noexcept { return data(); }
 	operator basic_string_view<CharT, Traits>() const noexcept { return sv_; }
 	// [string.view.cstring], modifiers
-	constexpr void remove_prefix(size_type n) { sv_.remove_prefix(n); }
+	JASEL_CXX14_CONSTEXPR void remove_prefix(size_type n) { sv_.remove_prefix(n); }
 	//constexpr void remove_suffix(size_type n) { return sv_.data(); }
-	constexpr void swap(basic_cstring_view &s) noexcept { sv_.swap(s.sv_); }
+	JASEL_CXX14_CONSTEXPR void swap(basic_cstring_view &s) noexcept { sv_.swap(s.sv_); }
 	// [string.view.cstring], string operations
 	constexpr size_type copy(CharT *s, size_type n, size_type pos = 0) const
 	{
@@ -309,5 +307,4 @@ operator<<(std::basic_ostream<CharT, Traits> &      os,
 } // namespace fundamental_v3
 } // namespace experimental
 } // namespace std
-#endif
 #endif // header

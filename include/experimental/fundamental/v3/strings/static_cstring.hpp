@@ -19,16 +19,13 @@
 #include <experimental/fundamental/v3/config/requires.hpp>
 #include <experimental/fundamental/v3/strings/null_terminated.hpp>
 #include <experimental/numerics/charsconv.hpp>
+#include <experimental/string_view.hpp>
 #include <experimental/utility.hpp>
 #include <array>
 #include <iterator>
 #include <stdexcept>
 #include <string>
 #include <utility>
-
-#if __cplusplus > 201402L
-#include <string_view>
-#endif
 
 namespace std
 {
@@ -67,11 +64,9 @@ public:
 	using size_type              = SizeType;
 	using difference_type        = ptrdiff_t;
 	using string_view_type       = basic_string_view<CharT, Traits>;
-#if __cplusplus > 201402L
-	using cstring_view_type = basic_cstring_view<CharT, Traits>;
-#endif
-	using cstr_view_type = basic_cstr_view<CharT, Traits>;
-	using string_type    = basic_string<CharT, Traits>;
+	using cstring_view_type      = basic_cstring_view<CharT, Traits>;
+	using cstr_view_type         = basic_cstr_view<CharT, Traits>;
+	using string_type            = basic_string<CharT, Traits>;
 
 	static constexpr size_type npos = size_type(-1);
 
@@ -134,36 +129,21 @@ public:
 		Traits::copy(data(), str, len);
 	}
 
-#if __cplusplus > 201402L
 	//! constructs a NTXS from a sting_view representing a NTXS of length sv.length()
 	//! expects sv.length() <= N+1
 	// fixme: This overload doesn't support conversion from const char* equal to nullptr.
-	constexpr basic_static_cstring(null_terminated_t tag, const string_view_type &sv)
+	JASEL_CXX14_CONSTEXPR basic_static_cstring(null_terminated_t tag, const string_view_type &sv)
 	        : basic_static_cstring(tag, sv.data(), sv.length())
 	{
 		JASEL_EXPECTS(sv.data() != 0);
 	}
-#else
-	JASEL_CXX14_CONSTEXPR basic_static_cstring(null_terminated_t, cvt str)
-	{
-		JASEL_EXPECTS(str.ptr != 0);
-		bool b = ntxs::test_and_set_length<N>(str.ptr, len_);
-		JASEL_EXPECTS(b);
-		Traits::copy(data(), str.ptr, len_);
-	}
-	JASEL_CXX14_CONSTEXPR basic_static_cstring(std::string const &str)
-	        : basic_static_cstring(null_terminated_t{}, str.c_str(), str.size())
-	{
-	}
-#endif
-#if __cplusplus > 201402L
+
 	//! constructs a NTXS from a sting representing a NTXS of length str.length()
 	//! expects str.length() <= N+1
 	constexpr basic_static_cstring(const cstring_view_type &str)
 	        : basic_static_cstring(null_terminated_t{}, str.c_str(), str.length())
 	{
 	}
-#endif
 
 	basic_static_cstring(std::initializer_list<CharT> ilist)
 	{
@@ -463,7 +443,7 @@ public:
 	{
 		return basic_cstr_view<CharT, Traits>(null_terminated_t{}, data(), size());
 	}
-#if __cplusplus > 201402L
+
 	//! implicit conversion to a cstring view
 	operator basic_cstring_view<CharT, Traits>() const noexcept
 	{
@@ -475,7 +455,7 @@ public:
 	}
 	//! implicit conversion to a string view
 	operator basic_string_view<CharT, Traits>() const noexcept { return to_string_view(); }
-#endif
+
 	// explicit conversions
 	//!  named to_string() instead of str() because we are not accessing to a string but we are constructing it an it takes time
 	basic_string<CharT, Traits> to_string() const noexcept
@@ -705,7 +685,7 @@ public:
 		data_.swap(other.data_);
 		std::swap(len_, other.len_);
 	}
-#if __cplusplus > 201402L
+
 	// [string.static_cstring], string operations
 	constexpr size_type copy(CharT *s, size_type n, size_type pos = 0) const
 	{
@@ -866,7 +846,7 @@ public:
 	{
 		return to_string_view().find_last_not_of(s, pos);
 	}
-#endif
+
 private:
 	size_type                len_;
 	std::array<CharT, N + 1> data_;
