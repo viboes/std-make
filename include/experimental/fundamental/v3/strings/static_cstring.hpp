@@ -18,12 +18,12 @@
 #include <experimental/fundamental/v2/config.hpp>
 #include <experimental/fundamental/v3/config/requires.hpp>
 #include <experimental/fundamental/v3/strings/null_terminated.hpp>
+#include <experimental/numerics/charsconv.hpp>
 #include <experimental/utility.hpp>
 #include <array>
 #include <iterator>
 #include <stdexcept>
 #include <string>
-
 #include <utility>
 
 #if __cplusplus > 201402L
@@ -870,7 +870,9 @@ public:
 private:
 	size_type                len_;
 	std::array<CharT, N + 1> data_;
-	//CharT     data_[N + 1];
+
+	template <class CharT2, size_t N2, class SizeType2, class Traits2, class T>
+	friend basic_static_cstring<CharT2, N2, SizeType2, Traits2> to_basic_static_cstring(T value);
 };
 
 // operator+
@@ -924,11 +926,6 @@ operator>>(basic_istream<CharT, Traits> &                    is,
 
 // getline
 
-// sto
-
-// to_static_cstring
-// to_static_cwstring
-
 // hash
 // todo: add hash specialization
 
@@ -942,6 +939,103 @@ template <size_t N>
 using static_u32cstring = basic_static_cstring<char32_t, N>;
 template <size_t N>
 using static_wcstring = basic_static_cstring<wchar_t, N>;
+
+// sto
+template <class T, size_t N>
+T sto(const static_cstring<N> &str, std::size_t *pos = 0, int base = 10)
+{
+	T    value;
+	auto result = from_chars(str.c_str(), str.c_str() + str.size(), value, base);
+	switch (int(result.ec))
+	{
+	default:
+	case int(errc::invalid_argument):
+		throw invalid_argument("invalid_argument sto");
+	case int(errc::result_out_of_range):
+		throw out_of_range("extracted value out of range");
+	case int(errc{}):
+		if (pos)
+			*pos = result.ptr - str.c_str();
+		return value;
+	}
+}
+
+template <size_t N>
+int stoi(const static_cstring<N> &str, std::size_t *pos = 0, int base = 10)
+{
+	return sto<int>(str, pos, base);
+}
+template <size_t N>
+int stoi(const static_wcstring<N> &str, std::size_t *pos = 0, int base = 10);
+template <size_t N>
+long stol(const static_cstring<N> &str, std::size_t *pos = 0, int base = 10)
+{
+	return sto<long>(str, pos, base);
+}
+template <size_t N>
+long stol(const static_wcstring<N> &str, std::size_t *pos = 0, int base = 10);
+template <size_t N>
+long long stoll(const static_cstring<N> &str, std::size_t *pos = 0, int base = 10)
+{
+	return sto<long long>(str, pos, base);
+}
+template <size_t N>
+long long stoll(const static_wcstring<N> &str, std::size_t *pos = 0, int base = 10);
+
+// to_static_cstring
+
+template <class CharT, size_t N, class SizeType, class Traits, class T>
+basic_static_cstring<CharT, N, SizeType, Traits> to_basic_static_cstring(T value)
+{
+	basic_static_cstring<CharT, N, SizeType, Traits> str;
+	auto                                             result = to_chars(str.data(), str.data() + N, value, 10);
+	if (result.ec != std::errc{})
+	{
+		throw invalid_argument("invalid_argument to_basic_static_cstring");
+	}
+	str.len_ = result.ptr - str.data();
+	return str;
+}
+
+template <size_t N>
+static_cstring<N> to_static_cstring(int value)
+{
+	return to_basic_static_cstring<char, N, typename static_cstring<N>::size_type, typename static_cstring<N>::traits_type>(value);
+}
+template <size_t N>
+static_cstring<N> to_static_cstring(long value)
+{
+	return to_basic_static_cstring<char, N, typename static_cstring<N>::size_type, typename static_cstring<N>::traits_type>(value);
+}
+template <size_t N>
+static_cstring<N> to_static_cstring(long long value)
+{
+	return to_basic_static_cstring<char, N, typename static_cstring<N>::size_type, typename static_cstring<N>::traits_type>(value);
+}
+
+template <size_t N>
+static_cstring<N> to_static_cstring(unsigned value)
+{
+	return to_basic_static_cstring<char, N, typename static_cstring<N>::size_type, typename static_cstring<N>::traits_type>(value);
+}
+template <size_t N>
+static_cstring<N> to_static_cstring(unsigned long value)
+{
+	return to_basic_static_cstring<char, N, typename static_cstring<N>::size_type, typename static_cstring<N>::traits_type>(value);
+}
+template <size_t N>
+static_cstring<N> to_static_cstring(unsigned long long value)
+{
+	return to_basic_static_cstring<char, N, typename static_cstring<N>::size_type, typename static_cstring<N>::traits_type>(value);
+}
+// template <size_t N>
+// static_cstring<N> to_static_cstring(float value);
+// template <size_t N>
+// static_cstring<N> to_static_cstring(double value);
+// template <size_t N>
+// static_cstring<N> to_static_cstring(long double value);
+
+// to_static_cwstring
 
 } // namespace fundamental_v3
 } // namespace experimental

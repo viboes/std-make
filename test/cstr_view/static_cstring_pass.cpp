@@ -536,7 +536,20 @@ int main()
 	}
 // test for all the string_view specific functions go here
 #endif
-
+	{
+		auto str = stdex::to_static_cstring<10>(100);
+		BOOST_TEST(str.to_string() == std::string("100"));
+	}
+	{
+		stdex::static_cstring<20> str(stdex::null_terminated_t{}, "100");
+		int                       value;
+		auto                      result = stdex::from_chars(str.c_str(), str.c_str() + str.size(), value, 10);
+		BOOST_TEST(result.ec == std::errc{});
+		auto i = stdex::sto<int>(str);
+		BOOST_TEST_EQ(i, 100);
+		//BOOST_TEST_EQ(stdex::sto<int>(str), 100);
+		//BOOST_TEST_EQ(stdex::stoi(str), 100);
+	}
 	return ::boost::report_errors();
 }
 
