@@ -822,8 +822,20 @@ void swap(optionals<Ts...> &x, optionals<Ts...> &y)
 	return std::swap(x, y);
 }
 
+template <class... Ts>
+struct are_pods;
+
+template <>
+struct are_pods<> : true_type
+{
+};
 template <class T, class... Ts>
-struct is_default_initializable<optionals<T, Ts...>> : integral_constant<bool, (is_pod<Ts>::value && ...)>
+struct are_pods<T, Ts...> : integral_constant<bool, (is_pod<T>::value && are_pods<Ts...>::value)>
+{
+};
+
+template <class T, class... Ts>
+struct is_default_initializable<optionals<T, Ts...>> : are_pods<Ts...>
 {
 };
 

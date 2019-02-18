@@ -11,6 +11,8 @@
 #include <experimental/fundamental/v2/config.hpp>
 #include <experimental/fundamental/v3/config/requires.hpp>
 
+#include <cstring>
+
 namespace std
 {
 namespace experimental
