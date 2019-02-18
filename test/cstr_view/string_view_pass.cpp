@@ -99,6 +99,7 @@ int main()
 		stdex::string_view sv("Hello");
 		BOOST_TEST(sv.compare("Hello") == 0);
 	}
+	// find
 	{
 		stdex::string_view sv("Hello");
 		BOOST_TEST(sv.find('H') == 0);
@@ -114,7 +115,7 @@ int main()
 	{
 		const char *       hello = "Hello";
 		stdex::string_view sv(hello);
-		BOOST_TEST(sv.find('l', 3) == 3);
+		BOOST_TEST_EQ(sv.find('l', 3), 3);
 	}
 	{
 		stdex::string_view sv("Hello");

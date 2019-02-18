@@ -875,10 +875,28 @@ private:
 
 // operator==
 
-//swap
+// swap
+template <class CharT, class Traits, class Alloc>
+
+void swap(std::basic_string<CharT, Traits, Alloc> &lhs,
+          std::basic_string<CharT, Traits, Alloc> &rhs) noexcept(noexcept(lhs.swap(rhs)))
+{
+	lhs.swap(rhs);
+}
 
 // erase
+template <class CharT, size_t N, class SizeType, class Traits, class U>
+void erase(basic_static_cstring<CharT, N, SizeType, Traits> &c, const U &value)
+{
+	c.erase(std::remove(c.begin(), c.end(), value), c.end());
+}
+
 // erase_if
+template <class CharT, size_t N, class SizeType, class Traits, class Pred>
+void erase_if(basic_static_cstring<CharT, N, SizeType, Traits> &c, Pred pred)
+{
+	c.erase(std::remove_if(c.begin(), c.end(), pred), c.end());
+}
 
 // operator<<
 template <class CharT, size_t N, class SizeType, class Traits>
@@ -890,6 +908,7 @@ operator<<(basic_ostream<CharT, Traits> &                          os,
 	return os;
 }
 
+// operator>>
 template <class CharT, size_t N, class SizeType, class Traits>
 basic_istream<CharT, Traits> &
 operator>>(basic_istream<CharT, Traits> &                    is,
@@ -902,8 +921,6 @@ operator>>(basic_istream<CharT, Traits> &                    is,
 	return is;
 }
 
-// operator>>
-
 // getline
 
 // sto
@@ -912,6 +929,7 @@ operator>>(basic_istream<CharT, Traits> &                    is,
 // to_static_cwstring
 
 // hash
+// todo: add hash specialization
 
 template <size_t N>
 using static_cstring = basic_static_cstring<char, N>;

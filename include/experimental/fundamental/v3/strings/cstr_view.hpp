@@ -340,6 +340,19 @@ using cstr_view = basic_cstr_view<char>;
 //using u32cstr_view = basic_cstr_view<char32_t>;
 using wcstr_view = basic_cstr_view<wchar_t>;
 
+// hash
+// todo: add hash specialization
+
+// Stream Inserter
+template <class CharT, class Traits>
+inline std::basic_ostream<CharT, Traits> &
+operator<<(std::basic_ostream<CharT, Traits> &   os,
+           const basic_cstr_view<CharT, Traits> &str)
+{
+	os << str.c_str();
+	return os;
+}
+
 } // namespace fundamental_v3
 } // namespace experimental
 } // namespace std
