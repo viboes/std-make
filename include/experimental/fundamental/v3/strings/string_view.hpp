@@ -4,13 +4,15 @@
 //
 // (C) Copyright 2019 Vicente J. Botet Escriba
 
+// See https://en.cppreference.com/w/cpp/string/basic_string_view
+
 #ifndef JASEL_EXPERIMENTAL_STRINGS_STRING_VIEW_HPP
 #define JASEL_EXPERIMENTAL_STRINGS_STRING_VIEW_HPP
 
 #include <experimental/contract.hpp>
 #include <experimental/fundamental/v2/config.hpp>
 #include <experimental/fundamental/v3/config/requires.hpp>
-#include <string> // this should be removed when string would depend on string_view as we had for std::string_view
+#include <string> // this should be removed when string would depend on this string_view implementation
 #if __cplusplus > 201703L
 #include <string_view>
 #endif
@@ -30,6 +32,18 @@ using std::u32string_view;
 using std::wstring_view;
 
 #else
+namespace detail
+{
+//  A helper functor because sometimes we don't have lambdas
+template <typename CharT, typename Traits>
+class Traits_eq_to {
+public:
+	Traits_eq_to(CharT ch) : ch(ch) {}
+	bool  operator()(CharT val) const { return Traits::eq(ch, val); }
+	CharT ch;
+};
+} // namespace detail
+
 // this is a temporary implementation
 
 // this class contains a pointer to a char const char* NTCS
@@ -41,7 +55,7 @@ class basic_string_view {
 
 public:
 	// types
-	using traits_type     = Traits;
+	using Traits_type     = Traits;
 	using value_type      = CharT;
 	using pointer         = value_type *;
 	using const_pointer   = const value_type *;
@@ -58,11 +72,18 @@ public:
 	static constexpr size_type npos = size_type(-1);
 
 	// [string.view.cstr], construction and assignment
-	constexpr basic_string_view() noexcept : ptr(nullptr), len(0) {}
+	constexpr basic_string_view() noexcept
+	        : ptr(nullptr), len(0)
+	{
+	}
 	constexpr basic_string_view(const basic_string_view &) noexcept = default;
 	JASEL_CXX14_CONSTEXPR basic_string_view &operator=(const basic_string_view &) noexcept = default;
-	constexpr basic_string_view(const CharT *str) : ptr(str), len(Traits::length(str)) {}
-	JASEL_CXX14_CONSTEXPR basic_string_view(const CharT *str, size_t len) : ptr(str), len(len)
+	constexpr basic_string_view(const CharT *str)
+	        : ptr(str), len(Traits::length(str))
+	{
+	}
+	JASEL_CXX14_CONSTEXPR basic_string_view(const CharT *str, size_t len)
+	        : ptr(str), len(len)
 	{
 	}
 
@@ -95,12 +116,17 @@ public:
 	{
 		return const_reverse_iterator(cbegin());
 	}
-	//        friend constexpr const_iterator begin(basic_string_view sv) noexcept
-	//        {   return sv.begin();}
-	//        friend constexpr const_iterator end(basic_string_view sv) noexcept
-	//        {   return sv.end();}
+
+	friend constexpr const_iterator begin(basic_string_view sv) noexcept
+	{
+		return sv.begin();
+	}
+	friend constexpr const_iterator end(basic_string_view sv) noexcept
+	{
+		return sv.end();
+	}
+
 	// [string.view.cstr], capacity
-	// these are expensive. better to transform to a string_view that will store the size once
 	constexpr size_type size() const noexcept
 	{
 		return this->length();
@@ -110,7 +136,10 @@ public:
 	{
 		return len;
 	}
-	constexpr size_type max_size() const noexcept;
+	constexpr size_type max_size() const noexcept
+	{
+		return this->length();
+	}
 
 	[[nodiscard]] constexpr bool empty() const noexcept
 	{
@@ -121,18 +150,19 @@ public:
 	{
 		return *(ptr + pos);
 	}
-	constexpr const_reference at(size_type pos) const
+	JASEL_CXX14_CONSTEXPR const_reference at(size_type pos) const
 	{
-		// todo add exceptional case
+		if (pos > size())
+			throw out_of_range("string_view bad access");
 		return *(ptr + pos);
 	}
 	constexpr const_reference front() const
 	{
-		return *ptr;
+		return ptr[0];
 	}
 	constexpr const_reference back() const
 	{
-		return *(ptr + len - 1);
+		return ptr[len - 1];
 	}
 
 	constexpr const_pointer data() const noexcept
@@ -150,11 +180,13 @@ public:
 	// [string.view.cstr], modifiers
 	JASEL_CXX14_CONSTEXPR void remove_prefix(size_type n)
 	{
+		JASEL_EXPECTS(n <= size());
 		ptr += n;
 		len -= n;
 	}
 	JASEL_CXX14_CONSTEXPR void remove_suffix(size_type n)
 	{
+		JASEL_EXPECTS(n <= size());
 		len -= n;
 	}
 	JASEL_CXX14_CONSTEXPR void swap(basic_string_view &s) noexcept
@@ -163,24 +195,22 @@ public:
 		swap(len, s.len);
 	}
 	// [string.view.cstr], string operations
-	constexpr size_type copy(CharT *s, size_type n, size_type pos = 0) const;
-
-	constexpr basic_string_view substr(size_type pos = 0) const
+	constexpr size_type copy(CharT *s, size_type count, size_type pos = 0) const
 	{
-		return basic_string_view(data() + pos, len - pos);
+		auto rcount = min(count, size() - pos);
+		return Traits::copy(s, data() + pos, rcount);
 	}
 
-	constexpr basic_string_view substr(size_type pos, size_type n) const
+	constexpr basic_string_view substr(size_type pos, size_type n = npos) const
 	{
-		return basic_string_view(data() + pos, n);
+		auto rcount = min(count, size() - pos);
+		return basic_string_view(data() + pos, rcount);
 	}
 	JASEL_CXX14_CONSTEXPR int compare(basic_string_view v) const noexcept
 	{
 		auto rlen = min(size(), v.size());
 		auto res  = Traits::compare(data(), v.data(), rlen);
-		if (res < 0)
-			return res;
-		if (res > 0)
+		if (res != 0)
 			return res;
 		if (size() < v.size())
 			return -1;
@@ -242,26 +272,17 @@ public:
 	// [string.view.cstr], searching
 	JASEL_CXX14_CONSTEXPR size_type find(basic_string_view s, size_type pos = 0) const noexcept
 	{
-		if (s.size() == 0)
-			return npos;
-		CharT const ch = s.front();
-		for (auto pos_it = begin() + pos; pos_it + s.size() < end(); ++pos_it)
-		{
-			// look for the first
-			pos_it = Traits::find(pos_it, end() - pos_it - s.size(), ch);
-			if (!pos_it)
-				// not found
-				return npos;
-			if (Traits::compare(pos_it + 1, s.data() + 1, s.size() - 1) == 0)
-				// found
-				return pos_it - data();
-			// not found yet, advance of one and try again
-		}
-		return npos;
+		if (s.empty())
+			return 0;
+		const_iterator iter = std::search(this->cbegin() + pos, this->cend(),
+		                                  s.cbegin(), s.cend(), Traits::eq);
+		return iter == this->cend() ? npos : std::distance(this->cbegin(), iter);
 	}
 	constexpr size_type find(CharT ch, size_type pos = 0) const noexcept
 	{
-		return find(basic_string_view(std::addressof(ch), 1), pos);
+		const_iterator iter = std::find_if(this->cbegin() + pos, this->cend(),
+		                                   detail::Traits_eq_to<CharT, Traits>(ch));
+		return iter == this->cend() ? npos : std::distance(this->cbegin(), iter);
 	}
 	constexpr size_type find(const CharT *s, size_type pos, size_type count) const
 	{
@@ -272,10 +293,22 @@ public:
 		return find(basic_string_view(s), pos);
 	}
 
-	constexpr size_type rfind(basic_string_view s, size_type pos = npos) const noexcept;
+	constexpr size_type rfind(basic_string_view s, size_type pos = npos) const noexcept
+	{
+		if (size() < s.size())
+			return npos;
+		if (s.empty())
+			return (min)(size(), pos);
+		const_reverse_iterator iter = std::search(this->crbegin() + pos, this->crend(),
+		                                          s.crbegin(), s.crend(), Traits::eq);
+		return iter == this->crend() ? npos : (std::distance(iter, this->crend()) - s.size());
+	}
+
 	constexpr size_type rfind(CharT c, size_type pos = npos) const noexcept
 	{
-		return rfind(basic_string_view(std::addressof(c), 1), pos);
+		const_reverse_iterator iter = std::find_if(this->crbegin() + pos, this->crend(),
+		                                           detail::Traits_eq_to<CharT, Traits>(c));
+		return iter == this->crend() ? npos : (this->size() - 1 - std::distance(this->crbegin(), iter));
 	}
 	constexpr size_type rfind(const CharT *s, size_type pos, size_type count) const
 	{
@@ -286,7 +319,11 @@ public:
 		return rfind(basic_string_view(s), pos);
 	}
 
-	constexpr size_type find_first_of(basic_string_view s, size_type pos = 0) const noexcept;
+	constexpr size_type find_first_of(basic_string_view s, size_type pos = 0) const noexcept
+	{
+		const_iterator iter = std::find_first_of(this->cbegin() + pos, this->cend(), s.cbegin(), s.cend(), Traits::eq);
+		return iter == this->cend() ? npos : std::distance(this->cbegin(), iter);
+	}
 	constexpr size_type find_first_of(CharT c, size_type pos = 0) const noexcept
 	{
 		return find_first_of(basic_string_view(std::addressof(c), 1), pos);
@@ -300,7 +337,11 @@ public:
 		return find_first_of(basic_string_view(s), pos);
 	}
 
-	constexpr size_type find_last_of(basic_string_view s, size_type pos = npos) const noexcept;
+	constexpr size_type find_last_of(basic_string_view s, size_type pos = npos) const noexcept
+	{
+		const_reverse_iterator iter = std::find_first_of(this->crbegin() + pos, this->crend(), s.cbegin(), s.cend(), Traits::eq);
+		return iter == this->crend() ? npos : (this->size() - 1 - std::distance(this->crbegin(), iter));
+	}
 	constexpr size_type find_last_of(CharT c, size_type pos = npos) const noexcept
 	{
 		return find_last_of(basic_string_view(std::addressof(c), 1), pos);
@@ -359,6 +400,7 @@ using u32string_view = basic_string_view<char32_t>;
 using wstring_view   = basic_string_view<wchar_t>;
 
 // hash
+// todo: add hash specialization
 
 // relational operators
 
@@ -366,13 +408,15 @@ template <class CharT, class Traits>
 constexpr bool operator==(basic_string_view<CharT, Traits> lhs,
                           basic_string_view<CharT, Traits> rhs) noexcept
 {
+	if (lhs.size() != rhs.size())
+		return false;
 	return lhs.compare(rhs) == 0;
 }
 template <class CharT, class Traits>
 constexpr bool operator!=(basic_string_view<CharT, Traits> lhs,
                           basic_string_view<CharT, Traits> rhs) noexcept
 {
-	return lhs.compare(rhs) != 0;
+	return !(lhs == rhs);
 }
 template <class CharT, class Traits>
 constexpr bool operator<(basic_string_view<CharT, Traits> lhs,
@@ -399,7 +443,16 @@ constexpr bool operator>=(basic_string_view<CharT, Traits> lhs,
 	return lhs.compare(rhs) >= 0;
 }
 
-// stream
+// Stream Inserter
+template <class CharT, class Traits>
+inline std::basic_ostream<CharT, Traits> &
+operator<<(std::basic_ostream<CharT, Traits> &     os,
+           const basic_string_view<CharT, Traits> &str)
+{
+	// todo: implement this more efficiently.
+	auto s = basic_string<CharT, Traits>(str);
+	return os << s;
+}
 
 #endif
 } // namespace fundamental_v3

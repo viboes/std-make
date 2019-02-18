@@ -118,8 +118,33 @@ int main()
 		BOOST_TEST_EQ(sv.find('l', 3), 3);
 	}
 	{
-		stdex::string_view sv("Hello");
+		stdex::string_view sv("Helloel");
 		BOOST_TEST(sv.find("el") == 1);
+	}
+	// rfind
+	{
+		stdex::string_view sv("Hello");
+		BOOST_TEST(sv.rfind('l') == 3);
+	}
+	{
+		stdex::string_view sv("Hello");
+		BOOST_TEST(sv.rfind('w') == stdex::string_view::npos);
+	}
+	{
+		stdex::string_view sv("Hello");
+		BOOST_TEST_EQ(sv.rfind('l', 2), 2);
+	}
+	{
+		stdex::string_view sv("Helloel");
+		BOOST_TEST(sv.rfind("el") == 5);
+	}
+	{
+		stdex::string_view sv("Helloel");
+		BOOST_TEST(sv.find_first_of("le") == 1);
+	}
+	{
+		stdex::string_view sv("Hello");
+		BOOST_TEST(sv.find_last_of("le") == 3);
 	}
 	return ::boost::report_errors();
 }
