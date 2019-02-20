@@ -28,11 +28,23 @@ int main()
 		BOOST_TEST(sp.data() == arr);
 	}
 	{
+		int                        arr[10];
+		stdex::span<const int, 10> sp(arr);
+		BOOST_TEST(sp.size() == 10);
+		BOOST_TEST(sp.data() == arr);
+	}
+	{
 		const int                  arr[10] = {};
 		stdex::span<const int, 10> sp(arr);
 		BOOST_TEST(sp.size() == 10);
 		BOOST_TEST(sp.data() == arr);
 	}
+#if 0
+	{
+		int                  arr[11];
+		stdex::span<int, 10> sp(arr);
+	}
+#endif
 #if 0
 	{
 		const int            arr[10] = {};

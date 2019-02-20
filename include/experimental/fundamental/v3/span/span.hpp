@@ -11,6 +11,7 @@
 #include <experimental/fundamental/v2/config.hpp>
 #include <experimental/fundamental/v3/config/requires.hpp>
 #include <experimental/fundamental/v3/utility/narrow.hpp>
+#include <experimental/type_traits.hpp>
 #include <algorithm>
 #include <array>
 #include <cstddef>
@@ -306,8 +307,8 @@ public:
 
 	explicit JASEL_CXX14_CONSTEXPR extent_type(extent_t size) : size_(size) { JASEL_EXPECTS(size >= 0); }
 
-	JASEL_CONSTEXPR inline size_type  size() const noexcept { return narrow_cast<size_type>(size_); }
-	JASEL_CONSTEXPR inline index_type ssize() const noexcept { return size_; }
+	JASEL_CXX14_CONSTEXPR inline size_type size() const noexcept { return narrow_cast<size_type>(size_); }
+	JASEL_CONSTEXPR inline index_type      ssize() const noexcept { return size_; }
 
 private:
 	index_type size_;
@@ -343,7 +344,7 @@ public:
 	template <bool Dependent = false,
 	          // "Dependent" is needed to make "std::enable_if_t<Dependent || Extent <= 0>" SFINAE,
 	          // since "std::enable_if_t<Extent <= 0>" is ill-formed when Extent is greater than 0.
-	          class = enable_if<(Dependent || Extent <= 0)>>
+	          class = enable_if<(Dependent || Extent == 0 || Extent == dynamic_extent)>>
 	JASEL_CONSTEXPR span() noexcept : storage_(nullptr, details::extent_type<0>())
 	{
 	}
@@ -359,18 +360,7 @@ public:
 	JASEL_CONSTEXPR span(element_type (&arr)[N]) noexcept : storage_(&arr[0], details::extent_type<N>())
 	{
 	}
-#if 0    
-    template <size_t N>
-    JASEL_CONSTEXPR span(typename remove_const<element_type>::type (&arr)[N]) noexcept : storage_(&arr[0], details::extent_type<N>())
-    {
-    }
-#endif
-	// //fixme
-	// template <size_t N, class ArrayElementType>
-	// JASEL_CONSTEXPR span(array<ArrayElementType, N> &arr) noexcept
-	//         : storage_(&arr[0], details::extent_type<N>())
-	// {
-	// }
+
 	template <size_t N>
 	JASEL_CONSTEXPR span(array<value_type, N> &arr) noexcept
 	        : storage_(&arr[0], details::extent_type<N>())
