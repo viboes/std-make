@@ -132,6 +132,11 @@ test-suite static_vector
       [ run static_vector/static_vector_pass.cpp  ]
     ;
 
+test-suite span
+    : 
+      [ run span/span_pass.cpp  ]
+    ;
+
 test-suite strings
     : 
       [ run cstr_view/string_view_pass.cpp  ]
