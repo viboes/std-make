@@ -61,7 +61,7 @@ JASEL_CXX14_CONSTEXPR bool valid(const CharT *str, size_t len) noexcept
 	return CharT() == str[len] && all_non_zero(str, len);
 }
 
-//! this function calculate the length of a NTXS a check that the length is less than a specific capacity N
+//! this function calculate the length of a NTXS and checks that the length is less than a specific capacity N
 template <size_t N, class CharT>
 JASEL_CXX14_CONSTEXPR bool test_and_set_length(const CharT *str, size_t &length) noexcept
 {

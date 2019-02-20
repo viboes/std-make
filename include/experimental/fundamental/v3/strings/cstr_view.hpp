@@ -65,18 +65,18 @@ public:
 	using string_view_type       = basic_string_view<CharT, Traits>;
 	using string_type            = basic_string<CharT, Traits>;
 
-	struct ntbs_sentiel
+	struct nts_sentiel
 	{
-		friend constexpr bool operator==(const iterator &x, const ntbs_sentiel &)
+		friend constexpr bool operator==(const iterator &x, const nts_sentiel &)
 		{
 			return *x == CharT();
 		}
-		friend constexpr bool operator==(const ntbs_sentiel &x, const iterator &y) { return y == x; }
-		friend constexpr bool operator!=(const iterator &x, const ntbs_sentiel &y) { return !(x == y); }
-		friend constexpr bool operator!=(const ntbs_sentiel &x, const iterator &y) { return !(y == x); }
+		friend constexpr bool operator==(const nts_sentiel &x, const iterator &y) { return y == x; }
+		friend constexpr bool operator!=(const iterator &x, const nts_sentiel &y) { return !(x == y); }
+		friend constexpr bool operator!=(const nts_sentiel &x, const iterator &y) { return !(y == x); }
 	};
-	using const_sentinel = ntbs_sentiel;
-	using sentinel       = ntbs_sentiel;
+	using const_sentinel = nts_sentiel;
+	using sentinel       = nts_sentiel;
 
 	using size_type                 = size_t;
 	using difference_type           = ptrdiff_t;

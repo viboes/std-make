@@ -89,17 +89,6 @@ public:
 	{
 		discard(assign(count, ch));
 	}
-	//! trick used to disambiguate the const char* and the const char(&)[N] overloads
-	//template <class CharT>
-	struct cvt
-	{
-		const CharT *ptr;
-		//cvt(nullptr_t) = delete;
-		constexpr cvt(const CharT *p) noexcept
-		        : ptr(p)
-		{
-		}
-	};
 
 	//! constructs a NTXS from a const CharT*
 	//! expects str to be a NTXS with length lt the N+1
@@ -365,11 +354,7 @@ public:
 	}
 
 	// [string.static_cstring], iterator support
-	JASEL_CXX14_CONSTEXPR iterator
-	begin() noexcept
-	{
-		return data_.begin();
-	}
+	JASEL_CXX14_CONSTEXPR iterator begin() noexcept { return data_.begin(); }
 	JASEL_CXX14_CONSTEXPR const_iterator begin() const noexcept { return data_.begin(); }
 	JASEL_CXX14_CONSTEXPR iterator end() noexcept { return &data_[len_]; }
 	JASEL_CXX14_CONSTEXPR const_iterator end() const noexcept { return &data_[len_]; }
@@ -471,7 +456,7 @@ public:
 	JASEL_CXX14_CONSTEXPR void clear() noexcept
 	{
 		len_ = 0;
-		Traits::assign(data_[len_], CharT{});
+		Traits::assign(data_[0], CharT{});
 	}
 	// insert
 	basic_static_cstring &insert(size_type index, size_type count, CharT ch)
