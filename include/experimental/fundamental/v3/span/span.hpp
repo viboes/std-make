@@ -349,7 +349,7 @@ public:
 	{
 	}
 
-	JASEL_CONSTEXPR span(pointer ptr, index_type count) : storage_(ptr, count) {}
+	JASEL_CONSTEXPR span(pointer ptr, size_type count) : storage_(ptr, count) {}
 
 	JASEL_CONSTEXPR span(pointer firstElem, pointer lastElem)
 	        : storage_(firstElem, std::distance(firstElem, lastElem))

@@ -19,6 +19,7 @@
 #include <experimental/fundamental/v3/config/requires.hpp>
 #include <experimental/fundamental/v3/strings/null_terminated.hpp>
 #include <experimental/numerics/charsconv.hpp>
+#include <experimental/span.hpp>
 #include <experimental/string_view.hpp>
 #include <experimental/utility.hpp>
 #include <array>
@@ -626,6 +627,37 @@ public:
 		JASEL_EXPECTS(count <= N);
 		len_ = count;
 		Traits::assign(data_[len_], CharT{});
+	}
+
+	// This function borrows count chars from the end.
+	JASEL_CXX14_CONSTEXPR span<CharT> borrow(size_type count)
+	{
+		JASEL_EXPECTS(size() + count <= N);
+		// this string is static so not need to  reserve the capacity size() + count
+		return span<CharT>{end(), count};
+	}
+	// This function is used to resturn the borrowed span by adding span size to the string.
+	JASEL_CXX14_CONSTEXPR void give_back(span<CharT> const &sp)
+	{
+		JASEL_EXPECTS(end() == sp.data());
+		JASEL_EXPECTS(size() + sp.size() <= N);
+		len_ += sp.size();
+		// no need to assign as the span is a mutable view on this string
+	}
+
+	// Borrow the whole string after reserving the new capacity
+	JASEL_CXX14_CONSTEXPR span<CharT> borrow_all(size_type capacity)
+	{
+		JASEL_EXPECTS(capacity <= N);
+		return span<CharT>{data(), capacity};
+	}
+	// This function is used to resturn the borrowed span by setting span size as the one of the string.
+	JASEL_CXX14_CONSTEXPR void give_back_all(span<CharT> const &sp)
+	{
+		JASEL_EXPECTS(data() == sp.data());
+		JASEL_EXPECTS(sp.size() <= N);
+		len_ = sp.size();
+		// no need to assign as the span is a mutable view on this string
 	}
 
 	//! expects count <= N

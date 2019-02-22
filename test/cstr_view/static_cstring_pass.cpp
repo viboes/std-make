@@ -544,6 +544,26 @@ int main()
 		//BOOST_TEST_EQ(stdex::sto<int>(str), 100);
 		//BOOST_TEST_EQ(stdex::stoi(str), 100);
 	}
+	{
+		const char *              str = "Hello";
+		stdex::static_cstring<20> scstr(stdex::null_terminated_t{}, str);
+
+		auto sp = scstr.borrow(10);
+		BOOST_TEST(sp.size() == 10);
+		BOOST_TEST(sp.data() == scstr.end());
+		scstr.give_back(sp);
+		BOOST_TEST(scstr.size() == 15);
+	}
+	{
+		const char *              str = "Hello";
+		stdex::static_cstring<20> scstr(stdex::null_terminated_t{}, str);
+
+		auto sp = scstr.borrow_all(15);
+		BOOST_TEST(sp.size() == 15);
+		BOOST_TEST(sp.data() == scstr.data());
+		scstr.give_back_all(sp);
+		BOOST_TEST(scstr.size() == 15);
+	}
 	return ::boost::report_errors();
 }
 
