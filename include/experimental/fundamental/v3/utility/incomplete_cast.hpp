@@ -17,19 +17,20 @@ inline namespace fundamental_v3
 {
 // As for  c-stype cast use incomplete_cast only when there is no a more explicit cast.
 // incomplete_cast has the advantage over c-cast that can be grep
-template <class T, class U>
-T incomplete_cast(U* u) {
-    return (T)(u);
+template <class TPtr, class U>
+TPtr incomplete_cast(U *u)
+{
+	return (TPtr)(u);
 }
 
-template <class T, class U>
-T incomplete_cast(U& u) {
-    return (T)(u);
+template <class TRef, class U>
+TRef incomplete_cast(U &u)
+{
+	return (TRef)(u);
 }
 
-
-}
-}
-}
+} // namespace fundamental_v3
+} // namespace experimental
+} // namespace std
 
 #endif // header

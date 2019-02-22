@@ -12,9 +12,11 @@
 #include <experimental/fundamental/v3/utility/as_ptr_const.hpp>
 //#include <experimental/fundamental/v3/utility/compressed_pair.hpp>
 #include <experimental/fundamental/v3/utility/constexpr_utility.hpp>
+#include <experimental/fundamental/v3/utility/convert_cast.hpp>
 #include <experimental/fundamental/v3/utility/decay_copy.hpp>
 #include <experimental/fundamental/v3/utility/dependent_false.hpp>
 #include <experimental/fundamental/v3/utility/discard.hpp>
+#include <experimental/fundamental/v3/utility/erased_ptr_cast.hpp>
 #include <experimental/fundamental/v3/utility/exchange.hpp>
 #include <experimental/fundamental/v3/utility/explicit_cast.hpp>
 #include <experimental/fundamental/v3/utility/incomplete_cast.hpp>
@@ -28,6 +30,7 @@
 #include <experimental/fundamental/v3/utility/priority_tag.hpp>
 #include <experimental/fundamental/v3/utility/static_addressof.hpp>
 #include <experimental/fundamental/v3/utility/swallow.hpp>
+#include <experimental/fundamental/v3/utility/unreachable.hpp>
 #include <experimental/fundamental/v3/utility/unwrap_ref_decay.hpp>
 
 #endif // header

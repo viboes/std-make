@@ -18,11 +18,11 @@
 #ifndef JASEL_EXPERIMENTAL_UTILITY_NARROW_HPP
 #define JASEL_EXPERIMENTAL_UTILITY_NARROW_HPP
 
+#include <experimental/contract.hpp>
+#include <experimental/fundamental/v2/config.hpp>
 #include <exception>
 #include <type_traits>
 #include <utility>
-#include <experimental/fundamental/v2/config.hpp>
-#include <experimental/contract.hpp>
 
 namespace std
 {
@@ -39,7 +39,7 @@ struct have_same_sign
         : public integral_constant<bool, is_signed<T>::value == is_signed<U>::value>
 {
 };
-}
+} // namespace detail
 #endif
 
 // checks if we can convert u to T without losing information and if succeed return the converted T
@@ -57,26 +57,26 @@ template <class T, class U>
 //  T and U are integral,
 //  T is convertible from U and
 //  U is convertible from T
-// cannot be constexpr as the result value can not be a constexpr variable that is reassigned
-JASEL_CXX14_CONSTEXPR bool narrow_to(T* t, U u) noexcept
+// todo: specialize when type T subsumes U, or forbid the overload
+JASEL_CXX14_CONSTEXPR bool narrow_to(T *t, U u) noexcept
 {
 #if 0
     pair<bool, T> res = narrow_to<T>(u);
     *t = res.second;
     return res.first;
 #else
-    *t = static_cast<T>(u);
-    if (static_cast<U>(*t) != u)
-    {
-        return false;
-    }
-    if ( (! detail::have_same_sign<T, U>::value) &&  ((*t < T{}) != (u < U{})) )
-    {
-        return false;
-    }
-    return true;
-}
+	*t = static_cast<T>(u);
+	if (static_cast<U>(*t) != u)
+	{
+		return false;
+	}
+	if ((!detail::have_same_sign<T, U>::value) && ((*t < T{}) != (u < U{})))
+	{
+		return false;
+	}
+	return true;
 #endif
+}
 
 template <class T, class U>
 // requires
@@ -96,20 +96,18 @@ JASEL_CXX14_CONSTEXPR std::pair<bool, T> narrow_to(U u) noexcept
     res.first = narrow_to<T>(&res.second, u);
     return res;
 #else
-    T t = static_cast<T>(u);
-    if (static_cast<U>(t) != u)
-    {
-        return std::make_pair(false, T{});
-    }
-    if ((! detail::have_same_sign<T, U>::value) &&  ((t < T{}) != (u < U{})) )
-    {
-        return std::make_pair(false, T{});
-    }
-    return std::make_pair(true, t);
+	T t = static_cast<T>(u);
+	if (static_cast<U>(t) != u)
+	{
+		return std::make_pair(false, T{});
+	}
+	if ((!detail::have_same_sign<T, U>::value) && ((t < T{}) != (u < U{})))
+	{
+		return std::make_pair(false, T{});
+	}
+	return std::make_pair(true, t);
 #endif
 }
-
-
 
 // checks if we can convert u to T without losing information
 template <class T, class U>
@@ -119,15 +117,15 @@ template <class T, class U>
 //  U is convertible from T
 JASEL_CXX14_CONSTEXPR bool can_narrow_to(U u) noexcept
 {
-    return narrow_to<T>(u).first;
+	return narrow_to<T>(u).first;
 }
 
 // precondition: can_narrow_to<T>(u)
 template <class T, class U>
 JASEL_CXX14_CONSTEXPR T narrow_cast(U u) noexcept
 {
-    JASEL_EXPECTS(can_narrow_to<T>(u));
-	return static_cast<T>( u );
+	JASEL_EXPECTS(can_narrow_to<T>(u));
+	return static_cast<T>(u);
 }
 
 struct narrowing_error : public exception
@@ -138,15 +136,15 @@ struct narrowing_error : public exception
 template <class T, class U>
 JASEL_CXX14_CONSTEXPR T narrow(U u)
 {
-    auto res = narrow_to<T>(u);
-    if (! res.first)
-    {
-        throw narrowing_error();
-    }
-    return res.second;
+	auto res = narrow_to<T>(u);
+	if (!res.first)
+	{
+		throw narrowing_error();
+	}
+	return res.second;
 }
-}
-}
-}
+} // namespace fundamental_v3
+} // namespace experimental
+} // namespace std
 
 #endif // header

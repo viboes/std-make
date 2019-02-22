@@ -89,12 +89,6 @@
 #define JASEL_INLINE_VAR
 #endif
 
-#if __cplusplus > 201402L
-#define JASEL_NODISCARD [[nodiscard]]
-#else
-#define JASEL_NODISCARD
-#endif
-
 #define JASEL_NOEXCEPT_DECLTYPE_RETURN(...)                \
 	noexcept(noexcept(decltype(__VA_ARGS__)(__VA_ARGS__))) \
 	        ->decltype(__VA_ARGS__)                        \
@@ -117,11 +111,64 @@
 		return (__VA_ARGS__);                              \
 	}
 
-#define JASEL_NORETURN BOOST_NORETURN
-
 #define JASEL_STRINGIFY(x) JASEL_STRINGIFY_(x)
 #define JASEL_STRINGIFY_(x) #x
 
-/**/
+// Attributes
+
+#if __cplusplus > 201703L
+#define JASEL_ATTR_LIKELY [[likely]]
+#define JASEL_ATTR_UNLIKELY [[unlikely]]
+#else
+#define JASEL_ATTR_LIKELY
+#define JASEL_ATTR_UNLIKELY
+#endif
+
+// this is more portable
+#define JASEL_LIKELY(X) BOOST_LIKELY(X)
+#define JASEL_UNLIKELY(X) BOOST_UNLIKELY(X)
+
+#if __cplusplus > 201402L
+#define JASEL_ATTR_NODISCARD [[nodiscard]]
+#define JASEL_ATTR_FALLTHROUGH [[fallthrough]]
+#define JASEL_ATTR_MAYBE_UNUSED [[maybe_unused]]
+#else
+#define JASEL_ATTR_NODISCARD
+#define JASEL_ATTR_FALLTHROUGH BOOST_FALLTHROUGH
+#define JASEL_ATTR_MAYBE_UNUSED BOOST_ATTRIBUTE_UNUSED
+#endif
+#define JASEL_NODISCARD JASEL_ATTR_NODISCARD
+
+#if __cplusplus > 201103L
+#define JASEL_ATTR_DEPRECATED [[deprecated]]
+#else
+#define JASEL_ATTR_DEPRECATED
+#endif
+
+#define JASEL_ATTR_NORETURN BOOST_NORETURN
+#define JASEL_NORETURN JASEL_ATTR_NORETURN
+#define JASEL_RESTRICT BOOST_RESTRICT
+#define JASEL_ATTR_FORCEINLINE BOOST_FORCEINLINE
+#define JASEL_ATTR_NOINLINE BOOST_NOINLINE
+#define JASEL_UNREACHABLE_RETURN BOOST_UNREACHABLE_RETURN(result)
+
+// builtins
+
+#ifdef _MSC_VER
+#define JASEL_ASSUME(cond) __assume(cond)
+
+#elif defined __clang__
+#define JASEL_ASSUME(cond) __builtin_assume(cond)
+
+#elif defined __GNUC__
+#define JASEL_ASSUME(cond) \
+	if (cond)              \
+		;                  \
+	else                   \
+		__builtin_unreachable()
+
+#else
+#define JASEL_ASSUME(cond) static_cast<void>(!!(cond))
+#endif
 
 #endif // header
