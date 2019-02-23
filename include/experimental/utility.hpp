@@ -28,6 +28,7 @@
 #include <experimental/fundamental/v3/utility/out_param.hpp>
 #include <experimental/fundamental/v3/utility/owner.hpp>
 #include <experimental/fundamental/v3/utility/priority_tag.hpp>
+#include <experimental/fundamental/v3/utility/size_of.hpp>
 #include <experimental/fundamental/v3/utility/static_addressof.hpp>
 #include <experimental/fundamental/v3/utility/swallow.hpp>
 #include <experimental/fundamental/v3/utility/unreachable.hpp>
