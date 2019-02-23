@@ -4,6 +4,10 @@
 //
 // (C) Copyright 2019 Vicente J. Botet Escriba
 
+// see https://en.cppreference.com/w/cpp/container/span
+// see http://wiki.edg.com/pub/Wg21kona2019/StrawPolls/p1227r2.htm
+// see http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2019/p1024r2.pdf
+
 #ifndef JASEL_EXPERIMENTAL_SPAN_SPAN_HPP
 #define JASEL_EXPERIMENTAL_SPAN_SPAN_HPP
 
@@ -18,8 +22,12 @@
 #include <iterator>
 #include <limits>
 #include <stdexcept>
+#include <tuple>
 #include <type_traits>
 #include <utility>
+
+#include <experimental/fundamental/v3/iterator/count.hpp>
+#include <experimental/fundamental/v3/utility/size_of.hpp>
 
 namespace std
 {
@@ -28,8 +36,9 @@ namespace experimental
 inline namespace fundamental_v3
 {
 
-using extent_t                                = ptrdiff_t;
-JASEL_CONSTEXPR const extent_t dynamic_extent = -1;
+using extent_t = size_t;
+//inline
+constexpr extent_t dynamic_extent = numeric_limits<size_t>::max();
 
 template <class ElementType, extent_t Extent = dynamic_extent>
 class span;
@@ -120,11 +129,10 @@ class span_iterator {
 	typedef typename Span::element_type element_type_;
 
 public:
-	typedef typename Span::index_type                  index_type;
-	typedef typename Span::index_type                  difference_type;
-	typedef random_access_iterator_tag                 iterator_category;
-	typedef typename remove_const<element_type_>::type value_type;
-
+	typedef typename Span::difference_type                                           difference_type;
+	typedef typename Span::size_type                                                 size_type;
+	typedef random_access_iterator_tag                                               iterator_category;
+	typedef typename remove_const<element_type_>::type                               value_type;
 	typedef typename conditional<IsConst, const element_type_, element_type_>::type &reference;
 	typedef typename add_pointer<reference>::type                                    pointer;
 
@@ -132,10 +140,10 @@ public:
 	        : span_(nullptr),
 	          index_(0) {}
 
-	JASEL_CXX14_CONSTEXPR span_iterator(const Span *span, typename Span::index_type index)
+	JASEL_CXX14_CONSTEXPR span_iterator(const Span *span, size_type index)
 	        : span_(span), index_(index)
 	{
-		JASEL_EXPECTS(span == nullptr || (index_ >= 0 && index <= span_->size()));
+		JASEL_EXPECTS(span == nullptr || (index <= span_->size()));
 	}
 
 	friend class span_iterator<Span, true>;
@@ -159,7 +167,7 @@ public:
 
 	JASEL_CXX14_CONSTEXPR span_iterator &operator++() noexcept
 	{
-		JASEL_EXPECTS(span_ && index_ >= 0 && index_ < span_->size());
+		JASEL_EXPECTS(span_ && index_ < span_->size());
 		++index_;
 		return *this;
 	}
@@ -193,7 +201,7 @@ public:
 
 	JASEL_CXX14_CONSTEXPR span_iterator &operator+=(difference_type n) noexcept
 	{
-		JASEL_EXPECTS(span_ && (index_ + n) >= 0 && (index_ + n) <= span_->size());
+		JASEL_EXPECTS(span_ && (index_ + n) >= 0 && (index_ + n) <= span_->ssize());
 		index_ += n;
 		return *this;
 	}
@@ -258,7 +266,7 @@ public:
 
 protected:
 	const Span *span_;
-	index_type  index_;
+	size_type   index_;
 };
 
 template <class Span, bool IsConst>
@@ -272,7 +280,7 @@ operator+(typename span_iterator<Span, IsConst>::difference_type n,
 template <extent_t Ext>
 class extent_type {
 public:
-	typedef ptrdiff_t index_type;
+	typedef size_of_t size_of_type;
 	typedef size_t    size_type;
 
 	static_assert(Ext >= 0, "A fixed-size span must be >= 0 in size.");
@@ -289,29 +297,37 @@ public:
 
 	JASEL_CXX14_CONSTEXPR extent_type(extent_t size) { JASEL_EXPECTS(size == Ext); }
 
-	JASEL_CXX14_CONSTEXPR inline size_type  size() const noexcept { return narrow_cast<size_type>(Ext); }
-	JASEL_CXX14_CONSTEXPR inline index_type ssize() const noexcept { return Ext; }
+	JASEL_CXX14_CONSTEXPR inline size_type           size() const noexcept { return Ext; }
+	static JASEL_CXX14_CONSTEXPR inline size_of_type ssize() noexcept { return narrow_cast<size_of_type>(Ext); }
 };
 
 template <>
 class extent_type<dynamic_extent> {
 public:
-	typedef ptrdiff_t index_type;
+	typedef size_of_t size_of_type;
 	typedef size_t    size_type;
 
 	template <extent_t Other>
 	explicit JASEL_CONSTEXPR extent_type(extent_type<Other> ext)
-	        : size_(ext.size())
+	        : size_(narrow_cast<size_of_type>(ext.size()))
 	{
 	}
 
-	explicit JASEL_CXX14_CONSTEXPR extent_type(extent_t size) : size_(size) { JASEL_EXPECTS(size >= 0); }
+	explicit JASEL_CXX14_CONSTEXPR extent_type(extent_t size) : size_(narrow_cast<size_of_type>(size))
+	{
+	}
 
-	JASEL_CXX14_CONSTEXPR inline size_type size() const noexcept { return narrow_cast<size_type>(size_); }
-	JASEL_CONSTEXPR inline index_type      ssize() const noexcept { return size_; }
+	JASEL_CXX14_CONSTEXPR inline size_type size() const noexcept
+	{
+		return narrow_cast<size_type>(size_);
+	}
+	JASEL_CONSTEXPR inline size_of_type ssize() const noexcept
+	{
+		return size_;
+	}
 
 private:
-	index_type size_;
+	size_of_type size_;
 };
 } // namespace details
 
@@ -322,7 +338,9 @@ public:
 	// constants and types
 	typedef ElementType               element_type;
 	typedef remove_cv_t<element_type> value_type;
-	typedef ptrdiff_t                 index_type;
+	typedef ptrdiff_t                 difference_type;
+	typedef size_of_t                 size_of_type;
+	typedef size_t                    index_type;
 	typedef size_t                    size_type;
 	typedef element_type *            pointer;
 	typedef element_type &            reference;
@@ -384,7 +402,7 @@ public:
 	                                            decltype(declval<Container>().data())>::value>::type * = 0
 
 	                     )
-	        : storage_(cont.data(), narrow<index_type>(cont.size()))
+	        : storage_(cont.data(), std::experimental::ssize(cont))
 	{
 	}
 
@@ -395,7 +413,7 @@ public:
 	                             is_convertible<typename Container::pointer, pointer>::value &&
 	                             is_convertible<typename Container::pointer,
 	                                            decltype(declval<Container>().data())>::value>::type * = 0)
-	        : storage_(cont.data(), narrow<index_type>(cont.size()))
+	        : storage_(cont.data(), std::experimental::ssize(cont))
 	{
 	}
 
@@ -443,40 +461,41 @@ public:
 		                                     Count == dynamic_extent ? size() - Offset : Count);
 	}
 
-	JASEL_CXX14_CONSTEXPR span<element_type, dynamic_extent> first(index_type count) const
+	JASEL_CXX14_CONSTEXPR span<element_type, dynamic_extent> first(size_type count) const
 	{
-		JASEL_EXPECTS(count >= 0 && count <= size());
+		JASEL_EXPECTS(count <= size());
 		return span<element_type, dynamic_extent>(data(), count);
 	}
 
-	JASEL_CXX14_CONSTEXPR span<element_type, dynamic_extent> last(index_type count) const
+	JASEL_CXX14_CONSTEXPR span<element_type, dynamic_extent> last(size_type count) const
 	{
-		JASEL_EXPECTS(count >= 0 && count <= size());
+		JASEL_EXPECTS(count <= size());
 		return span<element_type, dynamic_extent>(data() + (size() - count), count);
 	}
 
-	JASEL_CXX14_CONSTEXPR span<element_type, dynamic_extent> subspan(index_type offset,
-	                                                                 index_type count = dynamic_extent) const
+	JASEL_CXX14_CONSTEXPR span<element_type, dynamic_extent> subspan(size_type offset,
+	                                                                 size_type count = dynamic_extent) const
 	{
-		JASEL_EXPECTS((offset == 0 || (offset > 0 && offset <= size())) &&
-		              (count == dynamic_extent || (count >= 0 && offset + count <= size())));
+		JASEL_EXPECTS((offset <= size()) &&
+		              (count == dynamic_extent || (offset + count <= size())));
 		return span<element_type, dynamic_extent>(data() + offset, count == dynamic_extent ? size() - offset : count);
 	}
 
 	// [span.obs], span observers
 	JASEL_CONSTEXPR size_type size() const noexcept { return storage_.size(); }
-	JASEL_CONSTEXPR index_type ssize() const noexcept { return storage_.ssize(); }
-	JASEL_CONSTEXPR index_type size_bytes() const noexcept { return size() * narrow_cast<index_type>(sizeof(element_type)); }
-	JASEL_CONSTEXPR bool       empty() const noexcept { return size() == 0; }
+	JASEL_CONSTEXPR size_of_type ssize() const noexcept { return storage_.ssize(); }
+	JASEL_CONSTEXPR size_type size_bytes() const noexcept { return size() * size_of<element_type>(); }
+	JASEL_NODISCARD
+	JASEL_CONSTEXPR bool empty() const noexcept { return size() == 0; }
 
 	// [span.elem], span element access
-	JASEL_CXX14_CONSTEXPR reference operator[](index_type idx) const
+	JASEL_CXX14_CONSTEXPR reference operator[](size_type idx) const
 	{
-		JASEL_EXPECTS(idx >= 0 && idx < storage_.size());
+		JASEL_EXPECTS(idx < storage_.size());
 		return data()[idx];
 	}
-	// JASEL_CONSTEXPR reference at(index_type idx) const { return this->operator[](idx); }
-	JASEL_CONSTEXPR reference operator()(index_type idx) const { return this->operator[](idx); }
+	JASEL_CONSTEXPR reference front() const { return operator[](0); }
+	JASEL_CONSTEXPR reference back() const { return operator[](size() - 1); }
 	JASEL_CONSTEXPR pointer data() const noexcept { return storage_.data(); }
 
 	// [span.iter], span iterator support
@@ -505,7 +524,7 @@ private:
 		template <class OtherExtentType>
 		JASEL_CXX14_CONSTEXPR storage_type(pointer data, OtherExtentType ext) : ExtentType(ext), data_(data)
 		{
-			JASEL_EXPECTS((!data && ExtentType::ssize() == 0) || (data && ExtentType::ssize() >= 0));
+			//JASEL_EXPECTS((!data && ExtentType::ssize() == 0) || (data && ExtentType::ssize() > 0));
 		}
 
 		JASEL_CONSTEXPR inline pointer data() const noexcept { return data_; }
@@ -519,5 +538,38 @@ private:
 
 } // namespace fundamental_v3
 } // namespace experimental
+
+// 26.7.X Tuple interface
+// template <class T>
+// class tuple_size;
+// template <size_t I, class T>
+// class tuple_element;
+
+template <class ElementType, experimental::extent_t Extent>
+class tuple_size<experimental::span<ElementType, Extent>>
+        : public integral_constant<size_t, Extent> {
+};
+template <class ElementType>
+class tuple_size<experimental::span<ElementType, experimental::dynamic_extent>>;
+
+template <size_t I, class ElementType, experimental::extent_t Extent>
+class tuple_element<I, experimental::span<ElementType, Extent>> {
+public:
+	static_assert(I < static_cast<size_t>(Extent), "");
+	using type = ElementType;
+};
+
+template <size_t I, class ElementType>
+class tuple_element<I, experimental::span<ElementType, experimental::dynamic_extent>>;
+
+template <size_t I, class ElementType, experimental::extent_t Extent,
+          typename = typename enable_if<
+                  experimental::dynamic_extent != Extent &&
+                  (I < static_cast<size_t>(Extent))>::type>
+constexpr ElementType &get(experimental::span<ElementType, Extent> const &sp) noexcept
+{
+	return sp[I];
+}
+
 } // namespace std
 #endif // header

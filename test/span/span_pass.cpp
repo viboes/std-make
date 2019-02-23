@@ -183,12 +183,6 @@ int main()
 			BOOST_TEST(sp[i] == 0);
 	}
 	{
-		int              arr[] = {0, 1, 2, 3};
-		stdex::span<int> sp(arr);
-		for (int i = 0; i < sp.size(); ++i)
-			BOOST_TEST(sp(i) == i);
-	}
-	{
 		int              arr[10] = {};
 		stdex::span<int> sp(arr);
 		for (auto i : sp)
