@@ -33,6 +33,12 @@ template <bool B, class T = void>
 using enable_if_t = typename enable_if<B, T>::type;
 
 template <class T>
+using make_signed_t = typename make_signed<T>::type;
+
+template <class T>
+using make_unsigned_t = typename make_unsigned<T>::type;
+
+template <class T>
 using remove_const_t = typename remove_const<T>::type;
 
 template <class T>
