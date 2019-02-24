@@ -5,8 +5,12 @@
 // (C) Copyright 2019 Vicente J. Botet Escriba
 
 // see https://en.cppreference.com/w/cpp/container/span
+// see http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2018/p1024r1.pdf
 // see http://wiki.edg.com/pub/Wg21kona2019/StrawPolls/p1227r2.htm
 // see http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2019/p1024r2.pdf
+// see http://wiki.edg.com/pub/Wg21kona2019/StrawPolls/P1024r3.pdf
+// see http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2019/p1394r0.pdf
+// see http://wiki.edg.com/pub/Wg21kona2019/LibraryEvolutionWorkingGroup/P1394.pdf
 
 #ifndef JASEL_EXPERIMENTAL_SPAN_SPAN_HPP
 #define JASEL_EXPERIMENTAL_SPAN_SPAN_HPP
@@ -367,7 +371,19 @@ public:
 	{
 	}
 
-	JASEL_CONSTEXPR span(pointer ptr, size_type count) : storage_(ptr, count) {}
+	// todo
+	// template <ContiguousIterator It>
+	// //requires ConvertibleTo<remove_reference_t<iter_reference_t<It>> (*)[], ElementType (*)[]>
+	// JASEL_CONSTEXPR span(It ptr, size_type count) : storage_(ptr, count);
+
+	JASEL_CONSTEXPR span(pointer ptr, size_type count) : storage_(ptr, count)
+	{
+	}
+
+	// todo
+	// template <ContiguousIterator It, SizedSentinel<It> End>
+	// //requires ConvertibleTo<remove_reference_t<iter_reference_t<It>> (*)[], ElementType (*)[]>
+	// JASEL_CONSTEXPR span(It firstElem, End lastElem)
 
 	JASEL_CONSTEXPR span(pointer firstElem, pointer lastElem)
 	        : storage_(firstElem, std::distance(firstElem, lastElem))
@@ -390,6 +406,12 @@ public:
 	        : storage_(&arr[0], details::extent_type<N>())
 	{
 	}
+
+	// todo
+	// template <ranges::ContiguousRange R>
+	// requires ranges::SizedRange<R> && (forwarding - range<R> || std::is_const_v<ElementType>)
+	//      && ConvertibleTo<remove_reference_t<iter_reference_t<ranges::iterator_t<R>>> (*)[], ElementType (*)[]>
+	// constexpr span(R &&r);
 
 	// NB: the SFINAE here uses .data() as a incomplete/imperfect proxy for the requirement
 	// on Container to be a contiguous sequence container.
@@ -535,6 +557,7 @@ private:
 
 	storage_type<details::extent_type<Extent>> storage_;
 };
+// todo: add TCAD
 
 } // namespace fundamental_v3
 } // namespace experimental
