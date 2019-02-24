@@ -23,9 +23,6 @@ namespace experimental
 inline namespace fundamental_v3
 {
 
-template <class T>
-using aligned_storage_for_t = typename aligned_storage<sizeof(T), alignof(T)>::type;
-
 struct length_tag_t
 {
 };
