@@ -65,8 +65,8 @@ public:
 
 	using const_iterator            = value_type const *; //implementation-defined ; // see 20.4.2.2
 	using iterator                  = const_iterator;
-	using const_reverse_iterator    = reverse_iterator<const_iterator>;
-	using reverse_iterator          = const_reverse_iterator;
+	using const_reverse_iterator    = std::reverse_iterator<const_iterator>;
+	using reverse_iterator          = std::reverse_iterator<const_iterator>;
 	using string_type               = basic_string<CharT, Traits>;
 	using size_type                 = size_t;
 	using difference_type           = ptrdiff_t;

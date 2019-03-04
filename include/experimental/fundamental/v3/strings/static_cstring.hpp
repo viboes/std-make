@@ -60,8 +60,8 @@ public:
 	using const_reference        = const value_type &;
 	using iterator               = value_type *;
 	using const_iterator         = value_type const *;
-	using const_reverse_iterator = reverse_iterator<const_iterator>;
-	using reverse_iterator       = const_reverse_iterator;
+	using const_reverse_iterator = std::reverse_iterator<const_iterator>;
+	using reverse_iterator       = std::reverse_iterator<const_iterator>;
 	using size_type              = SizeType;
 	using difference_type        = ptrdiff_t;
 	using string_view_type       = basic_string_view<CharT, Traits>;
@@ -313,7 +313,7 @@ public:
 	template <class T>
 	basic_static_cstring &append(const T &t)
 	{
-		std::basic_string_view<CharT, Traits> sv = t;
+		basic_string_view<CharT, Traits> sv = t;
 		return append(sv.data(), sv.size());
 	}
 
@@ -322,7 +322,7 @@ public:
 	basic_static_cstring &append(const T &t, size_type pos,
 	                             size_type count = npos)
 	{
-		std::basic_string_view<CharT, Traits> sv = t;
+		basic_string_view<CharT, Traits> sv = t;
 		if (count == npos || count > sv.size())
 		{
 			count = sv.size() - pos + 1;
@@ -344,7 +344,7 @@ public:
 		return append(s);
 	}
 
-	basic_static_cstring &operator+=(std::initializer_list<CharT> ilist)
+	basic_static_cstring &operator+=(initializer_list<CharT> ilist)
 	{
 		return append(ilist);
 	}
@@ -522,7 +522,7 @@ public:
 		return rotate(pos_it, last_end, end());
 	}
 
-	iterator insert(const_iterator pos, std::initializer_list<CharT> ilist)
+	iterator insert(const_iterator pos, initializer_list<CharT> ilist)
 	{
 		return insert(pos, ilist.begin(), ilist.end());
 	}
@@ -530,7 +530,7 @@ public:
 	// requires convertible to string view
 	basic_static_cstring &insert(size_type pos, const T &t)
 	{
-		std::basic_string_view<CharT, Traits> sv = t;
+		basic_string_view<CharT, Traits> sv = t;
 		return insert(pos, sv.data(), sv.size());
 	}
 
@@ -539,7 +539,7 @@ public:
 	basic_static_cstring &insert(size_type index, const T &t,
 	                             size_type index_str, size_type count) // = npos)
 	{
-		std::basic_string_view<CharT, Traits> sv = t;
+		basic_string_view<CharT, Traits> sv = t;
 		if (count == npos || count > sv.size())
 		{
 			count = sv.size() - index_str + 1;
@@ -610,7 +610,7 @@ public:
 	basic_static_cstring &replace(const_iterator first, const_iterator last,
 	                              size_type count2, CharT ch);
 	basic_static_cstring &replace(const_iterator first, const_iterator last,
-	                              std::initializer_list<CharT> ilist);
+	                              initializer_list<CharT> ilist);
 	template <class T>
 	basic_static_cstring &replace(size_type pos, size_type count,
 	                              const T &t);

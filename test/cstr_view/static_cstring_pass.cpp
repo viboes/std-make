@@ -333,7 +333,7 @@ int main()
 		BOOST_TEST(sv.data() == scstr.data());
 	}
 // implicit conversion to cstr_view
-#if __cplusplus > 201402L
+#if defined __clang__ && __cplusplus > 201402L
 	// fixme: why this is ambiguous and not the following
 	{
 		const char *              str = "Hello";

@@ -41,8 +41,8 @@ public:
 	using const_reference        = const value_type &;
 	using const_iterator         = value_type const *; // see 20.4.2.2
 	using iterator               = const_iterator;
-	using const_reverse_iterator = reverse_iterator<const_iterator>;
-	using reverse_iterator       = const_reverse_iterator;
+	using const_reverse_iterator = std::reverse_iterator<const_iterator>;
+	using reverse_iterator       = std::reverse_iterator<const_iterator>;
 	using size_type              = size_t;
 	using difference_type        = ptrdiff_t;
 	using string_view_type       = basic_string_view<CharT, Traits>;
