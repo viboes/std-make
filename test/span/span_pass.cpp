@@ -129,6 +129,7 @@ int main()
 		BOOST_TEST(sp.size() == 5);
 		BOOST_TEST(sp.data() == arr + 2);
 	}
+#if defined __clang__
 	{
 		int                  arr[10];
 		stdex::span<int, 10> sp2(arr);
@@ -143,6 +144,7 @@ int main()
 		BOOST_TEST(sp.size() == 8);
 		BOOST_TEST(sp.data() == arr + 2);
 	}
+#endif
 	{
 		int                  arr[10];
 		stdex::span<int, 10> sp2(arr);
