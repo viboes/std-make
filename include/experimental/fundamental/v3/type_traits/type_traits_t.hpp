@@ -45,6 +45,9 @@ template <class T>
 using remove_cv_t = typename remove_cv<T>::type;
 
 template <class T>
+using remove_pointer_t = typename remove_pointer<T>::type;
+
+template <class T>
 using remove_reference_t = typename remove_reference<T>::type;
 
 } // namespace std
