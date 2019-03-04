@@ -473,6 +473,7 @@ public:
 		return span<element_type, Count>(data() + Offset, Count == dynamic_extent ? size() - Offset : Count);
 	}
 
+#if defined __clang__
 	template <extent_t Offset, bool b = false, extent_t ResExtent = Extent == dynamic_extent ? dynamic_extent : Extent - Offset>
 	JASEL_CXX14_CONSTEXPR span<element_type, ResExtent> subspan() const
 	{
@@ -482,7 +483,7 @@ public:
 		return span<element_type, ResExtent>(data() + Offset,
 		                                     Count == dynamic_extent ? size() - Offset : Count);
 	}
-
+#endif
 	JASEL_CXX14_CONSTEXPR span<element_type, dynamic_extent> first(size_type count) const
 	{
 		JASEL_EXPECTS(count <= size());
