@@ -68,13 +68,11 @@ inline void throw_violation_handler(contract_violation const &cv)
 
 inline void violation_handler(contract_violation const &cv)
 {
+#if JASEL_CONFIG_CONTRACT_VIOLATION_LOGS_V
+	log_violation_handler(cv);
+#endif
 #if JASEL_CONFIG_CONTRACT_VIOLATION_THROWS_V
 	throw_violation_handler(cv);
-#elif JASEL_CONFIG_CONTRACT_VIOLATION_LOG_AND_THROWS_V
-	log_violation_handler(cv);
-	throw_violation_handler(cv);
-#else
-	log_violation_handler(cv);
 #endif
 }
 
@@ -102,11 +100,19 @@ namespace contract
 #define JASEL_CONFIG_CONTRACT_AS_CHECK_NEVER_CONTINUE 4
 
 #ifndef JASEL_CONFIG_CONTRACT_DEFAULT
+#if !defined NDEBUG
+#define JASEL_CONFIG_CONTRACT_DEFAULT JASEL_CONFIG_CONTRACT_AS_CHECK_NEVER_CONTINUE
+#else
 #define JASEL_CONFIG_CONTRACT_DEFAULT JASEL_CONFIG_CONTRACT_AS_CHECK_MAYBE_CONTINUE
+#endif
 #endif
 
 #ifndef JASEL_CONFIG_CONTRACT_AUDIT
+#if !defined NDEBUG
+#define JASEL_CONFIG_CONTRACT_AUDIT JASEL_CONFIG_CONTRACT_AS_CHECK_NEVER_CONTINUE
+#else
 #define JASEL_CONFIG_CONTRACT_AUDIT JASEL_CONFIG_CONTRACT_AS_IGNORE
+#endif
 #endif
 
 #ifndef JASEL_CONFIG_CONTRACT_AXIOM
@@ -206,7 +212,7 @@ namespace contract
 	                      }),                                                                 \
 	                      0)))
 #endif
-//                                     "JASEL: Pre-condition failure: " #cond);                 \
+//                                     "JASEL: Pre-condition failure: " #cond);                 
 //"JASEL: Pre-condition failure at " __FILE__ "[" JASEL_STRINGIFY(__LINE__) "]: " JASEL_STRINGIFY(cond)
 
 #if JASEL_ELIDE_CONTRACT_ENSURES
