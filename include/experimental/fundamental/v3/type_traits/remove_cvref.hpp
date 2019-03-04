@@ -10,18 +10,21 @@
 #define JASEL_STD_REMOVE_CVREF_HPP
 
 // fixme: adapt as soon as this trait is implemented
-#if __cplusplus <= 201703L
+#if (defined __clang__ && __cplusplus > 201703L)
+#else
 
 #include <type_traits> //remove_cv_t, remove_reference_t
 
 namespace std
 {
-  template <class T>
-  struct remove_cvref : remove_cv< typename remove_reference<T>::type >  {};
+template <class T>
+struct remove_cvref : remove_cv<typename remove_reference<T>::type>
+{
+};
 
-  template <class T>
-  using remove_cvref_t = typename remove_cvref<T>::type;
-}
+template <class T>
+using remove_cvref_t = typename remove_cvref<T>::type;
+} // namespace std
 
 #endif
 #endif // header
