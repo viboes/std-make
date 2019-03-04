@@ -23,7 +23,7 @@ inline namespace fundamental_v3
 //      // auto r = discard(expr);
 //      // maybe_unused(r);
 //      discard(expr);
-
+// See also https://github.com/zenorogue/hyperrogue/commit/fbc7cd32126cbf4d9a5cf8712976c8fc79cfd15e#diff-77bf5bae97bab9c1cada10bb577e024a which name it ignore
 template <class U>
 void discard(U &&)
 {
