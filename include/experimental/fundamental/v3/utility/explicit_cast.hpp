@@ -17,11 +17,11 @@ namespace experimental
 {
 inline namespace fundamental_v3
 {
-// As for  c-style cast use explicit_cast only when there is no a more explicit cast,
+// As for  c-style cast use explicit_cast only when there is no a more precise cast,
 // as const_cast, static_cast, reinterpret_cast.
 // Of course, make use of even more explicit casts as narrow_cast, to_signed_cast, to_unsigned_cast,
-// polymorphic_down_cast, polymorphic_up_cast,
-// explicit_cast has the advantage over c-cast that can be grep, find easily and as long as the other cast.
+// polymorphic_downcast, polymorphic_cast, align_cast, resurrect_cast, incomplete_cast.
+// explicit_cast has the advantage over c-cast that is grep-able, find easily and as long as the other cast.
 // The question is if we should use T(u) or T{u} instead of (T)u or explicit_cast<T>(u) when T is the name of a class.
 // While T(u) or T{u} looks more like C++, it is not easy to grep neither.
 // However, in this case static_cast is more strict than explicit_cast.

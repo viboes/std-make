@@ -10,7 +10,8 @@
 #ifndef JASEL_FUNDAMENTAL_V3_UTILITY_CONVERT_CAST_HPP
 #define JASEL_FUNDAMENTAL_V3_UTILITY_CONVERT_CAST_HPP
 
-#include <utility> // forward, enable_if
+#include <type_traits> // is_pointer
+#include <utility>     // forward, enable_if
 
 namespace std
 {
@@ -22,6 +23,7 @@ inline namespace fundamental_v3
 // While T(u) or T{u} looks more like C++, it is not easy to grep neither.
 // static_cast can be used for more things than for converting between types.
 // Use convert_cast, when you want to state clearly that you are calling to the explicit convertion constructor or conversion operatot.
+// possible alternative - explicit_conversion
 template <class T, class U, typename = typename enable_if<!is_pointer<T>::value>::type>
 T convert_cast(U &&u)
 {

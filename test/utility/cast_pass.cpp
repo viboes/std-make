@@ -16,6 +16,19 @@
 
 namespace stdex = std::experimental;
 
+struct I
+{
+};
+struct X : I
+{
+};
+struct Y : I
+{
+};
+struct Z : I
+{
+};
+
 int main()
 {
 	// type_erase_cast
@@ -31,20 +44,39 @@ int main()
 		void *uptr = &u;
 		//short *tptr = uptr; // fail to compile
 		//short *tptr = static_cast<short *>(uptr); // compiles, but is not explicit enough
-		short *tptr = stdex::erased_ptr_cast<short *>(uptr);
+		short *tptr = stdex::any_ptr_cast<short *>(uptr);
 		// Wondering if there is no UB when trying to derreference tptr.
 		BOOST_TEST(tptr == uptr);
 	}
 	{
 		int const    u    = 1;
 		void const * uptr = &u;
-		short const *tptr = stdex::erased_ptr_cast<short const *>(uptr);
+		short const *tptr = stdex::any_ptr_cast<short const *>(uptr);
+		BOOST_TEST(tptr == uptr);
+	}
+	{
+		X  u;
+		I *uptr = &u;
+		X *tptr = stdex::erased_ptr_cast<X *>(uptr);
+		BOOST_TEST(tptr == uptr);
+	}
+	{
+		X  u;
+		I *uptr = &u;
+		Y *tptr = stdex::erased_ptr_cast<Y *>(uptr);
+		// Wondering if there is no UB when trying to derreference tptr.
+		BOOST_TEST(tptr == uptr);
+	}
+	{
+		X const  u;
+		I const *uptr = &u;
+		X const *tptr = stdex::erased_ptr_cast<X const *>(uptr);
 		BOOST_TEST(tptr == uptr);
 	}
 	// {
 	// 	int const   u    = 1;
 	// 	void const *uptr = &u;
-	// 	short *     tptr = stdex::erased_ptr_cast<short *>(uptr); // this MUST NOT compile
+	// 	short *     tptr = stdex::any_ptr_cast<short *>(uptr); // this MUST NOT compile
 	// }
 	// {
 	// 	int const   u    = 1;

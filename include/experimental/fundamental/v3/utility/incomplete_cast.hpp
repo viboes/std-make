@@ -18,13 +18,13 @@ inline namespace fundamental_v3
 // As for  c-stype cast use incomplete_cast only when there is no a more explicit cast.
 // incomplete_cast has the advantage over c-cast that can be grep
 template <class TPtr, class U>
-TPtr incomplete_cast(U *u)
+constexpr TPtr incomplete_cast(U *u) noexcept
 {
 	return (TPtr)(u);
 }
 
 template <class TRef, class U>
-TRef incomplete_cast(U &u)
+constexpr TRef incomplete_cast(U &u) noexcept
 {
 	return (TRef)(u);
 }
