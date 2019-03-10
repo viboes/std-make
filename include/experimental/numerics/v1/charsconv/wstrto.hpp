@@ -4,8 +4,8 @@
 //
 // (C) Copyright 2019 Vicente J. Botet Escriba
 
-#ifndef JASEL_NULMERIC_V1_CHARCONV_WSTRTO_HPP
-#define JASEL_NULMERIC_V1_CHARCONV_WSTRTO_HPP
+#ifndef JASEL_NUMERIC_V1_CHARCONV_WSTRTO_HPP
+#define JASEL_NUMERIC_V1_CHARCONV_WSTRTO_HPP
 
 #include <experimental/contract.hpp>
 #include <experimental/numerics/v1/charsconv/strto.hpp>
