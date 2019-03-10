@@ -85,6 +85,7 @@ namespace contract
 #define JASEL_ELIDE_CONTRACT_EXPECTS (0 == (JASEL_CONFIG_CONTRACT_LEVEL_MASK & 0x001))
 #define JASEL_ELIDE_CONTRACT_ENSURES (0 == (JASEL_CONFIG_CONTRACT_LEVEL_MASK & 0x010))
 #define JASEL_ELIDE_CONTRACT_ASSERTIONS (0 == (JASEL_CONFIG_CONTRACT_LEVEL_MASK & 0x100))
+#define JASEL_ELIDE_CONTRACTS (0x111 == (JASEL_CONFIG_CONTRACT_LEVEL_MASK))
 
 #define JASEL_CONTRACT_IGNORE(KIND, cond) ((void)sizeof(decltype((cond) ? true : false)))
 #define JASEL_CONTRACT_ASSUME(KIND, cond, MSG) JASEL_ASSUME(cond &&MSG)
@@ -212,7 +213,7 @@ namespace contract
 	                      }),                                                                 \
 	                      0)))
 #endif
-//                                     "JASEL: Pre-condition failure: " #cond);                 
+//                                     "JASEL: Pre-condition failure: " #cond);
 //"JASEL: Pre-condition failure at " __FILE__ "[" JASEL_STRINGIFY(__LINE__) "]: " JASEL_STRINGIFY(cond)
 
 #if JASEL_ELIDE_CONTRACT_ENSURES
@@ -251,6 +252,14 @@ namespace contract
 		                             "JASEL: Assertion failure at " __FILE__ "[" JASEL_STRINGIFY(__LINE__) "]: " JASEL_STRINGIFY(cond)); \
 	                      }),                                                                                                            \
 	                      0)))
+#endif
+
+#if JASEL_ELIDE_CONTRACTS
+#define JASEL_CONTRACT_NOEXCEPT BOOST_NOEXCEPT
+#define JASEL_CONTRACT_CONSTEXPR BOOST_CONSTEXPR
+#else
+#define JASEL_CONTRACT_NOEXCEPT
+#define JASEL_CONTRACT_CONSTEXPR BOOST_CXX14_CONSTEXPR
 #endif
 
 namespace detail

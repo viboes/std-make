@@ -89,6 +89,8 @@
 #define JASEL_INLINE_VAR
 #endif
 
+#define JASEL_NOEXCEPT BOOST_NOEXCEPT
+
 #define JASEL_NOEXCEPT_DECLTYPE_RETURN(...)                \
 	noexcept(noexcept(decltype(__VA_ARGS__)(__VA_ARGS__))) \
 	        ->decltype(__VA_ARGS__)                        \
