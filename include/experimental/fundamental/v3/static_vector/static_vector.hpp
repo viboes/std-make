@@ -335,7 +335,7 @@ public:
 	// 5.7, modifiers:
 	constexpr iterator insert(const_iterator position, const value_type &value)
 	{
-		return insert(position, size_type(1), value);
+		return insert(position, length_tag_t{}, size_type(1), value);
 	}
 
 	constexpr iterator insert(const_iterator position, value_type &&value)
