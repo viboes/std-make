@@ -132,6 +132,11 @@ test-suite static_vector
       [ run static_vector/static_vector_pass.cpp  ]
     ;
 
+test-suite static_forward_list
+    : 
+      [ run static_forward_list/static_forward_list_pass.cpp  ]
+    ;
+
 test-suite span
     : 
       [ run span/span_pass.cpp  ]
