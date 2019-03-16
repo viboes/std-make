@@ -65,6 +65,18 @@
 
 #define JASEL_CONSTEXPR BOOST_CONSTEXPR
 
+#if __cplusplus >= 202003L
+#define JASEL_CXX20_CONSTEXPR constexpr
+#else
+#define JASEL_CXX20_CONSTEXPR
+#endif
+
+#if __cplusplus >= 201703L
+#define JASEL_CXX17_CONSTEXPR constexpr
+#else
+#define JASEL_CXX17_CONSTEXPR
+#endif
+
 #if __cplusplus >= 201402L
 #define JASEL_MUTABLE_CONSTEXPR BOOST_CXX14_CONSTEXPR
 #define JASEL_CXX14_CONSTEXPR BOOST_CXX14_CONSTEXPR
