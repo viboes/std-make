@@ -169,7 +169,7 @@ int main()
 		int                                i  = 123;
 		auto                               it = cont.before_begin();
 		//Action
-		it = cont.insert_after(it, stdex::length_tag2_t{}, 1, i);
+		it = cont.insert_after(it, stdex::length_tag_t{}, 1, i);
 		//Assert
 		BOOST_TEST_EQ(*it, 123);
 		BOOST_TEST_EQ(1, cont.size());
@@ -181,7 +181,7 @@ int main()
 		int                                i  = 123;
 		auto                               it = cont.before_begin();
 		//Action
-		it = cont.insert_after(it, stdex::length_tag2_t{}, 3, i);
+		it = cont.insert_after(it, stdex::length_tag_t{}, 3, i);
 		//Assert
 		BOOST_TEST_EQ(*it, 123);
 		BOOST_TEST_EQ(3, cont.size());
@@ -193,7 +193,7 @@ int main()
 
 		int  i  = 123;
 		auto it = cont.before_begin();
-		it      = cont.insert_after(it, stdex::length_tag2_t{}, 1, i);
+		it      = cont.insert_after(it, stdex::length_tag_t{}, 1, i);
 		BOOST_TEST_EQ(*it, 123);
 		std::cout << ">>>>> " << __LINE__ << std::endl;
 		//Action
@@ -209,7 +209,7 @@ int main()
 		stdex::static_forward_list<int, 5> cont;
 		int                                i  = 123;
 		auto                               it = cont.before_begin();
-		it                                    = cont.insert_after(it, stdex::length_tag2_t{}, 1, i);
+		it                                    = cont.insert_after(it, stdex::length_tag_t{}, 1, i);
 		//Action
 		it = cont.insert_after(it, 321);
 		//Assert

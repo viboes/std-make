@@ -8,6 +8,7 @@
 #define JASEL_EXPERIMENTAL_STRINGS_NULL_TERMINATED_HPP
 
 #include <experimental/fundamental/v2/config.hpp>
+#include <experimental/fundamental/v3/utility/length_tag.hpp>
 
 namespace std
 {
@@ -23,12 +24,12 @@ struct null_terminated_t
 inline constexpr null_terminated_t null_terminated;
 #endif
 
-struct length_tag_t
-{
-};
-#if __cplusplus > 201402L
-inline constexpr length_tag_t length_tag;
-#endif
+// struct length_tag_t
+// {
+// };
+// #if __cplusplus > 201402L
+// inline constexpr length_tag_t length_tag;
+// #endif
 
 template <class CharT>
 struct null_terminated_traits

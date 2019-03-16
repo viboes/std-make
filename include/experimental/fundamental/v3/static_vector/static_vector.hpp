@@ -12,6 +12,7 @@
 #include <experimental/contract.hpp>
 #include <experimental/fundamental/v2/config.hpp>
 #include <experimental/fundamental/v3/contract/constexpr_assert.hpp>
+#include <experimental/fundamental/v3/utility/length_tag.hpp>
 #include <experimental/type_traits.hpp>
 #include <algorithm>
 #include <cassert>
@@ -22,10 +23,6 @@ namespace experimental
 {
 inline namespace fundamental_v3
 {
-
-struct length_tag_t
-{
-};
 
 template <typename T, size_t N>
 class static_vector {
