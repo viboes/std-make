@@ -19,8 +19,7 @@
 #include <type_traits>
 #include <utility>
 
-// observer_ptr is a non-owning pointer to a single object (no pointer arithmetic) providing default construction to nullptr.
-// See https://en.cppreference.com/w/cpp/experimental/observer_ptr
+// See http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2018/p1007r3.pdf
 
 namespace std
 {
@@ -59,24 +58,6 @@ namespace detail
 ////////////////////////////////////////////////////////////////////////////
 // Implementation detail classes
 ////////////////////////////////////////////////////////////////////////////
-
-template <class T>
-struct default_copy
-{
-	T *operator()(const T &t) const
-	{
-		return new T(t);
-	}
-};
-
-template <class T>
-struct default_delete
-{
-	void operator()(const T *t) const
-	{
-		delete t;
-	}
-};
 
 template <class T>
 struct control_block
@@ -196,8 +177,8 @@ public:
 	{
 	}
 
-	template <class U, class C = detail::default_copy<U>,
-	          class D = detail::default_delete<U>,
+	template <class U, class C = default_copy<U>,
+	          class D = default_delete<U>,
 	          class V = std::enable_if_t<std::is_convertible<U *, T *>::value>>
 	explicit polymorphic_value(U *u, C copier = C{}, D deleter = D{})
 	{
@@ -206,8 +187,8 @@ public:
 			return;
 		}
 
-		if (std::is_same<D, detail::default_delete<U>>::value &&
-		    std::is_same<C, detail::default_copy<U>>::value &&
+		if (std::is_same<D, default_delete<U>>::value &&
+		    std::is_same<C, default_copy<U>>::value &&
 		    typeid(*u) != typeid(U))
 			throw bad_polymorphic_value_construction();
 
@@ -376,7 +357,17 @@ polymorphic_value<typename std::decay<T>::type> make_polymorphic_value(T &&t)
 {
 	return polymorphic_value<typename std::decay<T>::type>(std::forward<T>(t));
 }
-
+#if 1
+template <class T, class U = T, class... Ts>
+polymorphic_value<T> make_polymorphic_value(Ts &&... ts)
+{
+	polymorphic_value<T> p;
+	p.cb_ = std::make_unique<detail::direct_control_block<T, U>>(
+	        std::forward<Ts>(ts)...);
+	p.ptr_ = p.cb_->ptr();
+	return std::move(p);
+}
+#else
 template <class T, class... Ts>
 polymorphic_value<T> make_polymorphic_value(Ts &&... ts)
 {
@@ -395,7 +386,7 @@ polymorphic_value<T> make_polymorphic_value(Ts &&... ts)
 	p.ptr_ = p.cb_->ptr();
 	return std::move(p);
 }
-
+#endif
 //
 // non-member swap
 //
