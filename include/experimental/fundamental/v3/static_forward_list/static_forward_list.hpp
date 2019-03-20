@@ -12,6 +12,7 @@
 #include <experimental/contract.hpp>
 #include <experimental/fundamental/v2/config.hpp>
 #include <experimental/fundamental/v3/contract/constexpr_assert.hpp>
+#include <experimental/fundamental/v3/utility/length_tag.hpp>
 #include <experimental/type_traits.hpp>
 #include <algorithm>
 #include <cassert>
@@ -22,9 +23,9 @@ namespace experimental
 {
 inline namespace fundamental_v3
 {
-struct length_tag2_t
-{
-};
+
+// The main difference with forward_list is that this class doesn't shares his allocator but contains the allocator statically.
+// This make impossible to implement the splice/merge functions. As the reason to don't implement size from hence, we can use a counter for the size of elements.
 
 template <typename T, size_t N>
 class static_forward_list {
@@ -46,53 +47,65 @@ private:
 		node *               next_;
 		element_storage_type storage_;
 	};
-	struct node_iterator
-	{
+	class const_node_iterator;
+	class node_iterator {
 		node *ptr_;
+		friend class static_forward_list;
+		friend class const_node_iterator;
 
-		node_iterator() : ptr_(nullptr) {}
-		node_iterator(node *it) : ptr_(it) {}
+	public:
+		typedef forward_iterator_tag iterator_category;
+		typedef T                    value_type;
+		typedef value_type &         reference;
+		typedef ptrdiff_t            difference_type;
+		typedef T *                  pointer;
+
+		node_iterator() noexcept : ptr_(nullptr) {}
+		node_iterator(node *it) noexcept : ptr_(it) {}
 		node_iterator(node_iterator const &) = default;
 		node_iterator &operator=(node_iterator const &) = default;
 
-		node_iterator &operator++()
+		node_iterator &operator++() noexcept
 		{
 			ptr_ = ptr_->next_;
 			return *this;
 		}
-		node_iterator operator++(int)
+		node_iterator operator++(int) noexcept
 		{
 			node_iterator tmp = *this;
 			ptr_              = ptr_->next_;
 			return tmp;
 		}
 
-		T const *   operator->() const { return reinterpret_cast<T const *>(&ptr_->storage_); }
-		T *         operator->() { return reinterpret_cast<T *>(&ptr_->storage_); }
-		T const &   operator*() const { return reinterpret_cast<T const &>(ptr_->storage_); }
-		T &         operator*() { return reinterpret_cast<T &>(ptr_->storage_); }
-		friend bool operator==(node_iterator const &x, node_iterator const &y)
+		T *         operator->() const noexcept { return reinterpret_cast<T *>(&ptr_->storage_); }
+		T &         operator*() const noexcept { return reinterpret_cast<T &>(ptr_->storage_); }
+		friend bool operator==(node_iterator const &x, node_iterator const &y) noexcept
 		{
 			return x.ptr_ == y.ptr_;
 		}
-		friend bool operator!=(node_iterator const &x, node_iterator const &y)
+		friend bool operator!=(node_iterator const &x, node_iterator const &y) noexcept
 		{
 			return x.ptr_ != y.ptr_;
 		}
 	};
 
-	struct const_node_iterator
-	{
+	class const_node_iterator {
 		node *ptr_;
+		friend class static_forward_list;
+
+	public:
+		typedef forward_iterator_tag iterator_category;
+		typedef T                    value_type;
+		typedef value_type const &   reference;
+		typedef ptrdiff_t            difference_type;
+		typedef T const *            pointer;
 
 		const_node_iterator() : ptr_(nullptr) {}
 		const_node_iterator(node const *it) : ptr_(it) {}
 		const_node_iterator(node_iterator const it) : ptr_(it.ptr_) {}
 
 		T const *operator->() const { return &ptr_->value; }
-		T const *operator->() { return &ptr_->value; }
 		T const &operator*() const { return ptr_->value; }
-		T const &operator*() { return ptr_->value; }
 
 		friend bool operator==(const_node_iterator const &x, const_node_iterator const &y)
 		{
@@ -167,11 +180,10 @@ private:
 
 public:
 	// 5.2, copy/move construction:
-	/**
-	    Effects: Constructs an empty static_forward_list.
-	    Ensures: empty().
-	    Complexity: Constant.
-	 */
+
+	//! Effects: Constructs an empty static_forward_list.
+	//! Ensures: empty().
+	//! Complexity: O(N).
 	JASEL_CXX14_CONSTEXPR static_forward_list() noexcept
 	        : size_(0)
 	{
@@ -195,11 +207,11 @@ public:
 	{
 		move_insert_after(before_begin(), other.begin(), other.end());
 	}
-	constexpr explicit static_forward_list(length_tag2_t tag, size_type n)
+	JASEL_CXX14_CONSTEXPR explicit static_forward_list(length_tag_t tag, size_type n)
 	        : static_forward_list(tag, n, T())
 	{
 	}
-	JASEL_CXX14_CONSTEXPR static_forward_list(length_tag2_t tag, size_type n, const value_type &value)
+	JASEL_CXX14_CONSTEXPR static_forward_list(length_tag_t tag, size_type n, const value_type &value)
 	        : size_(0)
 	{
 		insert_after(before_begin(), tag, n, value);
@@ -248,7 +260,7 @@ public:
 		clear();
 		insert_after(this->before_begin(), first, last);
 	}
-	JASEL_CXX14_CONSTEXPR void assign(length_tag2_t tag, size_type n, const value_type &u)
+	JASEL_CXX14_CONSTEXPR void assign(length_tag_t tag, size_type n, const value_type &u)
 	{
 		clear();
 		insert_after(this->before_begin(), tag, n, u);
@@ -329,17 +341,29 @@ public:
 	{
 		return N;
 	}
-	// JASEL_CXX14_CONSTEXPR void resize(size_type sz)
-	// {
-	// 	resize(sz, T());
-	// }
-	// JASEL_CXX14_CONSTEXPR void resize(size_type sz, const value_type &c)
-	// {
-	// 	if (sz < size())
-	// 		erase_after(element_ptr(sz), end());
-	// 	else
-	// 		insert_after(end(), sz - size(), c);
-	// }
+
+	JASEL_CXX14_CONSTEXPR iterator before_pos(size_type sz)
+	{
+		node *before = before_begin();
+		for (; sz != 0; --sz)
+		{
+			before = before->next_;
+		}
+		return before;
+	}
+
+	JASEL_CXX14_CONSTEXPR void resize(size_type sz)
+	{
+		resize(sz, T());
+	}
+
+	JASEL_CXX14_CONSTEXPR void resize(size_type sz, const value_type &c)
+	{
+		if (sz < size())
+			erase_after(before_pos(sz), end());
+		else
+			insert_after(before_pos(size()), sz - size(), c);
+	}
 
 	// // 5.6, element and data access:
 
@@ -358,7 +382,7 @@ public:
 	// 5.7, modifiers:
 	JASEL_CXX14_CONSTEXPR iterator insert_after(const_iterator position, const value_type &value)
 	{
-		return insert_after(position, length_tag2_t{}, size_type(1), value);
+		return insert_after(position, length_tag_t{}, size_type(1), value);
 	}
 
 	JASEL_CXX14_CONSTEXPR iterator insert_after(const_iterator position, value_type &&value)
@@ -379,7 +403,7 @@ public:
 		return last_updated;
 	}
 
-	JASEL_CXX14_CONSTEXPR iterator insert_after(const_iterator position, length_tag2_t, size_type n, const value_type &x)
+	JASEL_CXX14_CONSTEXPR iterator insert_after(const_iterator position, length_tag_t, size_type n, const value_type &x)
 	{
 		JASEL_EXPECTS(n <= capacity() - size() && "try to insert beyond capacity");
 
@@ -394,20 +418,7 @@ public:
 			--n;
 			last_busy_m_1 = last_busy_m_1->next_;
 		}
-#if 1
 		return _insert_first_n_nodes_until_after(num, last_busy_m_1, position);
-#else
-		node *last_busy         = last_busy_m_1->next_;
-		node *writable_position = data_[0].next_;
-		node *after_position    = position.ptr_->next_;
-
-		position.ptr_->next_ = writable_position;
-		last_busy_m_1->next_ = after_position;
-		data_[0].next_       = last_busy;
-		size_ += num;
-
-		return last_busy_m_1;
-#endif
 	}
 	template <class InputIterator>
 	JASEL_CXX14_CONSTEXPR iterator insert_after(const_iterator position, InputIterator first, InputIterator last)
@@ -427,20 +438,7 @@ public:
 			last_busy_m_1 = last_busy_m_1->next_;
 			++first;
 		}
-#if 1
 		return _insert_first_n_nodes_until_after(num, last_busy_m_1, position);
-#else
-		node *last_busy         = last_busy_m_1->next_;
-		node *writable_position = data_[0].next_;
-		node *after_position    = position.ptr_->next_;
-
-		position.ptr_->next_ = writable_position;
-		last_busy_m_1->next_ = after_position;
-		data_[0].next_       = last_busy;
-		size_ += num;
-
-		return last_busy_m_1;
-#endif
 	}
 	template <class InputIterator>
 	JASEL_CXX14_CONSTEXPR iterator move_insert_after(const_iterator position, InputIterator first, InputIterator last)
@@ -459,43 +457,25 @@ public:
 			last_busy_m_1 = last_busy_m_1->next_;
 			++first;
 		}
-#if 1
 		return _insert_first_n_nodes_until_after(num, last_busy_m_1, position);
-#else
-
-		node *last_busy         = last_busy_m_1->next_;
-		node *writable_position = data_[0].next_;
-		node *after_position    = position.ptr_->next_;
-
-		position.ptr_->next_ = writable_position;
-		last_busy_m_1->next_ = after_position;
-		data_[0].next_       = last_busy;
-		size_ += num;
-
-		return last_busy_m_1;
-#endif
 	}
 	JASEL_CXX14_CONSTEXPR iterator insert_after(const_iterator position, initializer_list<value_type> il)
 	{
 		return insert(position, il.begin(), il.end());
 	}
 
-	// template <class... Args>
-	// JASEL_CXX14_CONSTEXPR iterator emplace_after(const_iterator position, Args &&... args)
-	// {
-	// 	JASEL_EXPECTS(!full() && "try to emplace in a full collection");
-	// 	JASEL_EXPECTS(iterator_in_range(position) && "try to emplace in position out of range");
+	template <class... Args>
+	JASEL_CXX14_CONSTEXPR iterator emplace_after(const_iterator position, Args &&... args)
+	{
+		JASEL_EXPECTS(!full() && "try to emplace in a full collection");
+		//JASEL_EXPECTS(iterator_in_range(position) && "try to emplace in position out of range");
 
-	// 	// memorize the new first
-	// 	auto new_first = end();
-	// 	// emplace back the elements to insert
-	// 	emplace_back(forward<Args>(args)...);
-	// 	// make the pointer writable
-	// 	auto writable_position = begin() + (position - begin());
-	// 	// rotate the added elements
-	// 	rotate(writable_position, new_first, end());
-	// 	return writable_position;
-	// }
+		// emplace back the element to insert
+		node *last_busy_m_1 = &data_[0];
+		construct(last_busy_m_1->next_, std::forward<Args>(args)...);
+		last_busy_m_1 = last_busy_m_1->next_;
+		return _insert_first_n_nodes_until_after(1, last_busy_m_1, position);
+	}
 
 	template <class... Args>
 	JASEL_CXX14_CONSTEXPR reference emplace_front(Args &&... args)
@@ -503,7 +483,7 @@ public:
 		return *emplace_after(this->before_begin(), std::forward<Args>(args)...);
 	}
 
-	JASEL_CXX14_CONSTEXPR void move_to_busy(node *n)
+	JASEL_CXX14_CONSTEXPR void _move_to_busy(node *n)
 	{
 		auto next_free = n->next_;
 		n->next_       = head_.next_;
@@ -511,7 +491,7 @@ public:
 		data_[0].next_ = next_free;
 		++size_;
 	}
-	JASEL_CXX14_CONSTEXPR void move_to_free(node *n)
+	JASEL_CXX14_CONSTEXPR void _move_to_free(node *n)
 	{
 		auto nextbusy  = n->next_;
 		n->next_       = data_[0].next_->next_;
@@ -524,7 +504,7 @@ public:
 		JASEL_EXPECTS(!full() && "try to push_back in a full collection");
 		auto n = data_[0].next_;
 		construct(n, x);
-		move_to_busy(n);
+		_move_to_busy(n);
 	}
 
 	JASEL_CXX14_CONSTEXPR void push_front(value_type &&x)
@@ -532,7 +512,7 @@ public:
 		JASEL_EXPECTS(!full() && "try to push_back in a full collection");
 		auto n = data_[0].next_;
 		construct(n, move(x));
-		move_to_busy(n);
+		_move_to_busy(n);
 	}
 
 	JASEL_CXX14_CONSTEXPR void pop_front()
