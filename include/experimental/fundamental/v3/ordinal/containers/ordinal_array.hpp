@@ -99,18 +99,18 @@ public:
 	// iterator support
 	//! \n<b>Returns:</b> iterator for the first element
 	//! \n<b>Throws:</b> Nothing
-	JASEL_MUTABLE_CONSTEXPR iterator begin() noexcept { return elems; }
+	JASEL_MUTABLE_CONSTEXPR iterator begin() noexcept { return data(); }
 
 	//! \n<b>Returns:</b> const iterator for the first element
-	constexpr const_iterator begin() const noexcept { return elems; }
-	constexpr const_iterator cbegin() const noexcept { return elems; }
+	constexpr const_iterator begin() const noexcept { return data(); }
+	constexpr const_iterator cbegin() const noexcept { return data(); }
 
 	//! \n<b>Returns:</b> iterator for position after the last element
-	JASEL_MUTABLE_CONSTEXPR iterator end() noexcept { return elems + static_size; }
+	JASEL_MUTABLE_CONSTEXPR iterator end() noexcept { return data() + static_size; }
 
 	//! \n<b>Returns:</b> const iterator for position after the last element
-	constexpr const_iterator end() const noexcept { return elems + static_size; }
-	constexpr const_iterator cend() const noexcept { return elems + static_size; }
+	constexpr const_iterator end() const noexcept { return data() + static_size; }
+	constexpr const_iterator cend() const noexcept { return data() + static_size; }
 
 	// reverse iterator support
 	typedef std::reverse_iterator<iterator>       reverse_iterator;
@@ -152,7 +152,7 @@ public:
 	{
 		size_type i = ordinal::pos(k);
 		assert(i < static_size && "out of range");
-		return elems[i];
+		return data()[i];
 	}
 
 	//! \n<b>Pre-condition:</b> <tt>pos(k) < static_size</tt>
@@ -161,7 +161,7 @@ public:
 	JASEL_CXX14_CONSTEXPR const_reference operator[](key_type k) const
 	{
 		assert(ordinal::pos(k) < static_size && "out of range");
-		return elems[ordinal::pos(k)];
+		return data()[ordinal::pos(k)];
 	}
 
 	// at() with range check
@@ -169,11 +169,11 @@ public:
 	//! \n<b>Throws:</b> std::out_of_range if i >= static_size
 	JASEL_MUTABLE_CONSTEXPR reference at(key_type k)
 	{
-		return elems[rangecheck(k)];
+		return data()[rangecheck(k)];
 	}
 	constexpr const_reference at(key_type k) const
 	{
-		return elems[rangecheck(k)];
+		return data()[rangecheck(k)];
 	}
 
 	// front() and back()
@@ -181,28 +181,28 @@ public:
 	//! \n<b>Throws:</b> Nothing
 	JASEL_MUTABLE_CONSTEXPR reference front() noexcept
 	{
-		return elems[0];
+		return data()[0];
 	}
 
 	//! \n<b>Returns:</b> const reference to the first element
 	//! \n<b>Throws:</b> Nothing
 	constexpr const_reference front() const noexcept
 	{
-		return elems[0];
+		return data()[0];
 	}
 
 	//! \n<b>Returns:</b> reference to the last element
 	//! \n<b>Throws:</b> Nothing
 	JASEL_MUTABLE_CONSTEXPR reference back() noexcept
 	{
-		return elems[static_size - 1];
+		return data()[static_size - 1];
 	}
 
 	//! \n<b>Returns:</b> const reference to the last element
 	//! \n<b>Throws:</b> Nothing
 	constexpr const_reference back() const noexcept
 	{
-		return elems[static_size - 1];
+		return data()[static_size - 1];
 	}
 
 	// size is constant
@@ -234,11 +234,11 @@ public:
 	{
 		for (size_type i = 0; i < static_size; ++i)
 #if __cplusplus >= 201402L
-			swappable::swap(elems[i], y.elems[i]);
+			swappable::swap(data()[i], y.data()[i]);
 #else
 		{
 			using std::swap;
-			swap(elems[i], y.elems[i]);
+			swap(data()[i], y.data()[i]);
 		}
 #endif
 	}
@@ -259,7 +259,7 @@ public:
 	//! \n<b>Returns:</b> elems.
 	T *c_array()
 	{
-		return elems;
+		return data();
 	}
 
 	//! assignment with type conversion
