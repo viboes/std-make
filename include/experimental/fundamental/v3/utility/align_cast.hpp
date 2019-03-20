@@ -22,84 +22,58 @@ namespace experimental
 inline namespace fundamental_v3
 {
 template <size_t align>
-bool check_aligned(void const *u)
+// mandates align is a power of 2
+bool check_aligned_to(void const *u)
 {
 	return (reinterpret_cast<uintptr_t>(u) % align) == 0u;
 }
+template <class T>
+bool check_aligned_as(void const *u)
+{
+	return check_aligned_to<alignof(T)>(u);
+}
 
-//! This function returns its first argument, and tells the compiler that it can assume that the returned pointer
+//! This function returns its argument, and tells the compiler that it can assume that the returned pointer
 //! is at least align bytes aligned.
 //! See __builtin_assume_aligned. The major difference is that this fuction preserve the const
-template <size_t align>
-constexpr void const *assume_aligned(void const *u)
+// The function cannot be yet constexpr and check the a contract. Use `check_aligned`
+template <size_t align, class T>
+JASEL_NODISCARD JASEL_ATTR_ASSUME_ALIGNED(align) JASEL_CXX14_CONSTEXPR T *assume_aligned(T *u)
 {
 #if 1
-	return __builtin_assume_aligned(u, align);
+	discard(JASEL_ASSUME_ALIGNED(u, align));
 #else
 	JASEL_ASSUME(check_aligned<align>(u));
-	return u;
 #endif
-}
-
-template <size_t align>
-constexpr void *assume_aligned(void *u)
-{
-#if 1
-	return __builtin_assume_aligned(u, align);
-#else
-	JASEL_ASSUME(check_aligned<align>(u));
 	return u;
-#endif
-}
-
-template <size_t align, uintptr_t offset>
-constexpr void const *assume_aligned(void const *u)
-{
-
-#if 1
-	return __builtin_assume_aligned(u, align, offset);
-#else
-	discard(assume_aligned<align>(reinterpret_cast<char const *>(u) - offset));
-	return u;
-#endif
-}
-template <size_t align, uintptr_t offset>
-constexpr void *assume_aligned(void *u)
-{
-
-#if 1
-	return __builtin_assume_aligned(u, align, offset);
-#else
-	discard(assume_aligned<align>(reinterpret_cast<char *>(u) - offset));
-	return u;
-#endif
 }
 
 //! This function returns its first argument reinterpret casted to `TPtr`,
-//! and tells the compiler that it can assume that the returned pointer
-//! is at least aligned as the pointee `T` where `TPtr=T*`.
-//! See also: align_cast. The difference is that here we are impossing the behavior of the contract to assume
-//! while in align_cast we left the behavior depend on the contract configuration
-//! Use align_cast before so that you check it at runtime for a while and then move to assume_aligned_as.
-template <class TPtr, class U>
-constexpr TPtr assume_aligned_as(U *u)
-{
-	return reinterpret_cast<TPtr>(assume_aligned<alignof(remove_pointer_t<TPtr>)>(u));
-}
-
-template <class TPtr>
-constexpr bool check_aligned_as(void const *u)
-{
-	return check_aligned<alignof(remove_pointer_t<TPtr>)>(u);
-}
-//! This function returns its first argument reinterpret casted to `TPtr`,
+//! Tells the compiler that it can assume that the returned pointer is at least aligned as pointee `T`.
+// the difference with assume_aligned is that this function has a pre-condition,
+// and so depending on the configuration the check could be done
 //! Expects: the parameter `u` is at least aligned as the pointee `T` where `TPtr=T*`.
-template <class TPtr, class U>
-TPtr aligned_as_cast(U *u)
+template <class T, class U>
+T *JASEL_ATTR_ASSUME_ALIGNED(alignof(T)) aligned_as_cast(U *u)
 {
 	// The pointer must be aligned to the alignment of T
-	JASEL_EXPECTS(check_aligned_as<TPtr>(u));
-	return reinterpret_cast<TPtr>(u);
+	JASEL_EXPECTS(check_aligned_as<T>(u));
+	return reinterpret_cast<T *>(u);
+}
+template <class T, class U>
+T const *JASEL_ATTR_ASSUME_ALIGNED(alignof(T)) aligned_as_cast(U const *u)
+{
+	// The pointer must be aligned to the alignment of T
+	JASEL_EXPECTS(check_aligned_as<T>(u));
+	return reinterpret_cast<T const *>(u);
+}
+
+template <size_t align, class U>
+U *JASEL_ATTR_ASSUME_ALIGNED(align) aligned_to_cast(U *u)
+{
+	// The pointer must be aligned to the alignment of T
+	JASEL_EXPECTS(check_aligned_to<align>(u));
+	return u;
 }
 
 struct alignment_error : public exception
@@ -107,11 +81,11 @@ struct alignment_error : public exception
 };
 
 // This is to align_cast what narrow is to narrow_cast
-template <class TPtr, class U>
-TPtr aligned_as(U *u)
+template <class T, class U>
+T *JASEL_ATTR_ASSUME_ALIGNED(alignof(T)) aligned_as(U *u)
 {
-	if (check_aligned<TPtr>(u))
-		return reinterpret_cast<TPtr>(u);
+	if (check_aligned_as<T>(u))
+		return reinterpret_cast<T *>(u);
 	throw alignment_error();
 }
 

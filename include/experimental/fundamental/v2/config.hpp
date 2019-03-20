@@ -166,7 +166,11 @@
 #define JASEL_ATTR_NOINLINE BOOST_NOINLINE
 #define JASEL_UNREACHABLE_RETURN BOOST_UNREACHABLE_RETURN(result)
 
+#define JASEL_ATTR_ASSUME_ALIGNED(align) __attribute__((assume_aligned(align)))
+
 // builtins
+
+#define JASEL_ASSUME_ALIGNED(u, align) __builtin_assume_aligned(u, align)
 
 #ifdef _MSC_VER
 #define JASEL_ASSUME(cond) __assume(cond)

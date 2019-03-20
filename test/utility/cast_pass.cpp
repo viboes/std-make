@@ -131,6 +131,77 @@ int main()
 		T &tref = stdex::incomplete_cast<T &>(uref);
 		BOOST_TEST(&stdex::incomplete_cast<U &>(tref) == &uref);
 	}
+	// assume_aligned
+	{
+		int   i   = 1;
+		char *ptr = reinterpret_cast<char *>(&i);
+		ptr       = stdex::assume_aligned<alignof(int)>(ptr);
+		BOOST_TEST_EQ(*reinterpret_cast<int *>(ptr), i);
+	}
+	{
+		int const i   = 1;
+		auto      ptr = reinterpret_cast<char const *>(&i);
+		ptr           = stdex::assume_aligned<alignof(int)>(ptr);
+		BOOST_TEST_EQ(*reinterpret_cast<int const *>(ptr), i);
+	}
+
+	// aligned_as_cast
+	{
+		int  i   = 1;
+		auto ptr = reinterpret_cast<char *>(&i);
+		auto p   = stdex::aligned_as_cast<int>(ptr);
+		BOOST_TEST_EQ(*p, i);
+	}
+	{
+		int const   i   = 1;
+		char const *ptr = reinterpret_cast<char const *>(&i);
+		auto        p   = stdex::aligned_as_cast<int>(ptr);
+		BOOST_TEST_EQ(*p, i);
+	}
+	//aligned_as
+	{
+		struct X
+		{
+			short i;
+			short j;
+		};
+		union Y
+		{
+			X   x;
+			int y;
+		};
+
+		Y k;
+		k.x.i  = 1;
+		k.x.j  = 1;
+		auto p = stdex::aligned_as<int>(&k.x.i);
+		BOOST_TEST_EQ(*p, 0x00010001);
+	}
+	{
+		struct X
+		{
+			short i;
+			short j;
+		};
+		union Y
+		{
+			X   x;
+			int y;
+		};
+
+		Y k;
+		k.x.i = 1;
+		k.x.j = 1;
+		try
+		{
+			auto p = stdex::aligned_as<int>(&k.x.j);
+			stdex::maybe_unused(p);
+			BOOST_TEST(false && "should throw an exception");
+		}
+		catch (...)
+		{
+		}
+	}
 
 	return ::boost::report_errors();
 }
