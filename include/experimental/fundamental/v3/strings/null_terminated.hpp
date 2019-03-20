@@ -48,7 +48,7 @@ namespace ntxs
 template <class CharT>
 JASEL_CXX14_CONSTEXPR bool all_non_zero(const CharT *str, size_t len) noexcept
 {
-	for (int i = 0; i < len; ++i)
+	for (size_t i = 0; i < len; ++i)
 	{
 		if (CharT() == str[i])
 			return false;
