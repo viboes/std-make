@@ -11,6 +11,7 @@
 // see http://wiki.edg.com/pub/Wg21kona2019/StrawPolls/P1024r3.pdf
 // see http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2019/p1394r0.pdf
 // see http://wiki.edg.com/pub/Wg21kona2019/LibraryEvolutionWorkingGroup/P1394.pdf
+// see http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2019/p1394r1.pdf
 
 #ifndef JASEL_EXPERIMENTAL_SPAN_SPAN_HPP
 #define JASEL_EXPERIMENTAL_SPAN_SPAN_HPP
