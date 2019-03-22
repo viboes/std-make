@@ -6,11 +6,10 @@
 
 // see https://en.cppreference.com/w/cpp/container/span
 // see http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2018/p1024r1.pdf
-// see http://wiki.edg.com/pub/Wg21kona2019/StrawPolls/p1227r2.htm
+// see http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2019/p1227r2.html
 // see http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2019/p1024r2.pdf
-// see http://wiki.edg.com/pub/Wg21kona2019/StrawPolls/P1024r3.pdf
+// see http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2019/p1024r3.pdf
 // see http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2019/p1394r0.pdf
-// see http://wiki.edg.com/pub/Wg21kona2019/LibraryEvolutionWorkingGroup/P1394.pdf
 // see http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2019/p1394r1.pdf
 
 #ifndef JASEL_EXPERIMENTAL_SPAN_SPAN_HPP
@@ -45,8 +44,14 @@ using extent_t = size_t;
 //inline
 constexpr extent_t dynamic_extent = numeric_limits<size_t>::max();
 
+// span has pointer semantics
 template <class ElementType, extent_t Extent = dynamic_extent>
 class span;
+
+// span_ref has value semantics
+
+template <class ElementType, extent_t Extent = dynamic_extent>
+class span_ref;
 
 namespace details
 {
@@ -538,6 +543,8 @@ public:
 	friend constexpr iterator begin(span s) noexcept { return s.begin(); }
 	friend constexpr iterator end(span s) noexcept { return s.end(); }
 
+	JASEL_CXX14_CONSTEXPR span_ref<element_type, Extent> operator*() const;
+
 private:
 	// this implementation detail class lets us take advantage of the
 	// empty base class optimization to pay for only storage of a single
@@ -560,6 +567,267 @@ private:
 	storage_type<details::extent_type<Extent>> storage_;
 };
 // todo: add TCAD
+
+template <class ElementType, extent_t Extent>
+class span_ref {
+public:
+	// constants and types
+	typedef ElementType               element_type;
+	typedef remove_cv_t<element_type> value_type;
+	typedef ptrdiff_t                 difference_type;
+	typedef size_of_t                 size_of_type;
+	typedef size_t                    index_type;
+	typedef size_t                    size_type;
+	typedef element_type *            pointer;
+	typedef element_type &            reference;
+
+	typedef details::span_iterator<span_ref<ElementType, Extent>, false> iterator;
+	typedef details::span_iterator<span_ref<ElementType, Extent>, true>  const_iterator;
+	typedef std::reverse_iterator<iterator>                              reverse_iterator;
+	typedef std::reverse_iterator<const_iterator>                        const_reverse_iterator;
+
+	JASEL_CONSTEXPR static const extent_t extent = Extent;
+
+	// [span.cons], span constructors, copy, assignment, and destructor
+	span_ref(span_ref const &) = default;
+	span_ref(span_ref &&)      = default;
+
+	span_ref &operator=(span_ref const &other)
+	{
+		if (&other == this)
+			return *this;
+		std::copy(other.data(), other.data() + other.size(), data());
+		return *this;
+	}
+
+	span_ref &operator=(span_ref &&other)
+	{
+		if (&other == this)
+			return *this;
+		std::move(other.data(), other.data() + other.size(), data());
+		return *this;
+	}
+
+	~span_ref() = default;
+
+	template <bool Dependent = false,
+	          // "Dependent" is needed to make "std::enable_if_t<Dependent || Extent <= 0>" SFINAE,
+	          // since "std::enable_if_t<Extent <= 0>" is ill-formed when Extent is greater than 0.
+	          class = enable_if<(Dependent || Extent == 0 || Extent == dynamic_extent)>>
+	JASEL_CONSTEXPR span_ref() noexcept : storage_(nullptr, details::extent_type<0>())
+	{
+	}
+
+	// todo
+	// template <ContiguousIterator It>
+	// //requires ConvertibleTo<remove_reference_t<iter_reference_t<It>> (*)[], ElementType (*)[]>
+	// JASEL_CONSTEXPR span_ref(It ptr, size_type count) : storage_(ptr, count);
+
+	JASEL_CONSTEXPR span_ref(pointer ptr, size_type count) : storage_(ptr, count)
+	{
+	}
+
+	// todo
+	// template <ContiguousIterator It, SizedSentinel<It> End>
+	// //requires ConvertibleTo<remove_reference_t<iter_reference_t<It>> (*)[], ElementType (*)[]>
+	// JASEL_CONSTEXPR span_ref(It firstElem, End lastElem)
+
+	JASEL_CONSTEXPR span_ref(pointer firstElem, pointer lastElem)
+	        : storage_(firstElem, std::distance(firstElem, lastElem))
+	{
+	}
+
+	template <size_t N>
+	JASEL_CONSTEXPR span_ref(element_type (&arr)[N]) noexcept : storage_(&arr[0], details::extent_type<N>())
+	{
+	}
+
+	template <size_t N>
+	JASEL_CONSTEXPR span_ref(array<value_type, N> &arr) noexcept
+	        : storage_(&arr[0], details::extent_type<N>())
+	{
+	}
+
+	template <size_t N>
+	JASEL_CONSTEXPR span_ref(const array<value_type, N> &arr) noexcept
+	        : storage_(&arr[0], details::extent_type<N>())
+	{
+	}
+
+	// todo
+	// template <ranges::ContiguousRange R>
+	// requires ranges::SizedRange<R> && (forwarding - range<R> || std::is_const_v<ElementType>)
+	//      && ConvertibleTo<remove_reference_t<iter_reference_t<ranges::iterator_t<R>>> (*)[], ElementType (*)[]>
+	// constexpr span_ref(R &&r);
+
+	// NB: the SFINAE here uses .data() as a incomplete/imperfect proxy for the requirement
+	// on Container to be a contiguous sequence container.
+	template <class Container>
+	JASEL_CONSTEXPR span_ref(Container &cont,
+	                         typename enable_if<
+	                                 !details::is_span<Container>::value && !details::is_std_array<Container>::value &&
+	                                 is_convertible<typename Container::pointer, pointer>::value &&
+	                                 is_convertible<typename Container::pointer,
+	                                                decltype(declval<Container>().data())>::value>::type * = 0
+
+	                         )
+	        : storage_(cont.data(), std::experimental::ssize(cont))
+	{
+	}
+
+	template <class Container>
+	JASEL_CONSTEXPR span_ref(const Container &cont,
+	                         typename enable_if<
+	                                 is_const<element_type>::value && !details::is_span<Container>::value &&
+	                                 is_convertible<typename Container::pointer, pointer>::value &&
+	                                 is_convertible<typename Container::pointer,
+	                                                decltype(declval<Container>().data())>::value>::type * = 0)
+	        : storage_(cont.data(), std::experimental::ssize(cont))
+	{
+	}
+
+	template <
+	        class OtherElementType, extent_t OtherExtent>
+	JASEL_CONSTEXPR span_ref(const span_ref<OtherElementType, OtherExtent> &other,
+	                         typename enable_if<
+	                                 details::is_allowed_extent_conversion<OtherExtent, Extent>::value &&
+	                                 details::is_allowed_element_type_conversion<OtherElementType, element_type>::value>::type * = 0)
+	        : storage_(other.data(),
+	                   details::extent_type<OtherExtent>(other.size()))
+	{
+	}
+
+	template <
+	        class OtherElementType, extent_t OtherExtent>
+	JASEL_CONSTEXPR span_ref(const span<OtherElementType, OtherExtent> &other,
+	                         typename enable_if<
+	                                 details::is_allowed_extent_conversion<OtherExtent, Extent>::value &&
+	                                 details::is_allowed_element_type_conversion<OtherElementType, element_type>::value>::type * = 0)
+	        : storage_(other.data(),
+	                   details::extent_type<OtherExtent>(other.size()))
+	{
+	}
+
+	// [span.sub], span subviews
+	template <extent_t Count>
+	JASEL_CXX14_CONSTEXPR span_ref<element_type, Count> first() const
+	{
+		JASEL_EXPECTS(Count >= 0 && Count <= size());
+		return span_ref<element_type, Count>(data(), Count);
+	}
+
+	template <extent_t Count>
+	JASEL_CXX14_CONSTEXPR span_ref<element_type, Count> last() const
+	{
+		JASEL_EXPECTS(Count >= 0 && Count <= size());
+		return span_ref<element_type, Count>(data() + (size() - Count), Count);
+	}
+
+	template <extent_t Offset, extent_t Count>
+	JASEL_CXX14_CONSTEXPR span_ref<element_type, Count> subspan() const
+	{
+		JASEL_EXPECTS((Offset == 0 || (Offset > 0 && Offset <= size())) &&
+		              (Count == dynamic_extent || (Count >= 0 && Offset + Count <= size())));
+		return span_ref<element_type, Count>(data() + Offset, Count == dynamic_extent ? size() - Offset : Count);
+	}
+
+#if defined __clang__
+	template <extent_t Offset, bool b = false, extent_t ResExtent = Extent == dynamic_extent ? dynamic_extent : Extent - Offset>
+	JASEL_CXX14_CONSTEXPR span_ref<element_type, ResExtent> subspan() const
+	{
+		const extent_t Count = dynamic_extent;
+		JASEL_EXPECTS((Offset == 0 || (Offset > 0 && Offset <= size())) &&
+		              (Count == dynamic_extent || (Count >= 0 && Offset + Count <= size())));
+		return span_ref<element_type, ResExtent>(data() + Offset,
+		                                         Count == dynamic_extent ? size() - Offset : Count);
+	}
+#endif
+	JASEL_CXX14_CONSTEXPR span_ref<element_type, dynamic_extent> first(size_type count) const
+	{
+		JASEL_EXPECTS(count <= size());
+		return span_ref<element_type, dynamic_extent>(data(), count);
+	}
+
+	JASEL_CXX14_CONSTEXPR span_ref<element_type, dynamic_extent> last(size_type count) const
+	{
+		JASEL_EXPECTS(count <= size());
+		return span_ref<element_type, dynamic_extent>(data() + (size() - count), count);
+	}
+
+	JASEL_CXX14_CONSTEXPR span_ref<element_type, dynamic_extent> subspan(size_type offset,
+	                                                                     size_type count = dynamic_extent) const
+	{
+		JASEL_EXPECTS((offset <= size()) &&
+		              (count == dynamic_extent || (offset + count <= size())));
+		return span_ref<element_type, dynamic_extent>(data() + offset, count == dynamic_extent ? size() - offset : count);
+	}
+
+	// [span.obs], span observers
+	JASEL_CONSTEXPR size_type size() const noexcept { return storage_.size(); }
+	JASEL_CONSTEXPR size_of_type ssize() const noexcept { return storage_.ssize(); }
+	JASEL_CONSTEXPR size_type size_bytes() const noexcept { return size() * size_of<element_type>(); }
+	JASEL_NODISCARD
+	JASEL_CONSTEXPR bool empty() const noexcept { return size() == 0; }
+
+	// [span.elem], span element access
+	JASEL_CXX14_CONSTEXPR reference operator[](size_type idx) const
+	{
+		JASEL_EXPECTS(idx < storage_.size());
+		return data()[idx];
+	}
+	JASEL_CONSTEXPR reference front() const { return operator[](0); }
+	JASEL_CONSTEXPR reference back() const { return operator[](size() - 1); }
+	JASEL_CONSTEXPR pointer data() const noexcept { return storage_.data(); }
+
+	// [span.iter], span iterator support
+	iterator begin() const noexcept { return iterator(this, 0); }
+	iterator end() const noexcept { return iterator(this, size()); }
+
+	const_iterator cbegin() const noexcept { return const_iterator(this, 0); }
+	const_iterator cend() const noexcept { return const_iterator(this, size()); }
+
+	reverse_iterator rbegin() const noexcept { return reverse_iterator(end()); }
+	reverse_iterator rend() const noexcept { return reverse_iterator(begin()); }
+
+	const_reverse_iterator crbegin() const noexcept { return const_reverse_iterator(cend()); }
+	const_reverse_iterator crend() const noexcept { return const_reverse_iterator(cbegin()); }
+
+	friend constexpr iterator begin(span_ref s) noexcept { return s.begin(); }
+	friend constexpr iterator end(span_ref s) noexcept { return s.end(); }
+
+private:
+	// this implementation detail class lets us take advantage of the
+	// empty base class optimization to pay for only storage of a single
+	// pointer in the case of fixed-size spans
+	template <class ExtentType>
+	class storage_type : public ExtentType {
+	public:
+		template <class OtherExtentType>
+		JASEL_CXX14_CONSTEXPR storage_type(pointer data, OtherExtentType ext) : ExtentType(ext), data_(data)
+		{
+			//JASEL_EXPECTS((!data && ExtentType::ssize() == 0) || (data && ExtentType::ssize() > 0));
+		}
+
+		JASEL_CONSTEXPR inline pointer data() const noexcept { return data_; }
+
+	private:
+		pointer data_;
+	};
+
+	storage_type<details::extent_type<Extent>> storage_;
+};
+
+template <class ElementType, extent_t Extent>
+JASEL_CXX14_CONSTEXPR span_ref<ElementType, Extent> span<ElementType, Extent>::operator*() const
+{
+	return span_ref<ElementType, Extent>(*this);
+}
+
+template <class ElementType, extent_t Extent>
+JASEL_CXX14_CONSTEXPR span_ref<ElementType, Extent> make_ref(span<ElementType, Extent> that)
+{
+	return span_ref<ElementType, Extent>(that);
+}
 
 } // namespace fundamental_v3
 } // namespace experimental

@@ -14,6 +14,37 @@
 #if __cplusplus >= 201103L
 namespace stdex = std::experimental;
 
+void f0(stdex::span<const int, 10> sp)
+{
+}
+
+template <class T, std::size_t N>
+void f2(stdex::span<T const, N> sp)
+{
+}
+
+// While  f1 can not write on the pointee we can not constraint it enough
+// so that template class deduction is  possible
+// this is why we need to use SFINAE and forward the call to a function that
+// is constrained appropriately but that cannot be deduce the parameter conveniently.
+// This idiom is needed if we want to be strict.
+// The STL is not strict to this regard and e.g. the iterator passed to the algorithm
+// std::copy are not constrained at the signature level, but at the concept level
+// template <class InputIt, class OutputIt>
+// OutputIt copy(InputIt first, InputIt last, OutputIt d_first);
+// As concepts are not checked by the definition, we cannot be sure that
+// the implementation is not using the parameters incorrectly.
+// Having the parameter qualified by const protects both the caller as well the callee,
+// as this can be checked by the compiler.
+
+template <class T, std::size_t N>
+auto f1(stdex::span<T, N> sp) -> decltype(f2(stdex::span<T const, N>(sp)))
+{
+	//once deduced, a stdex::span<T, N> is convertible to a stdex::span<T const, N>
+	stdex::span<T const, N> sp2 = sp;
+	f2(sp2);
+}
+
 int main()
 {
 	{
@@ -190,6 +221,93 @@ int main()
 		for (auto i : sp)
 			BOOST_TEST(i == 0);
 	}
+	{
+		int                      arr[10]  = {};
+		int                      arr2[10] = {};
+		stdex::span_ref<int, 10> sp2(arr2);
+		stdex::span_ref<int, 10> sp(arr);
+		arr2[0] = 1;
+		sp      = sp2;
+		arr2[0] = 2;
+		BOOST_TEST(sp[0] == 1);
+	}
+	{
+		int                      arr[10] = {};
+		stdex::span<int, 10>     sp(arr);
+		int                      arr2[10] = {};
+		stdex::span_ref<int, 10> spr2(arr2);
+		stdex::span_ref<int, 10> spr(sp);
+		arr2[0] = 1;
+		spr     = spr2;
+		arr2[0] = 2;
+		BOOST_TEST(spr[0] == 1);
+	}
+	{
+		int                  arr[10]  = {};
+		int                  arr2[10] = {};
+		stdex::span_ref<int> sp2(arr2);
+		stdex::span_ref<int> sp(arr);
+		arr2[0] = 1;
+		sp      = sp2;
+		arr2[0] = 2;
+		BOOST_TEST(sp[0] == 1);
+	}
+	{
+		int                  arr[10]  = {};
+		int                  arr2[10] = {};
+		stdex::span<int, 10> sp2(arr2);
+		stdex::span<int, 10> sp(arr);
+		arr2[0] = 1;
+		sp      = sp2;
+		arr2[0] = 2;
+		BOOST_TEST(sp[0] == 2);
+	}
+	{
+		int                  arr[10]  = {};
+		int                  arr2[10] = {};
+		stdex::span<int, 10> sp2(arr2);
+		stdex::span<int, 10> sp(arr);
+		arr2[0] = 1;
+		*sp     = sp2;
+		arr2[0] = 2;
+		BOOST_TEST(sp[0] == 1);
+	}
+	{
+		int                  arr[10] = {};
+		stdex::span<int, 10> sp(arr);
+		f0(sp);
+	}
+	{
+		int const                  arr[10] = {};
+		stdex::span<int const, 10> sp(arr);
+		f0(sp);
+	}
+	{
+		int                  arr[10] = {};
+		stdex::span<int, 10> sp(arr);
+		f1(sp);
+	}
+	{
+		int const                  arr[10] = {};
+		stdex::span<int const, 10> sp(arr);
+		f1(sp);
+	}
+	{
+		int                  arr[10] = {};
+		stdex::span<int, 10> sp(arr);
+		f2<const int, 10>(sp); // note the explicit template arguments <const int, 10> that can not be deduced
+	}
+	{
+		int                  arr[10] = {};
+		stdex::span<int, 10> sp(arr);
+		f2(stdex::span<int const, 10>(sp)); // note the explicit unfriendly cast
+	}
+	{
+		int const                  arr[10] = {};
+		stdex::span<int const, 10> sp(arr);
+		f2(sp);
+	}
+
 	return ::boost::report_errors();
 }
 
