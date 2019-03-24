@@ -37,9 +37,6 @@ inline namespace fundamental_v3
 template <class T>
 class observer_ptr {
 public:
-	template <class U>
-	friend class observer_ptr;
-
 	using element_type = T;
 
 	constexpr observer_ptr() noexcept
@@ -54,7 +51,7 @@ public:
 
 	template <class W, JASEL_T_REQUIRES(is_convertible<W *, T *>::value)>
 	observer_ptr(observer_ptr<W> other) noexcept
-	        : ptr(other.ptr)
+	        : ptr(other.get())
 	{
 	}
 
@@ -81,6 +78,7 @@ public:
 	constexpr explicit operator element_type *() const noexcept { return ptr; }
 
 	constexpr explicit operator bool() const noexcept { return ptr != nullptr; }
+	constexpr bool     operator!() const noexcept { return ptr == nullptr; }
 
 	JASEL_CXX14_CONSTEXPR element_type *detach() noexcept
 	{
@@ -88,10 +86,10 @@ public:
 		reset();
 		return res;
 	}
-	JASEL_CXX14_CONSTEXPR element_type *release() noexcept
-	{
-		return detach();
-	}
+	// JASEL_CXX14_CONSTEXPR element_type *release() noexcept
+	// {
+	// 	return detach();
+	// }
 
 	JASEL_CXX14_CONSTEXPR void reset(element_type *p = nullptr) noexcept
 	{
@@ -123,13 +121,13 @@ constexpr observer_ptr<W> make_observer(W *p) noexcept
 }
 
 // comparison
-template <class W1, class W2>
+template <class W1, class W2, JASEL_T_REQUIRES(is_convertible<W1 *, W2 *>::value || is_convertible<W2 *, W1 *>::value)>
 constexpr bool operator==(observer_ptr<W1> p1, observer_ptr<W2> p2) noexcept
 {
 	return p1.get() == p2.get();
 }
 
-template <class W1, class W2>
+template <class W1, class W2, JASEL_T_REQUIRES(is_convertible<W1 *, W2 *>::value || is_convertible<W2 *, W1 *>::value)>
 constexpr bool operator!=(observer_ptr<W1> p1, observer_ptr<W2> p2) noexcept
 {
 	return !(p1 == p2);
@@ -159,25 +157,25 @@ constexpr bool operator!=(std::nullptr_t, observer_ptr<W> p) noexcept
 	return static_cast<bool>(p);
 }
 
-template <class W1, class W2>
+template <class W1, class W2, JASEL_T_REQUIRES(is_convertible<W1 *, W2 *>::value || is_convertible<W2 *, W1 *>::value)>
 constexpr bool operator<(observer_ptr<W1> p1, observer_ptr<W2> p2) noexcept
 {
 	return std::less<typename std::common_type<W1 *, W2 *>::type>()(p1.get(), p2.get());
 }
 
-template <class W1, class W2>
+template <class W1, class W2, JASEL_T_REQUIRES(is_convertible<W1 *, W2 *>::value || is_convertible<W2 *, W1 *>::value)>
 constexpr bool operator>(observer_ptr<W1> p1, observer_ptr<W2> p2) noexcept
 {
 	return p2 < p1;
 }
 
-template <class W1, class W2>
+template <class W1, class W2, JASEL_T_REQUIRES(is_convertible<W1 *, W2 *>::value || is_convertible<W2 *, W1 *>::value)>
 constexpr bool operator<=(observer_ptr<W1> p1, observer_ptr<W2> p2) noexcept
 {
 	return !(p2 < p1);
 }
 
-template <class W1, class W2>
+template <class W1, class W2, JASEL_T_REQUIRES(is_convertible<W1 *, W2 *>::value || is_convertible<W2 *, W1 *>::value)>
 constexpr bool operator>=(observer_ptr<W1> p1, observer_ptr<W2> p2) noexcept
 {
 	return !(p1 < p2);
