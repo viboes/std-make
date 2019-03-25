@@ -14,6 +14,7 @@
  \brief
  The header \c <experimental/.../bits/bit_pointer.hpp> defines a bit pointer to a bit located inside a word.
  Most of them are based on "Wording for fundamental bit manipulation utilities" http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2017/p0237r8.pdf
+
  */
 
 #ifndef JASEL_FUNDAMENTAL_V3_BITS_BIT_POINTER_HPP
@@ -185,7 +186,7 @@ private:
 
 public:
 	// Non-member arithmetic operators
-#ifdef __clang__
+#if defined __clang__ && __clang_major__ < 8
 	template <class T>
 	friend constexpr bit_pointer<T> operator+(
 	        typename bit_pointer<T>::difference_type n,
@@ -199,7 +200,7 @@ public:
 		return x + n;
 	}
 
-#ifdef __clang__
+#if defined __clang__ && __clang_major__ < 8
 	template <class T, class U>
 	friend JASEL_CXX14_CONSTEXPR typename common_type<
 	        typename bit_pointer<T>::difference_type,
@@ -233,7 +234,7 @@ public:
 #endif
 
 	// Comparison operators
-#ifdef __clang__
+#if defined __clang__ && __clang_major__ < 8
 	template <class T, class U>
 	friend constexpr bool operator==(
 	        bit_pointer<T> lhs,
@@ -247,7 +248,7 @@ public:
 		return lhs._ref.address() == rhs._ref.address() && lhs._ref.position() == rhs._ref.position();
 	}
 
-#ifdef __clang__
+#if defined __clang__ && __clang_major__ < 8
 	template <class T, class U>
 	friend constexpr bool operator!=(
 	        bit_pointer<T> lhs,
@@ -261,7 +262,7 @@ public:
 		return lhs._ref.address() != rhs._ref.address() || lhs._ref.position() != rhs._ref.position();
 	}
 
-#ifdef __clang__
+#if defined __clang__ && __clang_major__ < 8
 	template <class T, class U>
 	friend constexpr bool operator<(
 	        bit_pointer<T> lhs,
@@ -275,7 +276,7 @@ public:
 		return lhs._ref.address() < rhs._ref.address() || (lhs._ref.address() == rhs._ref.address() && lhs._ref.position() < rhs._ref.position());
 	}
 
-#ifdef __clang__
+#if defined __clang__ && __clang_major__ < 8
 	template <class T, class U>
 	friend constexpr bool operator<=(
 	        bit_pointer<T> lhs,
@@ -289,7 +290,7 @@ public:
 		return lhs._ref.address() < rhs._ref.address() || (lhs._ref.address() == rhs._ref.address() && lhs._ref.position() <= rhs._ref.position());
 	}
 
-#ifdef __clang__
+#if defined __clang__ && __clang_major__ < 8
 	template <class T, class U>
 	friend constexpr bool operator>(
 	        bit_pointer<T> lhs,
@@ -304,7 +305,7 @@ public:
 		return lhs._ref.address() > rhs._ref.address() || (lhs._ref.address() == rhs._ref.address() && lhs._ref.position() > rhs._ref.position());
 	}
 
-#ifdef __clang__
+#if defined __clang__ && __clang_major__ < 8
 	template <class T, class U>
 	friend constexpr bool operator>=(
 	        bit_pointer<T> lhs,
