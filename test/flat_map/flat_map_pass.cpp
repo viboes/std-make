@@ -10,7 +10,6 @@
 
 #include <boost/detail/lightweight_test.hpp>
 
-#if __cplusplus >= 201402L
 namespace stdex = std::experimental;
 
 int main()
@@ -32,6 +31,57 @@ int main()
 		BOOST_TEST_EQ(fm.size(), 3);
 		std::vector<int> keys2   = {1, 2, 3};
 		std::vector<int> values2 = {1, 2, 3};
+		BOOST_TEST(fm.keys() == keys2);
+		BOOST_TEST(fm.values() == values2);
+	}
+	{
+		std::vector<int>          keys   = {1, 2, 3};
+		std::vector<int>          values = {2, 4, 6};
+		stdex::flat_map<int, int> fm(stdex::sorted_unique_t{}, std::move(keys), std::move(values));
+		BOOST_TEST(!fm.empty());
+		BOOST_TEST_EQ(fm.size(), 3);
+		auto it  = fm.begin();
+		auto it2 = ++it;
+		BOOST_TEST((*it2).first == 2);
+		BOOST_TEST((*it2).second == 4);
+	}
+	{
+		std::vector<int>          keys   = {1, 3, 2};
+		std::vector<int>          values = {1, 2, 3};
+		stdex::flat_map<int, int> fm(std::move(keys), std::move(values));
+		BOOST_TEST(!fm.empty());
+		BOOST_TEST_EQ(fm.size(), 3);
+		auto it  = fm.begin();
+		auto it2 = ++it;
+		BOOST_TEST(it2->first == 2);
+		BOOST_TEST(it2->second == 3);
+
+		auto cit = fm.cbegin();
+		BOOST_TEST(cit->first == 1);
+		BOOST_TEST(cit->second == 1);
+
+		//it2->first  = 2; // compile fail as expected
+		it2->second = 2;
+	}
+	{
+		std::vector<int>          keys   = {1, 3, 2};
+		std::vector<int>          values = {1, 2, 3};
+		stdex::flat_map<int, int> fm(std::move(keys), std::move(values));
+		{
+			stdex::flat_map<int, int> const &cfm = fm;
+			auto                             cit = cfm.begin();
+			BOOST_TEST(cit->first == 1);
+			BOOST_TEST(cit->second == 1);
+		}
+	}
+	{
+		std::vector<int>          keys   = {1, 3, 2};
+		std::vector<int>          values = {1, 2, 3};
+		stdex::flat_map<int, int> fm(std::move(keys), std::move(values));
+		BOOST_TEST(!fm.empty());
+		BOOST_TEST_EQ(fm.size(), 3);
+		std::vector<int> keys2   = {1, 2, 3};
+		std::vector<int> values2 = {1, 3, 2};
 		BOOST_TEST(fm.keys() == keys2);
 		BOOST_TEST(fm.values() == values2);
 	}
@@ -337,10 +387,3 @@ int main()
 
 	return ::boost::report_errors();
 }
-
-//#else
-//int main()
-//{
-//    return ::boost::report_errors();
-//}
-//#endif
