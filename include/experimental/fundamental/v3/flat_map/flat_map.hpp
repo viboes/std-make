@@ -827,6 +827,8 @@ namespace experimental
 {
 inline namespace fundamental_v3
 {
+
+//Move to utility/arrow_proxy.hpp
 template <class Reference>
 struct arrow_proxy
 {
@@ -855,6 +857,100 @@ inline constexpr sorted_equivalent_t sorted_equivalent{};
 
 template <class Key, class T, class Compare = less<Key>, class KeyContainer = vector<Key>,
           class MappedContainer = vector<T>>
+class flat_map;
+
+template <class KeyConstIterator, class MappedIterator>
+class flat_map_iterator {
+public:
+	using key_const_iterator_type = KeyConstIterator;
+	using mapped_iterator_type    = MappedIterator;
+
+	using key_type                 = typename key_const_iterator_type::value_type;
+	using mapped_type              = typename mapped_iterator_type::value_type;
+	using key_const_reference_type = typename key_const_iterator_type::reference;
+	using mapped_reference_type    = typename mapped_iterator_type::reference;
+
+	using iterator_category = random_access_iterator_tag;
+	using value_type        = pair<const key_type, mapped_type>;
+	using difference_type   = ptrdiff_t;
+	using reference         = pair<key_const_reference_type, mapped_reference_type>;
+	using pointer           = arrow_proxy<reference>;
+
+	flat_map_iterator(key_const_iterator_type key_it, mapped_iterator_type value_it)
+	        : key_it(key_it),
+	          value_it(value_it)
+	{
+	}
+
+	flat_map_iterator &operator++()
+	{
+		++key_it;
+		++value_it;
+		return *this;
+	}
+	flat_map_iterator operator++(int)
+	{
+		flat_map_iterator retval = *this;
+		++(*this);
+		return retval;
+	}
+	flat_map_iterator &operator--()
+	{
+		--key_it;
+		--value_it;
+		return *this;
+	}
+	flat_map_iterator operator--(int)
+	{
+		flat_map_iterator retval = *this;
+		++(*this);
+		return retval;
+	}
+	flat_map_iterator operator+(difference_type n)
+	{
+		return {key_it + n, value_it + n};
+	}
+	friend flat_map_iterator operator+(difference_type n, flat_map_iterator it)
+	{
+		return it + n;
+	}
+	flat_map_iterator operator-(difference_type n)
+	{
+		return {key_it - n, value_it - n};
+	}
+	friend difference_type operator-(flat_map_iterator const &x, flat_map_iterator const &y)
+	{
+		return x.key_it - y.key_it;
+	}
+	reference operator*() const
+	{
+		return {*key_it, *value_it};
+	}
+	pointer operator->() const
+	{
+		return {reference{*key_it, *value_it}};
+	}
+	friend bool operator==(flat_map_iterator const &x, flat_map_iterator const &y)
+	{
+		return x.key_it == y.key_it;
+	}
+	friend bool operator!=(flat_map_iterator const &x, flat_map_iterator const &y)
+	{
+		return !(x == y);
+	}
+	friend bool operator<(flat_map_iterator const &x, flat_map_iterator const &y)
+	{
+		return x.key_it < y.key_it;
+	}
+
+private:
+	template <class Key, class T, class Compare, class KeyContainer, class MappedContainer>
+	friend class flat_map;
+	key_const_iterator_type key_it;
+	mapped_iterator_type    value_it;
+};
+
+template <class Key, class T, class Compare, class KeyContainer, class MappedContainer>
 class flat_map {
 public:
 	// types:
@@ -897,158 +993,9 @@ public:
 			return comp(x.first, y.first);
 		}
 	};
-	class iterator : public ::std::iterator<random_access_iterator_tag,
-	                                        value_type,
-	                                        difference_type, pointer, reference> {
-	public:
-		iterator(key_const_iterator_type key_it, mapped_iterator_type value_it)
-		        : key_it(key_it), value_it(value_it)
-		{
-		}
 
-		iterator &operator++()
-		{
-			++key_it;
-			++value_it;
-			return *this;
-		}
-		iterator operator++(int)
-		{
-			iterator retval = *this;
-			++(*this);
-			return retval;
-		}
-		iterator &operator--()
-		{
-			--key_it;
-			--value_it;
-			return *this;
-		}
-		iterator operator--(int)
-		{
-			iterator retval = *this;
-			++(*this);
-			return retval;
-		}
-		iterator operator+(difference_type n)
-		{
-			return {key_it + n, value_it + n};
-		}
-		friend iterator operator+(difference_type n, iterator it)
-		{
-			return it + n;
-		}
-		iterator operator-(difference_type n)
-		{
-			return {key_it - n, value_it - n};
-		}
-		friend difference_type operator-(iterator const &x, iterator const &y)
-		{
-			return x.key_it - y.key_it;
-		}
-		reference operator*()
-		{
-			return {*key_it, *value_it};
-		}
-		const_reference operator*() const
-		{
-			return {*key_it, *value_it};
-		}
-		pointer operator->()
-		{
-			return {reference{*key_it, *value_it}};
-		}
-		const_pointer operator->() const
-		{
-			return {const_reference{*key_it, *value_it}};
-		}
-		friend bool operator==(iterator const &x, iterator const &y)
-		{
-			return x.key_it == y.key_it;
-		}
-		friend bool operator!=(iterator const &x, iterator const &y)
-		{
-			return !(x == y);
-		}
-		friend bool operator<(iterator const &x, iterator const &y)
-		{
-			return x.key_it < y.key_it;
-		}
-
-	private:
-		friend class flat_map;
-		key_const_iterator_type key_it;
-		mapped_iterator_type    value_it;
-	};
-	class const_iterator : public ::std::iterator<random_access_iterator_tag,
-	                                              value_type,
-	                                              difference_type, const_pointer, const_reference> {
-	public:
-		const_iterator(key_const_iterator_type key_it, mapped_const_iterator_type value_it)
-		        : key_it(key_it), value_it(value_it) {}
-		const_iterator &operator++()
-		{
-			++key_it;
-			++value_it;
-			return *this;
-		}
-		const_iterator operator++(int)
-		{
-			iterator retval = *this;
-			++(*this);
-			return retval;
-		}
-		const_iterator &operator--()
-		{
-			--key_it;
-			--value_it;
-			return *this;
-		}
-		const_iterator operator--(int)
-		{
-			const_iterator retval = *this;
-			++(*this);
-			return retval;
-		}
-		const_iterator operator+(difference_type n)
-		{
-			return {key_it + n, value_it + n};
-		}
-		friend const_iterator operator+(difference_type n, const_iterator it)
-		{
-			return it + n;
-		}
-		friend difference_type operator-(const_iterator const &x, const_iterator const &y)
-		{
-			return x.key_it - y.key_it;
-		}
-		const_reference operator*() const
-		{
-			return {*key_it, *value_it};
-		}
-		const_pointer operator->() const
-		{
-			return {const_reference{*key_it, *value_it}};
-		}
-
-		friend bool operator==(const_iterator const &x, const_iterator const &y)
-		{
-			return x.key_it == y.key_it;
-		}
-		friend bool operator!=(const_iterator const &x, const_iterator const &y)
-		{
-			return !(x == y);
-		}
-		friend bool operator<(const_iterator const &x, const_iterator const &y)
-		{
-			return x.key_it < y.key_it;
-		}
-
-	private:
-		friend class flat_map;
-		key_const_iterator_type    key_it;
-		mapped_const_iterator_type value_it;
-	};
+	using iterator               = flat_map_iterator<key_const_iterator_type, mapped_iterator_type>;
+	using const_iterator         = flat_map_iterator<key_const_iterator_type, mapped_const_iterator_type>;
 	using reverse_iterator       = std::reverse_iterator<iterator>;
 	using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 
@@ -1057,6 +1004,7 @@ public:
 		key_container_type    keys;
 		mapped_container_type values;
 	};
+
 	// 26.6.8.2, construct/copy/destroy
 	flat_map() {}
 	explicit flat_map(const key_compare &comp)

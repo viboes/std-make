@@ -60,7 +60,7 @@ int main()
 		BOOST_TEST(cit->first == 1);
 		BOOST_TEST(cit->second == 1);
 
-		//it2->first  = 2; // compile fail as expected
+		//it2->first  = 2; // compile fails as expected
 		it2->second = 2;
 	}
 	{
