@@ -872,7 +872,7 @@ public:
 
 	using iterator_category = random_access_iterator_tag;
 	using value_type        = pair<const key_type, mapped_type>;
-	using difference_type   = ptrdiff_t;
+	using difference_type   = typename key_const_iterator_type::difference_type;
 	using reference         = pair<key_const_reference_type, mapped_reference_type>;
 	using pointer           = arrow_proxy<reference>;
 
@@ -906,21 +906,37 @@ public:
 		++(*this);
 		return retval;
 	}
-	flat_map_iterator operator+(difference_type n)
+	flat_map_iterator &operator+=(difference_type n)
 	{
-		return {key_it + n, value_it + n};
+		key_it += n;
+		value_it += n;
+		return *this;
 	}
-	friend flat_map_iterator operator+(difference_type n, flat_map_iterator it)
+	flat_map_iterator &operator-=(difference_type n)
 	{
-		return it + n;
+		key_it -= n;
+		value_it -= n;
+		return *this;
 	}
-	flat_map_iterator operator-(difference_type n)
+	friend flat_map_iterator operator+(flat_map_iterator const &x, difference_type n)
 	{
-		return {key_it - n, value_it - n};
+		return {x.key_it + n, x.value_it + n};
+	}
+	friend flat_map_iterator operator+(difference_type n, flat_map_iterator x)
+	{
+		return x + n;
+	}
+	friend flat_map_iterator operator-(flat_map_iterator const &x, difference_type n)
+	{
+		return {x.key_it - n, x.value_it - n};
 	}
 	friend difference_type operator-(flat_map_iterator const &x, flat_map_iterator const &y)
 	{
 		return x.key_it - y.key_it;
+	}
+	reference operator[](difference_type n) const
+	{
+		return *(*this + n);
 	}
 	reference operator*() const
 	{

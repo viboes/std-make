@@ -121,6 +121,27 @@ int main()
 		BOOST_TEST_EQ(r, 2);
 	}
 	{
+		std::vector<std::pair<int, short>> cont = {std::make_pair(1, short(2)), std::make_pair(2, short(4)), std::make_pair(3, short(6))};
+		stdex::flat_map<int, short>        fm(stdex::sorted_unique_t{}, std::move(cont));
+		auto                               bit = fm.begin();
+	 	auto 							   r1   = bit[1];
+	 	BOOST_TEST_EQ(r1.first, 2);
+	 	BOOST_TEST_EQ(r1.second, 4);
+	 	auto 							   r2   = *(bit+2);
+	 	BOOST_TEST_EQ(r2.first, 3);
+	 	BOOST_TEST_EQ(r2.second, 6);
+		bit += 1;
+	 	BOOST_TEST_EQ((*bit).first, 2);
+	 	BOOST_TEST_EQ(bit->second, 4);
+		bit -= 1;
+	 	BOOST_TEST_EQ((*bit).first, 1);
+	 	BOOST_TEST_EQ(bit->second, 2);
+		bit   = bit + 2 ;
+		bit   = bit - 1 ;
+	 	BOOST_TEST_EQ((*bit).first, 2);
+	 	BOOST_TEST_EQ(bit->second, 4); 
+	}
+	{
 		std::vector<std::pair<int, short>> cont = {std::make_pair(1, short(2))};
 		stdex::flat_map<int, short>        fm(stdex::sorted_unique_t{}, std::move(cont));
 		int                                i = 1;
