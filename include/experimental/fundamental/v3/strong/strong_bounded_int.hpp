@@ -58,7 +58,7 @@ inline namespace fundamental_v3
   */
   // todo rename to strong_bounded_integer
   // todo make use of domain instead of tags
-  //    Should this type be just a representation for an quantity?
+  //    Should this type be just a representation for a quantity?
   //    and use it in quantity<Domain, bounded_integer<>>
 
   template <class Tag, class UT, UT Low, UT High>
@@ -91,7 +91,7 @@ inline namespace fundamental_v3
 
       enum bounds : UT { low=Low, high=High };
 
-            // copy constructor/assignment default
+      // copy constructor/assignment default
       constexpr strong_bounded_int() noexcept = default;
 
       static constexpr bool valid(UT x) noexcept
