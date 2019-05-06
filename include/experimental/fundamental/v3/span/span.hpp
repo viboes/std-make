@@ -543,6 +543,7 @@ public:
 	friend constexpr iterator begin(span s) noexcept { return s.begin(); }
 	friend constexpr iterator end(span s) noexcept { return s.end(); }
 
+	// Given that a span has pointer semantics this obtains a span reference with value semantics
 	JASEL_CXX14_CONSTEXPR span_ref<element_type, Extent> operator*() const;
 
 private:
