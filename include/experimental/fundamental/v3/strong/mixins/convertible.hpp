@@ -2,7 +2,7 @@
 // accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 //
-// Copyright (C) 2017 Vicente J. Botet Escriba
+// Copyright (C) 2017,2019 Vicente J. Botet Escriba
 
 #ifndef JASEL_FUNDAMENTAL_V3_STRONG_MIXIN_CONVERTIBLE_HPP
 #define JASEL_FUNDAMENTAL_V3_STRONG_MIXIN_CONVERTIBLE_HPP
@@ -70,8 +70,27 @@ namespace std
       template <class Final>
       using type = mixin::explicit_convertible_to<Final, T>;
     };
+    template <class T>
+    struct explicit_convertible_to_ref
+    {
+      template <class Final>
+      using type = mixin::explicit_convertible_to_ref<Final, T>;
+    };
+    template <class T>
+    struct implicit_convertible_to
+    {
+      template <class Final>
+      using type = mixin::implicit_convertible_to<Final, T>;
+    };
+    template <class T>
+    struct implicit_convertible_to_ref
+    {
+      template <class Final>
+      using type = mixin::implicit_convertible_to_ref<Final, T>;
+    };
     }
   }
+ 
 }
 }
 
