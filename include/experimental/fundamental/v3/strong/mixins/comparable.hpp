@@ -44,6 +44,32 @@ namespace std
         //!
         //! Forwards to the underlying value
         friend constexpr bool operator<(Final const& x, Other const& y) noexcept
+        { return x.underlying() < y;}
+        friend constexpr bool operator<(Other const& x, Final const& y) noexcept
+        { return x < y.underlying();}
+        friend constexpr bool operator>(Final const& x, Other const& y) noexcept
+        { return x.underlying() > y;}
+        friend constexpr bool operator>(Other const& x, Final const& y) noexcept
+        { return x > y.underlying();}
+        friend constexpr bool operator<=(Final const& x, Other const& y) noexcept
+        { return x.underlying() <= y;}
+        friend constexpr bool operator<=(Other const& x, Final const& y) noexcept
+        { return x <= y.underlying();}
+        friend constexpr bool operator>=(Final const& x, Other const& y) noexcept
+        { return x.underlying() >= y;}
+        friend constexpr bool operator>=(Other const& x, Final const& y) noexcept
+        { return x >= y.underlying();}
+        //!@}
+      };
+      template <class Final, class Other>
+      struct comparable_with2 : comparable<Final>, equality_comparable_with<Final, Other>
+      {
+        static_assert(is_same<Final, Other>::value==false, "Final and Other must be different");
+        //!@{
+        //! relational operators
+        //!
+        //! Forwards to the underlying value
+        friend constexpr bool operator<(Final const& x, Other const& y) noexcept
         { return x.underlying() < y.underlying();}
         friend constexpr bool operator<(Other const& x, Final const& y) noexcept
         { return x.underlying() < y.underlying();}
@@ -60,7 +86,7 @@ namespace std
         friend constexpr bool operator>=(Other const& x, Final const& y) noexcept
         { return x.underlying() >= y.underlying();}
         //!@}
-      };
+      };      
       template <class Final, template <class, class> class Pred=is_compatible_with>
       struct comparable_with_if
           : equality_comparable_with_if<Final, Pred>
@@ -92,6 +118,12 @@ namespace std
       {
         template <class Final>
         using type = mixin::comparable<Final>;
+      };
+      template <class Other>
+      struct comparable_with
+      {
+        template <class Final>
+        using type = mixin::comparable_with<Final, Other>;
       };
       template <template <class, class> class Pred=mixin::is_compatible_with>
       struct comparable_with_if
