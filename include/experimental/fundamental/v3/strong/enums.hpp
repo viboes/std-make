@@ -2,13 +2,13 @@
 // accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 //
-// Copyright (C) 2017 Vicente J. Botet Escriba
+// Copyright (C) 2017-2019 Vicente J. Botet Escriba
 
 #ifndef JASEL_FUNDAMENTAL_V3_STRONG_STRONG_ENUMS_HPP
 #define JASEL_FUNDAMENTAL_V3_STRONG_STRONG_ENUMS_HPP
 
 #include <experimental/fundamental/v3/strong/strong_type.hpp>
-#include <experimental/fundamental/v3/strong/mixins/comparable.hpp>
+#include <experimental/fundamental/v3/strong/mixins/equality_comparable.hpp>
 #include <experimental/fundamental/v3/strong/mixins/hashable.hpp>
 #include <experimental/fundamental/v3/strong/mixins/streamable.hpp>
 #include <experimental/optional.hpp>
@@ -83,7 +83,7 @@ inline namespace fundamental_v3
   template <class Final, class E, class UT=underlying_type_t<E>>
   struct enum_wrapper
       : strong_type<Final, UT>, mixins<Final
-            , meta_mixin::comparable<>
+            , meta_mixin::equality_comparable_with<E>
             , meta_mixin::hashable<>
             , meta_mixin::streamable<>
       >
@@ -102,7 +102,6 @@ inline namespace fundamental_v3
       // If we had an additional tag the conversion should be explicit, as several classes enum_wrapper classes could wrap the same enum.
       operator enum_type() const noexcept { return enum_type(this->_value); }
 
-      // Shouldn't we provide a UT conversion as enums do?
   };
 
   //! strong_enum ensures that static_cast is not allowed between two strong_enums
@@ -118,6 +117,9 @@ inline namespace fundamental_v3
   template <class E, class UT=underlying_type_t<E>>
   struct strong_enum final : enum_wrapper<strong_enum<E, UT>, E, UT>
   {
+      // strong_enum can build invalid instances if the default value of the UT is not a valid value.
+      // the question is, should the class invariant be valid for uninitialized instances.
+      // This has relation of applicability of invariant of moved objects.      
       using base_type = enum_wrapper<strong_enum<E, UT>, E, UT>;
       using base_type::base_type;
 
@@ -131,7 +133,7 @@ inline namespace fundamental_v3
       using base_type::base_type;
       using underlying_type = typename base_type::underlying_type;
 
-      // safe_enum is not safe if the default value 0 is not one of the enumerators
+      // safe_enum is not safe if the default value of the UT is not one of the enumerators
       // the question is, should the class invariant be valid for uninitialized instances.
       // This has relation of applicability of invariant of moved objects.
       constexpr safe_enum() noexcept = default;
@@ -148,7 +150,7 @@ inline namespace fundamental_v3
       using base_type::base_type;
       using underlying_type = typename  base_type::underlying_type;
 
-      // ordinal_enum is not ordinal if the default value 0 is not one of the enumerators
+      // ordinal_enum is not ordinal if the default value of the UT is not one of the enumerators
       // the question is, should the class invariant be valid for uninitialized instances.
       // This has relation of applicability of invariant of moved objects.
       constexpr ordinal_enum() noexcept = default;

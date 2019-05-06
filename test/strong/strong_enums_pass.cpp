@@ -27,6 +27,7 @@ namespace std
 {
 namespace experimental
 {
+    // todo: Better to use overloading instea dof specialization.
 template <>
 bool is_enumerator<E>(int x) {
     switch (x) {
@@ -126,6 +127,7 @@ int main()
       ES es;
       static_cast<void>(es);
   }
+  // zero initialization
   {
       ES es = ES();
       E e = es.to_enum();
@@ -152,6 +154,7 @@ int main()
       E e = es.to_enum();
       BOOST_TEST(e==E(0));
   }
+  // zero initialization
   {
       ES es= ES();
       f(ES{});
@@ -172,6 +175,7 @@ int main()
       ES es = E1;
       f(E1);
       BOOST_TEST(es.to_enum()==E1);
+      BOOST_TEST(es==E1);
   }
   // assignment from  Enum
   {
